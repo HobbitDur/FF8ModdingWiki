@@ -17,8 +17,7 @@ Each section contains code that is executed at different times during the battle
 The order of execution when a monster is attacked is: **pre-counter** -> **death** (if killed) -> **counter**.  
 Note: **pre-counter** code will **ONLY** be executed after an attack that kills a monster if the monster's **death** section has code in it (apart from "return").  
 Note: if the **death** section is empty, it will function like a **_die_** opcode.  
-Note: if the **death** section is empty, it is mandatory for it to eventually execute a **_die_** opcode, otherwise the monster will continue fighting, even on 0 HP, making the battle unwinnable for the player and forcing them to run.  
-If running is not an option, this results in a soft lock.  
+Note: if the **death** section is *NOT* empty, it is mandatory for it to eventually execute a **_die_** opcode, otherwise the monster will continue fighting, even on 0 HP, making the battle unwinnable for the player and forcing them to run. If running is not an option, this results in a soft lock.  
 
 
 1. TOC
@@ -346,7 +345,8 @@ Seems to jump to the op code 25 (doNothing) and just save the param.
 
 ### Summary
 
-Sets local variable that will be only accessible by this monster during the battle.
+Sets local variable that will be only accessible by this monster during the battle.  
+Can also be used to initialize a battle variable, in case the battle variable already has a value this opcode will be ignored.
 
 | Opcode | IfritAI name | Size | Short Description               |
 |--------|--------------|------|---------------------------------|
