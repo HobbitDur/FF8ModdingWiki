@@ -269,7 +269,13 @@ Note that the original target will still be targeted by opcodes **_draw_** and *
 
 | Position | Size | Name            | Type                                      | Short Description |
 |----------|------|-----------------|-------------------------------------------|-------------------|
-| 1        | 1    | **Target** | [TargetBasic](../OpCodeType#target-basic) | The target        |
+| 1        | 1    | **Target**      | [TargetBasic](../OpCodeType#target-basic) | The target        |
+
+OR
+
+| Position | Size | Name            | Type                                | Short Description     |
+|----------|------|-----------------|-------------------------------------|-----------------------|
+| 1        | 1    | **Var**         | [LocalVar](../OpCodeType#local-var) | Var containing target |
 
 ---
 
@@ -359,11 +365,13 @@ Can also be used to initialize a battle variable, in case the battle variable al
 | 1        | 1    | **Var**   | [LocalVar](../OpCodeType#local-var) | The var to store the data     |
 | 2        | 1    | **Value** | [int](../OpCodeType#int)            | The value var is set to       |
 
+If **Value** is 203, the ID of the _Last Attacker_ will be stored in the variable. 
+
 ---
 
-## Opcode 0x0F (15) - gvar
+## Opcode 0x0F (15) - bvar
 
-Sets global variable (accessible by all monsters).
+Sets battle variable (accessible by all monsters).
 
 ### Summary
 
@@ -371,7 +379,7 @@ Sets global variable (accessible by all monsters)
 
 | Opcode | IfritAI name | Size | Short Description       |
 |--------|--------------|------|-------------------------|
-| 0x0F   | gvar         | 3    | Set global var to value |
+| 0x0F   | bvar         | 3    | Set battle var to value |
 
 ### Parameters
 
