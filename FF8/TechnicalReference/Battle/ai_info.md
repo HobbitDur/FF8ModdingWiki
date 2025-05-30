@@ -390,7 +390,7 @@ Sets global variable (accessible by all monsters)
 
 ---
 
-## Opcode 0x11 (17) - svar
+## Opcode 0x11 (17) - gvar
 
 ### Summary
 
@@ -398,7 +398,7 @@ Sets savemap variable (not sure how it it stored).
 
 | Opcode | IfritAI name | Size | Short Description        |
 |--------|--------------|------|--------------------------|
-| 0x11   | svar         | 3    | Set savemap var to value |
+| 0x11   | gvar         | 3    | Set savemap var to value |
 
 ### Parameters
 
@@ -426,15 +426,15 @@ Adds value to local variable that will be only accessible by this monster during
 | 1        | 1    | **Var**   | [LocalVar](../OpCodeType#local-var) | The var to store the data   |
 | 2        | 1    | **Value** | [int](../OpCodeType#int)            | The value to add to the var |
 
-If **Value** is equal to 0xCB (203), then the value add is the slot of the last attacker.
+If **Value** is equal to 0xCB (203), then the added value is equal to the last attacker's slot.
 
 ---
 
-## Opcode 0x13 (19) - gadd
+## Opcode 0x13 (19) - badd
 
 ### Summary
 
-Adds value to global var (accessible by all monsters).
+Adds value to battle var (accessible by all monsters).
 
 | Opcode | IfritAI name | Size | Short Description       |
 |--------|--------------|------|-------------------------|
@@ -449,7 +449,7 @@ Adds value to global var (accessible by all monsters).
 
 ---
 
-## Opcode 0x15 (21) - sadd
+## Opcode 0x15 (21) - gadd
 
 ### Summary
 
