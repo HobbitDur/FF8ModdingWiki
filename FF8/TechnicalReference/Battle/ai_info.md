@@ -496,9 +496,9 @@ Allows/Disallows escaping in the current battle.
 
 ### Parameters
 
-| Position | Size | Name                | Type                       | Short Description                         |
-|----------|------|---------------------|----------------------------|-------------------------------------------|
-| 1        | 1    | **EscapeActivated** | [Bool](../OpCodeType#bool) | True to allow escape, False to deactivate |
+| Position | Size | Name                | Type                       | Short Description                          |
+|----------|------|---------------------|----------------------------|--------------------------------------------|
+| 1        | 1    | **EscapeActivated** | [Bool](../OpCodeType#bool) | True to allow escape, False to disallow it |
 
 ---
 
@@ -528,17 +528,17 @@ Each text has an ID, starting from 0 and incrementing with each subsequent text.
 
 ### Summary
 
-Wait the previous message, with in parameters the number of text to wait.
+Waits for a specified amount of texts to finish displaying before resuming the battle.
 
-| Opcode | IfritAI name | Size | Short Description                            |
-|--------|--------------|------|----------------------------------------------|
-| 0x18   | waitText     | 2    | Wait text after printing some                |
+| Opcode | IfritAI name | Size | Short Description                     |
+|--------|--------------|------|---------------------------------------|
+| 0x18   | waitText     | 2    | Waits for text/s to finish displaying |
 
 ### Parameters
 
-| Position | Size | Name       | Type                     | Short Description          |
-|----------|------|------------|--------------------------|----------------------------|
-| 1        | 1    | **NbText** | [int](../OpCodeType#int) | The number of text to wait |
+| Position | Size | Name       | Type                     | Short Description               |
+|----------|------|------------|--------------------------|---------------------------------|
+| 1        | 1    | **NbText** | [int](../OpCodeType#int) | The number of texts to wait for |
 
 
 ---
@@ -590,19 +590,19 @@ Whilst possible, it is not advisable to use **_enter_** on an encounter slot if 
 
 ### Summary
 
-This is not used by any monster, analyse oif the code is not complete, but it seems to be like waitText but 2 times faster.
+This is not used by any monster, analyse of the code is not complete, but it seems to be like waitText but 2 times faster.
 
 Wait the previous message like wait text
 
-| Opcode | IfritAI name | Size | Short Description                            |
-|--------|--------------|------|----------------------------------------------|
-| 0x20   | waitText     | 2    | Wait text after printing some                |
+| Opcode | IfritAI name | Size | Short Description                     |
+|--------|--------------|------|---------------------------------------|
+| 0x18   | waitText     | 2    | Waits for text/s to finish displaying |
 
 ### Parameters
 
-| Position | Size | Name       | Type                     | Short Description          |
-|----------|------|------------|--------------------------|----------------------------|
-| 1        | 1    | **NbText** | [int](../OpCodeType#int) | The number of text to wait |
+| Position | Size | Name       | Type                     | Short Description               |
+|----------|------|------------|--------------------------|---------------------------------|
+| 1        | 1    | **NbText** | [int](../OpCodeType#int) | The number of texts to wait for |
 
 
 ---
