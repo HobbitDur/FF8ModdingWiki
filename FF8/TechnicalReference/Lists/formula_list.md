@@ -213,5 +213,21 @@ $$
 \text{Lvl} \times \text{VIT\_SPD\_EVA}_0 + \left\lfloor\frac{\text{Lvl}}{\text{VIT\_SPD\_EVA}_1}\right\rfloor + \text{VIT\_SPD\_EVA}_2 - \left\lfloor\frac{\text{Lvl}}{\text{VIT\_SPD\_EVA}_3}\right\rfloor
 $$
 
+# Experience
+
+
+{: .warning }
+>Work in progress
+>
+
+Regular experience: X * (5 * (M - P) / P + 4), rounded down at the end, minimum of 1 provided X > 0 and it's not a boss.
+
+Kill bonus: Y * (5 * (M - C) / C + 4), rounded down at the end, minimum of 1 provided Y > 0 and it's not a boss.
+
+M = monster level
+P = average party level (active members only, rounded down)
+C = level of character/GF who gets kill shot and thus kill bonus
+X and Y depend on the monster
+
 
 
