@@ -229,5 +229,9 @@ P = average party level (active members only, rounded down)
 C = level of character/GF who gets kill shot and thus kill bonus
 X and Y depend on the monster
 
+# Draw formula
 
+$$
+\text{NumberMagDraw} = \frac{\left( \frac{\text{CharaLvl} - \text{MonsterLvl} + 10}{2} - \text{MagicDrawResist} + [1..32] + \text{MagChara} \right)}{5}
+$$
 
