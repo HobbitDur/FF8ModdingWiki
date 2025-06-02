@@ -231,7 +231,11 @@ X and Y depend on the monster
 
 # Draw formula
 
+MagicDrawResist is defined in the kernel associated to the magic
+MagicQuantity is the number of magic in the draw magic defined in the c0m file (always 0 in vanilla)
+
+
 $$
-\text{NumberMagDraw} = \frac{\left( \frac{\text{CharaLvl} - \text{MonsterLvl} + 10}{2} - \text{MagicDrawResist} + [1..32] + \text{MagChara} \right)}{5}
+\text{NumberMagDraw} = \frac{\left( \frac{\text{CharaLvl} - \text{MonsterLvl} + 10}{2} - \text{MagicDrawResist} + [1..32] + \text{MagChara} \right)}{5} - \text{MagicQuantity}
 $$
 
