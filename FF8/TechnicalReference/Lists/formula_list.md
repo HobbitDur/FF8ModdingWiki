@@ -231,7 +231,7 @@ X and Y depend on the monster
 
 # Draw formula
 
-MagicDrawResist is defined in the kernel associated to the magic
+MagicDrawResist is defined in the kernel associated to the magic  
 MagicQuantity is the number of magic in the draw magic defined in the c0m file (always 0 in vanilla)
 
 
