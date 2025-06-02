@@ -11,7 +11,7 @@ permalink: /technical-reference/exedata/memory-info/
 
 ## Notes
 
-BCI seems to stand for BattleCommandInterface
+BCI seems to stand for BattleCharacterInfo
 To find the size, I take the slot 0 size
 BCI_CURRENT_HP is at 1D27B28, and next slot data is at 1D27BF8, so data size is 208.
 So to get a specific value of a specific slot ID, we takes the first value then shift by 208.
