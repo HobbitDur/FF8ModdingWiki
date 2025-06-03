@@ -6,6 +6,9 @@ author: Mirex, JWP, random_npc, myst6re, HobbitDur
 permalink: /technical-reference/battle/monster-files-c0mxxxdat/
 ---
 
+1. TOC
+{:toc}
+
 ## Header
 
 DAT file is divided into 11 sections (except for c0m127.dat, which contains only 2 sections : 7th and 8th).
