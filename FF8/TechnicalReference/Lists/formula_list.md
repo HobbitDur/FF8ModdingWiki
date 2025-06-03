@@ -118,8 +118,10 @@ $$
 ## Classic
 
 $$
-\text{Damage} = \frac{\text{StrAttacker}^2}{16 + \text{StrAttacker}} \times \frac{265 - \text{VitReceiver}}{256} \times \frac{\text{AttackDamage}}{16} \times \frac{[0..32] + 240}{256}
+\text{Damage} =  \frac{\text{CritDamage} + 40}{20} \times \frac{\text{StrAttacker}^2}{16 + \text{StrAttacker}} \times \frac{265 - \text{VitReceiver}}{256} \times \frac{\text{AttackDamage}}{16} \times \frac{[0..32] + 240}{256}
 $$
+
+With CritDamage being 0 if no crit, 20 for Squall/Seifer if crit, 40 if crit from other characters.
 
 ## Compute crit
 
