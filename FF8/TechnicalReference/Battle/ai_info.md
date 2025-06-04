@@ -763,9 +763,9 @@ None
 
 Sets this monster's Enabled flag to _True_.
 
-| Opcode | IfritAI name     | Size | Short Description |
-|--------|------------------|------|-------------------|
-| 0x30   | untargetable     | 1    | Enables monster   |
+| Opcode | IfritAI name | Size | Short Description |
+|--------|--------------|------|-------------------|
+| 0x34   | enable       | 1    | Enables monster   |
 
 ### Parameters
 
