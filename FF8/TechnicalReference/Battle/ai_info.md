@@ -10,7 +10,7 @@ FF8 monster battle scripts are divided into 5 sections, **init**, **turn**, **co
 Each section contains code that is executed at different times during the battle.
 - Init: executes once when the monster is loaded into battle.
 - Turn: executes once the monster's ATB bar fills. This happens after the monsters turn counter is incremented.
-- Counter: executes when the monster is targeted by a battle command.
+- Counter: executes after the monster is affected by a battle command. Note that this means its impossible to change a monsters stats/elemental resists before it takes damage, and that it cannot detect _Sleep_.
 - Death: executes when the monster’s HP reaches 0 or it is afflicted with the *Death* status.  (Eject may not trigger this section - this needs further testing.)
 - Pre-Counter: similar to counter but executed before it. Needs further testing. Seems to be used mostly for checking if the monster has the *Death* status and then change its animation. Ifs, variable assignments and stat changes can also be used. Launching an attack from this section crashes the game.
 
