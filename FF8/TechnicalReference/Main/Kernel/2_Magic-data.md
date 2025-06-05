@@ -80,19 +80,19 @@ permalink: /technical-reference/main/kernel/magic/
 |--------|---------|----------------------------------------------------------------|
 | 0x0000 | 2 bytes | Offset to spell name                                           |
 | 0x0002 | 2 bytes | Offset to spell description                                    |
-| 0x0004 | 2 bytes | [[Magic ID                                                     |MagicID]]       |
+| 0x0004 | 2 bytes | Magic ID                                                        |
 | 0x0006 | 1 byte  | Animation triggered                                            |
 | 0x0007 | 1 byte  | Attack type                                                    |
 | 0x0008 | 1 byte  | Spell power (used in damage formula)                           |
 | 0x0009 | 1 byte  | Unknown                                                        |
-| 0x000A | 1 byte  | Default target                                                 |
+| 0x000A | 1 byte  | [Target info](../../list/kernel/#target-info)                                                 |
 | 0x000B | 1 byte  | Attack Flags                                                   |
 | 0x000C | 1 byte  | Draw resist (how hard is the magic to draw)                    |
 | 0x000D | 1 byte  | Hit count (works with meteor animation, not sure about others) |
-| 0x000E | 1 byte  | [[Element                                                      |Elements]] |
+| 0x000E | 1 byte  | Element                                                        |
 | 0x000F | 1 byte  | Unknown                                                        |
-| 0x0010 | 4 bytes | [[Statuses 1                                                   |Statuses 1]] |
-| 0x0014 | 2 bytes | [[Statuses 0                                                   |Statuses 0]]  |
+| 0x0010 | 4 bytes | Statuses 1                                                   |
+| 0x0014 | 2 bytes | Statuses 0                                                   |
 | 0x0016 | 1 byte  | Status attack enabler                                          |
 | 0x0017 | 1 byte  | Characters HP junction value                                   |
 | 0x0018 | 1 byte  | Characters STR junction value                                  |
@@ -103,14 +103,14 @@ permalink: /technical-reference/main/kernel/magic/
 | 0x001D | 1 byte  | Characters EVA junction value                                  |
 | 0x001E | 1 byte  | Characters HIT junction value                                  |
 | 0x001F | 1 byte  | Characters LUCK junction value                                 |
-| 0x0020 | 1 byte  | [[Characters J-Elem attack                                     |Elements]] |
+| 0x0020 | 1 byte  | Characters J-Elem attack                                      |
 | 0x0021 | 1 byte  | Characters J-Elem attack value                                 |
-| 0x0022 | 1 byte  | [[Characters J-Elem defense                                    |Elements]] |
+| 0x0022 | 1 byte  | Characters J-Elem defense                                    |
 | 0x0023 | 1 byte  | Characters J-Elem defense value                                |
 | 0x0024 | 1 byte  | Characters J-Status attack value                               |
 | 0x0025 | 1 byte  | Characters J-Status defense value                              |
-| 0x0026 | 2 bytes | [[Characters J-Statuses Attack                                 |Characters J-Statuses]] |
-| 0x0028 | 2 bytes | [[Characters J-Statuses Defend                                 |Characters J-Statuses]] |
+| 0x0026 | 2 bytes | Characters J-Statuses Attack                                 |
+| 0x0028 | 2 bytes | Characters J-Statuses Defend                               |
 | 0x002A | 1 byte  | Quezacolt compatibility                                        |
 | 0x002B | 1 byte  | Shiva compatibility                                            |
 | 0x002C | 1 byte  | Ifrit compatibility                                            |
