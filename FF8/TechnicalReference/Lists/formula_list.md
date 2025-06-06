@@ -241,3 +241,9 @@ $$
 \text{NumberMagDraw} = \frac{\left( \frac{\text{CharaLvl} - \text{MonsterLvl} + 10}{2} - \text{MagicDrawResist} + [1..32] + \text{MagChara} \right)}{5} - \text{MagicQuantity}
 $$
 
+# Crisis level
+
+crisis_value = 15300 * BATTLE_SLOT_DATA[p_attacker_slot_id].crisis_level / 255;
+
+
+
