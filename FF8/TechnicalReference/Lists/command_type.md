@@ -47,5 +47,6 @@ Check means condition check in AI
 | 249      | 0xF9     | Renzokuken finisher     |                                                                                      |
 | 250      | 0xFA     | Renzokuken              | becomes 251 on hit and 249 on finisher use, but these can't be checked for           |
 | 251      | 0xFB     | Renzokuken on hit       |                                                                                      |
+| 252      | 0xFC     | Special action          |                                                                                      |
 | 253      | 0xFD     | Gunblade on hit         |                                                                                      |
 | 254      | 0xFE     | G-Force                 |                                                                                      |
