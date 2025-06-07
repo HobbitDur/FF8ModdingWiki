@@ -45,6 +45,7 @@ Check means condition check in AI
 | 244      | 0xF4     | Chocobo                 |                                                                                      |
 | 245      | 0xF5     | Odin/Gilgamesh          |                                                                                      |
 | 246      | 0xF6     | Doom finished           |                                                                                      |
+| 248      | 0xF8     | Gunblade mug     |                                                                                      |
 | 249      | 0xF9     | Renzokuken finisher     |                                                                                      |
 | 250      | 0xFA     | Renzokuken              | becomes 251 on hit and 249 on finisher use, but these can't be checked for           |
 | 251      | 0xFB     | Renzokuken on hit       |                                                                                      |
