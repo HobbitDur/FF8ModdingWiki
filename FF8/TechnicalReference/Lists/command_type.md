@@ -14,6 +14,7 @@ Check means condition check in AI
 | 1        | 0x01     | Attack                  | becomes 253 on hit for gunblade users, but this can't be checked for                 |
 | 2        | 0x02     | Magic                   |                                                                                      |
 | 4        | 0x04     | Item                    |                                                                                      |
+| 5        | 0x05     | Renzokuken without finisher                    |                                                                                      |
 | 6        | 0x06     | Draw                    |                                                                                      |
 | 7        | 0x07     | Devour                  | becomes 0 if it fails, but this can't be checked for                                 |
 | 8        | 0x08     | Monster Attack          |                                                                                      |
