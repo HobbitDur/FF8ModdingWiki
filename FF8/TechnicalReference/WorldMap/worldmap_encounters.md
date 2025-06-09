@@ -46,16 +46,16 @@ The following is a list of all the possible encounters in FF8's World Map.
 ## Beach (Ground Type 10)
 {: .no_toc }
 
-| Encounter ID  | Description       | Rarity |
-|---------------|-------------------|--------|
-| 517           | 2 Fastitocalon    | Common |
-| 517           | 2 Fastitocalon    | Common |
-| 517           | 2 Fastitocalon    | Common |
-| 517           | 2 Fastitocalon    | Common |
-| 517           | 2 Fastitocalon    | Medium |
-| 517           | 2 Fastitocalon    | Medium |
-| 517           | 2 Fastitocalon    | Rare   |
-| 517           | 2 Fastitocalon    | Rare   |
+| Encounter ID  | Description         | Rarity |
+|---------------|---------------------|--------|
+| 517           | 2 Fastitocalon-F    | Common |
+| 517           | 2 Fastitocalon-F    | Common |
+| 517           | 2 Fastitocalon-F    | Common |
+| 517           | 2 Fastitocalon-F    | Common |
+| 517           | 2 Fastitocalon-F    | Medium |
+| 517           | 2 Fastitocalon-F    | Medium |
+| 517           | 2 Fastitocalon-F    | Rare   |
+| 517           | 2 Fastitocalon-F    | Rare   |
 
 ## Mountain (Ground Type 24)
 {: .no_toc }
