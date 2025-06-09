@@ -2,6 +2,7 @@
 layout: default
 title: World Map Encounters
 parent: WorldMap
+permalink: /technical-reference/worldmap/world-map-encounters/
 ---
 
 The World Map is divided in _Regions_, and each _Region_ is made up of different _Ground Types_.  
