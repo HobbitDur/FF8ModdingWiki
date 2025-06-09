@@ -7,7 +7,7 @@ permalink: /technical-reference/worldmap/world-map-encounters/
 
 The World Map is divided in _Regions_, and each _Region_ is made up of different _Ground Types_.  
 For each _Ground Type_, 8 different encounter slots are available, and are ordered by rarity: the first 4 are common encounters, the following 2 are medium rarity, and the last 2 are rare encounters.  
-These 8 slots each contain an [EncounterID](../../battle/encounter-codes/), these IDs are used to load the correct encounter from [scene.out](../../battle/battle-structure-sceneout/).
+These 8 slots each contain an [EncounterID](../../battle/encounter-codes/), these IDs are used to load the correct encounter from [scene.out](../../battle/battle-structure-sceneout/).  
 The following is a list of all the possible encounters in FF8's World Map.
 
 1. TOC
