@@ -20,12 +20,12 @@ The following is a list of all the possible encounters in FF8's World Map.
 
 | Encounter ID  | Description   | Rarity |
 |---------------|---------------|--------|
-| 514           | 1 Bite Bug    | Common |
-| 514           | 1 Bite Bug    | Common |
-| 514           | 1 Bite Bug    | Common |
+| 514           | Bite Bug      | Common |
+| 514           | Bite Bug      | Common |
+| 514           | Bite Bug      | Common |
 | 512           | 2 Bite Bugs   | Common |
 | 512           | 2 Bite Bugs   | Medium |
-| 520           | 1 Glacial Eye | Medium |
+| 520           | Glacial Eye   | Medium |
 | 513           | 3 Bite Bugs   | Rare   |
 | 513           | 3 Bite Bugs   | Rare   |
 
@@ -67,7 +67,7 @@ The following is a list of all the possible encounters in FF8's World Map.
 | 518           | Glacial Eye     | Common |
 | 518           | Glacial Eye     | Common |
 | 518           | Glacial Eye     | Medium |
-| 519           | 2 Glacial Eye   | Medium |
-| 519           | 2 Glacial Eye   | Rare   |
-| 519           | 2 Glacial Eye   | Rare   |
+| 519           | 2 Glacial Eyes  | Medium |
+| 519           | 2 Glacial Eyes  | Rare   |
+| 519           | 2 Glacial Eyes  | Rare   |
 
