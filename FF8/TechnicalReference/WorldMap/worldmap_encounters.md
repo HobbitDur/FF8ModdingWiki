@@ -57,7 +57,7 @@ The following is a list of all the possible encounters in FF8's World Map.
 | 517           | 2 Fastitocalon-F    | Rare   |
 | 517           | 2 Fastitocalon-F    | Rare   |
 
-## Mountain (Ground Type 24)
+## Mountains (Ground Type 24)
 {: .no_toc }
 
 | Encounter ID  | Description     | Rarity |
