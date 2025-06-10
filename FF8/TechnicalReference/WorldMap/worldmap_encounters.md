@@ -57,7 +57,7 @@ The following is a list of all the possible encounters in FF8's World Map.
 | 517           | 2 Fastitocalon-F | Rare   |
 | 517           | 2 Fastitocalon-F | Rare   |
 
-## Mountains (Ground ID 24)
+## Next to Mountains (Ground ID 24)
 {: .no_toc }
 
 | Encounter ID  | Description   | Rarity |
@@ -90,7 +90,7 @@ The following is a list of all the possible encounters in FF8's World Map.
 ## Grassy Plains (Ground ID 6)
 {: .no_toc }
 
-Shared with _Region ID 19_
+Shared with _Region ID 19_.  
 
 | Encounter ID  | Description           | Rarity |
 |---------------|-----------------------|--------|
@@ -103,7 +103,7 @@ Shared with _Region ID 19_
 | 524           | Thrustaevis + Geezard | Rare   |
 | 523           | 2 Thrustaevis         | Rare   |
 
-## Desert Pavement (Ground ID 7)
+## Badlands (Ground ID 7)
 {: .no_toc }
 
 | Encounter ID  | Description | Rarity |
@@ -120,7 +120,7 @@ Shared with _Region ID 19_
 ## Beach (Ground ID 10)
 {: .no_toc }
 
-Shared with _Region ID 19_
+Shared with _Region ID 19_.  
 
 | Encounter ID  | Description      | Rarity |
 |---------------|------------------|--------|
@@ -136,7 +136,7 @@ Shared with _Region ID 19_
 ## Top of Plateau (Ground ID 14)
 {: .no_toc }
 
-Shared with _Region ID 19_
+Shared with _Region ID 19_.  
 
 | Encounter ID  | Description   | Rarity |
 |---------------|---------------|--------|
@@ -152,7 +152,7 @@ Shared with _Region ID 19_
 ## Next to Plateau on Grass (Ground ID 15)
 {: .no_toc }
 
-Shared with _Region ID 19_
+Shared with _Region ID 19_.  
 
 | Encounter ID  | Description | Rarity |
 |---------------|-------------|--------|
@@ -165,7 +165,7 @@ Shared with _Region ID 19_
 | 538           | 3 Geezard   | Rare   |
 | 538           | 3 Geezard   | Rare   |
 
-## Next to Plateau on Desert Pavement (Ground ID 16)
+## Next to Plateau on Badlands (Ground ID 16)
 {: .no_toc }
 
 Shared with _Region ID 19_
@@ -283,7 +283,7 @@ Shared with _Region ID 19_
 | 550           | Blood Soul  | Rare   |
 | 550           | Blood Soul  | Rare   |
 
-## Desert Pavement (Ground ID 7)
+## Badlands (Ground ID 7)
 {: .no_toc }
 
 Shared with _Region ID 19_
@@ -313,7 +313,7 @@ Shared with _Region ID 19_
 | 554           | Thrustaevis | Rare   |
 | 554           | Thrustaevis | Rare   |
 
-## Next to Plateau on Desert Pavement (Ground ID 16)
+## Next to Plateau on Badlands (Ground ID 16)
 {: .no_toc }
 
 | Encounter ID  | Description              | Rarity |
@@ -327,15 +327,201 @@ Shared with _Region ID 19_
 | 555           | Thrustaevis + Blood Soul | Rare   |
 | 555           | Thrustaevis + Blood Soul | Rare   |
 
-# Deling City area (Region ID 4)
-
-
-# Central and North-West Galbiadia Region (Region ID 19)
+# Deling City Area (Region ID 4)
 
 ## Grassy Plains (Ground ID 6)
 {: .no_toc }
 
-Shared with _Region ID 2_
+| Encounter ID  | Description   | Rarity |
+|---------------|---------------|--------|
+| 557           | Geezard       | Common |
+| 557           | Geezard       | Common |
+| 557           | Geezard       | Common |
+| 558           | Thrustaevis   | Common |
+| 558           | Thrustaevis   | Medium |
+| 558           | Thrustaevis   | Medium |
+| 559           | 2 Thrustaevis | Rare   |
+| 559           | 2 Thrustaevis | Rare   |
+
+## Badlands (Ground ID 7)
+{: .no_toc }
+
+| Encounter ID  | Description                    | Rarity |
+|---------------|--------------------------------|--------|
+| 560           | Wendigo                        | Common |
+| 560           | Wendigo                        | Common |
+| 580           | Geezard                        | Common |
+| 580           | Geezard                        | Common |
+| 561           | 2 Wendigo                      | Medium |
+| 561           | 2 Wendigo                      | Medium |
+| 552           | Wendigo + Geezard + Blood Soul | Rare   |
+| 553           | Belhelmel                      | Rare   |
+
+## Desert (Ground ID 8)
+{: .no_toc }
+
+Shared with _Region ID 19_.  
+Unused in _Region ID 3_.  
+
+| Encounter ID  | Description                     | Rarity |
+|---------------|---------------------------------|--------|
+| 568           | 3 Fastitocalon-F                | Common |
+| 568           | 3 Fastitocalon-F                | Common |
+| 581           | 1 Fastitocalon                  | Common |
+| 569           | 2 Fastitocalon-F + Fastitocalon | Common |
+| 570           | Abyss Worm                      | Medium |
+| 571           | 2 Fastitocalon-F                | Medium |
+| 571           | 2 Fastitocalon-F                | Rare   |
+| 572           | Chimera                         | Rare   |
+
+## Beach (Ground ID 10)
+{: .no_toc }
+
+| Encounter ID  | Description                   | Rarity |
+|---------------|-------------------------------|--------|
+| 564           | 2 Fastitocalon-F              | Common |
+| 564           | 2 Fastitocalon-F              | Common |
+| 564           | 2 Fastitocalon-F              | Common |
+| 564           | 2 Fastitocalon-F              | Common |
+| 564           | 2 Fastitocalon-F              | Medium |
+| 578           | Fastitocalon-F + Fastitocalon | Medium |
+| 578           | Fastitocalon-F + Fastitocalon | Rare   |
+| 578           | Fastitocalon-F + Fastitocalon | Rare   |
+
+## Top of Plateau (Ground ID 14)
+{: .no_toc }
+
+| Encounter ID  | Description               | Rarity |
+|---------------|---------------------------|--------|
+| 565           | 2 Geezard                 | Common |
+| 565           | 2 Geezard                 | Common |
+| 565           | 2 Geezard                 | Common |
+| 565           | 2 Geezard                 | Common |
+| 566           | Thrustaevis + Geezard     | Medium |
+| 566           | Thrustaevis + Geezard     | Medium |
+| 567           | 2 Thrustaevis + Belhelmel | Rare   |
+| 567           | 2 Thrustaevis + Belhelmel | Rare   |
+
+## Next to Plateau on Grass (Ground ID 15)
+{: .no_toc }
+
+| Encounter ID  | Description         | Rarity |
+|---------------|---------------------|--------|
+| 573           | 3 Geezard           | Common |
+| 573           | 3 Geezard           | Common |
+| 573           | 3 Geezard           | Common |
+| 573           | 3 Geezard           | Common |
+| 574           | 2 Funguar           | Medium |
+| 574           | 2 Funguar           | Medium |
+| 579           | Funguar + 2 Geezard | Rare   |
+| 579           | Funguar + 2 Geezard | Rare   |
+
+## Next to Plateau on Badlands (Ground ID 16)
+{: .no_toc }
+
+| Encounter ID  | Description           | Rarity |
+|---------------|-----------------------|--------|
+| 575           | Thrustaevis           | Common |
+| 575           | Thrustaevis           | Common |
+| 575           | Thrustaevis           | Common |
+| 576           | Thrustaevis + Geezard | Common |
+| 576           | Thrustaevis + Geezard | Medium |
+| 576           | Thrustaevis + Geezard | Medium |
+| 577           | 2 Thrustaevis         | Rare   |
+| 577           | 2 Thrustaevis         | Rare   |
+
+# Winhil Region (Region ID 6)
+
+## Grassy Plains (Ground ID 6)
+{: .no_toc }
+
+| Encounter ID  | Description    | Rarity |
+|---------------|----------------|--------|
+| 582           | Blood Soul     | Common |
+| 582           | Blood Soul     | Common |
+| 582           | Blood Soul     | Common |
+| 583           | Lefty + Righty | Common |
+| 583           | Lefty + Righty | Medium |
+| 584           | Vysage         | Medium |
+| 584           | Vysage         | Rare   |
+| 584           | Vysage         | Rare   |
+
+## Badlands (Ground ID 7)
+{: .no_toc }
+
+| Encounter ID  | Description             | Rarity |
+|---------------|-------------------------|--------|
+| 585           | Cockatrice + Blood Soul | Common |
+| 585           | Cockatrice + Blood Soul | Common |
+| 585           | Cockatrice + Blood Soul | Common |
+| 585           | Cockatrice + Blood Soul | Common |
+| 585           | Cockatrice + Blood Soul | Medium |
+| 585           | Cockatrice + Blood Soul | Medium |
+| 585           | Cockatrice + Blood Soul | Rare   |
+| 585           | Cockatrice + Blood Soul | Rare   |
+
+## Beach (Ground ID 10)
+{: .no_toc }
+
+| Encounter ID  | Description                     | Rarity |
+|---------------|---------------------------------|--------|
+| 586           | Fastitocalon-F                  | Common |
+| 586           | Fastitocalon-F                  | Common |
+| 586           | Fastitocalon-F                  | Common |
+| 586           | Fastitocalon-F                  | Common |
+| 586           | Fastitocalon-F                  | Medium |
+| 587           | Lefty + Fastitocalon-F + Righty | Medium |
+| 587           | Lefty + Fastitocalon-F + Righty | Rare   |
+| 587           | Lefty + Fastitocalon-F + Righty | Rare   |
+
+## Top of Plateau (Ground ID 14)
+{: .no_toc }
+
+| Encounter ID  | Description | Rarity |
+|---------------|-------------|--------|
+| 588           | 2 Grendel   | Common |
+| 588           | 2 Grendel   | Common |
+| 588           | 2 Grendel   | Common |
+| 588           | 2 Grendel   | Common |
+| 589           | Grendel     | Medium |
+| 589           | Grendel     | Medium |
+| 589           | Grendel     | Rare   |
+| 589           | Grendel     | Rare   |
+
+## Next to Plateau on Grass (Ground ID 15)
+{: .no_toc }
+
+| Encounter ID  | Description         | Rarity |
+|---------------|---------------------|--------|
+| 590           | Lefty               | Common |
+| 590           | Lefty               | Common |
+| 590           | Lefty               | Common |
+| 590           | Lefty               | Common |
+| 591           | Righty + Blood Soul | Medium |
+| 591           | Righty + Blood Soul | Medium |
+| 591           | Righty + Blood Soul | Rare   |
+| 591           | Righty + Blood Soul | Rare   |
+
+## Next to Plateau on Badlands (Ground ID 16)
+{: .no_toc }
+
+| Encounter ID  | Description             | Rarity |
+|---------------|-------------------------|--------|
+| 592           | Vysage + Lefty + Righty | Common |
+| 592           | Vysage + Lefty + Righty | Common |
+| 592           | Vysage + Lefty + Righty | Common |
+| 592           | Vysage + Lefty + Righty | Common |
+| 592           | Vysage + Lefty + Righty | Medium |
+| 592           | Vysage + Lefty + Righty | Medium |
+| 592           | Vysage + Lefty + Righty | Rare   |
+| 592           | Vysage + Lefty + Righty | Rare   |
+
+# Central and North-West Galbadia (Region ID 19)
+
+## Grassy Plains (Ground ID 6)
+{: .no_toc }
+
+Shared with _Region ID 2_.  
 
 | Encounter ID  | Description           | Rarity |
 |---------------|-----------------------|--------|
@@ -348,10 +534,10 @@ Shared with _Region ID 2_
 | 524           | Thrustaevis + Geezard | Rare   |
 | 523           | 2 Thrustaevis         | Rare   |
 
-## Desert Pavement (Ground ID 7)
+## Badlands (Ground ID 7)
 {: .no_toc }
 
-Shared with _Region ID 3_
+Shared with _Region ID 3_.  
 
 | Encounter ID  | Description             | Rarity |
 |---------------|-------------------------|--------|
@@ -364,10 +550,27 @@ Shared with _Region ID 3_
 | 556           | Thrustaevis + 2 Geezard | Rare   |
 | 556           | Thrustaevis + 2 Geezard | Rare   |
 
+
+## Desert (Ground ID 8)
+{: .no_toc }
+
+Shared with _Region ID 3_.  
+
+| Encounter ID  | Description                     | Rarity |
+|---------------|---------------------------------|--------|
+| 568           | 3 Fastitocalon-F                | Common |
+| 568           | 3 Fastitocalon-F                | Common |
+| 581           | 1 Fastitocalon                  | Common |
+| 569           | 2 Fastitocalon-F + Fastitocalon | Common |
+| 570           | Abyss Worm                      | Medium |
+| 571           | 2 Fastitocalon-F                | Medium |
+| 571           | 2 Fastitocalon-F                | Rare   |
+| 572           | Chimera                         | Rare   |
+
 ## Beach (Ground ID 10)
 {: .no_toc }
 
-Shared with _Region ID 2_
+Shared with _Region ID 2_.  
 
 | Encounter ID  | Description           | Rarity |
 |---------------|-----------------------|--------|
@@ -383,7 +586,7 @@ Shared with _Region ID 2_
 ## Top of Plateau (Ground ID 14)
 {: .no_toc }
 
-Shared with _Region ID 2_
+Shared with _Region ID 2_.  
 
 | Encounter ID  | Description           | Rarity |
 |---------------|-----------------------|--------|
@@ -400,7 +603,7 @@ Shared with _Region ID 2_
 ## Next to Plateau on Grass (Ground ID 15)
 {: .no_toc }
 
-Shared with _Region ID 2_
+Shared with _Region ID 2_.  
 
 | Encounter ID  | Description           | Rarity |
 |---------------|-----------------------|--------|
@@ -413,10 +616,10 @@ Shared with _Region ID 2_
 | 538           | 3 Geezard             | Rare   |
 | 538           | 3 Geezard             | Rare   |
 
-## Next to Plateau on Desert Pavement (Ground ID 16)
+## Next to Plateau on Badlands (Ground ID 16)
 {: .no_toc }
 
-Shared with _Region ID 2_
+Shared with _Region ID 2_.  
 
 | Encounter ID  | Description           | Rarity |
 |---------------|-----------------------|--------|
