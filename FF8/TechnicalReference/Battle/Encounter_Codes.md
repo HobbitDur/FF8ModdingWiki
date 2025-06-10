@@ -558,7 +558,7 @@ permalink: /technical-reference/battle/encounter-codes/
 | 547          | Anacondaur + 2 Geezard                             | Cliff Valley                             |
 | 548          | 2 Adamantoise                                      | Beach                                    |
 | 549          | Wendigo + Anacondaur + Funguar                     | Forest                                   |
-| 550          | Bloood Soul                                        | Valley                                   |
+| 550          | Blood Soul                                         | Valley                                   |
 | 551          | Belhelmel + Blood Soul                             | Desert                                   |
 | 552          | Belhelmel + Geezard                                | Desert                                   |
 | 553          | Grendel                                            | Forest                                   |
