@@ -253,7 +253,7 @@ Shared with _Region ID 19_
 | 547           | Anacondaur + 2 Geezard | Rare   |
 | 547           | Anacondaur + 2 Geezard | Rare   |
 
-# Small 1 chunk area roughly around Galbiadia Garden (Region ID 3)
+# Small 1 chunk area roughly around Galbadia Garden (Region ID 3)
 
 ## Forest (Ground ID 0)
 {: .no_toc }
