@@ -845,7 +845,7 @@ Shared with _Region ID 11_.
 | 698          | 2 Forbidden | Rare   |
 | 698          | 2 Forbidden | Rare   |
 
-## Inaccessible Encounters
+# Inaccessible Encounters
 
 ### Roads
 {: .no_toc }
