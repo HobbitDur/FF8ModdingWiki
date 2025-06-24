@@ -59,7 +59,7 @@ permalink: /technical-reference/main/kernel/battle-items/
 | 0x0004 | 2 bytes | Magic ID                    |
 | 0x0006 | 1 byte  | Attack type                 |
 | 0x0007 | 1 byte  | Attack power                |
-| 0x0008 | 1 byte  | Unknown                     |
+| 0x0008 | 1 byte  | Battle flag                 |
 | 0x0009 | 1 byte  | Target info                 |
 | 0x000A | 1 byte  | Unknown                     |
 | 0x000B | 1 byte  | Attack flags                |
