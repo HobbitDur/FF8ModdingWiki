@@ -245,5 +245,12 @@ $$
 
 crisis_value = 15300 * BATTLE_SLOT_DATA[p_attacker_slot_id].crisis_level / 255;
 
+# Stat formula per level
+## GF HP
+ K_GF_JUNCTIONABLE[gf_id].gfHPModifier3
+       + gf_lvl * K_GF_JUNCTIONABLE[gf_id].gfHPModifier1
+       + 10 * gf_lvl * gf_lvl / K_GF_JUNCTIONABLE[gf_id].gfHPModifier2;
+
+
 
 
