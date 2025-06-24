@@ -49,8 +49,10 @@ permalink: /technical-reference/main/kernel/junctionable-gfs/
 | 0x000D | 1 byte  | [[Element                              |Elements]] |
 | 0x000E | 2 bytes | [[Statuses 0                           |Statuses 0]] |
 | 0x0010 | 4 bytes | [[Statuses 1                           |Statuses 1]] |
-| 0x0014 | 1 byte  | GF HP Modifier (used in GF HP formula) |
-| 0x0015 | 6 bytes | Unknown                                |
+| 0x0014 | 1 byte  | GF HP Modifier 1(GF_LVLxGF_HP_MODIFIER_1) |
+| 0x0015 | 1 byte  | GF HP Modifier 2(10xGF_LVLxGF_LVL/GF_HP_MODIFIER_2) |
+| 0x0016 | 1 byte  | GF HP Modifier 3(GF_HP_MODIFIER_3) |
+| 0x0017 | 3 bytes | Unknown                                |
 | 0x001B | 1 byte  | Status attack enabler                  |
 | 0x001C | 1 byte  | [[Ability 1 Unlocker                   |Junctionable Abilities Unlocker]] |
 | 0x001D | 1 byte  | Unknown                                |
