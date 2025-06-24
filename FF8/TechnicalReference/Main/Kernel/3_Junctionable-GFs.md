@@ -52,7 +52,9 @@ permalink: /technical-reference/main/kernel/junctionable-gfs/
 | 0x0014 | 1 byte  | GF HP Modifier 1(GF_LVLxGF_HP_MODIFIER_1) |
 | 0x0015 | 1 byte  | GF HP Modifier 2(10xGF_LVLxGF_LVL/GF_HP_MODIFIER_2) |
 | 0x0016 | 1 byte  | GF HP Modifier 3(GF_HP_MODIFIER_3) |
-| 0x0017 | 3 bytes | Unknown                                |
+| 0x0017 | 1 bytes | Padding (always 0x00)                                |
+| 0x0017 | 1 bytes | GF Next level modifier (10xGF_LVLxGF_LVL_MODIFIER_1)                               |
+| 0x0017 | 1 bytes | GF Next level modifier (GF_LVLxGF_LVLxGF_LVL_MODIFIER_2/256)                                     |
 | 0x001B | 1 byte  | Status attack enabler                  |
 | 0x001C | 1 byte  | [[Ability 1 Unlocker                   |Junctionable Abilities Unlocker]] |
 | 0x001D | 1 byte  | Unknown                                |
