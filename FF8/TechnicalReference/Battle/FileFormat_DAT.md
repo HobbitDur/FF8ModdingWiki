@@ -232,14 +232,73 @@ Refer to this message for more info: [Qhimm message](https://forums.qhimm.com/in
 
 ## Section 5: Animation sequences
 
-Contain sequence of animation. Not much known yet, all info are found here: [Qhimm message](https://forums.qhimm.com/index.php?topic=19362.0)
-
 ### Header
 
 | Offset | Length                 | Description         |
 |--------|------------------------|---------------------|
 | 0      | 2 bytes                | Number of sequences |
 | 2      | nbSequences \* 2 bytes | Sequences Positions |
+
+Contain sequence of animation. They define specific movement/action when using an ability/or just being.
+Some old info can be found here: [Qhimm message](https://forums.qhimm.com/index.php?topic=19362.0)
+
+Now how it works. The sequence animation is composed of opcode, followed by parameters (often 1, sometimes 2 or 0). Each op code define an action to do.
+
+### Opcode between C0 and E3: set a "current_value"
+Those opcode are meant to store and modify a local values (that is then used by later opcodes).  
+To analyze it, it is done on two part. First defining how to use the param, then knowing how to modify the local variable (store in what is called the _stack_)
+
+#### How to interpret the params
+Do OpCode & 3:
+- case 0: 2 param int16 value (C0, C4, D0,...)
+- case 1: 1 param sign value (C1, C5, D1,...)
+- case 2: 1 param unsigned value (C2, C6, D2, DA,...)
+- case 3: 1 param, two cases: (C3, CB,...)
+    - Param < 0x80: special handle to set param value (cf dedicated chapter).
+    - Param >= 0x80: Read from stack value stored at param (from E5 opcode)
+
+#### How to modify the local var
+Do opcode & FC:
+- case 0xC0u: (C0, C1, C2, C3)
+current_value_computed = param;
+- case 0xC4u:// C4, C5, C6, C7
+current_value_computed += param;
+- case 0xC8u:
+current_value_computed -= param;
+- case 0xCCu:
+current_value_computed *= param;
+- case 0xD0u:
+current_value_computed /= param;
+- case 0xD4u:
+current_value_computed &= param;
+- case 0xD8u:
+current_value_computed |= param;
+- case 0xDCu:
+current_value_computed ^= param;
+- case 0xE0u:
+current_value_computed %= param;
+
+#### Case 3 param < 0x80:
+On each case a specific code is done, often it just read a value in memory that as a specific purpose.
+Param values known:
+- case 10: Speed depending of distance to target
+- case 11: Some other computed speed depending of distance and slot id data
+
+### E5 case:
+two cases:
+    Param < 0x80: special handle to set param value (cf dedicated chapter).
+    Param >= 0x80: Write to stack current_value at param
+
+### Example
+If we use the normal attack animation of bite bug, here for each opcode/param what it does:
+- C3 11: Set current_value to some speed (between 1000 and 5000)
+- C5 64: Add 0x64 to current_value
+- E5 FF: Store current_value to 0xFF
+- C1 00: Set current_value to 0x00
+- CB FF: Substract to current_value value stored at 0xFF (so did actually put a minus in front of current_value)
+- E5 02:  store to  BATTLE_STATE_CONTROLER + 2 * param + 20 the current_value
+- BB 08: Not yet understood
+- A0 09: 
 
 ## Section 6: Camera sequence
 
