@@ -305,7 +305,13 @@ two cases:
 - 0x08: *(BATTLE_STATE_CONTROLER + 44) = current_value_computed;
 - 0x0F: *(BATTLE_STATE_CONTROLER + 40) = current_value_computed;
 - 0x17: rotate the sequence (0-4096)
+- 0x1D: move hit particle position ?
+- 0x1E: move selection cursor position ?
 - 0x21: same as 0x31
+- 0x24: set enemy model scale (4096 is 1x scale)
+- 0x25: set enemy's Z scale
+- 0x26: set enemy's Y scale
+- 0x27: set enemy's X scale
 - 0x2C: set enemy's X position
 - 0x2D: set target's Y scale? (seems to make target flat)
 - 0x30: set target's rotation (forwards/backwards) (gets reset when target comes back from an attack)
