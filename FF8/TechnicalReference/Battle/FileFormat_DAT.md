@@ -251,9 +251,9 @@ To analyze it, it is done on two part. First defining how to use the param, then
 #### How to interpret the params
 Do OpCode & 3:
 - case 0: 2 param int16 value (C0, C4, D0,...)
-- case 1: 1 param sign value (C1, C5, D1,...)
+- case 1: 1 param sign value (C1, C5, C9, D1, D9 ...)
 - case 2: 1 param unsigned value (C2, C6, D2, DA,...)
-- case 3: 1 param, two cases: (C3, CB,...)
+- case 3: 1 param, two cases: (C3, C7, CB, CF, D3...)
     - Param < 0x80: special handle to set param value (cf dedicated chapter).
     - Param >= 0x80: Read from stack value stored at param (from E5 opcode)
 
@@ -281,24 +281,125 @@ current_value_computed %= param;
 #### Case 3 param < 0x80:
 On each case a specific code is done, often it just read a value in memory that as a specific purpose.
 Param values known:
-- case 10: Speed depending of distance to target
-- case 11: Some other computed speed depending of distance and slot id data
+- Param < 0x07: current_value = *(BATTLE_STATE_CONTROLER + 2 * param + 20); BATTLE_STATE_CONTROLER is at 0x1D98200
+- 0x08: LOWORD(return_value) = *(BATTLE_STATE_CONTROLER + 44);
+- 0x09:  LOWORD(return_value) = *(SHARED_ANIMATION_DATA + 6);(High byte of C3_12_SINE)
+- 0x0A: LOWORD(return_value) = *(SHARED_ANIMATION_DATA + 7); (High byte of C3_13_09_COSINE)
+- 0x10: Speed depending of distance to target
+- 0x11: Some other computed speed depending of distance and slot id data
+- Param > 0x77: current_value = *(E5_7F_save + 2 * (0x7F - param)); so at 0x7F it's E5_7F_save
 
 ### E5 case:
 two cases:
-    Param < 0x80: special handle to set param value (cf dedicated chapter).
+    Param < 0x80: special handle to save (and use) the current_value
     Param >= 0x80: Write to stack current_value at param
+    
+#### Param < 0x80 
+- Param < 0x08: *(BATTLE_STATE_CONTROLER + 2 * sequence_command_param_1 + 20) = current_value_computed; BATTLE_STATE_CONTROLER is at 0x1D98200
+- 0x08: *(BATTLE_STATE_CONTROLER + 44) = current_value_computed;
+- 0x0F: *(BATTLE_STATE_CONTROLER + 40) = current_value_computed;
+- Param > 0x77: *(dword_1D9820C + 2 * (127 - sequence_command_param_1)) = current_value_computed; (so 0x7F save at 0x1D9820C)
+
+### 0xE6 < opcode < 0xF3
+Those are conditional jump (if)
+Those value check the current_value and decide to either continue the flow or jump the number of hex value define by the param
+E7: current_value > 0:
+
+    
+### Opcode < 0x80
+This queue the animation by the ID defined in section 3
+Does *(BATTLE_STATE_CONTROLER + 44) |= 0xAu; and end local sequence
+
+## 0x80 < Opcode < C0
+Each one of those opcode are special:
+- 97: *param_address_anim_seq = linkedToSoundAnimSeq(*param_address_anim_seq, 128);
+- A0 XX: Queue animation XX and  *(BATTLE_STATE_CONTROLER + 44) |= 2u;
+- A1: End local sequence
+- A2: Seems to be the end of seq animation, but didn't confirm on the code
+- AA: Dunno
+- B7: Dunno
+- B9 XX : Set BATTLE_STATE_CONTROLER + 1 to XX - 1
+- BB: Handle text
+- B4: Seems to jump to other anim sequence
+- BF: No idea
 
 ### Example
 If we use the normal attack animation of bite bug, here for each opcode/param what it does:
 - C3 11: Set current_value to some speed (between 1000 and 5000)
 - C5 64: Add 0x64 to current_value
-- E5 FF: Store current_value to 0xFF
+- E5 FF: Store current_value to stack 0xFF
 - C1 00: Set current_value to 0x00
 - CB FF: Substract to current_value value stored at 0xFF (so did actually put a minus in front of current_value)
-- E5 02:  store to  BATTLE_STATE_CONTROLER + 2 * param + 20 the current_value
-- BB 08: Not yet understood
-- A0 09: 
+- E5 02: Store current_value to BATTLE_STATE_CONTROLER + 2 * param + 20, 
+- BB: Handle text
+- 08: Queue animation 08
+- A0 09: Queue animation 09
+- C3 0A: Set current_value to some angle
+- E5 7F: Save current_value to 0x1D9820C
+- C3 02: Set current_value to *(0x1D98218); (linked to E5_02_CASE)
+- C9 00: Substract 0 to current_value
+- E5 FF:  Store current_value to stack 0xFF
+- C3 FF: Read value from stack 0xFF
+- CF 09: Multiply the current_value by an angle
+- E5 FE: Store current_value to stack 0xFE
+- C3 FE: Set current_value to stack 0xFE
+- D3 0A: Divide current_value by an angle
+- E5 FD: Store current_value to stack 0xFD
+- C1 00: Set current_value to 0
+- C7 FD: Add to current_value value at stack FD
+- E5 0F: Set BATTLE_STATE_CONTROLER + 40 to current_value
+- A1: End local sequence
+- C3 7F: Set current_value to value stored at E5_7F_save
+- C5 FF: Add -1 to current_value
+- E5 7F: Save current_value to 0x1D9820C
+- E7 E1: Save current_value to stack 0xE1
+- A0 0A: Queue animation 0A
+- B9 06: Set BATTLE_STATE_CONTROLER + 1 to 05
+- 97: Linked to sound, seems no param but I could be wrong
+- 02: Queue anim 02 
+- 01: Queue anim 01
+- BF 04: No idea
+- B4: Jump to some other anim seq ?
+- 1A: Queue animation 1A
+- 00: Queue animation 00
+- B9 04: Set BATTLE_STATE_CONTROLER + 1 to 03
+- 97 02 01: Cf upper
+- BF: Some sound effect ?
+- 04: Queue animation 04
+- B4 1A 00: Cf upper
+- B9 04: Set BATTLE_STATE_CONTROLER + 1 to 03
+- 97 02 01: cf upper
+- B4 1A 00 : cf upper
+- AA: Dunno
+- C3 08: Set current_value to BATTLE_STATE_CONTROLER + 44
+- DA 80: Current_value OR 0x80
+- E5 08 : set BATTLE_STATE_CONTROLER + 44 to current_value
+- C3 08: Set current_value to BATTLE_STATE_CONTROLER + 44
+- D9 08: current_value OR 0x08
+- E5 08: set BATTLE_STATE_CONTROLER + 44 to current_value
+- A1: End local sequence
+- A0 0B: Queue animation 0B
+- C3 0A: Set current value to some angle
+- E5 7F: Save current_value to 0x1D9820C
+- C1 00: Set current_value to 0
+- CB 02: Decrease current_value by the value at *(BATTLE_STATE_CONTROLER + 24);
+- E5 FF: Store current_value at stack 0xFF
+- C3 FF: Set current_value from stack 0xFF
+- CF 09: Multiply current_value by some angle
+- E5 FE: Write current_value to stack 0xFE
+- C3 FE: set current_value from stack 0xFE
+- D3 0A: Divide current_value by an angle
+- E5 FD: Write current_value to stack 0xFD
+- C3 02: Set current_value to value at *(BATTLE_STATE_CONTROLER + 24);
+- C7 FD:  Add to current_value value at stack FD
+- E5 0F: Set BATTLE_STATE_CONTROLER + 40 to current_value
+- A1: End local sequence
+- C3 7F: Set current_value to value stored at E5_7F_save
+- C5 FF: Add -1 to current_value
+- E5 7F: Save current_value to 0x1D9820C
+- E7 E1: If current_value > 0: continue, either jump E1 forward
+- 0C: Play animation 0C
+- A2: Dunno
 
 ## Section 6: Camera sequence
 
