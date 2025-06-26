@@ -304,6 +304,7 @@ two cases:
 - Param < 0x08: *(BATTLE_STATE_CONTROLER + 2 * sequence_command_param_1 + 20) = current_value_computed; BATTLE_STATE_CONTROLER is at 0x1D98200
 - 0x08: *(BATTLE_STATE_CONTROLER + 44) = current_value_computed;
 - 0x0F: *(BATTLE_STATE_CONTROLER + 40) = current_value_computed;
+- 0x17: rotate the sequence (0-4096)
 - 0x21: same as 0x31
 - 0x2C: set enemy's X position
 - 0x2D: set target's Y scale? (seems to make target flat)
