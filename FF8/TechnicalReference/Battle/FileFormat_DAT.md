@@ -292,6 +292,7 @@ Param values known:
 - 0x0A: LOWORD(return_value) = *(SHARED_ANIMATION_DATA + 7); (High byte of C3_13_09_COSINE)
 - 0x10: Speed depending of distance to target
 - 0x11: Some other computed speed depending of distance and slot id data
+- 0x33: Combat scene ID
 - Param > 0x77: current_value = *(E5_7F_save + 2 * (0x7F - param)); so at 0x7F it's E5_7F_save
 
 ### E5 case:
@@ -303,7 +304,7 @@ two cases:
 - Param < 0x08: *(BATTLE_STATE_CONTROLER + 2 * sequence_command_param_1 + 20) = current_value_computed; BATTLE_STATE_CONTROLER is at 0x1D98200
 - 0x08: *(BATTLE_STATE_CONTROLER + 44) = current_value_computed;
 - 0x0F: *(BATTLE_STATE_CONTROLER + 40) = current_value_computed;
-- 0x21: same as 0x31?
+- 0x21: same as 0x31
 - 0x2C: set enemy's X position
 - 0x2D: set target's Y scale? (seems to make target flat)
 - 0x30: set target's rotation (forwards/backwards) (gets reset when target comes back from an attack)
