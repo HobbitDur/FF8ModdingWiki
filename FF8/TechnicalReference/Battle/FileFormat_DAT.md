@@ -244,6 +244,11 @@ Some old info can be found here: [Qhimm message](https://forums.qhimm.com/index.
 
 Now how it works. The sequence animation is composed of opcode, followed by parameters (often 1, sometimes 2 or 0). Each op code define an action to do.
 
+### Opcode A8
+Makes the enemy fade away or fade in, based on the following byte.  
+- param is 0x02: re-appear (if the enemy was previously made to disappear with this opcode)
+- param is 0x03: disappear
+
 ### Opcode between C0 and E3: set a "current_value"
 Those opcode are meant to store and modify a local values (that is then used by later opcodes).  
 To analyze it, it is done on two part. First defining how to use the param, then knowing how to modify the local variable (store in what is called the _stack_)
@@ -298,6 +303,13 @@ two cases:
 - Param < 0x08: *(BATTLE_STATE_CONTROLER + 2 * sequence_command_param_1 + 20) = current_value_computed; BATTLE_STATE_CONTROLER is at 0x1D98200
 - 0x08: *(BATTLE_STATE_CONTROLER + 44) = current_value_computed;
 - 0x0F: *(BATTLE_STATE_CONTROLER + 40) = current_value_computed;
+- 0x21: same as 0x31?
+- 0x2C: set enemy's X position
+- 0x2D: set target's Y scale? (seems to make target flat)
+- 0x30: set target's rotation (forwards/backwards) (gets reset when target comes back from an attack)
+- 0x31: set target's rotation (left/right) (gets reset when target comes back from an attack)
+- 0x32: set target's rotation (lean to a side) (gets reset when target comes back from an attack)
+- 0x34: set target's Y position
 - Param > 0x77: *(dword_1D9820C + 2 * (127 - sequence_command_param_1)) = current_value_computed; (so 0x7F save at 0x1D9820C)
 
 ### 0xE6 < opcode < 0xF3
