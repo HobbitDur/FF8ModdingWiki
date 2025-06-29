@@ -343,12 +343,12 @@ Each one of those opcode are special:
   - param is 0x03: Make it Invisible (by dissapearing and staying invisible)
   - param is 0x06: Leave the combat by dissapearing (no xp gained)
 - AA: Dunno
-- B0 XX..XX: From 2 to 6 param. Second param is a flag that define how many param and what to do with them.
-  - second param & 1: Third param exist
-  - second param & 2: fourth param exist
-  - second param & 4: fifth param exist
-  - second param & 8: sixth param exist in certain condition
-  - second param & 40: sixth param exist and param are actually 3 int16
+- B0 XX..XX: From 2 to 6 param. Second param is a flag that define how many param and what to do with them. Seems to launch some particle effect.
+  - second param & 1: One more param
+  - second param & 2: One more param
+  - second param & 4: One more param
+  - second param & 8: One more param in certain condition
+  - second param & 40: 6 param and param are actually 3 int16
 - B1 XX..XX:  Reated to 99 with a bool inversed. The number of parameters are infinite and finish by FF. Play some SFX.
 - B7: Dunno
 - B9 XX : Set BATTLE_STATE_CONTROLER + 1 to XX - 1
