@@ -336,9 +336,11 @@ Each one of those opcode are special:
 - A0 XX: Queue animation XX and  *(BATTLE_STATE_CONTROLER + 44) |= 2u;
 - A1: End local sequence
 - A2: Seems to be the end of seq animation, but didn't confirm on the code
-- A8: Makes the enemy fade away or fade in, based on the following byte.  
-  - param is 0x02: re-appear (if the enemy was previously made to disappear with this opcode)
-  - param is 0x03: disappear
+- A8: Makes the enemy fade away or fade in, based on the following byte.
+  - param is 0x01: Slowly dissapear (but re-appear suddenly at the end)
+  - param 0x02 or 0x0C: re-appear (Make the animation of re-appearing, so dissapear suddenly to re-appear slowly)
+  - param is 0x03: Make it Invisible (by dissapearing and saying invisible)
+  - param is 0x06: Leave the combat by dissapearing (no xp gained)
 - AA: Dunno
 - B7: Dunno
 - B9 XX : Set BATTLE_STATE_CONTROLER + 1 to XX - 1
