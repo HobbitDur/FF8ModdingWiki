@@ -339,7 +339,7 @@ Each one of those opcode are special:
 - A8: Makes the enemy fade away or fade in, based on the following byte.
   - param is 0x01: Slowly dissapear (but re-appear suddenly at the end)
   - param 0x02 or 0x0C: re-appear (Make the animation of re-appearing, so dissapear suddenly to re-appear slowly)
-  - param is 0x03: Make it Invisible (by dissapearing and saying invisible)
+  - param is 0x03: Make it Invisible (by dissapearing and staying invisible)
   - param is 0x06: Leave the combat by dissapearing (no xp gained)
 - AA: Dunno
 - B7: Dunno
