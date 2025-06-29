@@ -343,7 +343,7 @@ Each one of those opcode are special:
   - param is 0x03: Make it Invisible (by dissapearing and staying invisible)
   - param is 0x06: Leave the combat by dissapearing (no xp gained)
 - AA: Dunno
-- B1 XX..XX:  Reated to 99 with a bool inversed. The number of parameters are infinite and finish by FF.
+- B1 XX..XX:  Reated to 99 with a bool inversed. The number of parameters are infinite and finish by FF. Play some SFX.
 - B7: Dunno
 - B9 XX : Set BATTLE_STATE_CONTROLER + 1 to XX - 1
 - BA: Seems to play animation (but need to be already loaded)
