@@ -244,10 +244,6 @@ Some old info can be found here: [Qhimm message](https://forums.qhimm.com/index.
 
 Now how it works. The sequence animation is composed of opcode, followed by parameters (often 1, sometimes 2 or 0). Each op code define an action to do.
 
-### Opcode A8
-Makes the enemy fade away or fade in, based on the following byte.  
-- param is 0x02: re-appear (if the enemy was previously made to disappear with this opcode)
-- param is 0x03: disappear
 
 ### Opcode between C0 and E3: set a "current_value"
 Those opcode are meant to store and modify a local values (that is then used by later opcodes).  
@@ -332,10 +328,17 @@ Does *(BATTLE_STATE_CONTROLER + 44) |= 0xAu; and end local sequence
 
 ## 0x80 < Opcode < C0
 Each one of those opcode are special:
+- 85: Hide the yellow triangle of chara selection
+- 86: Show the yellow triangle of chara selection
+- 94: Toogle the shadow
+- 95: Reset current position to original position (X and Z)
 - 97: *param_address_anim_seq = linkedToSoundAnimSeq(*param_address_anim_seq, 128);
 - A0 XX: Queue animation XX and  *(BATTLE_STATE_CONTROLER + 44) |= 2u;
 - A1: End local sequence
 - A2: Seems to be the end of seq animation, but didn't confirm on the code
+- A8: Makes the enemy fade away or fade in, based on the following byte.  
+  - param is 0x02: re-appear (if the enemy was previously made to disappear with this opcode)
+  - param is 0x03: disappear
 - AA: Dunno
 - B7: Dunno
 - B9 XX : Set BATTLE_STATE_CONTROLER + 1 to XX - 1
