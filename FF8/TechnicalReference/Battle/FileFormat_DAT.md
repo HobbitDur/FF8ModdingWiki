@@ -333,6 +333,7 @@ Each one of those opcode are special:
 - 94: Toogle the shadow
 - 95: Reset current position to original position (X and Z)
 - 97: *param_address_anim_seq = linkedToSoundAnimSeq(*param_address_anim_seq, 128);
+- 99 XX..XX: Reated to B1 with a bool inversed. The number of parameters are infinite and finish by FF.
 - A0 XX: Queue animation XX and  *(BATTLE_STATE_CONTROLER + 44) |= 2u;
 - A1: End local sequence
 - A2: Seems to be the end of seq animation, but didn't confirm on the code
@@ -342,10 +343,16 @@ Each one of those opcode are special:
   - param is 0x03: Make it Invisible (by dissapearing and staying invisible)
   - param is 0x06: Leave the combat by dissapearing (no xp gained)
 - AA: Dunno
+- B1 XX..XX:  Reated to 99 with a bool inversed. The number of parameters are infinite and finish by FF.
 - B7: Dunno
 - B9 XX : Set BATTLE_STATE_CONTROLER + 1 to XX - 1
+- BA: Seems to play animation (but need to be already loaded)
 - BB: Handle text
+- BC XX: Seems to do nothing
 - B4: Seems to jump to other anim sequence
+- B9 XX: Unknown
+- BD XX XX: No idea
+- BE XX XX: No idea
 - BF: No idea
 
 ### Example
