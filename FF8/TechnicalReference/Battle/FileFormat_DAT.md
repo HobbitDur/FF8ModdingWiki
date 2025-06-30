@@ -286,8 +286,9 @@ Param values known:
 - 0x08: LOWORD(return_value) = *(BATTLE_STATE_CONTROLER + 44);
 - 0x09:  LOWORD(return_value) = *(SHARED_ANIMATION_DATA + 6);(High byte of C3_12_SINE)
 - 0x0A: LOWORD(return_value) = *(SHARED_ANIMATION_DATA + 7); (High byte of C3_13_09_COSINE)
-- 0x10: Speed depending of distance to target
-- 0x11: Some other computed speed depending of distance and slot id data
+- 0x10: Speed depending of distance to target. On itself, speed_factor = 1000. On a target, speed_factor = 5000*distance/4096.
+- 0x11: Speed from 0x10 adjusted: Speed_0x10 - (2000*(attacker_speed_factor + target_speed_factor)/4096). Set to 1000 if on itself.
+- 0x1A: Angle between the target and the attacker
 - 0x33: Combat scene ID
 - Param > 0x77: current_value = *(E5_7F_save + 2 * (0x7F - param)); so at 0x7F it's E5_7F_save
 
@@ -371,12 +372,12 @@ Each one of those opcode are special:
 
 ### Example
 If we use the normal attack animation of bite bug, here for each opcode/param what it does:
-- C3 11: Set current_value to some speed (between 1000 and 5000)
+- C3 11: Set current_value to adjusted speed
 - C5 64: Add 0x64 to current_value
 - E5 FF: Store current_value to stack 0xFF
 - C1 00: Set current_value to 0x00
 - CB FF: Substract to current_value value stored at 0xFF (so did actually put a minus in front of current_value)
-- E5 02: Store current_value to BATTLE_STATE_CONTROLER + 2 * param + 20, 
+- E5 02: Store current_value to BATTLE_STATE_CONTROLER[02]
 - BB: Handle text
 - 08: Queue animation 08
 - A0 09: Queue animation 09
