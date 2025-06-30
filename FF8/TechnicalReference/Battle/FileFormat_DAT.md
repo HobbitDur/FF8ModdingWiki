@@ -343,8 +343,14 @@ Each one of those opcode are special:
   - param is 0x03: Make it Invisible (by dissapearing and staying invisible)
   - param is 0x06: Leave the combat by dissapearing (no xp gained)
 - AA: Dunno
-- AD XX XX XX XX: Call AE and insert AE second param as FF.
-- AE XX XX XX XX XX: Dunno. Third and fourth param is actually a int16.
+- AD X1 X2 X3 X4: Call AE and insert AE second param as FF -> AE(X1, FF, X2, X3, X4)
+- AE X1 X2 X3 X4 X5: Dunno. Third and fourth param is actually a int16. Seems to move the target
+  - X1: Called *frame selector*. Several cases: (but value not really understood)
+    - FF: Special case where the start point is the target position
+    - 0x00 to 0xFE: Starting point is the attacker position
+  - X2: Special cases for FF where some computation is ignored. Should define middle point between first param and second param.
+  - X3-X4: int16 value in little endian.
+  - X5: Define time for how long the target stay to new location
 - B0 XX..XX: From 2 to 6 param. Second param is a flag that define how many param and what to do with them. Seems to launch some particle effect.
   - second param & 1: One more param
   - second param & 2: One more param
