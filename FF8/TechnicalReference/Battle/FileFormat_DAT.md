@@ -343,6 +343,8 @@ Each one of those opcode are special:
   - param is 0x03: Make it Invisible (by dissapearing and staying invisible)
   - param is 0x06: Leave the combat by dissapearing (no xp gained)
 - AA: Dunno
+- AD XX XX XX XX: Call AE and insert AE second param as FF.
+- AE XX XX XX XX XX: Dunno. Third and fourth param is actually a int16.
 - B0 XX..XX: From 2 to 6 param. Second param is a flag that define how many param and what to do with them. Seems to launch some particle effect.
   - second param & 1: One more param
   - second param & 2: One more param
