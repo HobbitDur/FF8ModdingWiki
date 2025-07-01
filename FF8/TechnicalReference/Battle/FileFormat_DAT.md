@@ -338,6 +338,13 @@ Each one of those opcode are special:
 - A0 XX: Queue animation XX and  *(BATTLE_STATE_CONTROLER + 44) |= 2u;
 - A1: End local sequence
 - A2: Seems to be the end of seq animation, but didn't confirm on the code
+- A5 XX: Call some function depending of the parameter, which trigger particle and sound effect
+  - 00: sub_574C80 => For character/ Boss green magic effect
+  - 01: sub_5742A0 => For GF summon
+  - 02: sub_5737C0 => Normal limit break
+  - 03: sub_574260 => Finisher limit break
+  - 04: sub_573560 => Enemy magic effect
+  - 05: sub_5736E0 => Looks a bit like 04
 - A8: Makes the enemy fade away or fade in, based on the following byte.
   - param is 0x01: Slowly dissapear (but re-appear suddenly at the end)
   - param 0x02 or 0x0C: re-appear (Make the animation of re-appearing, so dissapear suddenly to re-appear slowly)
