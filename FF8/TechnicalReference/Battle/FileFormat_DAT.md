@@ -367,6 +367,15 @@ Each one of those opcode are special:
   - second param & 40: 6 param and param are actually 3 int16
 - B1 XX..XX:  Reated to 99 with a bool inversed. The number of parameters are infinite and finish by FF. Play some SFX.
 - B7: Dunno
+- B8 X1 X_2 X3: Play a sound (call BdPlaySy(X1, v9, v6)). Either 2 or 3 param depending of condition
+  - X1: Some value for the sound
+  - X2: Flag:
+    - If Flag & 0x4: v6 = 128
+    - Else:
+      - If Flag & 0x1: Extract target position and compute v6 with it
+      - Else: Extract attacker position and compute v6 with it
+    - If Flag & 0x02: v9 is X3 (third param exist)
+    - Else: v9 is 0
 - B9 XX : Set BATTLE_STATE_CONTROLER + 1 to XX - 1
 - BA: Seems to play animation (but need to be already loaded)
 - BB: Handle text
