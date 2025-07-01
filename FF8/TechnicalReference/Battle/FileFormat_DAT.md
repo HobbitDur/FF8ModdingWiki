@@ -283,9 +283,10 @@ current_value_computed %= param;
 On each case a specific code is done, often it just read a value in memory that as a specific purpose.
 Param values known:
 - Param < 0x07: current_value = *(BATTLE_STATE_CONTROLER + 2 * param + 20); BATTLE_STATE_CONTROLER is at 0x1D98200
-- 0x08: LOWORD(return_value) = *(BATTLE_STATE_CONTROLER + 44);
-- 0x09:  LOWORD(return_value) = *(SHARED_ANIMATION_DATA + 6);(High byte of C3_12_SINE)
-- 0x0A: LOWORD(return_value) = *(SHARED_ANIMATION_DATA + 7); (High byte of C3_13_09_COSINE)
+- 0x08: return_value = BATTLE_STATE_CONTROLER->some_flag;
+- 0x09:  return_value = ACTIVE_ANIM_CMD->current_frame;
+- 0x0A:  return_value = ACTIVE_ANIM_CMD->total_frames;
+- 0x0C: return_value = Randomly generated value between [0:32767]
 - 0x10: Speed depending of distance to target. On itself, speed_factor = 1000. On a target, speed_factor = 5000*distance/4096.
 - 0x11: Speed from 0x10 adjusted: Speed_0x10 - (2000*(attacker_speed_factor + target_speed_factor)/4096). Set to 1000 if on itself.
 - 0x1A: Angle between the target and the attacker
