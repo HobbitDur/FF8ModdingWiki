@@ -252,7 +252,7 @@ To analyze it, it is done on two part. First defining how to use the param, then
 #### How to interpret the params
 Do OpCode & 3:
 - case 0: 2 param int16 value (C0, C4, D0,...)
-- case 1: 1 param sign value (C1, C5, C9, D1, D5, D9 ...)
+- case 1: 1 param sign value (C1, C5, C9, D1, D5, D9, DD,...)
 - case 2: 1 param unsigned value (C2, C6, D2, DA,...)
 - case 3: 1 param, two cases: (C3, C7, CB, CF, D3...)
     - Param < 0x80: special handle to set param value (cf dedicated chapter).
@@ -321,7 +321,8 @@ two cases:
 ### 0xE6 < opcode < 0xF3
 Those are conditional jump (if)
 Those value check the current_value and decide to either continue the flow or jump the number of hex value define by the param
-- E7 to EC: If condition is met, Jump X byte, X being the param value (and a signed value). Else jump just one (so the param itself)
+- E6: Jump forward X bytes, X being the param value (and a signed value).
+- E7 to EC: If condition is met, Jump X bytes, X being the param value (and a signed value). Else jump just one (so the param itself)
   - E7: current_value > 0
   - E8: current_value >= 0
   - E9: current_value == 0
