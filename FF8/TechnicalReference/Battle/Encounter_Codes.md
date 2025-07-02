@@ -5,7 +5,7 @@ title: Encounter Codes
 permalink: /technical-reference/battle/encounter-codes/
 ---
 
-## Usable Encounters
+## Used Encounters
 
 | Encounter ID | Description                                        | Location                                 |
 |--------------|----------------------------------------------------|------------------------------------------|
