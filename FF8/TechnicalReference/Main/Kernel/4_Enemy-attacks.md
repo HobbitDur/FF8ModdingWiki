@@ -46,7 +46,7 @@ permalink: /technical-reference/main/kernel/enemy-attacks/
 | 0x19D4 | 027 - Upward Kick                      |
 | 0x19E8 | 028 - Electric Discharge               |
 | 0x19FC | 029 - Petrify Stare                    |
-| 0x1A10 | 030 - null                             |
+| 0x1A10 | 030 - null (Cockatrice Pecks)          |
 | 0x1A24 | 031 - Bite                             |
 | 0x1A38 | 032 - Poison Gas                       |
 | 0x1A4C | 033 - Poison Gas                       |
@@ -56,11 +56,11 @@ permalink: /technical-reference/main/kernel/enemy-attacks/
 | 0x1A9C | 037 - Breath                           |
 | 0x1AB0 | 038 - Ice Breath                       |
 | 0x1AC4 | 039 - Sand Storm                       |
-| 0x1AD8 | 040 - null                             |
-| 0x1AEC | 041 - null                             |
-| 0x1B00 | 042 - null                             |
-| 0x1B14 | 043 - null                             |
-| 0x1B28 | 044 - null                             |
+| 0x1AD8 | 040 - null (Fastitocalon Reveal)       |
+| 0x1AEC | 041 - null (Fastitocalon-F Reveal)     |
+| 0x1B00 | 042 - null (Fastitocalon Bite)         |
+| 0x1B14 | 043 - null (Fastitocalon-F Bite)       |
+| 0x1B28 | 044 - null (Biggs b4 healing Wedge 1)  |
 | 0x1B3C | 045 - Wedge Enter Battle               |
 | 0x1B50 | 046 - null                             |
 | 0x1B64 | 047 - null                             |
@@ -98,8 +98,8 @@ permalink: /technical-reference/main/kernel/enemy-attacks/
 | 0x1DE4 | 079 - Ifrit Weak Punch                 |
 | 0x1DF8 | 080 - Sand Storm                       |
 | 0x1E0C | 081 - null                             |
-| 0x1E20 | 082 - null                             |
-| 0x1E34 | 083 - null                             |
+| 0x1E20 | 082 - null (Bomb Expand 1)             |
+| 0x1E34 | 083 - null (Bomb Expand 1)             |
 | 0x1E48 | 084 - Stare                            |
 | 0x1E5C | 085 - Sigh                             |
 | 0x1E70 | 086 - Curse                            |
@@ -120,7 +120,7 @@ permalink: /technical-reference/main/kernel/enemy-attacks/
 | 0x1F9C | 101 - null                             |
 | 0x1FB0 | 102 - Breath                           |
 | 0x1FC4 | 103 - Tail Blade                       |
-| 0x1FD8 | 104 - null                             |
+| 0x1FD8 | 104 - null (Forbidden Iai Blow Stance) |
 | 0x1FEC | 105 - null                             |
 | 0x2000 | 106 - Mega Spark                       |
 | 0x2014 | 107 - Onrush                           |
@@ -131,7 +131,7 @@ permalink: /technical-reference/main/kernel/enemy-attacks/
 | 0x2078 | 112 - Gastric Juice                    |
 | 0x208C | 113 - Sleeping Gas                     |
 | 0x20A0 | 114 - Breath                           |
-| 0x20B4 | 115 - null                             |
+| 0x20B4 | 115 - null (Funguar Laser)             |
 | 0x20C8 | 116 - null                             |
 | 0x20DC | 117 - null                             |
 | 0x20F0 | 118 - Beam Cannon                      |
@@ -150,7 +150,7 @@ permalink: /technical-reference/main/kernel/enemy-attacks/
 | 0x21F4 | 131 - "Brrawghh!"                      |
 | 0x2208 | 132 - null                             |
 | 0x221C | 133 - Wind Blast                       |
-| 0x2230 | 134 - null                             |
+| 0x2230 | 134 - null (Thrustaevis Attack)        |
 | 0x2244 | 135 - Scan                             |
 | 0x2258 | 136 - Cerberus Counter 1               |
 | 0x226C | 137 - Cerberus Counter 2               |
@@ -211,7 +211,7 @@ permalink: /technical-reference/main/kernel/enemy-attacks/
 | 0x26B8 | 192 - Ochu Dance                       |
 | 0x26CC | 193 - Earthquake                       |
 | 0x26E0 | 194 - Drink Magic                      |
-| 0x26F4 | 195 - null                             |
+| 0x26F4 | 195 - null (Ochu Poison Attack)        |
 | 0x2708 | 196 - null                             |
 | 0x271C | 197 - null                             |
 | 0x2730 | 198 - null                             |
@@ -388,7 +388,7 @@ permalink: /technical-reference/main/kernel/enemy-attacks/
 | 0x348C | 369 - Vacuum Wave                      |
 | 0x34A0 | 370 - null                             |
 | 0x34B4 | 371 - null                             |
-| 0x34C8 | 372 - null                             |
+| 0x34C8 | 372 - null (Elite Soldier BGH251F2 ?)  |
 | 0x34DC | 373 - Apocalypse                       |
 | 0x34F0 | 374 - null                             |
 | 0x3504 | 375 - Gigantic Sword                   |
