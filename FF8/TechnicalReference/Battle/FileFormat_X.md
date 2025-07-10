@@ -3,10 +3,10 @@ layout: default
 parent: Battle
 title:  Battle Stage (.X)
 author: 
-  - MaKiPL
-  - shakotay2 (XeNTaX)
-  - Halfer
-  - Yagami Light
+  - MaKiPL  
+  - shakotay2 (XeNTaX)  
+  - Halfer  
+  - Yagami Light  
 permalink: /technical-reference/battle/battle-stage-x/
 ---
 
