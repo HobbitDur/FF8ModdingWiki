@@ -16,7 +16,7 @@ Complete list of original battle stages: [List of battle stages](../BS_list)
 
 .X file is uncompressed 3D stage model with texture embedeed. The file contains unused info (not used by FF8 engine), camera data, movement, translations and geometry data.
 
-Battle stages **DOES NOT** contain pointers to next sections. All pointers are **HARDCODED** in FF8.EXE. [Click me for battle stage pointer list](../Pointers)
+Battle stages **DOES NOT** contain pointers to next sections. All pointers are **HARDCODED** in FF8.EXE. [Click me for battle stage pointer list](../battle-stage-pointers)
 
 | Name                      | Usually starting with:                  | Description                                                             |
 |---------------------------|-----------------------------------------|-------------------------------------------------------------------------|
