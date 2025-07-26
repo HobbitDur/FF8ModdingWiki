@@ -535,11 +535,19 @@ here they are mentionned together as the start of image characters instead of no
 | 0xc9 | {TM} | 1 |
 | 0xca | {<} | 1 |
 | 0xcb | {>} | 1 |
-| 0xcc | {(GA)MEFOLDER} | 1 |
-| 0xcd | {GA(ME)FOLDER} | 1 |
-| 0xce | {GAME(FOL)DER} | 1 |
-| 0xcf | {GAMEFOL(DE)R} | 1 |
-| 0xd0 | {GAMEFOLD(ER)} | 1 |
-| 0xd1 | {(SLO)T} | 1 |
-| 0xd2 | {SL(OT)} | 1 |
+
+# Word divided
+Some words are divided in several characters, but need to be used together to correctly form the word (for example the "m" can be trunced between two "characters"
+
+| Hex value | Word | Size |
+|-----------|--------------------|------|
+| 0xcc 0xcd 0xce 0xcf 0xd0 | {GAMEFOLDER} | 5 |
+| 0xd1 0xd2 | {Slot} | 2 |
+| 0xd3 | {Ing} | 1 |
+| 0xd4 0xd5 0xd6 0xd7 0xd8  | {Steckplatz} | 5 |
+| 0xd9 0xda | {Fente} | 2 |
+| 0xdb 0xdc 0xdd 0xde | {Ingresso} | 4 |
+| 0xdf 0xe0 0xe1 | {Ranura} | 3 |
+
+
 
