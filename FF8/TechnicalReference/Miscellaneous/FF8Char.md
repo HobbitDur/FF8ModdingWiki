@@ -521,6 +521,7 @@ List of known value:
 
 Some are mentionned earlier,
 here they are mentionned together as the start of image characters instead of normal characters
+
 | Hex value | Char/Signification | Size |
 |-----------|--------------------|------|
 | 0xc0 | {<<} | 1 |
