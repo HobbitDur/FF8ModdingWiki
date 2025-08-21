@@ -19,4 +19,4 @@ none
 
 #### Description
 
-This is used a lot whenever the party changes members or goes to/from the dream world.
+Resurrects dead characters, despite the name. Used when switching to Laguna's party
