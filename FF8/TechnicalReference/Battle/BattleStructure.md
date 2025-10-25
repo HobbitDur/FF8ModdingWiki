@@ -36,16 +36,16 @@ Scene.out contains no header. It is a raw list of 1024 encounters. Each encounte
 
 Enemy flags are one byte each, and each bit determines whether a specific monster's flag is on or off, starting from the leftmost bit (MSB) for Monster 1, down to the rightmost bit (LSB) for Monster 8.
 
-| Flag value | Binary   | Monster   |
-|------------|----------|-----------|
-| 0x80       | 10000000 | Monster 1 |
-| 0x40       | 01000000 | Monster 2 |
-| 0x20       | 00100000 | Monster 3 |
-| 0x10       | 00010000 | Monster 4 |
-| 0x08       | 00001000 | Monster 5 |
-| 0x04       | 00000100 | Monster 6 |
-| 0x02       | 00000010 | Monster 7 |
-| 0x01       | 00000001 | Monster 8 |
+| Flag value | Monster   |
+|------------|-----------|
+| 0x80       | Monster 1 |
+| 0x40       | Monster 2 |
+| 0x20       | Monster 3 |
+| 0x10       | Monster 4 |
+| 0x08       | Monster 5 |
+| 0x04       | Monster 6 |
+| 0x02       | Monster 7 |
+| 0x01       | Monster 8 |
 
 ## Battle flags
 
