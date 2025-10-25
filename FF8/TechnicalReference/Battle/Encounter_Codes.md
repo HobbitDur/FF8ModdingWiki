@@ -45,8 +45,8 @@ permalink: /technical-reference/battle/encounter-codes/
 | 033          | 2 G-Soldier                                        | Dollet Elevator                          |
 | 034          | Grat                                               | Balamb Garden Gate                       |
 | 035          | 2 Grat                                             | Balamb Garden Gate                       |
-| 036          | 2 Caterchipiller + 1 Bomb                          | Balamb Garden Gate                       |
-| 037          | Caterchipiller                                     | Balamb Garden Gate                       |
+| 036          | 2 Caterchipillar + 1 Bomb                          | Balamb Garden Gate                       |
+| 037          | Caterchipillar                                     | Balamb Garden Gate                       |
 | 038          | 1 T-Rexaur                                         | Balamb Garden Gate                       |
 | 039          | 1 Bomb                                             | Balamb Garden Hall                       |
 | 040          | 4 Bite Bug                                         | Balamb Garden Hall                       |
@@ -54,15 +54,15 @@ permalink: /technical-reference/battle/encounter-codes/
 | 042          | 2 Glacial Eye + 1 Bomb                             | Balamb Garden Hall                       |
 | 043          | 1 T-Rexaur                                         | Balamb Garden Hall                       |
 | 044          | 1 Bomb                                             | Balamb Garden 2f Hall                    |
-| 045          | 1 Glacial Eye + 1 Caterchipiller                   | Balamb Garden 2f Hall                    |
+| 045          | 1 Glacial Eye + 1 Caterchipillar                   | Balamb Garden 2f Hall                    |
 | 046          | 1 Grat                                             | Balamb Garden 2f Hall                    |
 | 047          | 1 T-Rexaur                                         | Balamb Garden 2f Hall                    |
 | 048          | 2 Bite Bug                                         | Balamb Garden Quad                       |
 | 049          | 2 Glacial Eye                                      | Balamb Garden Quad                       |
-| 050          | 1 Glacial Eye + 1 Caterchipiller                   | Balamb Garden Quad                       |
+| 050          | 1 Glacial Eye + 1 Caterchipillar                   | Balamb Garden Quad                       |
 | 051          | 1 Bite Bug + 1 Grat + 1 Bomb                       | Balamb Garden Quad                       |
 | 052          | 1 Grat                                             | Balamb Garden Walkway                    |
-| 053          | 1 Caterchipiller                                   | Balamb Garden Walkway                    |
+| 053          | 1 Caterchipillar                                   | Balamb Garden Walkway                    |
 | 054          | 1 Bomb                                             | Balamb Garden Walkway                    |
 | 055          | 1 T-Rexaur                                         | Balamb Garden Walkway                    |
 | 056          | 1 Glacial Eye                                      | Balamb Garden Walkway                    |
@@ -132,8 +132,8 @@ permalink: /technical-reference/battle/encounter-codes/
 | 118          | Cerberus (boss)                                    | Galbadia Garden Main Hall                |
 | 119          | Seifer (2nd)                                       | Galbadia Garden Master Room              |
 | 120          | Seifer + Edea (2nd)                                | Galbadia Garden Auditorium               |
-| 121          | 1 Caterchipiller                                   | Winhill                                  |
-| 122          | 1 Caterchipiller + 1 Bite Bug                      | Winhill                                  |
+| 121          | 1 Caterchipillar                                   | Winhill                                  |
+| 122          | 1 Caterchipillar + 1 Bite Bug                      | Winhill                                  |
 | 123          | 1 Death Claw                                       | Galbadia Garden Lobby                    |
 | 124          | 1 Jelleye                                          | Galbadia Garden Lobby                    |
 | 125          | 1 SAM08G                                           | Galbadia Garden Lobby                    |
@@ -210,7 +210,7 @@ permalink: /technical-reference/battle/encounter-codes/
 | 196          | G-Soldier                                          | ?                                        |
 | 197          | T-Rexaur                                           | Balamb Garden Walkway ()                 |
 | 198          | 2 Bomb                                             | Balamb Garden Walkway ()                 |
-| 199          | Caterchipiller                                     | Balamb Garden Walkway (Quad)             |
+| 199          | Caterchipillar                                     | Balamb Garden Walkway (Quad)             |
 | 200          | 2 Bite Bug                                         | Balamb Garden Walkway (infirmary)        |
 | 201          | Grat                                               | Balamb Garden Walkway (library)          |
 | 202          | Bite Big + Grat                                    | Balamb Garden Walkway (library)          |
