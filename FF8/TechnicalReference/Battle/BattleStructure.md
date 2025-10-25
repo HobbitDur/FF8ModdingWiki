@@ -67,8 +67,8 @@ Similarly to [enemy flags](#enemy-flags), it's a byte and each bit determines wh
 **Unknown 1, 2, and 3** each contain 2 bytes per monster, making them 16 bytes long (8 monsters \* 2 bytes).  
 **Unknown 4** contains 1 byte per monster, for a total of 8 bytes.  
 
-The data is laid out sequentially, from Monster 1 through Monster 8, and each monster has its own set of values, though some values are shared between monsters.  
-It appears that the game doesn't read use these fields' data, suggesting they may be remnants of a scrapped feature.  
+The data is laid out sequentially, from _Monster 1_ through _Monster 8_, and each monster has its own set of values, though some values are shared between monsters.  
+It appears that the game doesn't read these fields' data, suggesting they may be remnants of a scrapped feature.  
 
 ## Enemy level
 
