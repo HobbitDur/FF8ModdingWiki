@@ -33,7 +33,7 @@ Note: descriptions are written from the monster's perspective, so "opposing part
 
 ### Summary
 
-| Opcode | IfritAI name | Size | Short Description  |
+| Opcode | IfritAI name | Size | Short description  |
 |--------|--------------|------|--------------------|
 | 0x00   | return       | 1    | End monster's turn |
 
@@ -52,13 +52,13 @@ Displays a battle message.
 
 ### Summary
 
-| Opcode | IfritAI name | Size | Short Description   |
+| Opcode | IfritAI name | Size | Short description   |
 |--------|--------------|------|---------------------|
 | 0x01   | print        | 2    | Print text          |
 
 ### Parameters
 
-| Position | Size | Name       | Type                     | Short Description     |
+| Position | Size | Name       | Type                     | Short description     |
 |----------|------|------------|--------------------------|-----------------------|
 | 1        | 1    | **TextID** | [int](../OpCodeType#int) | The index of the text |
 
@@ -75,7 +75,7 @@ Note that battle message speed is ignored.
 
 The if opcode allow to execute code only on certain condition
 
-| Opcode | IfritAI name | Size | Short Description |
+| Opcode | IfritAI name | Size | Short description |
 |--------|--------------|------|-------------------|
 | 0x02   | if           | 1    | Define condition  |
 
@@ -87,7 +87,7 @@ Then it uses 3 parameters for the condition: the left part of the condition, the
 So it does something like this: \[ConditionLeftPart\] \[Comparator\] \[ConditionRightPart\], for ex: COMBAT SCENE == 76  
 Then there is a jump param to define the jump size if the condition is not met
 
-| Position | Size | Name                   | Type                                   | Short Description                                    |
+| Position | Size | Name                   | Type                                   | Short description                                    |
 |----------|------|------------------------|----------------------------------------|------------------------------------------------------|
 | 1        | 1    | **SubjectID**          | [SubjectID](#subjectid)                | Define what the if will be about                     |
 | 2        | 1    | **ConditionLeftPart**  | Vary                                   | The left condition                                   |
@@ -261,19 +261,19 @@ This opcode defines a target, it must be used before any opcode that requires a 
 If the target is a specific playable character who isn't currently targetable, the character in the slot of the original target -1 will be targeted, if the original target was slot 0, the new target will be slot 1 instead.  
 Note that the original target will still be targeted by opcodes **_draw_** and **_blowAway_**.
 
-| Opcode | IfritAI name | Size | Short Description |
+| Opcode | IfritAI name | Size | Short description |
 |--------|--------------|------|-------------------|
 | 0x04   | target       | 2    | Print text        |
 
 ### Parameters
 
-| Position | Size | Name            | Type                                      | Short Description |
+| Position | Size | Name            | Type                                      | Short description |
 |----------|------|-----------------|-------------------------------------------|-------------------|
 | 1        | 1    | **Target**      | [TargetBasic](../OpCodeType#target-basic) | The target        |
 
 OR
 
-| Position | Size | Name            | Type                                | Short Description     |
+| Position | Size | Name            | Type                                | Short description     |
 |----------|------|-----------------|-------------------------------------|-----------------------|
 | 1        | 1    | **Var**         | [LocalVar](../OpCodeType#local-var) | Var containing target |
 
@@ -285,7 +285,7 @@ OR
 
 Causes monster that executes this opcode to die.
 
-| Opcode | IfritAI name | Size | Short Description     |
+| Opcode | IfritAI name | Size | Short description     |
 |--------|--------------|------|-----------------------|
 | 0x05   | die          | 1    | Causes monster to die |
 
@@ -309,13 +309,13 @@ This Opcode is not used in any monster, but the code seems to indicate it declar
 Picks one of 3 abilities to use randomly, then uses it.  
 Requires **_target_** to have been used.
 
-| Opcode | IfritAI name | Size | Short Description            |
+| Opcode | IfritAI name | Size | Short description            |
 |--------|--------------|------|------------------------------|
 | 0x0B   | useRandom    | 4    | Use random ability between 3 |
 
 ### Parameters
 
-| Position | Size | Name                    | Type                                                     | Short Description       |
+| Position | Size | Name                    | Type                                                     | Short description       |
 |----------|------|-------------------------|----------------------------------------------------------|-------------------------|
 | 1        | 1    | **MonsterLineAbility1** | [MonsterLineAbility](../OpCodeType#monster-line-ability) | The first ability line  |
 | 2        | 1    | **MonsterLineAbility2** | [MonsterLineAbility](../OpCodeType#monster-line-ability) | The second ability line |
@@ -329,13 +329,13 @@ Requires **_target_** to have been used.
 
 Use one ability, requires **_target_** to have been used.
 
-| Opcode | IfritAI name | Size | Short Description |
+| Opcode | IfritAI name | Size | Short description |
 |--------|--------------|------|-------------------|
 | 0x0C   | use          | 2    | Use one ability   |
 
 ### Parameters
 
-| Position | Size | Name                   | Type                                                     | Short Description |
+| Position | Size | Name                   | Type                                                     | Short description |
 |----------|------|------------------------|----------------------------------------------------------|-------------------|
 | 1        | 1    | **MonsterLineAbility** | [MonsterLineAbility](../OpCodeType#monster-line-ability) | The ability line  |
 
@@ -354,13 +354,13 @@ Seems to jump to the op code 25 (doNothing) and just save the param.
 Sets local variable that will be only accessible by this monster during the battle.  
 Can also be used to initialize a battle variable, in case the battle variable already has a value this opcode will be ignored.
 
-| Opcode | IfritAI name | Size | Short Description               |
+| Opcode | IfritAI name | Size | Short description               |
 |--------|--------------|------|---------------------------------|
 | 0x0E   | var          | 3    | Set local var to specific value |
 
 ### Parameters
 
-| Position | Size | Name      | Type                                | Short Description             |
+| Position | Size | Name      | Type                                | Short description             |
 |----------|------|-----------|-------------------------------------|-------------------------------|
 | 1        | 1    | **Var**   | [LocalVar](../OpCodeType#local-var) | The var to store the data     |
 | 2        | 1    | **Value** | [int](../OpCodeType#int)            | The value var is set to       |
@@ -377,13 +377,13 @@ Sets battle variable (accessible by all monsters).
 
 Sets global variable (accessible by all monsters)
 
-| Opcode | IfritAI name | Size | Short Description       |
+| Opcode | IfritAI name | Size | Short description       |
 |--------|--------------|------|-------------------------|
 | 0x0F   | bvar         | 3    | Set battle var to value |
 
 ### Parameters
 
-| Position | Size | Name      | Type                                 | Short Description             |
+| Position | Size | Name      | Type                                 | Short description             |
 |----------|------|-----------|--------------------------------------|-------------------------------|
 | 1        | 1    | **Var**   | [LocalVar](../OpCodeType#global-var) | The var to store the data     |
 | 2        | 1    | **Value** | [int](../OpCodeType#int)             | The value var is set to       |
@@ -396,13 +396,13 @@ Sets global variable (accessible by all monsters)
 
 Sets savemap variable (not sure how it it stored).
 
-| Opcode | IfritAI name | Size | Short Description        |
+| Opcode | IfritAI name | Size | Short description        |
 |--------|--------------|------|--------------------------|
 | 0x11   | gvar         | 3    | Set savemap var to value |
 
 ### Parameters
 
-| Position | Size | Name      | Type                                    | Short Description             |
+| Position | Size | Name      | Type                                    | Short description             |
 |----------|------|-----------|-----------------------------------------|-------------------------------|
 | 1        | 1    | **Var**   | [SavemapVar](../OpCodeType#savemap-var) | The var to store the data     |
 | 2        | 1    | **Value** | [int](../OpCodeType#int)                | The value var is set to       |
@@ -415,13 +415,13 @@ Sets savemap variable (not sure how it it stored).
 
 Adds value to local variable that will be only accessible by this monster during the battle.
 
-| Opcode | IfritAI name | Size | Short Description      |
+| Opcode | IfritAI name | Size | Short description      |
 |--------|--------------|------|------------------------|
 | 0x12   | add          | 3    | Add value to local var |
 
 ### Parameters
 
-| Position | Size | Name      | Type                                | Short Description           |
+| Position | Size | Name      | Type                                | Short description           |
 |----------|------|-----------|-------------------------------------|-----------------------------|
 | 1        | 1    | **Var**   | [LocalVar](../OpCodeType#local-var) | The var to store the data   |
 | 2        | 1    | **Value** | [int](../OpCodeType#int)            | The value to add to the var |
@@ -436,13 +436,13 @@ If **Value** is equal to 0xCB (203), then the added value is equal to the last a
 
 Adds value to battle var (accessible by all monsters).
 
-| Opcode | IfritAI name | Size | Short Description       |
+| Opcode | IfritAI name | Size | Short description       |
 |--------|--------------|------|-------------------------|
 | 0x13   | gadd         | 3    | Add value to global var |
 
 ### Parameters
 
-| Position | Size | Name      | Type                                  | Short Description           |
+| Position | Size | Name      | Type                                  | Short description           |
 |----------|------|-----------|---------------------------------------|-----------------------------|
 | 1        | 1    | **Var**   | [GlobalVar](../OpCodeType#global-var) | The var to store the data   |
 | 2        | 1    | **Value** | [int](../OpCodeType#int)              | The value to add to the var |
@@ -455,13 +455,13 @@ Adds value to battle var (accessible by all monsters).
 
 Adds value to savemap var (not sure where it is stored).
 
-| Opcode | IfritAI name | Size | Short Description        |
+| Opcode | IfritAI name | Size | Short description        |
 |--------|--------------|------|--------------------------|
 | 0x15   | sadd         | 3    | Add value to savemap var |
 
 ### Parameters
 
-| Position | Size | Name      | Type                                    | Short Description           |
+| Position | Size | Name      | Type                                    | Short description           |
 |----------|------|-----------|-----------------------------------------|-----------------------------|
 | 1        | 1    | **Var**   | [SavemapVar](../OpCodeType#savemap-var) | The var to store the data   |
 | 2        | 1    | **Value** | [int](../OpCodeType#int)                | The value to add to the var |
@@ -474,7 +474,7 @@ Adds value to savemap var (not sure where it is stored).
 
 Sets remaining HP to max HP.
 
-| Opcode | IfritAI name | Size | Short Description           |
+| Opcode | IfritAI name | Size | Short description           |
 |--------|--------------|------|-----------------------------|
 | 0x16   | recover      | 1    | Sets remaining HP to max HP |
 
@@ -490,13 +490,13 @@ None
 
 Allows/Disallows escaping in the current battle.
 
-| Opcode | IfritAI name | Size | Short Description      |
+| Opcode | IfritAI name | Size | Short description      |
 |--------|--------------|------|------------------------|
 | 0x17   | setEscape    | 2    | Sets ability to escape |
 
 ### Parameters
 
-| Position | Size | Name                | Type                       | Short Description                          |
+| Position | Size | Name                | Type                       | Short description                          |
 |----------|------|---------------------|----------------------------|--------------------------------------------|
 | 1        | 1    | **EscapeActivated** | [Bool](../OpCodeType#bool) | True to allow escape, False to disallow it |
 
@@ -508,13 +508,13 @@ Allows/Disallows escaping in the current battle.
 
 Displays a battle message, respecting the _battle message speed_ setting.
 
-| Opcode | IfritAI name | Size | Short Description                            |
+| Opcode | IfritAI name | Size | Short description                            |
 |--------|--------------|------|----------------------------------------------|
 | 0x18   | printSpeed   | 2    | Print text with battle message speed setting |
 
 ### Parameters
 
-| Position | Size | Name       | Type                     | Short Description     |
+| Position | Size | Name       | Type                     | Short description     |
 |----------|------|------------|--------------------------|-----------------------|
 | 1        | 1    | **TextID** | [int](../OpCodeType#int) | The index of the text |
 
@@ -530,13 +530,13 @@ Each text has an ID, starting from 0 and incrementing with each subsequent text.
 
 Waits for a specified amount of texts to finish displaying before resuming the battle.
 
-| Opcode | IfritAI name | Size | Short Description                     |
+| Opcode | IfritAI name | Size | Short description                     |
 |--------|--------------|------|---------------------------------------|
 | 0x18   | waitText     | 2    | Waits for text/s to finish displaying |
 
 ### Parameters
 
-| Position | Size | Name       | Type                     | Short Description               |
+| Position | Size | Name       | Type                     | Short description               |
 |----------|------|------------|--------------------------|---------------------------------|
 | 1        | 1    | **NbText** | [int](../OpCodeType#int) | The number of texts to wait for |
 
@@ -549,13 +549,13 @@ Waits for a specified amount of texts to finish displaying before resuming the b
 
 Makes the monster in a specified encounter slot leave combat.
 
-| Opcode | IfritAI name | Size | Short Description            |
+| Opcode | IfritAI name | Size | Short description            |
 |--------|--------------|------|------------------------------|
 | 0x1D   | leave        | 2    | Makes a monster leave combat |
 
 ### Parameters
 
-| Position | Size | Name       | Type                     | Short Description            |
+| Position | Size | Name       | Type                     | Short description            |
 |----------|------|------------|--------------------------|------------------------------|
 | 1        | 1    | **Target** | [int](../OpCodeType#int) | Monster that's made to leave |
 
@@ -571,13 +571,13 @@ Note that if 200 is used, the monster executing this opcode will be used as **Ta
 Makes the monster in a specified encounter slot enter combat, by setting it's Enabled, NOT Targetable and NOT Loaded flags to true.  
 Whilst possible, it is not advisable to use **_enter_** on an encounter slot if the monster in that slot is currently in the fight.
 
-| Opcode | IfritAI name | Size | Short Description            |
+| Opcode | IfritAI name | Size | Short description            |
 |--------|--------------|------|------------------------------|
 | 0x1F   | enter        | 2    | Makes a monster enter combat |
 
 ### Parameters
 
-| Position | Size | Name       | Type                     | Short Description             |
+| Position | Size | Name       | Type                     | Short description             |
 |----------|------|------------|--------------------------|-------------------------------|
 | 1        | 1    | **Target** | [int](../OpCodeType#int) | Encounter slot of the monster |
 
@@ -594,13 +594,13 @@ This is not used by any monster, analyse of the code is not complete, but it see
 
 Wait the previous message like wait text
 
-| Opcode | IfritAI name | Size | Short Description                     |
+| Opcode | IfritAI name | Size | Short description                     |
 |--------|--------------|------|---------------------------------------|
 | 0x18   | waitText     | 2    | Waits for text/s to finish displaying |
 
 ### Parameters
 
-| Position | Size | Name       | Type                     | Short Description               |
+| Position | Size | Name       | Type                     | Short description               |
 |----------|------|------------|--------------------------|---------------------------------|
 | 1        | 1    | **NbText** | [int](../OpCodeType#int) | The number of texts to wait for |
 
@@ -613,7 +613,7 @@ Wait the previous message like wait text
 
 Fills the monster's ATB bar, readying it for its turn.
 
-| Opcode | IfritAI name | Size | Short Description       |
+| Opcode | IfritAI name | Size | Short description       |
 |--------|--------------|------|-------------------------|
 | 0x24   | fillAtb      | 1    | Fills monster's ATB bar |
 
@@ -630,13 +630,13 @@ None
 Sets the extra scan text to a specific battle text.
 This text can be found in the bottom left section of the scan screen, where info such as HP, monster name, level and elemental affinities is shown.
 
-| Opcode | IfritAI name | Size | Short Description       |
+| Opcode | IfritAI name | Size | Short description       |
 |--------|--------------|------|-------------------------|
 | 0x25   | setScanText  | 2    | Sets extra scan text    |
 
 ### Parameters
 
-| Position | Size | Name       | Type                     | Short Description     |
+| Position | Size | Name       | Type                     | Short description     |
 |----------|------|------------|--------------------------|-----------------------|
 | 1        | 1    | **TextID** | [int](../OpCodeType#int) | The index of the text |
 
@@ -654,13 +654,13 @@ Sets the multiplier for a chosen stat.
 The base stat itself remains unchanged, but for calculations during battle, the stat used is affected by the multiplier.  
 For example, if **_statChange_** is used to increase a stat to 500% of its original value, setting the multiplier back to 100% will restore it to its base value.
 
-| Opcode | IfritAI name | Size | Short Description        |
+| Opcode | IfritAI name | Size | Short description        |
 |--------|--------------|------|--------------------------|
 | 0x26   | statChange   | 3    | Changes a stat           |
 
 ### Parameters
 
-| Position | Size | Name           | Type                                    | Short Description             |
+| Position | Size | Name           | Type                                    | Short description             |
 |----------|------|----------------|-----------------------------------------|-------------------------------|
 | 1        | 1    | **Stat**       | [Stat](../OpCodeType#stat)              | The stat that will be changed |
 | 2        | 1    | **Multiplier** | [int](../OpCodeType#int)                | The multiplier for said stat  |
@@ -678,7 +678,7 @@ Since monsters can only hold one drawn magic at a time, using **_draw_** again w
 In the case where **_draw_** is used on a playable character that has no magic or a monster, the message showing what magic was stolen will appear only the first time and a nameless magic with no effect that looks and sounds like _Cure_ will be stored.  
 If a monster uses **_draw_** on itself and then uses **_cast_**, the game will crash.
 
-| Opcode | IfritAI name | Size | Short Description |
+| Opcode | IfritAI name | Size | Short description |
 |--------|--------------|------|-------------------|
 | 0x29   | draw         | 1    | Draws magic       |
 
@@ -697,7 +697,7 @@ If no magic is stored, does nothing.
 Using this after the monster used **_draw_** on itself will crash the game.  
 Note that casting magic with this opcode will not consume the stored magic.
 
-| Opcode | IfritAI name | Size | Short Description |
+| Opcode | IfritAI name | Size | Short description |
 |--------|--------------|------|-------------------|
 | 0x2A   | cast         | 1    | Casts drawn magic |
 
@@ -715,7 +715,7 @@ Makes previous ability remove a randomly selected magic from the target's invent
 Note that if the blown-away magic was junctioned to a stat, Elemental Attack/Defense, or Status Attack/Defense, the affected attribute will lose its junction bonus.  
 Does nothing if the target has no magic.
 
-| Opcode | IfritAI name | Size | Short Description |
+| Opcode | IfritAI name | Size | Short description |
 |--------|--------------|------|-------------------|
 | 0x2E   | blowAway     | 1    | Blow away magic   |
 
@@ -731,7 +731,7 @@ None
 
 Sets this monster's NOT Targetable flag to _False_.
 
-| Opcode | IfritAI name   | Size | Short Description          |
+| Opcode | IfritAI name   | Size | Short description          |
 |--------|----------------|------|----------------------------|
 | 0x2F   | targetable     | 1    | Makes monster targetable   |
 
@@ -747,7 +747,7 @@ None
 
 Sets this monster's NOT Targetable flag to _True_.
 
-| Opcode | IfritAI name     | Size | Short Description          |
+| Opcode | IfritAI name     | Size | Short description          |
 |--------|------------------|------|----------------------------|
 | 0x30   | untargetable     | 1    | Makes monster untargetable |
 
@@ -763,13 +763,13 @@ None
 
 Sets this monster's Enabled flag to _True_.
 
-| Opcode | IfritAI name | Size | Short Description |
+| Opcode | IfritAI name | Size | Short description |
 |--------|--------------|------|-------------------|
 | 0x34   | enable       | 1    | Enables monster   |
 
 ### Parameters
 
-| Position | Size | Name       | Type                     | Short Description             |
+| Position | Size | Name       | Type                     | Short description             |
 |----------|------|------------|--------------------------|-------------------------------|
 | 1        | 1    | **Target** | [int](../OpCodeType#int) | Encounter slot of the monster |
 

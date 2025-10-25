@@ -1,12 +1,12 @@
 ---
 layout: default
 parent: Battle
-title: Battle encounter data (Scene.out)
-author: JeMaCheHi, HobbitDur
+title: Encounters data (scene.out)
+author: JeMaCheHi, HobbitDur, Nihil
 permalink: /technical-reference/battle/battle-structure-sceneout/
 ---
 
-Scene.out contains enemy placement data and flags for each of the game's battle encounters.
+Scene.out contains all the data for each encounter in the game, this includes enemy IDs, positions, flags and more.  
 
 See the corresponding thread: <http://forums.qhimm.com/index.php?topic=15816.0>
 
@@ -15,67 +15,62 @@ See the corresponding thread: <http://forums.qhimm.com/index.php?topic=15816.0>
 Scene.out contains no header. It is a raw list of 1024 encounters. Each encounter block consists of 128 bytes and has the following structure:
 
 | Offset | Length | Description                                                                                                                                                                                                                                                                                                               |
-|--------|--------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| 0x00   | 1      | Battle scenario. The value here corresponds to the number in the a0stg???.x files (into battle.fs file). You have to convert it to hex                                                                                                                                                                                    |
-| 0x01   | 1      | [Battle flag 1](#battle-flag-1)                                                                                                                                                                                                                                                                                           |
-| 0x02   | 1      | MainCam If you set it to 0xFF camera will always be fixed                                                                                                                                                                                                                                                                 |
-| 0x03   | 1      | Sec cam                                                                                                                                                                                                                                                                                                                   |
-| 0x04   | 1      | Visible enemies. Shows an enemy for each bit in the byte. (see below for "enemy switches")                                                                                                                                                                                                                                |
-| 0x05   | 1      | Loaded enemies. Show the enemies that are been actually fought. Loaded enemies will attack you.                                                                                                                                                                                                                           |
-| 0x06   | 1      | Targetable enemies. Show the enemies which will appear in the target window. Careful with this, if you put untargetable enemies battle will never end. (see "enemy switches" too)                                                                                                                                         |
-| 0x07   | 1      | Enabled enemies. Also works like eight binary switches. See below                                                                                                                                                                                                                                                         |
-| 0x08   | 48     | Enemy coordinates. Its a set of 6x8 bytes which describes each enemy's coordinate in (x,y,z) format. So, first 6 bytes would be enemy 1's coords, next 6 enemy 2's ones, and so on.                                                                                                                                       |
-| 0x38   | 8      | Enemies. Each byte represents an enemy. To know what enemy you're working with, you can check the c0m???.dat files in battle.fs. You just have to convert it to hex and add 0x10. Be careful, if you put numbers under 0x10 as enemies, battle will crush.                                                                |
-| 0x40   | 16     | unknown                                                                                                                                                                                                                                                                                                                   |
-| 0x50   | 16     | Still under research, but this is usually the same as the previous field's value.                                                                                                                                                                                                                                         |
-| 0x60   | 16     | unknown                                                                                                                                                                                                                                                                                                                   |
-| 0x70   | 8      | unknown                                                                                                                                                                                                                                                                                                                   |
-| 0x78   | 8      | [Ennemy level](#ennemy-level) |
+|--------|--------|---------------------------------------------------------------------------------------------------|
+| 0x00   | 1      | Battle Stage ID (See [.x files](../battle-stage-x))                                               |
+| 0x01   | 1      | [Battle flags](#battle-flags)                                                                     |
+| 0x02   | 1      | Main Camera data (the upper nibble is the camera's ID, the lower nibble is the animation ID)      |
+| 0x03   | 1      | Secondary camera data (the upper nibble is the camera's ID, the lower nibble is the animation ID) |
+| 0x04   | 1      | "NOT Visible" [enemy flags](#enemy-flags)                                                         |
+| 0x05   | 1      | "Not Loaded" [enemy flags](#enemy-flags)                                                          |
+| 0x06   | 1      | "NOT Targetable" [enemy flags](#enemy-flags)                                                      |
+| 0x07   | 1      | "Enabled" [enemy flags](#enemy-flags)                                                             |
+| 0x08   | 48     | Enemy coordinates, 6 bytes per monster (2 bytes each for X, Y, and Z positions)                   |
+| 0x38   | 8      | Enemy IDs (used for [c0mxxx.dat files](../monster-files-c0mxxxdat/) + 0x10                        |
+| 0x40   | 16     | [Unknown 1](#unknowns)                                                                            |
+| 0x50   | 16     | [Unknown 2](#unknowns)                                                                            |
+| 0x60   | 16     | [Unknown 3](#unknowns)                                                                            |
+| 0x70   | 8      | [Unknown 4](#unknowns)                                                                            |
+| 0x78   | 8      | [Enemy levels](#enemy-level)                                                                      |
 
-## Notes
+## Enemy Flags
 
-Each 128block can have up to 8 enemies, but if more than 4 are shown at the same time, the game will crash. This could seem stupid, but it's not. If you think about some battles, like the final battle (where we have 8 enemies), all the monsters are present, but only one or two are shown at any given time. The rest appear through scripting.
+Enemy flags are one byte each, and each bit determines whether a specific monster's flag is on or off, starting from the leftmost bit (MSB) for Monster 1, down to the rightmost bit (LSB) for Monster 8.
 
-Some byte fields are just 8 switches. Here's what I've found:
+| Flag value | Binary   | Monster   |
+|------------|----------|-----------|
+| 0x80       | 10000000 | Monster 1 |
+| 0x40       | 01000000 | Monster 2 |
+| 0x20       | 00100000 | Monster 3 |
+| 0x10       | 00010000 | Monster 4 |
+| 0x08       | 00001000 | Monster 5 |
+| 0x04       | 00000100 | Monster 6 |
+| 0x02       | 00000010 | Monster 7 |
+| 0x01       | 00000001 | Monster 8 |
 
-In 0x01:
+## Battle flags
 
-In 0x04, 0x05, 0x06, and 0x07
+Similarly to [enemy flags](#enemy-flags), it's a byte and each bit determines whether a specific flag is on or off.  
 
-  
-+128: 1st enemy relative
+| Flag value | Description                |
+|------------|----------------------------|
+| 0x01       | Disable Escape             |
+| 0x02       | Disable Victory Fanfare    |
+| 0x04       | Show Timer                 |
+| 0x08       | Disable EXP Gain           |
+| 0x10       | Disable Post-Battle Screen |
+| 0x20       | Surprise Attack            |
+| 0x40       | Back Attack                |
+| 0x80       | Scripted Battle            |
 
-+64: 2nd enemy relative
+## Unknowns
 
-+32: 3rd enemy relative
+**Unknown 1, 2, and 3** each contain 2 bytes per monster, making them 16 bytes long (8 monsters \* 2 bytes).  
+**Unknown 4** contains 1 byte per monster, for a total of 8 bytes.  
 
-+16: 4th enemy relative
+The data is laid out sequentially, from Monster 1 through Monster 8, and each monster has its own set of values, though some values are shared between monsters.  
+It appears that the game doesn't read use these fields' data, suggesting they may be remnants of a scrapped feature.  
 
-+8: 5th enemy relative
-
-+4: 6th enemy relative
-
-+2: 7th enemy relative
-
-+1: 8th enemy relative
-
-An important note: If you put an enemy that "summons" another one (Ultimecia summoning Griever, Sphinxara summoning jelleye...) it will summon the enemy from certain slot. This means that if you put that enemy in another battle, it will still summon that slot, because (I think) that summoning is scripted in its AI (in c9m???.dat)
-
-
-## Battle flag 1
-
-| Flag Value | Description         |
-|------------|---------------------|
-| 0x01       | No Escape           |
-| 0x02       | No Victory          |
-| 0x04       | Show Timer          |
-| 0x08       | No EXP Gain         |
-| 0x10       | No EXP Screen       |
-| 0x20       | Surprise Attack     |
-| 0x40       | Back Attack         |
-| 0x80       | Scripted Battle     |
-
-## Ennemy level
+## Enemy level
 
 Each ennemy level is 1 byte.<br>
 By default, the ennemy level is determined by the average level of the current team `team level`, and the game adds or substracts `team level / 5`.
@@ -88,3 +83,8 @@ By default, the ennemy level is determined by the average level of the current t
 - 253 is not used in the game, but the formula is random with a constraint `rand(1, team level +- (team level / 5))`
 - 254 is the average team level, period, no division per 5 `team level`
 - 255 is the standard formula `team level +- (team level / 5)`
+
+## Notes
+
+Only a maximum of 4 enemies can be loaded at the same time.  
+Using a value lower than 0x10 for an enemy ID will crash the game on battle start.  
