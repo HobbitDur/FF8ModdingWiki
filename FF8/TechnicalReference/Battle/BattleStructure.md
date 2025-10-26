@@ -18,7 +18,7 @@ Scene.out contains no header. It is a raw list of 1024 encounters. Each encounte
 |--------|--------|---------------------------------------------------------------------------------------------------|
 | 0x00   | 1      | Battle Stage ID (See [.x files](../battle-stage-x))                                               |
 | 0x01   | 1      | [Battle flags](#battle-flags)                                                                     |
-| 0x02   | 1      | Main Camera data (the upper nibble is the camera's ID, the lower nibble is the animation ID)      |
+| 0x02   | 1      | Main camera data (the upper nibble is the camera's ID, the lower nibble is the animation ID)      |
 | 0x03   | 1      | Secondary camera data (the upper nibble is the camera's ID, the lower nibble is the animation ID) |
 | 0x04   | 1      | "NOT Visible" [enemy flags](#enemy-flags)                                                         |
 | 0x05   | 1      | "Not Loaded" [enemy flags](#enemy-flags)                                                          |
