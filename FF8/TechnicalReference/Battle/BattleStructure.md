@@ -25,7 +25,7 @@ Scene.out contains no header. It is a raw list of 1024 encounters. Each encounte
 | 0x06   | 1      | "NOT Targetable" [enemy flags](#enemy-flags)                                                      |
 | 0x07   | 1      | "Enabled" [enemy flags](#enemy-flags)                                                             |
 | 0x08   | 48     | Enemy coordinates, 6 bytes per monster (2 bytes each for X, Y, and Z positions)                   |
-| 0x38   | 8      | Enemy IDs (used for [c0mxxx.dat files](../monster-files-c0mxxxdat/)) + 0x10                       |
+| 0x38   | 8      | Enemy IDs (used for [c0mxxx.dat files](../monster-files-c0mxxxdat/)) + 0x10, 1 byte per mosnter   |
 | 0x40   | 16     | [Unknown 1](#unknowns)                                                                            |
 | 0x50   | 16     | [Unknown 2](#unknowns)                                                                            |
 | 0x60   | 16     | [Unknown 3](#unknowns)                                                                            |
