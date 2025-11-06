@@ -51,16 +51,16 @@ Enemy flags are one byte each, and each bit determines whether a specific monste
 
 Similarly to [enemy flags](#enemy-flags), it's a byte and each bit determines whether a specific flag is on or off.  
 
-| Flag value | Description                |
-|------------|----------------------------|
-| 0x01       | Disable Escape             |
-| 0x02       | Disable Victory Fanfare    |
-| 0x04       | Show Timer                 |
-| 0x08       | Disable EXP Gain           |
-| 0x10       | Disable Post-Battle Screen |
-| 0x20       | Surprise Attack            |
-| 0x40       | Back Attack                |
-| 0x80       | Scripted Battle            |
+| Flag value | Name                       | Description                                                              |
+|------------|----------------------------|--------------------------------------------------------------------------|
+| 0x01       | Disable Escape             | Prevents escaping, AI opcode re-enable escaping                          |
+| 0x02       | Disable Victory Fanfare    | Disables the fanfare                                                     |
+| 0x04       | Show Timer                 | Shows active timer                                                       |
+| 0x08       | Disable EXP Gain           | Prevents EXP from being gained                                           |
+| 0x10       | Disable Post-Battle Screen | Doesn't show the post-battle screens                                     |
+| 0x20       | Surprise Attack            | Monster's ATBs start full                                                |
+| 0x40       | Back Attack                | Monster's ATBs start full + all party members afflicted with Back Attack |
+| 0x80       | Force Standard Battle      | Normal ATB starting positions for everyone                               |
 
 ## Unknowns
 
