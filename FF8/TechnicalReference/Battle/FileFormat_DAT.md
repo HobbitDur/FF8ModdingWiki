@@ -7,7 +7,7 @@ permalink: /technical-reference/battle/monster-files-c0mxxxdat/
 ---
 
 1. TOC
-{:toc}
+   {:toc}
 
 ## Header
 
@@ -244,13 +244,15 @@ Some old info can be found here: [Qhimm message](https://forums.qhimm.com/index.
 
 Now how it works. The sequence animation is composed of opcode, followed by parameters (often 1, sometimes 2 or 0). Each op code define an action to do.
 
-
 ### Opcode between C0 and E3: set a "current_value"
+
 Those opcode are meant to store and modify a local values (that is then used by later opcodes).  
 To analyze it, it is done on two part. First defining how to use the param, then knowing how to modify the local variable (store in what is called the _stack_)
 
 #### How to interpret the params
+
 Do OpCode & 3:
+
 - case 0: 2 param int16 value (C0, C4, D0,...)
 - case 1: 1 param sign value (C1, C5, C9, D1, D5, D9, DD,...)
 - case 2: 1 param unsigned value (C2, C6, D2, DA,...)
@@ -259,29 +261,33 @@ Do OpCode & 3:
     - Param >= 0x80: Read from stack value stored at param (from E5 opcode)
 
 #### How to modify the local var
+
 Do opcode & FC:
+
 - case 0xC0u: (C0, C1, C2, C3)
-current_value_computed = param;
+  current_value_computed = param;
 - case 0xC4u:// C4, C5, C6, C7
-current_value_computed += param;
+  current_value_computed += param;
 - case 0xC8u:
-current_value_computed -= param;
+  current_value_computed -= param;
 - case 0xCCu:
-current_value_computed *= param;
+  current_value_computed *= param;
 - case 0xD0u:
-current_value_computed /= param;
+  current_value_computed /= param;
 - case 0xD4u:
-current_value_computed &= param;
+  current_value_computed &= param;
 - case 0xD8u:
-current_value_computed |= param;
+  current_value_computed |= param;
 - case 0xDCu:
-current_value_computed ^= param;
+  current_value_computed ^= param;
 - case 0xE0u:
-current_value_computed %= param;
+  current_value_computed %= param;
 
 #### Case 3 param < 0x80:
+
 On each case a specific code is done, often it just read a value in memory that as a specific purpose.
 Param values known:
+
 - Param < 0x07: current_value = *(BATTLE_STATE_CONTROLER + 2 * param + 20); BATTLE_STATE_CONTROLER is at 0x1D98200
 - 0x08: return_value = BATTLE_STATE_CONTROLER->some_flag;
 - 0x09:  return_value = ACTIVE_ANIM_CMD->current_frame;
@@ -294,11 +300,13 @@ Param values known:
 - Param > 0x77: current_value = *(E5_7F_save + 2 * (0x7F - param)); so at 0x7F it's E5_7F_save
 
 ### E5 case:
+
 two cases:
-    Param < 0x80: special handle to save (and use) the current_value
-    Param >= 0x80: Write to stack current_value at param
-    
-#### Param < 0x80 
+Param < 0x80: special handle to save (and use) the current_value
+Param >= 0x80: Write to stack current_value at param
+
+#### Param < 0x80
+
 - Param < 0x08: *(BATTLE_STATE_CONTROLER + 2 * sequence_command_param_1 + 20) = current_value_computed; BATTLE_STATE_CONTROLER is at 0x1D98200
 - 0x08: *(BATTLE_STATE_CONTROLER + 44) = current_value_computed;
 - 0x0F: *(BATTLE_STATE_CONTROLER + 40) = current_value_computed;
@@ -319,24 +327,28 @@ two cases:
 - Param > 0x77: *(dword_1D9820C + 2 * (127 - sequence_command_param_1)) = current_value_computed; (so 0x7F save at 0x1D9820C)
 
 ### 0xE6 < opcode < 0xF3
+
 Those are conditional jump (if)
 Those value check the current_value and decide to either continue the flow or jump the number of hex value define by the param
+
 - E6: Jump forward X bytes, X being the param value (and a signed value).
 - E7 to EC: If condition is met, Jump X bytes, X being the param value (and a signed value). Else jump just one (so the param itself)
-  - E7: current_value > 0
-  - E8: current_value >= 0
-  - E9: current_value == 0
-  - EA: current_value != 0
-  - EB: current_value <= 0
-  - EC: current_value < 0
+    - E7: current_value > 0
+    - E8: current_value >= 0
+    - E9: current_value == 0
+    - EA: current_value != 0
+    - EB: current_value <= 0
+    - EC: current_value < 0
 
-    
 ### Opcode < 0x80
+
 This queue the animation by the ID defined in section 3
 Does *(BATTLE_STATE_CONTROLER + 44) |= 0xAu; and end local sequence
 
 ## 0x80 < Opcode < C0
+
 Each one of those opcode are special:
+
 - 85: Hide the yellow triangle of chara selection
 - 86: Show the yellow triangle of chara selection
 - 94: Toogle the shadow
@@ -347,43 +359,43 @@ Each one of those opcode are special:
 - A1: End local sequence
 - A2: Seems to be the end of seq animation, but didn't confirm on the code
 - A5 XX: Call some function depending of the parameter, which trigger particle and sound effect
-  - 00: sub_574C80 => For character/ Boss green magic effect
-  - 01: sub_5742A0 => For GF summon
-  - 02: sub_5737C0 => Normal limit break
-  - 03: sub_574260 => Finisher limit break
-  - 04: sub_573560 => Enemy magic effect
-  - 05: sub_5736E0 => Looks a bit like 04
+    - 00: sub_574C80 => For character/ Boss green magic effect
+    - 01: sub_5742A0 => For GF summon
+    - 02: sub_5737C0 => Normal limit break
+    - 03: sub_574260 => Finisher limit break
+    - 04: sub_573560 => Enemy magic effect
+    - 05: sub_5736E0 => Looks a bit like 04
 - A8: Makes the enemy fade away or fade in, based on the following byte.
-  - param is 0x01: Slowly dissapear (but re-appear suddenly at the end)
-  - param 0x02 or 0x0C: re-appear (Make the animation of re-appearing, so dissapear suddenly to re-appear slowly)
-  - param is 0x03: Make it Invisible (by dissapearing and staying invisible)
-  - param is 0x06: Leave the combat by dissapearing (no xp gained)
+    - param is 0x01: Slowly dissapear (but re-appear suddenly at the end)
+    - param 0x02 or 0x0C: re-appear (Make the animation of re-appearing, so dissapear suddenly to re-appear slowly)
+    - param is 0x03: Make it Invisible (by dissapearing and staying invisible)
+    - param is 0x06: Leave the combat by dissapearing (no xp gained)
 - AA: Dunno
 - AD X1 X2 X3 X4: Call AE and insert AE second param as FF -> AE(X1, FF, X2, X3, X4)
 - AE X1 X2 X3 X4 X5: Dunno. Third and fourth param is actually a int16. Seems to move the target
-  - X1: Called *frame selector*. Several cases: (but value not really understood)
-    - FF: Special case where the start point is the target position
-    - 0x00 to 0xFE: Starting point is the attacker position
-  - X2: Special cases for FF where some computation is ignored. Should define middle point between first param and second param.
-  - X3-X4: int16 value in little endian.
-  - X5: Define time for how long the target stay to new location
+    - X1: Called *frame selector*. Several cases: (but value not really understood)
+        - FF: Special case where the start point is the target position
+        - 0x00 to 0xFE: Starting point is the attacker position
+    - X2: Special cases for FF where some computation is ignored. Should define middle point between first param and second param.
+    - X3-X4: int16 value in little endian.
+    - X5: Define time for how long the target stay to new location
 - B0 XX..XX: From 2 to 6 param. Second param is a flag that define how many param and what to do with them. Seems to launch some particle effect.
-  - second param & 1: One more param
-  - second param & 2: One more param
-  - second param & 4: One more param
-  - second param & 8: One more param in certain condition
-  - second param & 40: 6 param and param are actually 3 int16
+    - second param & 1: One more param
+    - second param & 2: One more param
+    - second param & 4: One more param
+    - second param & 8: One more param in certain condition
+    - second param & 40: 6 param and param are actually 3 int16
 - B1 XX..XX:  Reated to 99 with a bool inversed. The number of parameters are infinite and finish by FF. Play some SFX.
 - B7: Dunno
 - B8 X1 X_2 X3: Play a sound (call BdPlaySy(X1, v9, v6)). Either 2 or 3 param depending of condition
-  - X1: Some value for the sound
-  - X2: Flag:
-    - If Flag & 0x4: v6 = 128
-    - Else:
-      - If Flag & 0x1: Extract target position and compute v6 with it
-      - Else: Extract attacker position and compute v6 with it
-    - If Flag & 0x02: v9 is X3 (third param exist)
-    - Else: v9 is 0
+    - X1: Some value for the sound
+    - X2: Flag:
+        - If Flag & 0x4: v6 = 128
+        - Else:
+            - If Flag & 0x1: Extract target position and compute v6 with it
+            - Else: Extract attacker position and compute v6 with it
+        - If Flag & 0x02: v9 is X3 (third param exist)
+        - Else: v9 is 0
 - B9 XX : Set BATTLE_STATE_CONTROLER + 1 to XX - 1
 - BA: Seems to play animation (but need to be already loaded)
 - BB: Handle text
@@ -395,7 +407,9 @@ Each one of those opcode are special:
 - BF: No idea
 
 ### Example
+
 If we use the normal attack animation of bite bug, here for each opcode/param what it does:
+
 - C3 11: Set current_value to adjusted speed
 - C5 64: Add 0x64 to current_value
 - E5 FF: Store current_value to stack 0xFF
@@ -427,7 +441,7 @@ If we use the normal attack animation of bite bug, here for each opcode/param wh
 - A0 0A: Queue animation 0A
 - B9 06: Set BATTLE_STATE_CONTROLER + 1 to 05
 - 97: Linked to sound, seems no param but I could be wrong
-- 02: Queue anim 02 
+- 02: Queue anim 02
 - 01: Queue anim 01
 - BF 04: No idea
 - B4: Jump to some other anim seq ?
@@ -478,45 +492,45 @@ Not analysed, but defined camera work.
 
 ## Section 7: Informations & stats
 
-| Offset | Length     | Description                                                                                                                                                                                                                           |
-|--------|------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| 0      | 24 bytes   | Monster name in [FF8 String]({{site.baseurl}}/technical-reference//Miscellaneous/FF8String)                                                                                                                                        |
-| 24     | 4 bytes    | HP values                                                                                                                                                                                                                             |
-| 28     | 4 bytes    | Str values                                                                                                                                                                                                                            |
-| 32     | 4 bytes    | Vit values                                                                                                                                                                                                                            |
-| 36     | 4 bytes    | Mag values                                                                                                                                                                                                                            |
-| 40     | 4 bytes    | Spr values                                                                                                                                                                                                                            |
-| 44     | 4 bytes    | Spd values                                                                                                                                                                                                                            |
-| 48     | 4 bytes    | Eva values                                                                                                                                                                                                                            |
-| 52     | 16*4 bytes | [Abilities](#abilities), low level                                                                                                                                                                                                    |
-| 116    | 16*4 bytes | [Abilities](#abilities), med level                                                                                                                                                                                                    |
-| 180    | 16*4 bytes | [Abilities](#abilities), high level                                                                                                                                                                                                   |
-| 244    | 1 byte     | Med level start                                                                                                                                                                                                                       |
-| 245    | 1 byte     | High level start                                                                                                                                                                                                                      |
-| 246    | 1 byte     | Camera flag (activated when launching magic for ex) 0x8 => value=5, 0x4 => value=4, else value=3-flag_value                                                                                                                           |
-| 247    | 1 byte     | [LSB] Zombie / Fly / zz1 / LvUp-Down Immunity / HP Hidden / Auto-Reflect / Auto-Shell / Auto-Protect [MSB]                                                                                                                            |
-| 248    | 3 bytes    | [Card]({{site.baseurl}}/technical-reference/Lists/Card_list#card-info) (drop/mod/rare mod)                                                                                                                                         |
-| 251    | 3 bytes    | [Devour]({{site.baseurl}}/technical-reference/Lists/Devour_list#devour-effects) (low/med/high)                                                                                                                                     |
-| 254    | 1 byte     | [LSB] IncreaseSurpriseRNG (by 20) / DecreaseSurpriseRNG (by 20) / <a id="surprise-attack-immunity">SurpriseAttackImmunity</a> / unused / unused / unused / Gravity Immunity / Always obtains card [MSB]                               |
-| 255    | 1 byte     | Unknown (flags, 4 bits used)                                                                                                                                                                                                          |
-| 256    | 2 bytes    | Extra EXP                                                                                                                                                                                                                             |
-| 258    | 2 bytes    | EXP                                                                                                                                                                                                                                   |
-| 260    | 8 bytes    | [Draw](#draw-mug-drop) (low)                                                                                                                                                                                                          |
-| 268    | 8 bytes    | [Draw](#draw-mug-drop) (med)                                                                                                                                                                                                          |
-| 276    | 8 bytes    | [Draw](#draw-mug-drop) (high)                                                                                                                                                                                                         |
-| 284    | 8 bytes    | [Mug](#draw-mug-drop)(low)                                                                                                                                                                                                            |
-| 292    | 8 bytes    | [Mug](#draw-mug-drop)(med)                                                                                                                                                                                                            |
-| 300    | 8 bytes    | [Mug](#draw-mug-drop)(high)                                                                                                                                                                                                           |
-| 308    | 8 bytes    | [Drop](#draw-mug-drop) (low)                                                                                                                                                                                                          |
-| 316    | 8 bytes    | [Drop](#draw-mug-drop) (med)                                                                                                                                                                                                          |
-| 324    | 8 bytes    | [Drop](#draw-mug-drop) (high)                                                                                                                                                                                                         |
-| 332    | 1 byte     | [Mug rate](#rate-value)                                                                                                                                                                                                               |
-| 333    | 1 byte     | [Drop rate](#rate-value)                                                                                                                                                                                                              |
-| 334    | 1 byte     | Padding (0x00)                                                                                                                                                                                                                        |
-| 335    | 1 byte     | APs                                                                                                                                                                                                                                   |
-| 336    | 16 bytes   | [Renzokuken data](#renzokuken-data)                                                                                                                                                                                                   |                                                                         
-| 352    | 8 bytes    | [Elemental resistance](#elemental-resistance) (Fire, Ice, Thunder, Earth, Poison, Wind, Water, Holy)                                                                                                                                  |
-| 360    | 20 bytes   | [Status resistance](#mental-resistance) (Death, Poison, Petrify, Darkness, Silence, Berserk, Zombie, Sleep,<br> Haste, Slow, Stop, Regen, Reflect, Doom, Slow Petrify, Float, Drain, Confuse , Expulsion, VIT0(but unused by the game)) |
+| Offset | Length     | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+|--------|------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 0      | 24 bytes   | Monster name in [FF8 String]({{site.baseurl}}/technical-reference/Miscellaneous/FF8String)                                                                                                                                                                                                                                                                                                                                                                                 |
+| 24     | 4 bytes    | HP values                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| 28     | 4 bytes    | Str values                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| 32     | 4 bytes    | Vit values                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| 36     | 4 bytes    | Mag values                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| 40     | 4 bytes    | Spr values                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| 44     | 4 bytes    | Spd values                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| 48     | 4 bytes    | Eva values                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| 52     | 16*4 bytes | [Abilities](#abilities), low level                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| 116    | 16*4 bytes | [Abilities](#abilities), med level                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| 180    | 16*4 bytes | [Abilities](#abilities), high level                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| 244    | 1 byte     | Med level start                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| 245    | 1 byte     | High level start                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| 246    | 1 byte     | Camera flag (activated when launching magic for ex) 0x8 => value=5, 0x4 => value=4, else value=3-flag_value                                                                                                                                                                                                                                                                                                                                                                |
+| 247    | 1 byte     | [LSB] Zombie / Fly / zz1 / LvUp-Down Immunity / HP Hidden / Auto-Reflect / Auto-Shell / Auto-Protect [MSB]                                                                                                                                                                                                                                                                                                                                                                 |
+| 248    | 3 bytes    | [Card]({{site.baseurl}}/technical-reference/Lists/Card_list#card-info) (drop/mod/rare mod)                                                                                                                                                                                                                                                                                                                                                                                 |
+| 251    | 3 bytes    | [Devour]({{site.baseurl}}/technical-reference/Lists/Devour_list#devour-effects) (low/med/high)                                                                                                                                                                                                                                                                                                                                                                             |
+| 254    | 1 byte     | [LSB] <span id="increase-surprise-rng">[IncreaseSurpriseRNG]({{site.baseurl}}/technical-reference/battle/surprise-attack)</span> / <span id="decrease-surprise-rng">[DecreaseSurpriseRNG]{{site.baseurl}}/technical-reference/battle/surprise-attack)</span>  / <span id="surprise-attack-immunity">[SurpriseAttackImmunity]({{site.baseurl}}/technical-reference/battle/surprise-attack)</span> / unused / unused / unused / Gravity Immunity / Always obtains card [MSB] |
+| 255    | 1 byte     | Unknown (flags, 4 bits used)                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| 256    | 2 bytes    | Extra EXP                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| 258    | 2 bytes    | EXP                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| 260    | 8 bytes    | [Draw](#draw-mug-drop) (low)                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| 268    | 8 bytes    | [Draw](#draw-mug-drop) (med)                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| 276    | 8 bytes    | [Draw](#draw-mug-drop) (high)                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| 284    | 8 bytes    | [Mug](#draw-mug-drop)(low)                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| 292    | 8 bytes    | [Mug](#draw-mug-drop)(med)                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| 300    | 8 bytes    | [Mug](#draw-mug-drop)(high)                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| 308    | 8 bytes    | [Drop](#draw-mug-drop) (low)                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| 316    | 8 bytes    | [Drop](#draw-mug-drop) (med)                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| 324    | 8 bytes    | [Drop](#draw-mug-drop) (high)                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| 332    | 1 byte     | [Mug rate](#rate-value)                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| 333    | 1 byte     | [Drop rate](#rate-value)                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| 334    | 1 byte     | Padding (0x00)                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| 335    | 1 byte     | APs                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| 336    | 16 bytes   | [Renzokuken data](#renzokuken-data)                                                                                                                                                                                                                                                                                                                                                                                                                                        |                                                                         
+| 352    | 8 bytes    | [Elemental resistance](#elemental-resistance) (Fire, Ice, Thunder, Earth, Poison, Wind, Water, Holy)                                                                                                                                                                                                                                                                                                                                                                       |
+| 360    | 20 bytes   | [Status resistance](#mental-resistance) (Death, Poison, Petrify, Darkness, Silence, Berserk, Zombie, Sleep,<br> Haste, Slow, Stop, Regen, Reflect, Doom, Slow Petrify, Float, Drain, Confuse , Expulsion, VIT0(but unused by the game))                                                                                                                                                                                                                                    |
 
 ### Abilities
 
