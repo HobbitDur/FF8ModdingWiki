@@ -32,7 +32,7 @@ if SurpriseNegativeForPlayer and AbilityAlert, then it's converted to NoSurprise
 if [MonsterFlagImmuneSurpriseAttack]({{site.baseurl}}/technical-reference/battle/monster-files-c0mxxxdat/#surprise-attack-immunity) and SurprisePositiveForPlayer, then it's
 converted to NoSurprise
 
-Now we know if a side has an advantage starting the fight. From this it is decided with $$\frac{129}{256}$$ chance if it's simply an ATB fill (strike first) or also a back attack.
+Now we know if a side has an advantage starting the fight. From this it is decided with $$\frac{1}{2}$$ chance if it's simply an ATB fill (strike first) or also a back attack.
 
 All 4 values are resume here:
 
