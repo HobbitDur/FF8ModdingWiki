@@ -52,16 +52,16 @@ permalink: /technical-reference/list/battle/
 
 ## Byte 2
 
-| Bit Position | Flag (Hex) | Description           |
-|--------------|------------|-----------------------|
-| 0 (LSB)      | 0x01       | zz1                   |
-| 1            | 0x02       | zz2                   |
-| 2            | 0x04       | unused                |
-| 3            | 0x08       | unused                |
-| 4            | 0x10       | unused                |
-| 5            | 0x20       | unused                |
-| 6            | 0x40       | Gravity Immunity      |
-| 7 (MSB)      | 0x80       | Always obtains card   |
+| Bit Position | Flag (Hex) | Description             |
+|--------------|------------|-------------------------|
+| 0 (LSB)      | 0x01       | Increase SurpriseRNG    |
+| 1            | 0x02       | Decrease SurpriseRNG    |
+| 2            | 0x04       | SurpriseAttack Immunity |
+| 3            | 0x08       | unused                  |
+| 4            | 0x10       | unused                  |
+| 5            | 0x20       | unused                  |
+| 6            | 0x40       | Gravity Immunity        |
+| 7 (MSB)      | 0x80       | Always obtains card     |
 
 ## GF/ Magic / Item Type damage
 

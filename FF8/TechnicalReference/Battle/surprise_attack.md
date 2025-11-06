@@ -14,9 +14,9 @@ $$
 \text{SurpriseRng} = [0..255] + 20 \times \text{MonsterFlagIncrease} - 20 \times \text{MonsterFlagDecrease} + 20 \times \text{AbilityAlert}
 $$
 
-With [MonsterFlagIncrease]({{site.baseurl}}/technical-reference/battle/monster-files-c0mxxxdat/#section-7-informations--stats), MonsterFlagDecrease being bool (so 1 or 0). If one
+With [MonsterFlagIncrease]({{site.baseurl}}/technical-reference/battle/monster-files-c0mxxxdat/#increase-surprise-rng), [MonsterFlagDecrease]({{site.baseurl}}/technical-reference/battle/monster-files-c0mxxxdat/#increase-surprise-rng) being bool (so 1 or 0). If one
 monster has the flag on his dat file, then the flag is applied (only once so)
-With AbilityAlert being a bool (0 or 1) set to 1 if the ability *Alert* is equiped.
+With AbilityAlert being a bool (0 or 1) set to 1 if the ability [Alert]({{site.baseurl}}/technical-reference/list/ability-list/#passif-abilities) is equipped.
 
 For this RNG, 3 possible values are computed:
 
