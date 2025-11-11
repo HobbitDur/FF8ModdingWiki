@@ -538,9 +538,9 @@ Abilities are composed of:
 
 | Length | Description                                                                                 |
 |--------|---------------------------------------------------------------------------------------------|
-| 1 byte | [AbilityTypeID]({{site.baseurl}}/FF8/Technical Reference/Lists/Ability_list#abilities-type) |
+| 1 byte | [AbilityTypeID]({{site.baseurl}}/technical-reference/Lists/Ability_list#abilities-type) |
 | 1 byte | [AnimationSequenceID](#animationsequenceid)                                                 |
-| 2 byte | [AbilityID]({{site.baseurl}}/FF8/Technical Reference/Lists/Ability_list#abilities)          |
+| 2 byte | [AbilityID]({{site.baseurl}}/technical-reference/Lists/Ability_list#abilities)          |
 
 #### AnimationSequenceID
 
@@ -548,12 +548,12 @@ Refer to a sequence in the [Section 5](#section-5-animation-sequences)
 
 ### Renzokuken data
 
-The data is 8*2 bytes, each 2 bytes corresponding to an ID on the [Special Action list]({{site.baseurl}}/FF8/Technical Reference/Lists/Specialaction_list)
+The data is 8*2 bytes, each 2 bytes corresponding to an ID on the [Special Action list]({{site.baseurl}}/technical-reference/Lists/Specialaction_list)
 
 ### Draw Mug Drop
 
 Each section is composed of 8 bytes corresponding to 4 id ([magic]({{site.baseurl}}/FF8/Technical Reference/Lists/Magic_list) for
-draw, [Item]({{site.baseurl}}/FF8/Technical Reference/Lists/Item_list) for mug & drop) and 4 quantity.
+draw, [Item]({{site.baseurl}}/technical-reference/Lists/Item_list) for mug & drop) and 4 quantity.
 Quantity is not used for draw (always 0 but no impact on game when changing it)
 
 | Length | Description |
@@ -631,7 +631,7 @@ Contains AKAO sequence + unknown data (can be empty).
 
 ## Section 11: Textures
 
-Contains some [TIMs]({{site.baseurl}}/FF8/Technical Reference/PSX/TIM_Format).
+Contains some [TIMs]({{site.baseurl}}/technical-reference/PSX/TIM_Format).
 
 | Offset          | Length            | Description    |
 |-----------------|-------------------|----------------|
