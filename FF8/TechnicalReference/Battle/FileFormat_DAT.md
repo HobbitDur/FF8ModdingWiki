@@ -536,11 +536,11 @@ Not analysed, but defined camera work.
 
 Abilities are composed of:
 
-| Length | Description                                                                                 |
-|--------|---------------------------------------------------------------------------------------------|
-| 1 byte | [AbilityTypeID]({{site.baseurl}}/technical-reference//list/ability-list/#abilities-type) |
-| 1 byte | [AnimationSequenceID](#animationsequenceid)                                                 |
-| 2 byte | [AbilityID]({{site.baseurl}}/technical-reference//list/ability-list/#abilities)          |
+| Length | Description                                                                             |
+|--------|-----------------------------------------------------------------------------------------|
+| 1 byte | [AbilityTypeID]({{site.baseurl}}/technical-reference/list/ability-list/#abilities-type) |
+| 1 byte | [AnimationSequenceID](#animationsequenceid)                                             |
+| 2 byte | [AbilityID]({{site.baseurl}}/technical-reference//list/ability-list/#monster_ability)   |
 
 #### AnimationSequenceID
 
