@@ -26,11 +26,10 @@ is quite basic and will just read 'drawpoint(15)' for instance.
 
 ## Default values
 Address Starts:
-0xB92500
-0x792500
+0x00B92328
 
 Default Values
-.data:00B92500 byte_B92500     db 55h, 44h, 99h, 9Bh, 0Dh, 0CCh, 0C7h, 0D5h, 0C1h, 0E9h  
+.data:00B92328 byte_B92328     db 55h, 44h, 99h, 9Bh, 0Dh, 0CCh, 0C7h, 0D5h, 0C1h, 0E9h  
 .data:00B92500                 db 0E6h, 72h, 55h, 6, 0E3h, 0D8h, 0DEh, 0DDh, 21h, 0A0h  
 .data:00B92500                 db 55h, 4Ah, 48h, 70h, 5Bh, 4Ch, 0C2h, 0EEh, 9, 4Bh, 0C5h  
 .data:00B92500                 db 0E6h, 59h, 0ECh, 0DCh, 17h, 1Fh, 0DDh, 0EFh, 56h, 0E3h  
