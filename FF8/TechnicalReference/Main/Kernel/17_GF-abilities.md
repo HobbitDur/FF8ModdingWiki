@@ -34,5 +34,7 @@ permalink: /technical-reference/main/kernel/gf-abilities/
 | 0x0002 | 2 bytes | Offset to ability description |
 | 0x0004 | 1 byte  | AP Required to learn ability  |
 | 0x0005 | 1 byte  | Enable Boost                  |
-| 0x0006 | 1 byte  | Stat to increse               |
+| 0x0006 | 1 byte  | Stat to increase              |
 | 0x0007 | 1 byte  | Increase value                |
+
+

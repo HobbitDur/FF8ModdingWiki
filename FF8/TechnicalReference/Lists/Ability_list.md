@@ -5,19 +5,22 @@ parent: List
 permalink: /technical-reference/list/ability-list/
 ---
 
+1. TOC
+{:toc}
+2. 
 # Ability list
 
 ## Abilities Type
 
 This ID define which list should be check. Seifer is a special case for seifer but point to same list than custom.
 
-| ID  | Name                                                                                 |
-|-----|--------------------------------------------------------------------------------------|
-| 0   | Not defined                                                                          |
+| ID  | Name                                                                             |
+|-----|----------------------------------------------------------------------------------|
+| 0   | Not defined                                                                      |
 | 2   | [Magic]({{site.baseurl}}/technical-reference/list/magic-list)                    |
 | 4   | [Item]({{site.baseurl}}/technical-reference/list/item_list)                      |
 | 8   | [Custom]({{site.baseurl}}/technical-reference/list/ability-list#monster-ability) |
-| 179 | Ultimecia_weird_file_127                                                             |
+| 179 | Ultimecia_weird_file_127                                                         |
 | 236 | [Seifer]({{site.baseurl}}/technical-reference/list/ability-list#monster-ability) |
 
 ## Passif abilities
@@ -419,27 +422,150 @@ This ID define which list should be check. Seifer is a special case for seifer b
 | 382 | 0x17E | Unnamed                               |
 | 383 | 0x17F | Unnamed                               |
 
+# Junction abilities
+
+| Bit Position | Flag    | Ability       |
+|--------------|---------|---------------|
+| 0            | 0x0001  | Dummy/Unused  |
+| 1            | 0x0002  | HP-J          |
+| 2            | 0x0004  | Str-J         |
+| 3            | 0x0008  | Vit-J         |
+| 4            | 0x0010  | Mag-J         |
+| 5            | 0x0020  | Spr-J         |
+| 6            | 0x0040  | Spd-J         |
+| 7            | 0x0080  | Eva-J         |
+| 8            | 0x0100  | Hit-J         |
+| 9            | 0x0200  | Luck-J        |
+| 10           | 0x0400  | Elem-Atk-J    |
+| 11           | 0x0800  | ST-Atk-J      |
+| 12           | 0x1000  | Elem-Def-J    |
+| 13           | 0x2000  | ST-Def-J      |
+| 14           | 0x4000  | Elem-Defx2    |
+| 15           | 0x8000  | Elem-Defx4    |
+| 16           | 0x10000 | ST-Def-Jx2    |
+| 17           | 0x20000 | ST-Def-Jx4    |
+| 18           | 0x40000 | Abilityx3     |
+| 19           | 0x80000 | Abilityx4     |
+
+# FF8 abilities
+
+| Hex Value | Ability Name |
+|-----------|--------------|
+| 0x00      | Dummy/Unused |
+| 0x01      | HP-J         |
+| 0x02      | Str-J        |
+| 0x03      | Vit-J        |
+| 0x04      | Mag-J        |
+| 0x05      | Spr-J        |
+| 0x06      | Spd-J        |
+| 0x07      | Eva-J        |
+| 0x08      | Hit-J        |
+| 0x09      | Luck-J       |
+| 0x0A      | Elem-Atk-J   |
+| 0x0B      | ST-Atk-J     |
+| 0x0C      | Elem-Def-J   |
+| 0x0D      | ST-Def-J     |
+| 0x0E      | Elem-Defx2   |
+| 0x0F      | Elem-Defx4   |
+| 0x10      | ST-Def-Jx2   |
+| 0x11      | ST-Def-Jx4   |
+| 0x12      | Abilityx3    |
+| 0x13      | Abilityx4    |
+| 0x14      | Magic        |
+| 0x15      | GF           |
+| 0x16      | Draw         |
+| 0x17      | Item         |
+| 0x18      | (Unused)     |
+| 0x19      | Card         |
+| 0x1A      | Doom         |
+| 0x1B      | Mad Rush     |
+| 0x1C      | Treatment    |
+| 0x1D      | Defend       |
+| 0x1E      | Darkside     |
+| 0x1F      | Recover      |
+| 0x20      | Absorb       |
+| 0x21      | Revive       |
+| 0x22      | Lvl Down     |
+| 0x23      | Lvl Up       |
+| 0x24      | Kamikaze     |
+| 0x25      | Devour       |
+| 0x26      | Minimog      |
+| 0x27      | HP+20%       |
+| 0x28      | HP+40%       |
+| 0x29      | HP+80%       |
+| 0x2A      | Str+20%      |
+| 0x2B      | Str+40%      |
+| 0x2C      | Str+60%      |
+| 0x2D      | Vit+20%      |
+| 0x2E      | Vit+40%      |
+| 0x2F      | Vit+60%      |
+| 0x30      | Mag+20%      |
+| 0x31      | Mag+40%      |
+| 0x32      | Mag+60%      |
+| 0x33      | Spr+20%      |
+| 0x34      | Spr+40%      |
+| 0x35      | Spr+60%      |
+| 0x36      | Spd+20%      |
+| 0x37      | Spd+40%      |
+| 0x38      | Eva+30%      |
+| 0x39      | Luck+50%     |
+| 0x3A      | Mug          |
+| 0x3B      | (Unused)     |
+| 0x3C      | Counter      |
+| 0x3D      | (Unused)     |
+| 0x3E      | Cover        |
+| 0x3F      | Initiative   |
+| 0x40      | Move-HP Up   |
+| 0x41      | HP Bonus     |
+| 0x42      | Str Bonus    |
+| 0x43      | Vit Bonus    |
+| 0x44      | Mag Bonus    |
+| 0x45      | Spr Bonus    |
+| 0x46      | Auto-Protect |
+| 0x47      | Auto-Shell   |
+| 0x48      | Auto-Reflect |
+| 0x49      | Auto-Haste   |
+| 0x4A      | Auto-Potion  |
+| 0x4B      | Expendx2-1   |
+| 0x4C      | Expendx3-1   |
+| 0x4D      | Ribbon       |
+| 0x4E      | Alert        |
+| 0x4F      | Move-Find    |
+| 0x50      | Enc-Half     |
+| 0x51      | Enc-None     |
+| 0x52      | Rare Item    |
+
 # Chara abilities
 
-| Bit Position | Ability       |
-|--------------|---------------|
-| 1            | Mug           |
-| 2            | Med Data      |
-| 3            | Counter       |
-| 4            | Return Damage |
-| 5            | Cover         |
-| 6            | Initiative    |
-| 7            | Move-HP Up    |
-| 8            | HP Bonus      |
-| 9            | Str Bonus     |
-| 10           | Vit Bonus     |
-| 11           | Mag Bonus     |
-| 12           | Spr Bonus     |
-| 13           | Auto-Protect  |
-| 14           | Auto-Shell    |
-| 15           | Auto-Reflect  |
-| 16           | Auto-Haste    |
-| 17           | Auto-Potion   |
-| 18           | Expendx2-1    |
-| 19           | Expendx3-1    |
-| 20           | Ribbon        |
+| Bit Position | Flag    | Ability       |
+|--------------|---------|---------------|
+| 1            | 0x00001 | Mug           |
+| 2            | 0x00002 | Med Data      |
+| 3            | 0x00004 | Counter       |
+| 4            | 0x00008 | Return Damage |
+| 5            | 0x00010 | Cover         |
+| 6            | 0x00020 | Initiative    |
+| 7            | 0x00040 | Move-HP Up    |
+| 8            | 0x00080 | HP Bonus      |
+| 9            | 0x00100 | Str Bonus     |
+| 10           | 0x00200 | Vit Bonus     |
+| 11           | 0x00400 | Mag Bonus     |
+| 12           | 0x00800 | Spr Bonus     |
+| 13           | 0x01000 | Auto-Protect  |
+| 14           | 0x02000 | Auto-Shell    |
+| 15           | 0x04000 | Auto-Reflect  |
+| 16           | 0x08000 | Auto-Haste    |
+| 17           | 0x10000 | Auto-Potion   |
+| 18           | 0x20000 | Expendx2-1    |
+| 19           | 0x40000 | Expendx3-1    |
+| 20           | 0x80000 | Ribbon        |
+
+# Party abilities
+
+| Bit Position | Flag   | Ability   |
+|--------------|--------|-----------|
+| 0            | 0x0001 | Alert     |
+| 1            | 0x0002 | Move-Find |
+| 2            | 0x0004 | Enc-Half  |
+| 3            | 0x0008 | Enc-None  |
+| 4            | 0x0010 | Rare Item |

@@ -39,9 +39,9 @@ permalink: /technical-reference/main/kernel/junction-abilities/
 
 ## Section Structure
 
-| Offset | Length  | Description                   |
-|--------|---------|-------------------------------|
-| 0x0000 | 2 bytes | Offset to ability name        |
-| 0x0002 | 2 bytes | Offset to ability description |
-| 0x0004 | 1 byte  | AP Required to learn ability  |
-| 0x0005 | 3 byte  | J-Flag                        |
+| Offset | Length  | Description                                                                                                                                        |
+|--------|---------|----------------------------------------------------------------------------------------------------------------------------------------------------|
+| 0x0000 | 2 bytes | Offset to ability name                                                                                                                             |
+| 0x0002 | 2 bytes | Offset to ability description                                                                                                                      |
+| 0x0004 | 1 byte  | AP Required to learn ability                                                                                                                       |
+| 0x0005 | 3 byte  | The [junction ability flag]({{site.baseurl}}/technical-reference/list/ability-list#junction-abilities) that define the flag value for this ability |
