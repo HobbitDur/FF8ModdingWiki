@@ -6,8 +6,8 @@ author: HobbitDur, Maki
 permalink: /technical-reference/exedata/draw-point/
 ---
 
-1. TOC
-   {:toc}
+1. TOC 
+{:toc}
 
 # Draw point definition
 
