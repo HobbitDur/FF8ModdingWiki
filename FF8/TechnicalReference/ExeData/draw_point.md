@@ -22,7 +22,7 @@ Here a table to explain what each part of the byte does:
 
 | bit | Name       | Flag | Description                                                                                        |
 |-----|------------|------|----------------------------------------------------------------------------------------------------|
-| 0-5 | MagicID    | -    | Can be any magic from the [magic list]({{site.baseurl}}/technical-reference/list/magic-list#magic) |
+| 0-5 | MagicID    | 0x3F | Can be any magic from the [magic list]({{site.baseurl}}/technical-reference/list/magic-list#magic) |
 | 6   | Refill     | 0x40 | True (1) if the draw point will refill                                                             |
 | 7   | High yield | 0x80 | True (1) if the draw point will draw more than 10 magic.                                           |
 
