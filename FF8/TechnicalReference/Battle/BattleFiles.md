@@ -1,7 +1,7 @@
 ---
 layout: default
 parent: Battle
-title: Battle Files
+title: Battle Stages
 permalink: /technical-reference/battle/battle-files/
 ---
 
