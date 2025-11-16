@@ -29,7 +29,7 @@ Here you will find an explination on how to convert the Tonberry mod by Mcindus 
 ## __Cut Textures__
    - Go inside the Angelwing Ultima folder that was extracted. Go inside the textures Folder. Then go inside the field_bg folder. 
    - **Cut all 2 letter folders. (right click, select all, then right click and CUT, or CONTROL+A, then CONTROL+X)**
-   - 
+     
 ![](../../assets/guides/angelwcut.png)
 
 ## __Locate JUNCTION 8 Library Folder__
@@ -53,6 +53,8 @@ Here you will find an explination on how to convert the Tonberry mod by Mcindus 
 ## __Paste__
    - **Inside Junction VIII\mods\textures\field\mapdata\ paste all the 2 letter folders from ANGELWING ULTIMA.**
    - right click PASTE, or CONTROL+V
+
+![](../../assets/guides/angelwpaste.png)
 
 ## __Activate__
    - Open up Junction 8. There will be a new mod on your mod list called ANGELWING (or what ever you named the folder in the JUNCTION VIII directory)
