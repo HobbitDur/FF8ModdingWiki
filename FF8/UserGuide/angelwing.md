@@ -3,6 +3,7 @@ layout: default
 title: Converting Angelwings Ultima for Junction 8
 parent: User Guide
 permalink: /user-guide/converting-angelwings-ultima-for-junction8/
+author: Slimebucket
 ---
 
 
@@ -63,5 +64,3 @@ Here you will find an explination on how to convert the Tonberry mod by Mcindus 
 ![](../../assets/guides/angelwinj.png)
 
    - If or when Mcindus creates a new offical version, just turn this mod off, or delete it.
-
-  Guide written by Slimebucket
