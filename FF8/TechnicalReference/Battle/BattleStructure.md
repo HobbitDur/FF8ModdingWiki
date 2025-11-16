@@ -47,6 +47,11 @@ Enemy flags are one byte each, and each bit determines whether a specific monste
 | 0x02       | Monster 7 |
 | 0x01       | Monster 8 |
 
+**NOT Visible** stops the monster from rendering.  
+**NOT Targetable** removes the monster from the list of targetable enemies.  
+**NOT Loaded** means the monster's AI isn't being evaluated.  
+**Enabled** needs to be *true* for the monster to exist in the fight, even if it's not tagged as **NOT Visible** or **NOT Loaded**, it won't appear or do anything until it's **Enabled**.  
+
 ## Battle flags
 
 Similarly to [enemy flags](#enemy-flags), it's a byte and each bit determines whether a specific flag is on or off.  
@@ -72,8 +77,8 @@ It appears that the game doesn't read these fields' data, suggesting they may be
 
 ## Enemy level
 
-Each ennemy level is 1 byte.<br>
-By default, the ennemy level is determined by the average level of the current team `team level`, and the game adds or substracts `team level / 5`.
+Each enemy level is 1 byte.<br>
+By default, the enemy level is determined by the average level of the current team `team level`, and the game adds or substracts `team level / 5`.
 
 - Numbers from 0 to 100 are fixed levels `N +- (N / 5)`. 
 - From 101 to 200 are max levels fixed `min(team level +- (team level / 5), N)`
@@ -86,5 +91,5 @@ By default, the ennemy level is determined by the average level of the current t
 
 ## Notes
 
-Only a maximum of 4 enemies can be loaded at the same time.  
-Using a value lower than 0x10 for an enemy ID will crash the game on battle start.  
+No more than 4 enemies can be **Enabled** at any given time.  
+Using a value lower than 0x10 for an enemy ID will crash the game on battle start, as the first 16 IDs are reserved for playable characters.  
