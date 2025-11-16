@@ -245,11 +245,21 @@ if 0xCB, v92 = last_attacker_slot_id
 
 ---
 
+## Opcode 0x03 (3) - prepareMagic
 
+### Summary
 
-## Opcode 0x03 (1) - declareCommandMagic
+Stores a magic ID in the monster's *stored action*, so that it may be used by the opcode **_silentUse_**.  
 
-This Opcode is not used in any monster, but the code seems to indicate it declares a command type as magic. Don't know the impact
+| Opcode | IfritAI name | Size | Short description             |
+|--------|--------------|------|-------------------------------|
+| 0x03   | prepareMagic | 1    | Stores magic ID for later use |
+
+### Parameters
+
+| Position | Size | Name            | Type                                          | Short description |
+|----------|------|-----------------|-----------------------------------------------|-------------------|
+| 1        | 1    | **Magic ID**    | [Magic](../../list/magic-list/#magic)         | Magic ID          |
 
 ---
 
@@ -259,7 +269,7 @@ This Opcode is not used in any monster, but the code seems to indicate it declar
 
 This opcode defines a target, it must be used before any opcode that requires a target (like launching an ability).  
 If the target is a specific playable character who isn't currently targetable, the character in the slot of the original target -1 will be targeted, if the original target was slot 0, the new target will be slot 1 instead.  
-Note that the original target will still be targeted by opcodes **_draw_** and **_blowAway_**.
+Note that the original target will still be targeted by opcodes **_draw_** and **_blowAway_** (TO BE TESTED: silentUse).
 
 | Opcode | IfritAI name | Size | Short description |
 |--------|--------------|------|-------------------|
@@ -295,10 +305,37 @@ None
 
 ---
 
+## Opcode 0x06 (6) - silentUse
 
-## Opcode 0x07 (1) - declareCommandMonsterAttack
+### Summary 
 
-This Opcode is not used in any monster, but the code seems to indicate it declares a command type as monster attack. Don't know the impact
+Uses the monster's *stored action* without, without launching a monster animation (this is what silent means in this context).  
+
+| Opcode | IfritAI name | Size | Short description     |
+|--------|--------------|------|-----------------------|
+| 0x05   | silentUse    | 1    | Uses stored action    |
+
+### Parameters
+
+None
+
+---
+
+## Opcode 0x07 (7) - prepareMonsterAbility
+
+### Summary
+
+Stores an monster ability ID in the monster's *stored action*, so that it may be used by the opcode **_silentUse_**.  
+
+| Opcode | IfritAI name          | Size | Short description                       |
+|--------|-----------------------|------|-----------------------------------------|
+| 0x07   | prepareMonsterAbility | 1    | Stores monster ability ID for later use |
+
+### Parameters
+
+| Position | Size | Name                      | Type                                               | Short description  |
+|----------|------|---------------------------|----------------------------------------------------|--------------------|
+| 1        | 1    | **Monster Ability ID**    | [Monster Ability ID](../../list/ability-list/#monster-ability) | Monster Ability ID |
 
 ---
 
