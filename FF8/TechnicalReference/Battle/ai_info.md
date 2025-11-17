@@ -60,7 +60,7 @@ Displays a battle message.
 
 | Position | Size | Name       | Type                     | Short description     |
 |----------|------|------------|--------------------------|-----------------------|
-| 1        | 1    | **TextID** | [int](../OpCodeType#int) | The index of the text |
+| 1        | 1    | **TextID** | [int](../opcode-type-list#int) | The index of the text |
 
 Texts are defined in [section 7](../FileFormat_DAT#section-7-informations--stats) of c0mxxx.dat files.  
 Each text has an ID, starting from 0 and incrementing with each subsequent text.  
@@ -91,10 +91,10 @@ Then there is a jump param to define the jump size if the condition is not met
 |----------|------|------------------------|----------------------------------------|------------------------------------------------------|
 | 1        | 1    | **SubjectID**          | [SubjectID](#subjectid)                | Define what the if will be about                     |
 | 2        | 1    | **ConditionLeftPart**  | Vary                                   | The left condition                                   |
-| 3        | 1    | **Comparator**         | [Comparator](../OpCodeType#comparator) | The comparator of the condition                      |
+| 3        | 1    | **Comparator**         | [Comparator](../opcode-type-list#comparator) | The comparator of the condition                      |
 | 4        | 1    | **ConditionRightPart** | Vary                                   | The right condition                                  |
-| 5        | 1    | **Padding**            | [Unused](../OpCodeType#unused)         | Always 0x00 (changing it has no impact)              |
-| 6        | 2    | **Jump**               | [int](../OpCodeType#int)               | The number of byte to jump if the condition is false |
+| 5        | 1    | **Padding**            | [Unused](../opcode-type-list#unused)         | Always 0x00 (changing it has no impact)              |
+| 6        | 2    | **Jump**               | [int](../opcode-type-list#int)               | The number of byte to jump if the condition is false |
 
 ### SubjectID
 
@@ -111,8 +111,8 @@ The _Param list_ can feed the param type with additional info.
 
 | SubjectID | Short text                | Left text                           | Param left type                                                    | Right text     | Param right type         | Param list |
 |-----------|---------------------------|-------------------------------------|--------------------------------------------------------------------|----------------|--------------------------|------------|
-| 0         | HP OF SPECIFIC TARGET     | HP_SPE of {}                        | [target_advanced_specific](../OpCodeType#target-advanced-specific) |                | percent                  |            |
-| 1         | HP OF GENERIC TARGET      | HP_GEN of {}                        | [target_advanced_generic](../OpCodeType#target-advanced-generic)   |                | percent                  |            |
+| 0         | HP OF SPECIFIC TARGET     | HP_SPE of {}                        | [target_advanced_specific](../opcode-type-list#target-advanced-specific) |                | percent                  |            |
+| 1         | HP OF GENERIC TARGET      | HP_GEN of {}                        | [target_advanced_generic](../opcode-type-list#target-advanced-generic)   |                | percent                  |            |
 | 2         | RANDOM VALUE              | RANDOM VALUE BETWEEN 0 AND {}       | int_shift                                                          |                | int                      | [-1]       |
 | 3         | COMBAT SCENE              | COMBAT SCENE                        |                                                                    |                | int                      |            |
 | 4         | STATUS OF SPECIFIC TARGET | STATUS_SPE OF {}                    | target_advanced_specific                                           |                | status_ai                |            |
@@ -279,13 +279,13 @@ Note that the original target will still be targeted by opcodes **_draw_** and *
 
 | Position | Size | Name            | Type                                      | Short description |
 |----------|------|-----------------|-------------------------------------------|-------------------|
-| 1        | 1    | **Target**      | [TargetBasic](../OpCodeType#target-basic) | The target        |
+| 1        | 1    | **Target**      | [TargetBasic](../opcode-type-list#target-basic) | The target        |
 
 OR
 
-| Position | Size | Name            | Type                                | Short description     |
-|----------|------|-----------------|-------------------------------------|-----------------------|
-| 1        | 1    | **Var**         | [LocalVar](../OpCodeType#local-var) | Var containing target |
+| Position | Size | Name            | Type                                      | Short description     |
+|----------|------|-----------------|-------------------------------------------|-----------------------|
+| 1        | 1    | **Var**         | [LocalVar](../opcode-type-list#local-var) | Var containing target |
 
 ---
 
@@ -354,9 +354,9 @@ Requires **_target_** to have been used.
 
 | Position | Size | Name                    | Type                                                     | Short description       |
 |----------|------|-------------------------|----------------------------------------------------------|-------------------------|
-| 1        | 1    | **MonsterLineAbility1** | [MonsterLineAbility](../OpCodeType#monster-line-ability) | The first ability line  |
-| 2        | 1    | **MonsterLineAbility2** | [MonsterLineAbility](../OpCodeType#monster-line-ability) | The second ability line |
-| 3        | 1    | **MonsterLineAbility3** | [MonsterLineAbility](../OpCodeType#monster-line-ability) | The third ability line  |
+| 1        | 1    | **MonsterLineAbility1** | [MonsterLineAbility](../opcode-type-list#monster-line-ability) | The first ability line  |
+| 2        | 1    | **MonsterLineAbility2** | [MonsterLineAbility](../opcode-type-list#monster-line-ability) | The second ability line |
+| 3        | 1    | **MonsterLineAbility3** | [MonsterLineAbility](../opcode-type-list#monster-line-ability) | The third ability line  |
 
 ---
 
@@ -374,7 +374,7 @@ Use one ability, requires **_target_** to have been used.
 
 | Position | Size | Name                   | Type                                                     | Short description |
 |----------|------|------------------------|----------------------------------------------------------|-------------------|
-| 1        | 1    | **MonsterLineAbility** | [MonsterLineAbility](../OpCodeType#monster-line-ability) | The ability line  |
+| 1        | 1    | **MonsterLineAbility** | [MonsterLineAbility](../opcode-type-list#monster-line-ability) | The ability line  |
 
 ---
 
@@ -400,8 +400,8 @@ Can also be used to initialize a battle variable, in case the battle variable al
 
 | Position | Size | Name      | Type                                | Short description             |
 |----------|------|-----------|-------------------------------------|-------------------------------|
-| 1        | 1    | **Var**   | [LocalVar](../OpCodeType#local-var) | The var to store the data     |
-| 2        | 1    | **Value** | [int](../OpCodeType#int)            | The value var is set to       |
+| 1        | 1    | **Var**   | [LocalVar](../opcode-type-list#local-var) | The var to store the data     |
+| 2        | 1    | **Value** | [int](../opcode-type-list#int)            | The value var is set to       |
 
 If **Value** is 203, the ID of the _Last Attacker_ will be stored in the variable. 
 
@@ -423,8 +423,8 @@ Sets global variable (accessible by all monsters)
 
 | Position | Size | Name      | Type                                 | Short description             |
 |----------|------|-----------|--------------------------------------|-------------------------------|
-| 1        | 1    | **Var**   | [LocalVar](../OpCodeType#global-var) | The var to store the data     |
-| 2        | 1    | **Value** | [int](../OpCodeType#int)             | The value var is set to       |
+| 1        | 1    | **Var**   | [LocalVar](../opcode-type-list#global-var) | The var to store the data     |
+| 2        | 1    | **Value** | [int](../opcode-type-list#int)             | The value var is set to       |
 
 ---
 
@@ -442,8 +442,8 @@ Sets savemap variable (not sure how it it stored).
 
 | Position | Size | Name      | Type                                    | Short description             |
 |----------|------|-----------|-----------------------------------------|-------------------------------|
-| 1        | 1    | **Var**   | [SavemapVar](../OpCodeType#savemap-var) | The var to store the data     |
-| 2        | 1    | **Value** | [int](../OpCodeType#int)                | The value var is set to       |
+| 1        | 1    | **Var**   | [SavemapVar](../opcode-type-list#savemap-var) | The var to store the data     |
+| 2        | 1    | **Value** | [int](../opcode-type-list#int)                | The value var is set to       |
 
 ---
 
@@ -461,8 +461,8 @@ Adds value to local variable that will be only accessible by this monster during
 
 | Position | Size | Name      | Type                                | Short description           |
 |----------|------|-----------|-------------------------------------|-----------------------------|
-| 1        | 1    | **Var**   | [LocalVar](../OpCodeType#local-var) | The var to store the data   |
-| 2        | 1    | **Value** | [int](../OpCodeType#int)            | The value to add to the var |
+| 1        | 1    | **Var**   | [LocalVar](../opcode-type-list#local-var) | The var to store the data   |
+| 2        | 1    | **Value** | [int](../opcode-type-list#int)            | The value to add to the var |
 
 If **Value** is equal to 0xCB (203), then the added value is equal to the last attacker's slot.
 
@@ -482,8 +482,8 @@ Adds value to battle var (accessible by all monsters).
 
 | Position | Size | Name      | Type                                  | Short description           |
 |----------|------|-----------|---------------------------------------|-----------------------------|
-| 1        | 1    | **Var**   | [GlobalVar](../OpCodeType#global-var) | The var to store the data   |
-| 2        | 1    | **Value** | [int](../OpCodeType#int)              | The value to add to the var |
+| 1        | 1    | **Var**   | [GlobalVar](../opcode-type-list#global-var) | The var to store the data   |
+| 2        | 1    | **Value** | [int](../opcode-type-list#int)              | The value to add to the var |
 
 ---
 
@@ -501,8 +501,8 @@ Adds value to savemap var (not sure where it is stored).
 
 | Position | Size | Name      | Type                                    | Short description           |
 |----------|------|-----------|-----------------------------------------|-----------------------------|
-| 1        | 1    | **Var**   | [SavemapVar](../OpCodeType#savemap-var) | The var to store the data   |
-| 2        | 1    | **Value** | [int](../OpCodeType#int)                | The value to add to the var |
+| 1        | 1    | **Var**   | [SavemapVar](../opcode-type-list#savemap-var) | The var to store the data   |
+| 2        | 1    | **Value** | [int](../opcode-type-list#int)                | The value to add to the var |
 
 ---
 
@@ -536,7 +536,7 @@ Allows/Disallows escaping in the current battle.
 
 | Position | Size | Name                | Type                       | Short description                          |
 |----------|------|---------------------|----------------------------|--------------------------------------------|
-| 1        | 1    | **EscapeActivated** | [Bool](../OpCodeType#bool) | True to allow escape, False to disallow it |
+| 1        | 1    | **EscapeActivated** | [Bool](../opcode-type-list#bool) | True to allow escape, False to disallow it |
 
 ---
 
@@ -554,7 +554,7 @@ Displays a battle message, respecting the _battle message speed_ setting.
 
 | Position | Size | Name       | Type                     | Short description     |
 |----------|------|------------|--------------------------|-----------------------|
-| 1        | 1    | **TextID** | [int](../OpCodeType#int) | The index of the text |
+| 1        | 1    | **TextID** | [int](../opcode-type-list#int) | The index of the text |
 
 Texts are defined in [section 7](../FileFormat_DAT#section-7-informations--stats) of c0mxxx.dat files.  
 Each text has an ID, starting from 0 and incrementing with each subsequent text.  
@@ -576,7 +576,7 @@ Waits for a specified amount of texts to finish displaying before resuming the b
 
 | Position | Size | Name       | Type                     | Short description               |
 |----------|------|------------|--------------------------|---------------------------------|
-| 1        | 1    | **NbText** | [int](../OpCodeType#int) | The number of texts to wait for |
+| 1        | 1    | **NbText** | [int](../opcode-type-list#int) | The number of texts to wait for |
 
 
 ---
@@ -595,7 +595,7 @@ Makes the monster in a specified encounter slot leave combat.
 
 | Position | Size | Name       | Type                     | Short description            |
 |----------|------|------------|--------------------------|------------------------------|
-| 1        | 1    | **Target** | [int](../OpCodeType#int) | Monster that's made to leave |
+| 1        | 1    | **Target** | [int](../opcode-type-list#int) | Monster that's made to leave |
 
 **Target** is the slot in which the monster currently is in the fight.  
 Note that if 200 is used, the monster executing this opcode will be used as **Target**.
@@ -617,7 +617,7 @@ Whilst possible, it is not advisable to use **_enter_** on an encounter slot if 
 
 | Position | Size | Name       | Type                     | Short description             |
 |----------|------|------------|--------------------------|-------------------------------|
-| 1        | 1    | **Target** | [int](../OpCodeType#int) | Encounter slot of the monster |
+| 1        | 1    | **Target** | [int](../opcode-type-list#int) | Encounter slot of the monster |
 
 **Target** is the monster's encounter slot, as defined in [scene.out](../BattleStructure).  
 
@@ -640,7 +640,7 @@ Wait the previous message like wait text
 
 | Position | Size | Name       | Type                     | Short description               |
 |----------|------|------------|--------------------------|---------------------------------|
-| 1        | 1    | **NbText** | [int](../OpCodeType#int) | The number of texts to wait for |
+| 1        | 1    | **NbText** | [int](../opcode-type-list#int) | The number of texts to wait for |
 
 
 ---
@@ -676,7 +676,7 @@ This text can be found in the bottom left section of the scan screen, where info
 
 | Position | Size | Name       | Type                     | Short description     |
 |----------|------|------------|--------------------------|-----------------------|
-| 1        | 1    | **TextID** | [int](../OpCodeType#int) | The index of the text |
+| 1        | 1    | **TextID** | [int](../opcode-type-list#int) | The index of the text |
 
 Texts are defined in [section 7](../FileFormat_DAT#section-7-informations--stats) of c0mxxx.dat files.  
 Each text has an ID, starting from 0 and incrementing with each subsequent text.  
@@ -700,8 +700,8 @@ For example, if **_statChange_** is used to increase a stat to 500% of its origi
 
 | Position | Size | Name           | Type                                    | Short description             |
 |----------|------|----------------|-----------------------------------------|-------------------------------|
-| 1        | 1    | **Stat**       | [Stat](../OpCodeType#stat)              | The stat that will be changed |
-| 2        | 1    | **Multiplier** | [int](../OpCodeType#int)                | The multiplier for said stat  |
+| 1        | 1    | **Stat**       | [Stat](../opcode-type-list#stat)              | The stat that will be changed |
+| 2        | 1    | **Multiplier** | [int](../opcode-type-list#int)                | The multiplier for said stat  |
 
 Note that **Multiplier** is multiplied by 10, so for example if its set to 0x28 (40), the stat will be multiplied by 0x28 \* 0x0A = 0x190 (40 \* 10 = 400)
 
@@ -809,6 +809,6 @@ Sets this monster's Enabled flag to _True_.
 
 | Position | Size | Name       | Type                     | Short description             |
 |----------|------|------------|--------------------------|-------------------------------|
-| 1        | 1    | **Target** | [int](../OpCodeType#int) | Encounter slot of the monster |
+| 1        | 1    | **Target** | [int](../opcode-type-list#int) | Encounter slot of the monster |
 
 **Target** is the monster's encounter slot, as defined in [scene.out](../BattleStructure).  

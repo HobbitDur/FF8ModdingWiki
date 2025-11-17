@@ -60,7 +60,7 @@ Means the value is not used and could be changed by any value without any impact
 
 # Monster line ability
 
-In FF8, monster have 3 level of difficulty, by default at level 10, 20 and 30.   
+In FF8, monster have 3 level of difficultyjehafeahhfxcdfgxf, by default at level 10, 20 and 30.   
 For each level, the ability change.
 
 An ability line correspond to a list of 3 abilities, with the first being at low level, second at medium level and third at high level.
@@ -71,8 +71,8 @@ So the value is the ID of the ability line, starting from 0. The line contains 3
 
 # Local var
 
-The AI use local var to make calculation and use it on future turn (or same turn).  
-Here the list of available var and the ID of the var:
+Local variable of unsigned byte type, used by AIs.    
+Here the list of all available local vars and their respective IDs:
 
 | Opcode dec | Opcode hex | IfritAI name |
 |------------|------------|--------------|
@@ -85,6 +85,21 @@ Here the list of available var and the ID of the var:
 | 226        | 0xE2       | varG         |
 | 227        | 0xE3       | varH         |
 | 228        | 0xE4       | varI         |
+
+When used as a parameter for the opcode [**_target_**](../battle-scripts/#opcode-0x04-4---target):
+
+| Value | Resulting target |
+|-------|------------------|
+| 0     | Battle slot 0    |
+| 1     | Battle slot 1    |
+| 2     | Battle slot 2    |
+| 3     | Battle slot 3    |
+| 4     | Battle slot 4    |
+| 5     | Battle slot 5    |
+| 6     | Battle slot 6    |
+| 7     | Battle slot 7    |
+
+_Battle slots_ from 0 to 2 represent the playable characters in menu order, 3 to 7 represent monsters, in [scene.out](../battle-structure-sceneout/) declaration order.  
 
 # Savemap var
 
