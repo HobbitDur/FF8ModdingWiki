@@ -277,8 +277,8 @@ Note that the original target will still be targeted by opcodes **_draw_** and *
 
 ### Parameters
 
-| Position | Size | Name            | Type                                      | Short description |
-|----------|------|-----------------|-------------------------------------------|-------------------|
+| Position | Size | Name            | Type                                            | Short description |
+|----------|------|-----------------|-------------------------------------------------|-------------------|
 | 1        | 1    | **Target**      | [TargetBasic](../opcode-type-list#target-basic) | The target        |
 
 OR
@@ -286,6 +286,12 @@ OR
 | Position | Size | Name            | Type                                      | Short description     |
 |----------|------|-----------------|-------------------------------------------|-----------------------|
 | 1        | 1    | **Var**         | [LocalVar](../opcode-type-list#local-var) | Var containing target |
+
+OR
+
+| Position | Size | Name            | Type                                                      | Short description     |
+|----------|------|-----------------|-----------------------------------------------------------|-----------------------|
+| 1        | 1    | **Monster ID**  | [c0mxxx.dat files ID](../monster-files-c0mxxxdat/) + 0x10 | Monster ID            |
 
 ---
 
