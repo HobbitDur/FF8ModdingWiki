@@ -295,31 +295,15 @@ OR
 
 ---
 
-## Opcode 0x05 (5) - die
+## Opcode 0x06 (6) - usePrepared
 
 ### Summary 
 
-Causes monster that executes this opcode to die.
+Uses the monster's *stored action*.  
 
 | Opcode | IfritAI name | Size | Short description     |
 |--------|--------------|------|-----------------------|
-| 0x05   | die          | 1    | Causes monster to die |
-
-### Parameters
-
-None
-
----
-
-## Opcode 0x06 (6) - silentUse
-
-### Summary 
-
-Uses the monster's *stored action* without, without launching a monster animation (this is what silent means in this context).  
-
-| Opcode | IfritAI name | Size | Short description     |
-|--------|--------------|------|-----------------------|
-| 0x05   | silentUse    | 1    | Uses stored action    |
+| 0x05   | usePrepared  | 1    | Uses stored action    |
 
 ### Parameters
 
@@ -342,6 +326,22 @@ Stores an monster ability ID in the monster's *stored action*, so that it may be
 | Position | Size | Name                      | Type                                               | Short description  |
 |----------|------|---------------------------|----------------------------------------------------|--------------------|
 | 1        | 1    | **Monster Ability ID**    | [Monster Ability ID](../../list/ability-list/#monster-ability) | Monster Ability ID |
+
+---
+
+## Opcode 0x08 (8) - die
+
+### Summary 
+
+Causes monster that executes this opcode to die.
+
+| Opcode | IfritAI name | Size | Short description     |
+|--------|--------------|------|-----------------------|
+| 0x05   | die          | 1    | Causes monster to die |
+
+### Parameters
+
+None
 
 ---
 
