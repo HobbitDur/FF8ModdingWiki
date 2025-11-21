@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 068_THROUGHOFF
+nav_order: 105
 permalink: /technical-reference/field/field-opcodes/068-throughoff/
 ---
 

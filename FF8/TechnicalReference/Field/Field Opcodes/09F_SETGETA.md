@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 09F_SETGETA
+nav_order: 160
 permalink: /technical-reference/field/field-opcodes/09f-setgeta/
 ---
 

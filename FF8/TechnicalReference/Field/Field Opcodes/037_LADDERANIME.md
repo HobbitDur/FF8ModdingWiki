@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 037_LADDERANIME
+nav_order: 56
 permalink: /technical-reference/field/field-opcodes/037-ladderanime/
 ---
 

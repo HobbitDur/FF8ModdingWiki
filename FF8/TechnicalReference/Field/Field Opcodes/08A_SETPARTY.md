@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 08A_SETPARTY
+nav_order: 139
 permalink: /technical-reference/field/field-opcodes/08a-setparty/
 ---
 

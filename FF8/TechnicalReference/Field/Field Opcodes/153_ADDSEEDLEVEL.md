@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 153_ADDSEEDLEVEL
+nav_order: 340
 permalink: /technical-reference/field/field-opcodes/153-addseedlevel/
 ---
 

@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 038_DISCJUMP
+nav_order: 57
 permalink: /technical-reference/field/field-opcodes/038-discjump/
 ---
 

@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 036_RCANIMELOOP
+nav_order: 55
 permalink: /technical-reference/field/field-opcodes/036-rcanimeloop/
 ---
 

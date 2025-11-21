@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 095_BGANIME
+nav_order: 150
 permalink: /technical-reference/field/field-opcodes/095-bganime/
 ---
 

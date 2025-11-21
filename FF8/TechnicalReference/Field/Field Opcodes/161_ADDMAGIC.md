@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 161_ADDMAGIC
+nav_order: 354
 permalink: /technical-reference/field/field-opcodes/161-addmagic/
 ---
 

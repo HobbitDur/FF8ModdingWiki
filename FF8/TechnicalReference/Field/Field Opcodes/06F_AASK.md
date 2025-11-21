@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 06F_AASK
+nav_order: 112
 permalink: /technical-reference/field/field-opcodes/06f-aask/
 ---
 

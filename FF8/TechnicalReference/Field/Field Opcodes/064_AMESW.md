@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 064_AMESW
+nav_order: 101
 permalink: /technical-reference/field/field-opcodes/064-amesw/
 ---
 

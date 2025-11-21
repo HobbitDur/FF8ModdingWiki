@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 03F_MOVEA
+nav_order: 64
 permalink: /technical-reference/field/field-opcodes/03f-movea/
 ---
 

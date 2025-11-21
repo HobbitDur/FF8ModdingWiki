@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 018_PREQSW
+nav_order: 25
 permalink: /technical-reference/field/field-opcodes/018-preqsw/
 ---
 

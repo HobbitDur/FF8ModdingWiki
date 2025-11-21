@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 066_GETINFO
+nav_order: 103
 permalink: /technical-reference/field/field-opcodes/066-getinfo/
 ---
 

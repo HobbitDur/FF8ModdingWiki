@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 10B_BATTLECUT
+nav_order: 268
 permalink: /technical-reference/field/field-opcodes/10b-battlecut/
 ---
 

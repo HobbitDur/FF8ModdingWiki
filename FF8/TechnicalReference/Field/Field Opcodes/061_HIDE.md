@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 061_HIDE
+nav_order: 98
 permalink: /technical-reference/field/field-opcodes/061-hide/
 ---
 

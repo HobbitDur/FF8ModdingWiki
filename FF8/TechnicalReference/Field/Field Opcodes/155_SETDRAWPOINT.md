@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 155_SETDRAWPOINT
+nav_order: 342
 permalink: /technical-reference/field/field-opcodes/155-setdrawpoint/
 ---
 

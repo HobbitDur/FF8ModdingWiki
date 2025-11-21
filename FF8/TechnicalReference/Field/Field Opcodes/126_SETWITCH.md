@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 126_SETWITCH
+nav_order: 295
 permalink: /technical-reference/field/field-opcodes/126-setwitch/
 ---
 

@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 056_SPUREADY
+nav_order: 87
 permalink: /technical-reference/field/field-opcodes/056-spuready/
 ---
 

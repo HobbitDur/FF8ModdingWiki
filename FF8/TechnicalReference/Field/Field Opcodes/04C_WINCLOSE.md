@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 04C_WINCLOSE
+nav_order: 77
 permalink: /technical-reference/field/field-opcodes/04c-winclose/
 ---
 

@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 03B_LINEOFF
+nav_order: 60
 permalink: /technical-reference/field/field-opcodes/03b-lineoff/
 ---
 

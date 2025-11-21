@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 008_PSHI_L
+nav_order: 9
 permalink: /technical-reference/field/field-opcodes/008-pshi-l/
 ---
 

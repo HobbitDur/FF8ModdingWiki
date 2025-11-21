@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 150_KEYSIGHNCHANGE
+nav_order: 337
 permalink: /technical-reference/field/field-opcodes/150-keysighnchange/
 ---
 

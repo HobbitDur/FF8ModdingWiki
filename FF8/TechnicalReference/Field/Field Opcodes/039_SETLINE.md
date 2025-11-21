@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 039_SETLINE
+nav_order: 58
 permalink: /technical-reference/field/field-opcodes/039-setline/
 ---
 

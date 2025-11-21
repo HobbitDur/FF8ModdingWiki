@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 06B_BATTLEON
+nav_order: 108
 permalink: /technical-reference/field/field-opcodes/06b-battleon/
 ---
 

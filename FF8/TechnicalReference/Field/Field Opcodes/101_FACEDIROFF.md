@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 101_FACEDIROFF
+nav_order: 258
 permalink: /technical-reference/field/field-opcodes/101-facediroff/
 ---
 

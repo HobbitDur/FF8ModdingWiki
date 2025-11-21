@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 06E_KEYON
+nav_order: 111
 permalink: /technical-reference/field/field-opcodes/06e-keyon/
 ---
 

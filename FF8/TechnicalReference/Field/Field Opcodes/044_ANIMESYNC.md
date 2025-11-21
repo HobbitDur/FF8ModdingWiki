@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 044_ANIMESYNC
+nav_order: 69
 permalink: /technical-reference/field/field-opcodes/044-animesync/
 ---
 

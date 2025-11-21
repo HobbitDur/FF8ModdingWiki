@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 127_SETODIN
+nav_order: 296
 permalink: /technical-reference/field/field-opcodes/127-setodin/
 ---
 

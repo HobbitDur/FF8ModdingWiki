@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 148_MOVEFLUSH
+nav_order: 329
 permalink: /technical-reference/field/field-opcodes/148-moveflush/
 ---
 

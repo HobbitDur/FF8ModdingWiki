@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 106_MESMODE
+nav_order: 263
 permalink: /technical-reference/field/field-opcodes/106-mesmode/
 ---
 

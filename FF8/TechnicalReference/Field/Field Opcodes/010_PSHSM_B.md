@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 010_PSHSM_B
+nav_order: 17
 permalink: /technical-reference/field/field-opcodes/010-pshsm-b/
 ---
 

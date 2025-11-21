@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 05F_SETMESSPEED
+nav_order: 96
 permalink: /technical-reference/field/field-opcodes/05f-setmesspeed/
 ---
 

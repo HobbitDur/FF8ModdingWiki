@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 03D_MSPEED
+nav_order: 62
 permalink: /technical-reference/field/field-opcodes/03d-mspeed/
 ---
 

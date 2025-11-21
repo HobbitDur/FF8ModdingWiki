@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 11B_MENUPHS
+nav_order: 284
 permalink: /technical-reference/field/field-opcodes/11b-menuphs/
 ---
 

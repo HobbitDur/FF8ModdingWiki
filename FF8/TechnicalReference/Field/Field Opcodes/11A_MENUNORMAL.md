@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 11A_MENUNORMAL
+nav_order: 283
 permalink: /technical-reference/field/field-opcodes/11a-menunormal/
 ---
 

@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 013_PSHAC
+nav_order: 20
 permalink: /technical-reference/field/field-opcodes/013-pshac/
 ---
 

@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 06A_BATTLERESULT
+nav_order: 107
 permalink: /technical-reference/field/field-opcodes/06a-battleresult/
 ---
 

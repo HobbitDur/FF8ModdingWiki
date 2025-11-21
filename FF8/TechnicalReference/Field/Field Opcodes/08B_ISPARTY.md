@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 08B_ISPARTY
+nav_order: 140
 permalink: /technical-reference/field/field-opcodes/08b-isparty/
 ---
 

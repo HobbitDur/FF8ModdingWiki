@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 011_PSHSM_W
+nav_order: 18
 permalink: /technical-reference/field/field-opcodes/011-pshsm-w/
 ---
 

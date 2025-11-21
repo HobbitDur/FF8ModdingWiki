@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 11D_GETPARTY
+nav_order: 286
 permalink: /technical-reference/field/field-opcodes/11d-getparty/
 ---
 

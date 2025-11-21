@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 05B_ISTOUCH
+nav_order: 92
 permalink: /technical-reference/field/field-opcodes/05b-istouch/
 ---
 

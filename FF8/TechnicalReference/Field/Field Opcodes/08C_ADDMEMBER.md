@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 08C_ADDMEMBER
+nav_order: 141
 permalink: /technical-reference/field/field-opcodes/08c-addmember/
 ---
 

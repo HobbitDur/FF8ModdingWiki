@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 070_PGETINFO
+nav_order: 113
 permalink: /technical-reference/field/field-opcodes/070-pgetinfo/
 ---
 

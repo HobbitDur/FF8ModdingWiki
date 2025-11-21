@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 08D_SUBMEMBER
+nav_order: 142
 permalink: /technical-reference/field/field-opcodes/08d-submember/
 ---
 

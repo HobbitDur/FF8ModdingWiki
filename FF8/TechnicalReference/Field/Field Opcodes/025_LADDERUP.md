@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 025_LADDERUP
+nav_order: 38
 permalink: /technical-reference/field/field-opcodes/025-ladderup/
 ---
 

@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 016_REQEW
+nav_order: 23
 permalink: /technical-reference/field/field-opcodes/016-reqew/
 ---
 

@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 069_BATTLE
+nav_order: 106
 permalink: /technical-reference/field/field-opcodes/069-battle/
 ---
 

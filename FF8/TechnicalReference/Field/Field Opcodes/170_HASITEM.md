@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 170_HASITEM
+nav_order: 369
 permalink: /technical-reference/field/field-opcodes/170-hasitem/
 ---
 

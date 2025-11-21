@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 090_CTURN
+nav_order: 145
 permalink: /technical-reference/field/field-opcodes/090-cturn/
 ---
 

@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 100_FACEDIRLIMIT
+nav_order: 257
 permalink: /technical-reference/field/field-opcodes/100-facedirlimit/
 ---
 

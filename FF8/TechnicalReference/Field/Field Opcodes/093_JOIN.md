@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 093_JOIN
+nav_order: 148
 permalink: /technical-reference/field/field-opcodes/093-join/
 ---
 

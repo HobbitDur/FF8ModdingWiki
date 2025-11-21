@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 04B_WINSIZE
+nav_order: 76
 permalink: /technical-reference/field/field-opcodes/04b-winsize/
 ---
 

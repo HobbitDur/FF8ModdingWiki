@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 164_SPUSYNC
+nav_order: 357
 permalink: /technical-reference/field/field-opcodes/164-spusync/
 ---
 

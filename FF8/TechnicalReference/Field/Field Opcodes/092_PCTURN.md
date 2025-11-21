@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 092_PCTURN
+nav_order: 147
 permalink: /technical-reference/field/field-opcodes/092-pcturn/
 ---
 

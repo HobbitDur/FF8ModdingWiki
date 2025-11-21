@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 145_DYING
+nav_order: 326
 permalink: /technical-reference/field/field-opcodes/145-dying/
 ---
 

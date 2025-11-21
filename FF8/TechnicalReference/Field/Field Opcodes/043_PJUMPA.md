@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 043_PJUMPA
+nav_order: 68
 permalink: /technical-reference/field/field-opcodes/043-pjumpa/
 ---
 

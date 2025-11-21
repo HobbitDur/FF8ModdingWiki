@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 09C_SETTIMER
+nav_order: 157
 permalink: /technical-reference/field/field-opcodes/09c-settimer/
 ---
 

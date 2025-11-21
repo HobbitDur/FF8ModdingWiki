@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 021_EFFECTPLAY2
+nav_order: 34
 permalink: /technical-reference/field/field-opcodes/021-effectplay2/
 ---
 

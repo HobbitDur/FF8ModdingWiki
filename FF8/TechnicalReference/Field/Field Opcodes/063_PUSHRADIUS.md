@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 063_PUSHRADIUS
+nav_order: 100
 permalink: /technical-reference/field/field-opcodes/063-pushradius/
 ---
 

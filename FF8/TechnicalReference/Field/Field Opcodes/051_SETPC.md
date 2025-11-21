@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 051_SETPC
+nav_order: 82
 permalink: /technical-reference/field/field-opcodes/051-setpc/
 ---
 

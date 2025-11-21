@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 125_ADDITEM
+nav_order: 294
 permalink: /technical-reference/field/field-opcodes/125-additem/
 ---
 

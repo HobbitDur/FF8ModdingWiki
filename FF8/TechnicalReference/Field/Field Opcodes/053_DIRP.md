@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 053_DIRP
+nav_order: 84
 permalink: /technical-reference/field/field-opcodes/053-dirp/
 ---
 

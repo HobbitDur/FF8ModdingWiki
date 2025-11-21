@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 130_PHSENABLE
+nav_order: 305
 permalink: /technical-reference/field/field-opcodes/130-phsenable/
 ---
 

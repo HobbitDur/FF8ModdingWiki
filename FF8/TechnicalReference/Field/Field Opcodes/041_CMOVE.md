@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 041_CMOVE
+nav_order: 66
 permalink: /technical-reference/field/field-opcodes/041-cmove/
 ---
 

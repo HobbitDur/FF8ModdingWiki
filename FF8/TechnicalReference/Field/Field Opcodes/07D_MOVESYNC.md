@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 07D_MOVESYNC
+nav_order: 126
 permalink: /technical-reference/field/field-opcodes/07d-movesync/
 ---
 

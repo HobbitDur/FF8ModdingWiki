@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 084_CTURNR
+nav_order: 133
 permalink: /technical-reference/field/field-opcodes/084-cturnr/
 ---
 

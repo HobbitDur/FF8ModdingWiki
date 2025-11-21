@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 03E_MOVE
+nav_order: 63
 permalink: /technical-reference/field/field-opcodes/03e-move/
 ---
 

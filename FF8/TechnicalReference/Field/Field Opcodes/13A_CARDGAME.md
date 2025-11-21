@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 13A_CARDGAME
+nav_order: 315
 permalink: /technical-reference/field/field-opcodes/13a-cardgame/
 ---
 

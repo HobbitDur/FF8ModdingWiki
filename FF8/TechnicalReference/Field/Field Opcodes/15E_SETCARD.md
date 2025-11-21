@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 15E_SETCARD
+nav_order: 351
 permalink: /technical-reference/field/field-opcodes/15e-setcard/
 ---
 

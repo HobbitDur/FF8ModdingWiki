@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 138_PHSPOWER
+nav_order: 313
 permalink: /technical-reference/field/field-opcodes/138-phspower/
 ---
 

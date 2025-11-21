@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 020_IDUNLOCK
+nav_order: 33
 permalink: /technical-reference/field/field-opcodes/020-idunlock/
 ---
 

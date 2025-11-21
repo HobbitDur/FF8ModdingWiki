@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 042_FMOVE
+nav_order: 67
 permalink: /technical-reference/field/field-opcodes/042-fmove/
 ---
 

@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 030_CANIMEKEEP
+nav_order: 49
 permalink: /technical-reference/field/field-opcodes/030-canimekeep/
 ---
 

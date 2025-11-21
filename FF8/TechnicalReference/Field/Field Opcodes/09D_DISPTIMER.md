@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 09D_DISPTIMER
+nav_order: 158
 permalink: /technical-reference/field/field-opcodes/09d-disptimer/
 ---
 

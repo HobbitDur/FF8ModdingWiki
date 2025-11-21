@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 11F_DISC
+nav_order: 288
 permalink: /technical-reference/field/field-opcodes/11f-disc/
 ---
 

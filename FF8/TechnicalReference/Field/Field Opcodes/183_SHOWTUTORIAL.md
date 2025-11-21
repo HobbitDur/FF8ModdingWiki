@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 183_UNKNOWN18
+nav_order: 388
 permalink: /technical-reference/field/field-opcodes/183-unknown18/
 ---
 

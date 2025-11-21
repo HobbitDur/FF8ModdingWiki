@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 03C_WAIT
+nav_order: 61
 permalink: /technical-reference/field/field-opcodes/03c-wait/
 ---
 

@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 06D_KEYSCAN
+nav_order: 110
 permalink: /technical-reference/field/field-opcodes/06d-keyscan/
 ---
 
