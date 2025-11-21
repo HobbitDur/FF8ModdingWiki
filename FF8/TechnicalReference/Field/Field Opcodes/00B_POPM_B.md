@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 00B_POPM_B
+nav_order: 12
 permalink: /technical-reference/field/field-opcodes/00b-popm-b/
 ---
 

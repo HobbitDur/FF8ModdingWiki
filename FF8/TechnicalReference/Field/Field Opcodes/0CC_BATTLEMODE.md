@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 0CC_BATTLEMODE
+nav_order: 205
 permalink: /technical-reference/field/field-opcodes/0cc-battlemode/
 ---
 

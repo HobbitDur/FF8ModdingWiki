@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 0F6_RUNENABLE
+nav_order: 247
 permalink: /technical-reference/field/field-opcodes/0f6-runenable/
 ---
 

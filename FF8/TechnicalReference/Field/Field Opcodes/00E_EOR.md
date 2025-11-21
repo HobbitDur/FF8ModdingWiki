@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 00E_EOR
+nav_order: 15
 permalink: /technical-reference/field/field-opcodes/00e-eor/
 ---
 

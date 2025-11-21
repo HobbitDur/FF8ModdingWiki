@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 01A_UNUSE
+nav_order: 27
 permalink: /technical-reference/field/field-opcodes/01a-unuse/
 ---
 

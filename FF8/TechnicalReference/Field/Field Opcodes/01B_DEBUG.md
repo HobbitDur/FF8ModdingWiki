@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 01B_DEBUG
+nav_order: 28
 permalink: /technical-reference/field/field-opcodes/01b-debug/
 ---
 

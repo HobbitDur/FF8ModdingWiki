@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 0CB_SETBATTLEMUSIC
+nav_order: 204
 permalink: /technical-reference/field/field-opcodes/0cb-setbattlemusic/
 ---
 

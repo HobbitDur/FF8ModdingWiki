@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 02C_BASEANIME
+nav_order: 45
 permalink: /technical-reference/field/field-opcodes/02c-baseanime/
 ---
 

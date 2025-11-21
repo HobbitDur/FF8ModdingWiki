@@ -2,10 +2,9 @@
 layout: default
 parent: Field Opcodes
 title: 0EE_FCOLSUB
+nav_order: 239
 permalink: /technical-reference/field/field-opcodes/0ee-fcolsub/
 ---
-
-\_\_NOTOC\_\_
 
 -   Opcode: **0x0EE**
 -   Short name: **FCOLSUB**

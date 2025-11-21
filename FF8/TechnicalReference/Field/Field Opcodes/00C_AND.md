@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 00C_AND
+nav_order: 13
 permalink: /technical-reference/field/field-opcodes/00c-and/
 ---
 

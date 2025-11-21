@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 02E_ANIMEKEEP
+nav_order: 47
 permalink: /technical-reference/field/field-opcodes/02e-animekeep/
 ---
 

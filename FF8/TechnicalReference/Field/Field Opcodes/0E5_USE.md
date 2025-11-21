@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 0E5_USE
+nav_order: 230
 permalink: /technical-reference/field/field-opcodes/0e5-use/
 ---
 

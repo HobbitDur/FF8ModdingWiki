@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 02B_SETMODEL
+nav_order: 44
 permalink: /technical-reference/field/field-opcodes/02b-setmodel/
 ---
 

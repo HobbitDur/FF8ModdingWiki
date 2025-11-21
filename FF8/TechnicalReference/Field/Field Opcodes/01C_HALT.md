@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 01C_HALT
+nav_order: 29
 permalink: /technical-reference/field/field-opcodes/01c-halt/
 ---
 

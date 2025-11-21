@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 01D_SET
+nav_order: 30
 permalink: /technical-reference/field/field-opcodes/01d-set/
 ---
 

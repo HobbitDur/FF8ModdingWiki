@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 02A_MAPJUMP3
+nav_order: 43
 permalink: /technical-reference/field/field-opcodes/02a-mapjump3/
 ---
 

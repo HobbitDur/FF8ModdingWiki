@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 02F_CANIME
+nav_order: 48
 permalink: /technical-reference/field/field-opcodes/02f-canime/
 ---
 

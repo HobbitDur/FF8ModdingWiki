@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 0E6_SPLIT
+nav_order: 231
 permalink: /technical-reference/field/field-opcodes/0e6-split/
 ---
 

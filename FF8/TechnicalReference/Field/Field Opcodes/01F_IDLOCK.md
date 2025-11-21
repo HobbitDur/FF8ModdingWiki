@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 01F_IDLOCK
+nav_order: 32
 permalink: /technical-reference/field/field-opcodes/01f-idlock/
 ---
 

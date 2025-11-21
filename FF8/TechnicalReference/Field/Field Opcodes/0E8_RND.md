@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 0E8_RND
+nav_order: 233
 permalink: /technical-reference/field/field-opcodes/0e8-rnd/
 ---
 

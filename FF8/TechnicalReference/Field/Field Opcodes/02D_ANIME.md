@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 02D_ANIME
+nav_order: 46
 permalink: /technical-reference/field/field-opcodes/02d-anime/
 ---
 

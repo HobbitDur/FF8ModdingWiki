@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 0FF_FACEDIRP
+nav_order: 256
 permalink: /technical-reference/field/field-opcodes/0ff-facedirp/
 ---
 
