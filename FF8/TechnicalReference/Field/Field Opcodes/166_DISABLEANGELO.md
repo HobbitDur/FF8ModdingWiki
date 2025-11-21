@@ -6,8 +6,8 @@ permalink: /technical-reference/field/field-opcodes/166-unknown1/
 ---
 
 -   Opcode: **0x166**
--   Short name: **UNKNOWN1**
--   Long name: ????
+-   Short name: **DISABLEANGELO**
+-   Long name: Disable angelo
 
 #### Argument
 
@@ -18,8 +18,8 @@ none
   
 *0 or 1*
 
-**UNKNOWN1**
+**DISABLEANGELO**
 
 #### Description
 
-Don't know what this does. It uses 1 at the Esthar concourse and the Ragnarok airlock. Uses 0 in the ragnarok cockpit.
+It uses 1 at the Esthar concourse and the Ragnarok airlock. Uses 0 in the ragnarok cockpit.
