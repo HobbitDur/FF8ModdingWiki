@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 0C5_ALLSEPOS
+nav_order: 198
 permalink: /technical-reference/field/field-opcodes/0c5-allsepos/
 ---
 

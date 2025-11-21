@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 0C7_SEVOL
+nav_order: 200
 permalink: /technical-reference/field/field-opcodes/0c7-sevol/
 ---
 

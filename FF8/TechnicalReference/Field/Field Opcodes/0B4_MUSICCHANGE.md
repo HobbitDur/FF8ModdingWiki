@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 0B4_MUSICCHANGE
+nav_order: 181
 permalink: /technical-reference/field/field-opcodes/0b4-musicchange/
 ---
 

@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 0AF_SHADELEVEL
+nav_order: 176
 permalink: /technical-reference/field/field-opcodes/0af-shadelevel/
 ---
 

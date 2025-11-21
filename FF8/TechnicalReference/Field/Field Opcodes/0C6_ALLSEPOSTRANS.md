@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 0C6_ALLSEPOSTRANS
+nav_order: 199
 permalink: /technical-reference/field/field-opcodes/0c6-allsepostrans/
 ---
 

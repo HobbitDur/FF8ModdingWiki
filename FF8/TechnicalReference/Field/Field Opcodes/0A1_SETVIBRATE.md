@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 0A1_SETVIBRATE
+nav_order: 162
 permalink: /technical-reference/field/field-opcodes/0a1-setvibrate/
 ---
 

@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 0BF_MUSICSTOP
+nav_order: 192
 permalink: /technical-reference/field/field-opcodes/0bf-musicstop/
 ---
 

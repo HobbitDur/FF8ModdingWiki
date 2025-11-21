@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 0AA_FADEBLACK
+nav_order: 171
 permalink: /technical-reference/field/field-opcodes/0aa-fadeblack/
 ---
 

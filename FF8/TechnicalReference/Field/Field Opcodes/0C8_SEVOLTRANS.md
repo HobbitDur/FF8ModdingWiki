@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 0C8_SEVOLTRANS
+nav_order: 201
 permalink: /technical-reference/field/field-opcodes/0c8-sevoltrans/
 ---
 

@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 0BD_EFFECTLOAD
+nav_order: 190
 permalink: /technical-reference/field/field-opcodes/0bd-effectload/
 ---
 

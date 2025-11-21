@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 0AD_GAMEOVER
+nav_order: 174
 permalink: /technical-reference/field/field-opcodes/0ad-gameover/
 ---
 

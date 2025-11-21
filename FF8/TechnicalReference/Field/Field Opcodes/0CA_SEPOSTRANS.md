@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 0CA_SEPOSTRANS
+nav_order: 203
 permalink: /technical-reference/field/field-opcodes/0ca-sepostrans/
 ---
 

@@ -2,6 +2,7 @@
 layout: default
 parent: Field Opcodes
 title: 0C9_SEPOS
+nav_order: 202
 permalink: /technical-reference/field/field-opcodes/0c9-sepos/
 ---
 
