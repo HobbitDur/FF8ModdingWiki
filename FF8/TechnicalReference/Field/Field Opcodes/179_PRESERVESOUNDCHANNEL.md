@@ -6,7 +6,7 @@ permalink: /technical-reference/field/field-opcodes/179-unknown14/
 ---
 
 -   Opcode: **0x179**
--   Short name: **UNKNOWN14**
+-   Short name: **PRESERVESOUNDCHANNEL**
 -   Long name: Preserve Sound Channel
 
 #### Argument
@@ -18,7 +18,7 @@ none
   
 *Sound channel*
 
-**UNKNOWN14**
+**PRESERVESOUNDCHANNEL**
 
 #### Description
 

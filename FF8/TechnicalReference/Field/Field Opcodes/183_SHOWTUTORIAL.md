@@ -6,7 +6,7 @@ permalink: /technical-reference/field/field-opcodes/183-unknown18/
 ---
 
 -   Opcode: **0x183**
--   Short name: **UNKNOWN18**
+-   Short name: **SHOWTUTORIAL**
 -   Long name: Show tutorial
 
 #### Argument
@@ -18,7 +18,7 @@ none
   
 *Tutorial ID*
 
-**UNKNOWN18**
+**SHOWTUTORIAL**
 
 #### Description
 

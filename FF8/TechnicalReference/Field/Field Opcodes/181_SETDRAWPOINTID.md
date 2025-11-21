@@ -6,7 +6,7 @@ permalink: /technical-reference/field/field-opcodes/181-unknown16/
 ---
 
 -   Opcode: **0x181**
--   Short name: **UNKNOWN16**
+-   Short name: **SETDRAWPOINTID**
 -   Long name: Set Draw Point ID
 
 #### Argument
@@ -18,7 +18,7 @@ none
   
 *Draw point ID*
 
-**UNKNOWN16**
+**SETDRAWPOINTID**
 
 #### Description
 

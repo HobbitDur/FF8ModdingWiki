@@ -6,7 +6,7 @@ permalink: /technical-reference/field/field-opcodes/172-unknown7/
 ---
 
 -   Opcode: **0x172**
--   Short name: **UNKNOWN7**
+-   Short name: **COUNTERCLOCKWISETURN**
 -   Long name: Counterclockwise Turn
 
 #### Argument
@@ -20,7 +20,7 @@ none
 
 *Duration of turn (frames)*
 
-**UNKNOWN7**
+**COUNTERCLOCKWISETURN**
 
 #### Description
 

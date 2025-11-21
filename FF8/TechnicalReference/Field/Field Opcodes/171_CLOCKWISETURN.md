@@ -1,12 +1,12 @@
 ---
 layout: default
 parent: Field Opcodes
-title: 173_UNKNOWN8
-permalink: /technical-reference/field/field-opcodes/173-unknown8/
+title: 171_UNKNOWN6
+permalink: /technical-reference/field/field-opcodes/171-unknown6/
 ---
 
--   Opcode: **0x173**
--   Short name: **UNKNOWN8**
+-   Opcode: **0x171**
+-   Short name: **CLOCKWISETURN**
 -   Long name: Clockwise Turn
 
 #### Argument
@@ -20,10 +20,10 @@ none
 
 *Duration of turn (frames)*
 
-**UNKNOWN8**
+**CLOCKWISETURN**
 
 #### Description
 
 Turns this entity clockwise to face some direction. The only noticeable difference between this and the other turn functions is that the turn is always clockwise.
 
-It is unknown how this differs from [UNKNOWN6](171_UNKNOWN6).
+It is unknown how this differs from [UNKNOWN8](173_UNKNOWN8).

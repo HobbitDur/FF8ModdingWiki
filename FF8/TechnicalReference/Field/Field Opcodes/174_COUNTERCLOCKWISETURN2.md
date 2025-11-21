@@ -6,7 +6,7 @@ permalink: /technical-reference/field/field-opcodes/174-unknown9/
 ---
 
 -   Opcode: **0x174**
--   Short name: **UNKNOWN9**
+-   Short name: **COUNTERCLOCKWISETURN2**
 -   Long name: Counterclockwise Turn
 
 #### Argument
@@ -20,7 +20,7 @@ none
 
 *Duration of turn (frames)*
 
-**UNKNOWN9**
+**COUNTERCLOCKWISETURN2**
 
 #### Description
 
