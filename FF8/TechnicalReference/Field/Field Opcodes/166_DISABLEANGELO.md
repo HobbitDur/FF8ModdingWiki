@@ -1,8 +1,8 @@
 ---
 layout: default
 parent: Field Opcodes
-title: 166_UNKNOWN1
-permalink: /technical-reference/field/field-opcodes/166-unknown1/
+title: 166_DISABLEANGELO
+permalink: /technical-reference/field/field-opcodes/166-disableangelo/
 ---
 
 -   Opcode: **0x166**

@@ -1,12 +1,12 @@
 ---
 layout: default
 parent: Field Opcodes
-title: 170_UNKNOWN5
-permalink: /technical-reference/field/field-opcodes/170-unknown5/
+title: 170_HASITEM
+permalink: /technical-reference/field/field-opcodes/170-hasitem/
 ---
 
 -   Opcode: **0x16A**
--   Short name: **UNKNOWN5**
+-   Short name: **HASITEM**
 -   Long name: Has item
 
 #### Argument
@@ -16,7 +16,7 @@ permalink: /technical-reference/field/field-opcodes/170-unknown5/
   
 *Item ID*
 
-**UNKNOWN5**
+**HASITEM**
 
 #### Description
 
