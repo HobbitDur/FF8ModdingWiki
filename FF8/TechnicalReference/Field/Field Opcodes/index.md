@@ -55,10 +55,10 @@ listed separately, if the function requires one. For example, on the page for [S
 Which means when you call **SET3**, the ZCoord is the top item on the stack, YCoord is under it, and XCoord is under that, for example
 
 ```
-PSHN_L            402      (XCoord)
-PSHN_L -381    (YCoord)  
-PSHN_L            20        (ZCoord)  
-SET3                17        (walkmesh  triangle  ID)
+PSHN_L  402   (XCoord)
+PSHN_L  -381  (YCoord)  
+PSHN_L  20    (ZCoord)  
+SET3    17    (walkmesh  triangle  ID)
 ```
 
 ## Opcode list
