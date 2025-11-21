@@ -15,16 +15,16 @@ The field script language in ff8 is a simple assembly language with a stack. Her
 ```
 stack =  []
 
-PSHM_W              1024 # push  var1024  onto  the  stack  (stack =  [var1024])  
-PSHN_L              6 # push  number  6  onto  the  stack  (stack =  [6Â ; var1024])  
-CAL                    EQ # compare  the  two  numbers  at  the  top  of  the  stack, pop  this  numbers, and  push  the  result  (1  or  0)  into  the  stack  (stack =  [1  or  0])    
-JPF                    LABEL1 # if  the  popped  top  of  the  stack  is  0, jump  to  LABEL1  (stack =  [])  
-PSHN_L              0 # push  0  at  the  top  of  the  stack  (stack =  [0])  
-POPM_W              1024 # pop  the  top  of  the  stack  into  var1024  (stack =  [])  
-JMP                    LABEL2 # goto  LABEL2  
-LABEL1  
-PSHN_L              1 # push  1  at  the  top  of  the  stack  (stack =  [1])  
-POPM_W              1024 # pop  the  top  of  the  stack  into  var1024  (stack =  [])  
+PSHM_W   1024 # push  var1024  onto  the  stack  (stack =  [var1024])  
+PSHN_L   6 # push  number  6  onto  the  stack  (stack =  [6Â ; var1024])  
+CAL      EQ # compare  the  two  numbers  at  the  top  of  the  stack, pop  this  numbers, and  push  the  result  (1  or  0)  into  the  stack  (stack =  [1  or  0])    
+JPF      LABEL1 # if  the  popped  top  of  the  stack  is  0, jump  to  LABEL1  (stack =  [])  
+PSHN_L   0 # push  0  at  the  top  of  the  stack  (stack =  [0])  
+POPM_W   1024 # pop  the  top  of  the  stack  into  var1024  (stack =  [])  
+JMP      LABEL2 # goto  LABEL2  
+LABEL1          
+PSHN_L   1 # push  1  at  the  top  of  the  stack  (stack =  [1])  
+POPM_W   1024 # pop  the  top  of  the  stack  into  var1024  (stack =  [])  
 LABEL2  
 ...
 ```
