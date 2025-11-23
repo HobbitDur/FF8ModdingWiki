@@ -3,6 +3,7 @@ layout: default
 title: Known Issues and fixes
 parent: User Guide
 permalink: /user-guide/issues/
+Author: Slimebucket
 ---
 
 
@@ -89,7 +90,3 @@ This is a collection of known issues, and fixes to those issues.
    - Other things to try are disable all mods and see if it crashes. 
    - If game still crashing, try different RENDER options in Junction 8 / SETTINGS / GAME DRIVER
    - All else fails, share the log file in Tsunamods ff8 mod support channel!
-
-
-
- **Guide written by Slimebucket**
