@@ -56,11 +56,11 @@ This is a collection of known issues, and fixes to those issues.
    - in here is volume controls to edit volumes of sfx, music, voice, ambient and movie. You can also select sound device you want sound to come out of.
 
 ## __How to play Junction8 in non english languages?__
-   - **To play junction8 in other languages, you must first install the ENGLISH version of the game, then inside Junction8 change the langauge.
-   - to change the Junction8 language Open junction8 go SETTINGS, LANGAUGE and select which one you want.
-   - Then go Browse Catalog tab, and find the mod called FF* ILP (International Langauge Patch) 
+   - **To play junction8 in other languages, you must first install the ENGLISH version of the game, then inside Junction8 change the language.
+   - to change the Junction8 language Open junction8 go SETTINGS, LANGUAGE and select which one you want.
+   - Then go Browse Catalog tab, and find the mod called FF* ILP (International Language Patch) 
    - Then go to My Mods tab, find FF8 ILP, select it and click CONFIGURE MOD.
-   - In here select which langauge you want to use and click SAVE.
+   - In here select which language you want to use and click SAVE.
 
 ## __When playing 16:9 or 16:10 Move names, and scan information gets cut off__
    - **Widescreen 16:9 and 16:10 is still in alpha stages of development and is not perfect. 
