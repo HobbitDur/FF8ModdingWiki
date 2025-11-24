@@ -16,7 +16,7 @@ Here you will find an explination on how to convert the Tonberry mod by Mcindus 
 
 
 ## __Download__
-  - **Download Angelwing Ultima. Version 1.0a , 1.1 and 2.0 all work. Old NON ULTIMA version do not work.**
+  - **Download Angelwing Ultima. Version 1.0a , 1.1 and 2.0 all work. Old NON ULTIMA version  (ie: Version 3.0 that was used on Tonberry) do not work.**
 
   - This is a paid mod, you either have to get it from [Mcindus Mods Patreon](https://www.patreon.com/cw/mcindusmods)
 
