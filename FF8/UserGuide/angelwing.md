@@ -42,16 +42,16 @@ Here you will find an explination on how to convert the Tonberry mod by Mcindus 
 ![](../../assets/guides/angelwlibrary.png)
 
 ## __Create Directory__
-   - Go to Junction 8 mod Directory, and make a folder called ANGELWING
+   - Go to Junction 8 mod Directory, and make a folder called ANGELWINGULTIMA
    - inside this folder create a folder called mods
    - inside mods folder create a folder named textures
    - inside textures folder create a folder named field
    - inside field folder create mapdata folder
 
-   - **The directory you are now in should look like this Junction VIII\mods\textures\field\mapdata\**
+   - **The directory you are now in should look like this Junction VIII\ANGELWINGULTIMA\mods\textures\field\mapdata\**
 
 ## __Paste__
-   - **Inside Junction VIII\mods\textures\field\mapdata\ paste all the 2 letter folders from ANGELWING ULTIMA.**
+   - **Inside Junction VIII\ANGELWINGULTIMA\mods\textures\field\mapdata\ paste all the 2 letter folders from ANGELWING ULTIMA.**
    - right click PASTE, or CONTROL+V
 
 ![](../../assets/guides/angelwpaste.png)
