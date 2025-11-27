@@ -39,12 +39,12 @@ permalink: /technical-reference/main/kernel/blue-magic/
 |--------|---------|-----------------------------|
 | 0x0000 | 2 bytes | Offset to limit name        |
 | 0x0002 | 2 bytes | Offset to limit description |
-| 0x0004 | 2 bytes | Magic ID                    |
+| 0x0004 | 2 bytes | SpecialAction ID            |
 | 0x0006 | 1 byte  | Unknown                     |
 | 0x0007 | 1 byte  | Attack Type                 |
 | 0x0008 | 2 bytes | Unknown                     |
 | 0x000A | 1 byte  | Attack Flags                |
-| 0x000B | 1 byte  | Unknown                     |
+| 0x000B | 1 byte  | Hit Count                   |
 | 0x000C | 1 byte  | Element                     |
 | 0x000D | 1 byte  | Status Attack               |
 | 0x000E | 1 byte  | Crit Bonus                  |
