@@ -25,6 +25,7 @@ This is a collection of known issues, and fixes to those issues.
    - **Disable Echo-S 8 mod in Junction 8 and keep on playing the same save file.**
 
 ## __Poly-Up and any mod that replaces character models can crash__
+   - POLY-UP has been fixed in lastest Canary build. Use Canary build to be able to use Poly-Up without crashes.
    - **Having more than 3 enhcanced character models active at a time can and will cause crashes on scenes where more than 3 main characters on screen at once.
    - Poly up has options to turn on and off characters enchanced models individually. Try to only have 2 characters enchanced at a time.
 
@@ -38,9 +39,11 @@ This is a collection of known issues, and fixes to those issues.
    - **Known bug with Battlefield Pack mod. Disable Battlefield Pack mod, do the fight, then re-enable the mod**
 
 ## __Game Crashes at Tonberry King Fight__
+   - This was a bug with Lunar Cry Plus mod and not battlefield pack. Issue has been foxed
    - **Known bug with Battlefield Pack mod. Disable Battlefield Pack mod, do the fight, then re-enable the mod**
 
 ## __When starting Battles, casting magic and GF's game lags a little bit__
+   - This bug has been fixed with the new version of Hit-J!
    - **Known bug with Hit-J. If the stutter/ lag bothers you, disable this mod**
 
 ## __Game Crashes when using EDEN GF__
