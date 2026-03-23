@@ -45,7 +45,7 @@ More info on [OpenVIII](https://github.com/MaKiPL/OpenVIII/blob/4ac151daad7cd147
 | 10     | s16f (divide by 4096f) | unknown                     |
 | 12     | s16f (divide by 4096f) | unknown                     |
 | 14     | s16f (divide by 4096f) | unknown                     |
-| 16     | 28 bytes               | Unknown (often empty)       |
+| 16     | 32 bytes               | Unknown (often empty)       |
 
 ## Section 2: Model geometry
 
