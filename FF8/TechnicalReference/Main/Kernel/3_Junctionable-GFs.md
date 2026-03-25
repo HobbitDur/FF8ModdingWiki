@@ -44,7 +44,7 @@ permalink: /technical-reference/main/kernel/junctionable-gfs/
 | 0x0007 | 1 byte  | GF power (used in damage formula)                                                                |
 | 0x0008 | 2 bytes | Unknown                                                                                          |                                                                                       
 | 0x000A | 1 byte  | Attack Flags                                                                                     |
-| 0x000B | 1 bytes | Unknown                                                                                          |
+| 0x000B | 1 bytes | HIT_TYPE_TARGET_ANIMATION_TO_PLAY                                                                |
 | 0x000C | 1 bytes | Hit count                                                                                        |
 | 0x000D | 1 byte  | [Element]({{site.baseurl}}/technical-reference/list/magic-list#element)                          |
 | 0x000E | 2 bytes | [Status1]({{site.baseurl}}/technical-reference/list/status-flags#status-1)                       |
@@ -140,26 +140,27 @@ permalink: /technical-reference/main/kernel/junctionable-gfs/
 | 0x006C | 1 byte  | Unknown                                                                                          |
 | 0x006D | 1 byte  | [Ability 21]({{site.baseurl}}/technical-reference/list/junctionable-abilities)                   |
 | 0x006E | 1 byte  | Unknown                                                                                          |
-| 0x006F | 1 byte  | Quezacolt compatibility                                                                          |
-| 0x0070 | 1 byte  | Shiva compatibility                                                                              |
-| 0x0071 | 1 byte  | Ifrit compatibility                                                                              |
-| 0x0072 | 1 byte  | Siren compatibility                                                                              |
-| 0x0073 | 1 byte  | Brothers compatibility                                                                           |
-| 0x0074 | 1 byte  | Diablos compatibility                                                                            |
-| 0x0075 | 1 byte  | Carbuncle compatibility                                                                          |
-| 0x0076 | 1 byte  | Leviathan compatibility                                                                          |
-| 0x0077 | 1 byte  | Pandemona compatibility                                                                          |
-| 0x0078 | 1 byte  | Cerberus compatibility                                                                           |
-| 0x0079 | 1 byte  | Alexander compatibility                                                                          |
-| 0x007A | 1 byte  | Doomtrain compatibility                                                                          |
-| 0x007B | 1 byte  | Bahamut compatibility                                                                            |
-| 0x007C | 1 byte  | Cactuar compatibility                                                                            |
-| 0x007D | 1 byte  | Tonberry compatibility                                                                           |
-| 0x007E | 1 byte  | Eden compatibility                                                                               |
-| 0x007F | 1 byte  | Padding                                                                                          |
-| 0x0080 | 2 byte  | Unknown                                                                                          |
-| 0x0082 | 1 byte  | Power Mod (used in damage formula)                                                               |
-| 0x0083 | 1 byte  | Level Mod (used in damage formula)                                                               |
+| 0x006F | 1 byte  | Padding                                                                                          |
+| 0x0070 | 1 byte  | Quezacolt compatibility                                                                          |
+| 0x0071 | 1 byte  | Shiva compatibility                                                                              |
+| 0x0072 | 1 byte  | Ifrit compatibility                                                                              |
+| 0x0073 | 1 byte  | Siren compatibility                                                                              |
+| 0x0074 | 1 byte  | Brothers compatibility                                                                           |
+| 0x0075 | 1 byte  | Diablos compatibility                                                                            |
+| 0x0076 | 1 byte  | Carbuncle compatibility                                                                          |
+| 0x0077 | 1 byte  | Leviathan compatibility                                                                          |
+| 0x0078 | 1 byte  | Pandemona compatibility                                                                          |
+| 0x0079 | 1 byte  | Cerberus compatibility                                                                           |
+| 0x007A | 1 byte  | Alexander compatibility                                                                          |
+| 0x007B | 1 byte  | Doomtrain compatibility                                                                          |
+| 0x007C | 1 byte  | Bahamut compatibility                                                                            |
+| 0x007D | 1 byte  | Cactuar compatibility                                                                            |
+| 0x007E | 1 byte  | Tonberry compatibility                                                                           |
+| 0x007F | 1 byte  | Eden compatibility                                                                               |
+| 0x0080 | 1 byte  | Padding                                                                                          |
+| 0x0082 | 2 byte  | Unknown                                                                                          |
+| 0x0083 | 1 byte  | Power Mod (used in damage formula)                                                               |
+| 0x0084 | 1 byte  | Level Mod (used in damage formula)                                                               |
 
 
 
