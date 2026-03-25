@@ -45,7 +45,7 @@ permalink: /technical-reference/main/kernel/junctionable-gfs/
 | 0x0008 | 2 bytes | Unknown                                                                                          |                                                                                       
 | 0x000A | 1 byte  | Attack Flags                                                                                     |
 | 0x000B | 1 bytes | Unknown                                                                                          |
-| 0x000B | 1 bytes | Hit count                                                                                        |
+| 0x000C | 1 bytes | Hit count                                                                                        |
 | 0x000D | 1 byte  | [Element]({{site.baseurl}}/technical-reference/list/magic-list#element)                          |
 | 0x000E | 2 bytes | [Status1]({{site.baseurl}}/technical-reference/list/status-flags#status-1)                       |
 | 0x0010 | 4 bytes | [Status2]({{site.baseurl}}/technical-reference/list/status-flags#status-2)                       |
