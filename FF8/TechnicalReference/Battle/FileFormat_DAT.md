@@ -143,7 +143,7 @@ The frames work accumulatively, so in order to get the final rotation at in exam
 | Offset | Length                          | Description                               |
 |--------|---------------------------------|-------------------------------------------|
 | 0      | LocationVectorData              | LocationVectorData                        |
-| Varies | 1 BIT                           | Mode bit (contains additional info check) |
+| Varies | 1 BIT                           | Mode bit (1 if there is additional data in RotationVectorData, bUnk1...) |
 | Varies | RotationVectorData * bonesCount | Rotation Vector data per bone             |
 
 ### Location vector data
