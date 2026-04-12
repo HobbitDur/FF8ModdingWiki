@@ -1,8 +1,8 @@
 ---
 layout: default
-title: Special Action List
+title: Action Animation List
 parent: List
-permalink: /technical-reference/list/special-action-list/
+permalink: /technical-reference/list/action-animation-list/
 ---
 
 | ID  | Name                                  |
@@ -225,14 +225,14 @@ permalink: /technical-reference/list/special-action-list/
 | 215 | My Final Heaven (Zell's Finisher)     |
 | 216 | Different Beat (Zell's Finisher)      |
 | 217 | Energy Bomber                         |
-| 218 | Unknown                               |
+| 218 | Gilgamesh Introduction                |
 | 219 | Terra Break                           |
 | 220 | Light Pillar                          |
 | 221 | Apocalypse                            |
 | 222 | Water                                 |
 | 223 | Meteor                                |
-| 224 | Unknown                               |
-| 225 | Unknown                               |
+| 224 | Unknown (Looks like Cure?)            |
+| 225 | Unknown (Looks like Cure?)            |
 | 226 | White Wind                            |
 | 227 | Ultimecia First Death                 |
 | 228 | Ice Strike                            |
@@ -271,9 +271,9 @@ permalink: /technical-reference/list/special-action-list/
 | 261 | Desperado                             |
 | 262 | Blood Pain                            |
 | 263 | Massive Anchor                        |
-| 264 | Unknown                               |
-| 265 | Unknown                               |
-| 266 | Unknown                               |
+| 264 | Unknown (Boss death anim?)            |
+| 265 | Unknown (Boss death anim?)            |
+| 266 | Unknown (Boss death anim?)            |
 | 267 | Unknown                               |
 | 268 | Unknown                               |
 | 269 | Unknown                               |
@@ -308,25 +308,25 @@ permalink: /technical-reference/list/special-action-list/
 | 298 | Unknown                               |
 | 299 | Micro Missiles (Quistis)              |
 | 300 | Bad Breath (Quistis)                  |
-| 301 | Unknown                               |
+| 301 | Unknown (Part of Brothers summon?)    |
 | 302 | Snipe Laser                           |
-| 303 | Unknown                               |
+| 303 | Sphinxaur Mask Shattering             |
 | 304 | Boomerang Sword                       |
 | 305 | Gatling Gun (Quistis)                 |
 | 306 | Degenerator (Quistis)                 |
 | 307 | Ray-Bomb (Quistis)                    |
-| 308 | Unknown                               |
+| 308 | Unknown (Maelstrom w/less particles?) |
 | 309 | Hero-trial/Hero                       |
 | 310 | Holy War-trial/Holy War               |
 | 311 | Unknown                               |
 | 312 | Megiddo Flame (Mobile Type 8)         |
-| 313 | Unknown                               |
-| 314 | Unknown                               |
+| 313 | Alt Megiddo Flame (Unused?)           |
+| 314 | Some boss death anim + trigger win    |
 | 315 | Fake President Death                  |
-| 316 | Unknown                               |
+| 316 | Some boss death anim + trigger win    |
 | 317 | Acid (Quistis)                        |
-| 318 | Unknown                               |
-| 319 | Unknown                               |
+| 318 | Unknown (Some sort of missile?)       |
+| 319 | Unknown (Some green explosion?) + win |
 | 320 | Dark Flare                            |
 | 321 | Ker Plunk                             |
 | 322 | Zan                                   |
