@@ -52,8 +52,20 @@ Items in grey are unused by field scripts (some of them may be used in battle sc
 | Long        | 108         | Music related                                                                                                                                                           |
 | Long        | 112         | unused in fields                                                                                                                                                        |
 | Byte        | 116-147     | Draw points in field                                                                                                                                                    |
-| Byte        | 148-179     | Draw points in worldmap                                                                                                                                                 |
-| Byte        | 180-255     | unused in fields                                                                                                                                                        |
+| Byte        | 148-179     | Draw points in worldmap                                                                                                                                    | Byte | 180-243 | unused in fields |
+| Byte | 244 | Worldmap variant extra flags. Bit 3 (normal path) or bit 4 (Disc 4 path) OR-ins bit 6 (`0x40`) into the `word_2036BB6` variant bitmask. Likely Balamb Garden mobile/stationary toggle. |
+| Byte | 245 | Copied into worldmap state block (`+103`) by `sub_544860`, purpose not yet verified. Read only, not investigated. |
+| Byte | 246 | Worldmap variant index. Bits 0-4 select the base tile-variant bitmask via a 5-case switch: `0→0x011D`, `1→0x010D`, `2→0x0101`, `3→0x0100`, `4→0x0180`. Each bit corresponds to one entry in the trigger-rect table at `.rdata:0xC763D2`/`0xC763EE` that overrides grid segments (0-767) with alternate segments (768-834). |
+| Byte | 247 | Disc 4 worldmap sub-variant. Bits 0-1 select among three Disc 4 bitmasks (`0x003E`, `0x023E`, `0x003F`). Only used when Disc 4 code path is active (`dword_203FD60 != 0`). |
+| Byte | 248-255 | unused in fields |
+| Word | 256 | Main Story quest progress. |
+| Byte | 258 | not investigated |
+| Byte | 259-260 | unused in fields |
+| Byte | 261 | not investigated |
+| Byte | 262-263 | unused in fields |
+| Byte | 264 | not investigated |
+| Byte | 265 | not investigated |
+| Byte | 266 | World map version? (3=Esthar locations unlocked) |
 | Word        | 256         | Main Story quest progress.                                                                                                                                              |
 | Byte        | 258         | not investigated                                                                                                                                                        |
 | Byte        | 259-260     | unused in fields                                                                                                                                                        |
