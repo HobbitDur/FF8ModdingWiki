@@ -91,8 +91,8 @@ permalink: /technical-reference/main/kernel/magic/
 | 0x000D | 1 byte  | Hit count (works with meteor animation, not sure about others)                                  |
 | 0x000E | 1 byte  | Element                                                                                         |
 | 0x000F | 1 byte  | Unknown                                                                                         |
-| 0x0010 | 4 bytes | Statuses 1                                                                                      |
-| 0x0014 | 2 bytes | Statuses 0                                                                                      |
+| 0x0010 | 4 bytes | [Status 2]({{site.baseurl}}/technical-reference/list/status-flags#status-2)                     |
+| 0x0012 | 2 bytes | [Status 1]({{site.baseurl}}/technical-reference/list/status-flags#status-1)                     |
 | 0x0016 | 1 byte  | Status attack enabler                                                                           |
 | 0x0017 | 1 byte  | Characters HP junction value                                                                    |
 | 0x0018 | 1 byte  | Characters STR junction value                                                                   |
@@ -103,9 +103,9 @@ permalink: /technical-reference/main/kernel/magic/
 | 0x001D | 1 byte  | Characters EVA junction value                                                                   |
 | 0x001E | 1 byte  | Characters HIT junction value                                                                   |
 | 0x001F | 1 byte  | Characters LUCK junction value                                                                  |
-| 0x0020 | 1 byte  | Characters J-Elem attack                                                                        |
+| 0x0020 | 1 byte  | [Characters J-Elem attack]({{site.baseurl}}/technical-reference/list/magic-list#element)        |
 | 0x0021 | 1 byte  | Characters J-Elem attack value                                                                  |
-| 0x0022 | 1 byte  | Characters J-Elem defense                                                                       |
+| 0x0022 | 1 byte  | [Characters J-Elem defense]({{site.baseurl}}/technical-reference/list/magic-list#element)       |
 | 0x0023 | 1 byte  | Characters J-Elem defense value                                                                 |
 | 0x0024 | 1 byte  | Characters J-Status attack value                                                                |
 | 0x0025 | 1 byte  | Characters J-Status defense value                                                               |
