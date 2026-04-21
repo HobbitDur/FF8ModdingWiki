@@ -5,7 +5,7 @@ parent: List
 permalink: /technical-reference/list/kernel/
 ---
 
-## Target info
+# Target info
 
 | ID     | Description          |
 |--------|----------------------|
@@ -20,7 +20,7 @@ permalink: /technical-reference/list/kernel/
 | 0x0080 | ???                  |
 
 
-## Attack Type
+# Attack Type
 
 | ID | Hex  | Description                          |
 |----|------|--------------------------------------|

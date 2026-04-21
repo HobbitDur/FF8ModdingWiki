@@ -82,7 +82,7 @@ permalink: /technical-reference/main/kernel/magic/
 | 0x0002 | 2 bytes | Offset to spell description                                                                     |
 | 0x0004 | 2 bytes | Magic ID                                                                                        |
 | 0x0006 | 1 byte  | Animation triggered                                                                             |
-| 0x0007 | 1 byte  | Attack type                                                                                     |
+| 0x0007 | 1 byte  | [Attack type]({site.baseurl}}/technical-reference/list/kernel#attack-type)                      |
 | 0x0008 | 1 byte  | Spell power (used in damage formula)                                                            |
 | 0x0009 | 1 byte  | Unknown                                                                                         |
 | 0x000A | 1 byte  | [TargetInfo]({{site.baseurl}}/technical-reference/list/kernel#target-info)                      |
