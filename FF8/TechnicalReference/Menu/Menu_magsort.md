@@ -8,6 +8,7 @@ author: hobbitdur
 
 This file contains how each magic need to be ordered.
 There is 7 entry, each entry containing 64 Ids corresponding to the [MagicID]({{site.baseurl}}/technical-reference/list/magic-list/#magic).
+In practice, there is only 50 bytes used as there is only 50 magic that can appear in the menu. There is then 14 zeros.
 An exception for the last one: there is only 63 bytes, not 64. But the game seems to work without it.
 Here the 7 entries possible:
 
@@ -32,14 +33,6 @@ The category (Attack/Restore/Indirect) are defined only by the sorting, but here
 # Preset
 
 Here all vanilla preset:
-
-## Category Legend Table
-
-| Category     | Spell IDs | Description                                                                                                                                                                                                                 |
-|--------------|-----------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Attack**   | 01-14     | Fire, Fira, Firaga, Blizzard, Blizzara, Blizzaga, Thunder, Thundara, Thundaga, Water, Aero, Bio, Demi, Holy, Flare, Meteor, Quake, Tornado, Ultima, Apocalypse                                                              |
-| **Restore**  | 15-1B     | Cure, Cura, Curaga, Life, Full Life, Regen, Esuna                                                                                                                                                                           |
-| **Indirect** | 1C-32     | Sleep, Silence, Break, Death, Drain, Pain, Berserk, Float, Zombie, Meltdown, Scan, Full-cure, Wall, Rapture, Percent, Catastrophe, Dispel, Protect, Shell, Reflect, Aura, Double, Triple, Haste, Slow, Stop, Blind, Confuse |
 
 ## Preset 0: "Manual" (No sort)
 
