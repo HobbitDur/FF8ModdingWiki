@@ -553,7 +553,7 @@ The data is 8*2 bytes, each 2 bytes corresponding to an ID on the [Special Actio
 ### Draw Mug Drop
 
 Each section is composed of 8 bytes corresponding to 4 id ([magic]({{site.baseurl}}/technical-reference/list/magic-list) for
-draw, [Item]({{site.baseurl}}/technical-reference/list/item-list) for mug & drop) and 4 quantity.
+draw, [Item]({{site.baseurl}}/technical-reference/list/item) for mug & drop) and 4 quantity.
 Quantity is not used for draw (always 0 but no impact on game when changing it)
 
 | Length | Description |

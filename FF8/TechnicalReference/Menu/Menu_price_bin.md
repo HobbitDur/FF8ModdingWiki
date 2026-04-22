@@ -2,12 +2,12 @@
 layout: default
 parent: Menu
 title: Price (price.bin)
-permalink: /technical-reference/menu/price-pricebin/
+permalink: /technical-reference/menu/price/
 ---
 
 ### price.bin
 
-Shop prices - 4 bytes per [Item]({{site.baseurl}}/FF8/TechnicalReference/Lists/item_list)
+Shop prices - 4 bytes per [Item]({{site.baseurl}}/technical-reference/list/item)
 
 | Type   | Size | Value           |
 |--------|------|-----------------|
