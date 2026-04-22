@@ -1,7 +1,7 @@
 ---
 layout: default
 parent: Menu
-title: mtmag.bin file format
+title: ChocoboWorld items (mtmag2.bin file format)
 permalink: /technical-reference/menu/mmag2/
 author: hobbitdur
 ---
