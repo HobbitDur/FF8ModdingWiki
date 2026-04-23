@@ -23,15 +23,18 @@ DAT file is divided into 11 sections (except for c0m127.dat, which contains only
 
 More info on [OpenVIII](https://github.com/MaKiPL/OpenVIII/blob/4ac151daad7cd1475eb0694dd0715bc35d7a4b39/FF8/debug_battleDat.cs)
 
-| Offset | Length                      | Description     |
-|--------|-----------------------------|-----------------|
-| 0      | 2 bytes                     | Number of bones |
-| 2      | 6 bytes                     | Unknown         |
-| 8      | s16f (divide by 4096f)      | scaleX          |
-| 10     | s16f (divide by 4096f)      | scale -Z        |
-| 12     | s16f (divide by 4096f)      | scale Y         |
-| 14     | 2 bytes                     | Unknown         |
+| Offset | Length                   | Description     |
+|--------|--------------------------|-----------------|
+| 0      | 1 byte                   | Number of bones |
+| 1      | 1 byte                   | Extra data      |
+| 2      | 6 bytes                  | Unknown         |
+| 8      | s16f (divide by 4096f)   | scaleX          |
+| 10     | s16f (divide by 4096f)   | scale -Z        |
+| 12     | s16f (divide by 4096f)   | scale Y         |
+| 14     | 2 bytes                  | Unknown         |
 | 16     | Number of bones \* 48 bytes | Bones           |
+
+When "Extra data" is 1, it adds 3 axes transformations to be read from the animation section. In vanilla, this extra data flag is always at 0.
 
 ### Bone struct
 
@@ -169,6 +172,7 @@ The frames work accumulatively, so in order to get the final rotation at in exam
 | Varies | 0 if bUnk3==0, else 16 BITs | Unk3 data   |
 
 We don't know what the Unk1, Unk2 and Unk3 do. Enemies works without them, but as it's important to keep up with the current bit position, we need to read it anyway
+After the 3 RotationType, if ExtraData flag is set (from the bone section), then there is 3 more data to read. It's new discovery we don't know how it affects the game yet.
 
 ### Position type
 
