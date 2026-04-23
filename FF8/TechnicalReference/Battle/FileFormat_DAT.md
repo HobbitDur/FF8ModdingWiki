@@ -52,6 +52,7 @@ When "Extra data" is 1, it adds 3 axes transformations to be read from the bone 
 
 SomeX, someY and someZ are read only if the "Extra data" flag is set.
 If the entity is slowed, the RotX, RotY and RotZ are divided by 2.
+The 3 rotation are added to the animation, so it's a fix bone change applied to all animation.
 
 ## Section 2: Model geometry
 
