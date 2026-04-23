@@ -34,21 +34,23 @@ More info on [OpenVIII](https://github.com/MaKiPL/OpenVIII/blob/4ac151daad7cd147
 | 14     | 2 bytes                  | Unknown         |
 | 16     | Number of bones \* 48 bytes | Bones           |
 
-When "Extra data" is 1, it adds 3 axes transformations to be read from the animation section. In vanilla, this extra data flag is always at 0.
+When "Extra data" is 1, it adds 3 axes transformations to be read from the bone struct. In vanilla, this extra data flag is always at 0.
 
 ### Bone struct
 
-| Offset | Length                 | Description                 |
-|--------|------------------------|-----------------------------|
-| 0      | 2 bytes                | Parent id                   |
-| 2      | s16f (divide by 4096f) | Bone size (?)               |
-| 4      | s16f (divide by 4096f) | unknown, multiplied by 360f |
-| 6      | s16f (divide by 4096f) | unknown, multiplied by 360f |
-| 8      | s16f (divide by 4096f) | unknown, multiplied by 360f |
-| 10     | s16f (divide by 4096f) | unknown                     |
-| 12     | s16f (divide by 4096f) | unknown                     |
-| 14     | s16f (divide by 4096f) | unknown                     |
-| 16     | 32 bytes               | Unknown (often empty)       |
+| Offset | Length                 | Description             |
+|--------|------------------------|-------------------------|
+| 0      | 2 bytes                | Parent id               |
+| 2      | s16f (divide by 4096f) | Bone size (?)           |
+| 4      | s16f (divide by 4096f) | RotX, multiplied by 360f |
+| 6      | s16f (divide by 4096f) | RotY, multiplied by 360f |
+| 8      | s16f (divide by 4096f) | RotZ, multiplied by 360f |
+| 10     | s16f (divide by 4096f) | someX                   |
+| 12     | s16f (divide by 4096f) | someY                   |
+| 14     | s16f (divide by 4096f) | someZ                   |
+| 16     | 32 bytes               | Unknown (often empty)   |
+
+SomeX, someY and someZ are read only if the "Extra data" flag is set.
 
 ## Section 2: Model geometry
 
@@ -172,7 +174,6 @@ The frames work accumulatively, so in order to get the final rotation at in exam
 | Varies | 0 if bUnk3==0, else 16 BITs | Unk3 data   |
 
 We don't know what the Unk1, Unk2 and Unk3 do. Enemies works without them, but as it's important to keep up with the current bit position, we need to read it anyway
-After the 3 RotationType, if ExtraData flag is set (from the bone section), then there is 3 more data to read. It's new discovery we don't know how it affects the game yet.
 
 ### Position type
 
