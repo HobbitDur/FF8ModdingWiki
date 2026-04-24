@@ -7,7 +7,7 @@ permalink: /technical-reference/battle/monster-files-c0mxxxdat/
 ---
 
 1. TOC
-   {:toc}
+{:toc}
 
 ## Header
 
