@@ -214,10 +214,10 @@ Rotation is also BIT length. First read first bit to see, if there's rotation da
 | 0b10                   | 8                                |
 | 0b11                   | 12                               |
 
-## Section 4: Texture animation data
+## Section 4: Dynamic texture data
 
 Optional section, often empty.
-It contains info on animated texture (like blink-eyes)
+It contains info on dynamic texture (like blink-eyes)
 
 
 It starts with a list of offset followed by data.
@@ -228,7 +228,7 @@ The offset value start at the beginning of the section.
 Each data pointed by the offset look like this:
 
 ```
-struct TextureAnimData
+struct DynamicTextureData
 {
   BYTE textureNum;                      ///< Which texture page/slot to use
   BYTE vram_x_offset;
@@ -239,9 +239,9 @@ struct TextureAnimData
   WORD unk2;
   BYTE source_uv_u;                     ///< X offset of source sprite in VRAM (x2 to get pixel for X)
   BYTE source_uv_v;                     ///< Y offset of source sprite in VRAM
-  TextureAnimDataDestinationUV dest_uv[6]; ///< Actually pairs of bytes: {dest_u, dest_v} for each frame
+  UV_VRAM dest_uv[6]; ///< Actually pairs of bytes: {dest_u, dest_v} for each frame
 };
-struct TextureAnimDataDestinationUV
+struct UV_VRAM
 {
   BYTE u;                               ///< X in VRAM (x2 to get pixel)
   BYTE v;                               ///< Y in VRAM
