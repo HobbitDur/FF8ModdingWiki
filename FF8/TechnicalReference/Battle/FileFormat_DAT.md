@@ -230,15 +230,16 @@ Each data pointed by the offset look like this:
 ```
 struct TextureAnimData
 {
-  WORD textureNum;                      ///< Which texture page/slot to use
-  BYTE unk;
+  BYTE textureNum;                      ///< Which texture page/slot to use
+  BYTE vram_x_offset;
+  BYTE vram_y_offset;
   BYTE sprite_width_in_vram_coord;      ///< Width of region to copy, in X you need to multiply by 2 to get the pixel value
   BYTE sprite_height_in_vram_coord;     ///< Height of region to copy
   BYTE number_destination;
   WORD unk2;
   BYTE source_uv_u;                     ///< X offset of source sprite in VRAM (x2 to get pixel for X)
   BYTE source_uv_v;                     ///< Y offset of source sprite in VRAM
-  TextureAnimDataDestinationUV dest_uv[]; ///< Actually pairs of bytes: {dest_u, dest_v} for each frame
+  TextureAnimDataDestinationUV dest_uv[6]; ///< Actually pairs of bytes: {dest_u, dest_v} for each frame
 };
 struct TextureAnimDataDestinationUV
 {
