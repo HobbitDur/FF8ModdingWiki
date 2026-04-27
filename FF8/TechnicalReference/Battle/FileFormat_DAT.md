@@ -218,24 +218,42 @@ Rotation is also BIT length. First read first bit to see, if there's rotation da
 
 Optional section, often empty.
 It contains info on animated texture (like blink-eyes)
-It starts with a list of offset followed by data that look like this:
+
+
+It starts with a list of offset followed by data.
+The offset list start with a 0 offset which must be ignored. Each offset is 2 bytes.
+The number of offset need to be deduced: so read each 2 bytes till you read a bit that is inferior to the previous.
+The offset value start at the beginning of the section.
+
+Each data pointed by the offset look like this:
 
 ```
-struct texAnim
+struct TextureAnimData
 {
-	uint8 textureNum;
-	uint8 originalUCoord; //All UV coords here are for the upper left corner
-	uint8 originalVCoord;
-	uint8 regionUSize;
-	uint8 regionVSize;
-	uint8 copiedRegionCount; //1 less than the actual number
-	uint8 unknown1;
-	uint8 unknown2;
-	//Insert remaining UV coords here
+  WORD textureNum;                      ///< Which texture page/slot to use
+  BYTE unk;
+  BYTE sprite_width_in_vram_coord;      ///< Width of region to copy, in X you need to multiply by 2 to get the pixel value
+  BYTE sprite_height_in_vram_coord;     ///< Height of region to copy
+  BYTE number_destination;
+  WORD unk2;
+  BYTE source_uv_u;                     ///< X offset of source sprite in VRAM (x2 to get pixel for X)
+  BYTE source_uv_v;                     ///< Y offset of source sprite in VRAM
+  TextureAnimDataDestinationUV dest_uv[]; ///< Actually pairs of bytes: {dest_u, dest_v} for each frame
 };
+struct TextureAnimDataDestinationUV
+{
+  BYTE u;                               ///< X in VRAM (x2 to get pixel)
+  BYTE v;                               ///< Y in VRAM
+};
+
 ```
 
-Refer to this message for more info: [Qhimm message](https://forums.qhimm.com/index.php?topic=11137.msg165149#msg165149)
+The number of `dest_uv` depends of the `number_of_destination`.
+
+Important point is that all UV and sprite width/height is expressed in VRAM value, which mean you need to multiply the X value by 2 to get the pixel value (Y is already in pixel).
+
+TODO: Add the monster list that have an animated texture section.
+
 
 ## Section 5: Animation sequences
 
