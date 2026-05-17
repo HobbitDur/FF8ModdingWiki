@@ -5,6 +5,8 @@ title: Encounter Codes
 permalink: /technical-reference/battle/encounter-codes/
 ---
 
+Encounter IDs are battle scene IDs. Field scripts, field random encounters and world-map random encounters all select one of these IDs, then hand it to the battle module as `COMBAT_SCENE_ID`. See [Encounter Trigger Runtime](../encounter-trigger-runtime/) for the field/world-map selection and module handoff.
+
 ## Used Encounters
 
 | Encounter ID | Description                                        | Location                                 |

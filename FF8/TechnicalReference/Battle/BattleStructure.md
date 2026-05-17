@@ -10,6 +10,8 @@ Scene.out contains all the data for each encounter in the game, this includes en
 
 See the corresponding thread: <http://forums.qhimm.com/index.php?topic=15816.0>
 
+Runtime loading and field/world-map handoff are documented in [Encounter Trigger Runtime](../encounter-trigger-runtime/) and [Battle Runtime](../battle-runtime/).
+
 ## File Structure
 
 Scene.out contains no header. It is a raw list of 1024 encounters. Each encounter block consists of 128 bytes and has the following structure:

@@ -21,3 +21,5 @@ none
 #### Description
 
 Enables random battles.
+
+Runtime note: this clears the temporary field encounter disable flag checked by the field encounter tick. Random encounters are still blocked by cutscenes, field state, map encounter settings and Enc-None. See [Encounter Trigger Runtime](../../battle/encounter-trigger-runtime/).

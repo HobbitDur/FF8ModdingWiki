@@ -332,6 +332,8 @@ A 16-entry header pointing into 16 formation groups. Each group is itself an off
 
 Used to organise encounter formations by type/tier.
 
+At runtime, `WM_Encounter_RollAndSelectScene` (`0x541C80`) selects from the wmset encounter tables by region/terrain. There are 8 formations per terrain; if the selected formation matches `WM_LAST_FORMATION_ID` (`0x20400A0`), the game can re-roll up to two times before handing the scene id to the battle module. See [World Map Encounters](worldmap_encounters) and [Encounter Trigger Runtime](../../battle/encounter-trigger-runtime/).
+
 ---
 
 ## Section 18: Region location IDs

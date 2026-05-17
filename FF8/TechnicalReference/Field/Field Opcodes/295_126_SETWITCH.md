@@ -24,3 +24,5 @@ none
 #### Description
 
 This is only called once in the whole game - the first time you enter the Ragnarok in space. It unlocks Rinoa's alternate limit break after she becomes a sorceress.
+
+Runtime note: sets bit `0x20` in `SG_ODIN_ANGEL_GILGA_FLAG` (`0x1CFE97A`). The same byte also stores Odin, Phoenix, Gilgamesh and Angelo-related battle flags. See [GF Summon Runtime](../../battle/gf-summon-runtime/).
