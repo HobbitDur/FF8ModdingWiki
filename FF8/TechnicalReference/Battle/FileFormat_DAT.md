@@ -636,6 +636,8 @@ value_hex = value% * 255 / 100
 | 12     | 4 bytes | Offset to death code                     |
 | 16     | 4 bytes | Offset to "before dying or taking a hit" |
 
+The runtime interpreter and section dispatch are documented in [Enemy AI VM Runtime](../enemy-ai-vm-runtime/). The per-opcode authoring reference is [Battle Scripts](../battle-scripts/).
+
 ### Texts
 
 Text offsets is a list of text positions (2 bytes each) in the text sub-section.

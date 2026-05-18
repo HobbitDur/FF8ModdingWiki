@@ -12,6 +12,8 @@ For each _Ground ID_, 8 different encounter slots are available, and are ordered
 These 8 slots each contain an [EncounterID](../../battle/encounter-codes/), these IDs are used to load the correct encounter from [scene.out](../../battle/battle-structure-sceneout/).  
 The following is a list of all the possible encounters in FF8's World Map.
 
+World-map random encounters are selected by `WM_Encounter_RollAndSelectScene` (`0x541C80`), called from `FFWorldDirector` (`0x53F4B0`). Encounters are blocked by Enc-None, most vehicle states, lack of movement, and some terrain ids (27 and 28). While moving, `WM_ENC_METER` (`0x2040A5C`) increases by 16 each frame, or 4 with Enc-Half. When it exceeds 256, the world map uses `Encounter_RandomRollArray` (`0xC75D20`) with the current step/cycle bonus and terrain encounter rate to decide whether an encounter triggers. The selected scene id is handed to the battle module through `WM_PENDING_MODULE_ID = 3` and `WM_PENDING_SCENE_LO/HI`. See [Encounter Trigger Runtime](../../battle/encounter-trigger-runtime/) for the full runtime flow.
+
 1. TOC
 {:toc}
 

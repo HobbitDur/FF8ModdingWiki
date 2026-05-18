@@ -19,6 +19,7 @@ Note: **pre-counter** code will **ONLY** be executed after an attack that kills 
 Note: if the **death** section is empty, it will function like a **_die_** opcode.  
 Note: if the **death** section is *NOT* empty, it is mandatory for it to eventually execute a **_die_** opcode, otherwise the monster will continue fighting, even on 0 HP, making the battle unwinnable for the player and forcing them to run. If running is not an option, this results in a soft lock.  
 
+The PC runtime interpreter, section dispatch functions and important addresses are documented in [Enemy AI VM Runtime](../enemy-ai-vm-runtime/).
 
 1. TOC
 {:toc}

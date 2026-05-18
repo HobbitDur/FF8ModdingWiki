@@ -25,6 +25,8 @@ Files starting with 10 00 00 00 09 00 00 00 are obviously TIM texture. Files sta
 
 <http://forums.qhimm.com/index.php?topic=15056.0>
 
+For runtime dispatch of GF summon effects, `MagicList_Logic`, `effect_id`, Odin/Gilgamesh/Phoenix/Angelo auto-actions and GF callback addresses, see [GF Summon Runtime](../gf-summon-runtime/).
+
 ## Environment objects
 
 **I'm aware it's chaotic**, like no tables and etc. but it's **up-to-date** information First, recognize file:

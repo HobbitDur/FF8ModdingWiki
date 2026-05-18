@@ -8,6 +8,8 @@ permalink: /technical-reference/battle/surprise-attack/
 
 When starting a fight, there is some computation done to decide if you are lucky (or unlucky) for a strike first or a back attack.
 
+PC runtime function: `Battle_InitPreemptiveBackAttackStatus` (`0x48AFD0`). Scripted battles can force or suppress the result with `ENCOUTER_BATTLE_FLAG`; see [Battle Runtime](../battle-runtime/) and [Encounter Trigger Runtime](../encounter-trigger-runtime/).
+
 A RNG value is computed
 
 $$
