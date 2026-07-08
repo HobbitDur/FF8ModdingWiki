@@ -17,19 +17,19 @@ none
 #### Stack
 
   
-Deck ID
+Deck ID (Long)
 
-Known rules
+Known rules (Byte)
 
-Region rules
+Region rules (Byte)
 
-Rare card chance
+Rare card chance (Long)
 
-Unknown1
+Unknown1 (Long)
 
-Unknown2
+Unknown2 (Long)
 
-Unknown3
+Unknown3 (Long)
 
 **CARDGAME**
 
