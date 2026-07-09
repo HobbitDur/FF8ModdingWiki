@@ -29,7 +29,7 @@ Unknown1 (Long)
 
 Unknown2 (Long)
 
-Unknown3 (Long)
+Allowed card level mask (Long)
 
 **CARDGAME**
 
@@ -41,4 +41,7 @@ Starts a game of Triple Triad against the specified deck.
 
 "Rare card chance" is a percentage chance (0-100) that the opponent will play a rare card if they have one.
 
+"Allowed card level mask" is a 7 bit mask that define what card level the player can use to pick cards. For example, with 0xA, he can pick either on level 1 or level 3.
+
 Not known what the remaining 3 numbers do yet. Presumably the range of common cards they'll use is included. Maybe some AI characteristics like thinking time.
+
