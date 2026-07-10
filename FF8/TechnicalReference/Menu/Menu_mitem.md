@@ -352,14 +352,14 @@ Types **0/3**, **1/4** and **2/5** are pairwise identical from the field menu's 
 | 0xA6 | Pet Nametag       | 12     | PET_NAMETAG      | 0x01    | MENU                     | 0    | 0    |                                                                     |
 | 0xA7 | Solomon Ring      | 15     | SOLOMON_RING     | 0x01    | MENU                     | 0    | 0    | grants GF 11 (Doomtrain)                                            |
 | 0xA8 | Magical Lamp      | 14     | MAGICAL_LAMP     | 0x01    | MENU                     | 43   | 3    | grants GF 5 (Diablos)                                               |
-| 0xA9 | HP Up             | 20     | STAT_UP          | 0x03    | MENU+CHR                 | 10   | 1    | Death +10                                                           |
-| 0xAA | Str Up            | 20     | STAT_UP          | 0x03    | MENU+CHR                 | 1    | 2    | Poison +1                                                           |
-| 0xAB | Vit Up            | 20     | STAT_UP          | 0x03    | MENU+CHR                 | 1    | 4    | Petrify +1                                                          |
-| 0xAC | Mag Up            | 20     | STAT_UP          | 0x03    | MENU+CHR                 | 1    | 8    | Darkness +1                                                         |
-| 0xAD | Spr Up            | 20     | STAT_UP          | 0x03    | MENU+CHR                 | 1    | 16   | Silence +1                                                          |
-| 0xAE | Spd Up            | 20     | STAT_UP          | 0x03    | MENU+CHR                 | 1    | 32   | Berserk +1                                                          |
-| 0xAF | Luck Up           | 20     | STAT_UP          | 0x03    | MENU+CHR                 | 1    | 64   | Zombie +1                                                           |
-| 0xB0 | LuvLuv G          | 16     | GF_COMPATIBILITY | 0x83    | MENU+CHR+OTHERGF         | 255  | 101  | all GFs, 101                                                        |
+| 0xA9 | HP Up             | 20     | STAT_UP          | 0x03    | MENU+CHR                 | 10   | 1    | HP +10                                                              |
+| 0xAA | Str Up            | 20     | STAT_UP          | 0x03    | MENU+CHR                 | 1    | 2    | STR +1                                                              |
+| 0xAB | Vit Up            | 20     | STAT_UP          | 0x03    | MENU+CHR                 | 1    | 4    | VIT +1                                                              |
+| 0xAC | Mag Up            | 20     | STAT_UP          | 0x03    | MENU+CHR                 | 1    | 8    | MAG +1                                                              |
+| 0xAD | Spr Up            | 20     | STAT_UP          | 0x03    | MENU+CHR                 | 1    | 16   | SPR +1                                                              |
+| 0xAE | Spd Up            | 20     | STAT_UP          | 0x03    | MENU+CHR                 | 1    | 32   | SPD +1                                                              |
+| 0xAF | Luck Up           | 20     | STAT_UP          | 0x03    | MENU+CHR                 | 1    | 64   | Luck +1                                                             |
+| 0xB0 | LuvLuv G          | 16     | GF_COMPATIBILITY | 0x83    | MENU+CHR+OTHERGF         | 255  | 101  | all GFs + 101                                                       |
 | 0xB1 | Weapons Mon 1st   | 9      | MAGAZINE         | 0x01    | MENU                     | 0    | 3    | pages 0-3                                                           |
 | 0xB2 | Weapons Mon Mar   | 9      | MAGAZINE         | 0x01    | MENU                     | 4    | 7    | pages 4-7                                                           |
 | 0xB3 | Weapons Mon Apr   | 9      | MAGAZINE         | 0x01    | MENU                     | 8    | 11   | pages 8-11                                                          |
