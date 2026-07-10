@@ -20,15 +20,15 @@ The opcode pops **7 bytes** off the script stack (one byte each, last pushed is
 popped first) into engine globals, then starts the match. Some entries are pushed
 as Long in scripts, but only the low byte of each is actually consumed.
 
-| Order popped | Value                   | Written to (addr)                      | Effective range           |
-|--------------|-------------------------|----------------------------------------|---------------------------|
-| 1            | Allowed card level mask | `ALLOWED_CARD_LEVEL_MASK` (0x1DCD7B0)  | bits 0–6                  |
-| 2            | AI Strategy Profile     | `AI_POWER_WEIGHT_PROFILE` (0x1DCD7AE)  | 0–7 (`& 7`)               |
-| 3            | AI Search Profile       | `AI_BEHAVIOR_PROFILE` (0x1DCD7AF)      | 0–7 (`& 7`) + flag `0x10` |
-| 4            | Rare card chance        | `RARE_CARD_CHANCE` (0x1DCD7B1)         | 0–100                     |
-| 5            | Trade rules             | `CARD_TRADES_RULES_SCRIPT` (0x1DCD7AC) | 0–4                       |
-| 6            | Game rules              | `CARD_GAME_RULES_SCRIPT` (0x1DCD7A8)   | low byte 0x00–0xFF        |
-| 7            | Deck ID                 | `CARD_OWNER_LOCATION_ID` (0x1DCD7AD)   | location id               |
+| Order popped | Name                       | Description             |
+|--------------|----------------------------|-------------------------|
+| 1            | `ALLOWED_CARD_LEVEL_MASK`  | Allowed card level mask |
+| 2            | `AI_POWER_WEIGHT_PROFILE`  | AI Strategy Profile     |
+| 3            | `AI_BEHAVIOR_PROFILE`      | AI Search Profile       |
+| 4            | `RARE_CARD_CHANCE`         | Rare card chance        |
+| 5            | `CARD_TRADES_RULES_SCRIPT` | Trade rules             |
+| 6            | `CARD_GAME_RULES_SCRIPT`   | Game rules              |
+| 7            | `CARD_DECK_ID`             | Deck ID                 |
 
 Push order in the script (first pushed = Deck ID):
 
@@ -54,7 +54,7 @@ all this — call `[region]_maeshori0` before the game (it prepares the opponent
 loads the region's rules from the save-map), then run **CARDGAME**, and finally
 call `[region]_shori0` afterwards to deal with the result.
 
-Internally, `SCRIPT_CARDGAME` (0x5225A0) copies the 7 bytes into engine globals.
+Internally, `SCRIPT_CARDGAME` copies the 7 bytes into engine globals.
 When the card module actually boots (in `FFBattleDirector_battleLoop`) it copies
 `CARD_GAME_RULES_SCRIPT` → `CARD_GAME_RULES` and `CARD_TRADES_RULES_SCRIPT` →
 `CARD_TRADE_RULES_ENGINE`, decides who controls each side, and builds the decks.
@@ -125,11 +125,10 @@ in the same hand become progressively less likely.
 
 #### Deck ID (owner location)
 
-`CARD_OWNER_LOCATION_ID` is a location/owner code. It (a) is the deck the AI
-opponent draws from and (b) gates which rare cards can appear (see above). The
-reserved value `0xF0` (`TT_RARE_CARD_LOCATION_PLAYER_OWN`) means "the player's own
-cards". Rare-card locations are **savegame state** (cards move around as you play),
-not a fixed table.
+The **Deck ID** is a location/owner code. It (a) is the deck the AI opponent draws
+from and (b) gates which rare cards can appear (see above). The reserved value
+`0xF0` means "the player's own cards". Rare-card locations are **savegame state**
+(cards move around as you play), not a fixed table.
 
 #### Allowed card level mask
 
@@ -217,6 +216,7 @@ scores the boards at the bottom, and bubbles the values back up — max at its o
 levels, min at yours.
 
 {% raw %}
+
 ```mermaid
 flowchart TD
     R{{"AI to move - take MAX"}}
@@ -233,6 +233,7 @@ flowchart TD
     I5m --> I5a["+5"]
     I5m --> I5b["+3"]
 ```
+
 {% endraw %}
 
 Each branch is worth the **minimum** of its leaves (your best reply):
@@ -251,11 +252,15 @@ minimax strong.
 
 #### 1) Look-ahead depth — low 3 bits (`profile & 7`, 0–7)
 
-The low 3 bits pick a **row** in an internal table (`byte_C75BAF` @ 0xC75BAF); the
-looked-up value is the minimax **search depth**. The **column** is how many legal
-moves are still available, so depth adapts to how busy the board is — shallow when
-the board is wide open (too many branches to afford), deeper in the mid/endgame.
-Index = `9 × (profile & 7) + valid_move_count`:
+The low 3 bits pick a **row** in an internal table
+(`CARD_AI_SEARCH_DEPTH_TABLE`); the looked-up value is the minimax
+**search depth**. The **column** is `valid_outcome_count`, computed once when the
+AI's move-decision task is built (`PrepareAIMoveDecisionTask`): it starts at **9**
+and is decremented for every *empty* slot across **both players' hands**, so it
+tracks how many cards are still left to play (it shrinks as the game goes on) —
+*not* the number of moves open on the board. The net effect is still that the
+search is shallow early (hands full, too many branches to afford) and deeper in
+the mid/endgame. Index = `9 × (profile & 7) + valid_outcome_count`:
 
 | profile | c0 | c1 | c2 | c3 | c4 | c5 | c6 | c7 | c8 |
 |---------|----|----|----|----|----|----|----|----|----|
@@ -289,9 +294,9 @@ hidden cards*.
 ### AI Strategy Profile (`AI_POWER_WEIGHT_PROFILE`)
 
 `profile & 7` (0–7) selects one of 8 weight presets from
-`AI_POWER_WEIGHT_PROFILE_ARRAY` (`CardAIPowerWeightProfile`, @ 0xC75BF8). Those
+`AI_POWER_WEIGHT_PROFILE_ARRAY` (`CardAIPowerWeightProfile`). Those
 weights are the only tunable inputs to the board **scoring function** the minimax
-uses at its leaves (`EvaluateBoardScore` @ 0x53B430). Everything is scored **from
+uses at its leaves (`EvaluateBoardScore`). Everything is scored **from
 the AI's point of view** (positive = good for the AI):
 
 ```
@@ -314,8 +319,10 @@ if RANDOMNESS > 0:
 ```
 
 `POWER_WEIGHT[card]` is precomputed once per game as
-`card_power_scale × card_power / 200`. If `card_power_scale = 0`, **every card's
-strength becomes 0** and the AI scores purely by *how many tiles it holds*.
+`(card_power_scale × card_power / 200) >> 12` (the `>> 12` un-scales the
+fixed-point weight, where `1.0 = 4096`; `card_power` is the card's top-edge stat).
+If `card_power_scale = 0`, **every card's strength becomes 0** and the AI scores
+purely by *how many tiles it holds*.
 
 One extra weight lives inside the minimax itself: leaf scores reached on the
 **AI's own move** are multiplied by `self_turn_score_scale` (your-turn nodes use ×1).
@@ -391,39 +398,85 @@ The two knobs are orthogonal:
 
 The strongest opponents are **high Search + a coherent Strategy**.
 
-### Hard-coded search limits (advanced / patching)
+### Hard-coded search limits (advanced)
 
-Two fixed constants cap the AI's computation regardless of the profiles. They are
-plain immediates in the code, so they can be patched to make the AI think more or
-less. Addresses are virtual (image base `0x400000`).
+Two fixed numbers cap how much the AI is allowed to think, no matter which profiles
+it was given. They are the same for every opponent in the game, and both can be
+changed by patching — the exact code addresses and byte patterns are in the
+[Reference](#reference-addresses) section at the bottom.
 
-| Value   | Meaning                                                                                                                                                                                                                                        | Runtime global              | Set by instruction                                                        | Immediate to patch           |
-|---------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------|---------------------------------------------------------------------------|------------------------------|
-| **100** | Max board positions the minimax may evaluate in one search pass. `SearchBestMoveMinimax` decrements it per position and aborts the pass when it hits 0. This is the real cap that forces the depth table to stay shallow on a wide-open board. | `dword_1DFF3F4` @ 0x1DFF3F4 | `mov dword_1DFF3F4, 100` @ **0x53B055** (`C7 05 F4 F3 DF 01 64 00 00 00`) | `64 00 00 00` @ **0x53B05B** |
-| **10**  | How many passes/frames the AI is allowed while resolving a move before it must commit (extra search attempts when a pass runs out of budget, plus a short "thinking" delay).                                                                   | `dword_1DFF394` @ 0x1DFF394 | `mov dword_1DFF394, 10` @ **0x53B0A9** (`C7 05 94 F3 DF 01 0A 00 00 00`)  | `0A 00 00 00` @ **0x53B0AB** |
+To understand them you need one fact: **the AI thinks across several game frames, a
+little at a time.** A deep search done all in one go would freeze the screen, so
+while it is the AI's turn the card module runs a small "pick a move" task **once per
+frame**. Each frame does one slice of the search and then hands control back so the
+game keeps running smoothly.
+
+- **100 — positions per frame.** At the start of every frame this counter is reset
+  to 100. It counts *hypothetical placements*: each time the search asks "what if I
+  put this card on that empty tile?", it simulates that board and spends one. When
+  it reaches 0 the slice stops immediately — even in the middle of the look-ahead —
+  and the game moves on to the next frame. This exists only so that a single frame
+  never does too much work at once.
+- **10 — frames per move.** How many of those per-frame slices the AI may use to
+  settle on one move. The half-finished search is remembered between frames, so the
+  AI resumes where it left off; across the slices it can examine roughly
+  `10 × 100 = 1000` positions in total. Any slices it doesn't need (because the
+  search finished early) become a short "thinking" pause before it actually plays.
+
+Together these are the real ceiling on the AI's strength: the depth table can *ask*
+for a deep search, but if that search would need more than ~1000 positions it never
+finishes, and the AI simply plays the best move it found so far.
+
+| Number | What it limits                                                    |
+|--------|-------------------------------------------------------------------|
+| 100    | Hypothetical placements the AI may test in a single frame         |
+| 10     | Frames the AI may spend on one move (unused frames become a pause) |
 
 {: .note }
-Raising **100** lets deeper searches actually complete (stronger, slower AI);
-lowering it makes the AI weaker and snappier. Raising **10** gives the search more
-frames to finish before committing. Both are global to every card match, so they
-affect every opponent at once.
+Raising **100** lets each frame do more work, so deeper searches finish (stronger,
+but each frame costs more time). Raising **10** gives the AI more frames per move
+(stronger, but it pauses a little longer before playing). Both apply to every card
+match at once.
 
 ---
 
 #### Reference (addresses)
 
-| Symbol                                           | Address   |
-|--------------------------------------------------|-----------|
-| `SCRIPT_CARDGAME`                                | 0x5225A0  |
-| `BuildOpponentDeck`                              | 0x537640  |
-| `PrepareAIMoveDecisionTask`                      | 0x53ADF0  |
-| `ExecuteAIMoveSelectionTask`                     | 0x53AFA0  |
-| `SearchBestMoveMinimax`                          | 0x53B170  |
-| `EvaluateBoardScore`                             | 0x53B430  |
-| `RunCardMatchTurnLoop` (trade resolution)        | 0x534BC0  |
-| `AI_POWER_WEIGHT_PROFILE_ARRAY`                  | 0xC75BF8  |
-| `byte_C75BAF` (search-depth table)               | 0xC75BAF  |
-| `dword_1DFF3F4` (per-pass position budget = 100) | 0x1DFF3F4 |
-| `dword_1DFF394` (move-resolution passes = 10)    | 0x1DFF394 |
-| `CARD_GAME_RULES` (live)                         | 0x1DCD794 |
-| `CARD_TRADE_RULES_ENGINE` (live)                 | 0x1DCD766 |
+Script-input globals (the 7 bytes the opcode writes):
+
+| Symbol | Address |
+|--------|---------|
+| `ALLOWED_CARD_LEVEL_MASK` | 0x1DCD7B0 |
+| `AI_POWER_WEIGHT_PROFILE` (AI Strategy Profile) | 0x1DCD7AE |
+| `AI_BEHAVIOR_PROFILE` (AI Search Profile) | 0x1DCD7AF |
+| `RARE_CARD_CHANCE` | 0x1DCD7B1 |
+| `CARD_TRADES_RULES_SCRIPT` | 0x1DCD7AC |
+| `CARD_GAME_RULES_SCRIPT` | 0x1DCD7A8 |
+| `CARD_DECK_ID` (Deck ID) | 0x1DCD7AD |
+
+Functions and engine internals:
+
+| Symbol                                                                 | Address   |
+|------------------------------------------------------------------------|-----------|
+| `SCRIPT_CARDGAME`                                                      | 0x5225A0  |
+| `BuildOpponentDeck`                                                    | 0x537640  |
+| `PrepareAIMoveDecisionTask`                                            | 0x53ADF0  |
+| `ExecuteAIMoveSelectionTask`                                           | 0x53AFA0  |
+| `SearchBestMoveMinimax`                                                | 0x53B170  |
+| `EvaluateBoardScore`                                                   | 0x53B430  |
+| `RunCardMatchTurnLoop` (trade resolution)                              | 0x534BC0  |
+| `AI_POWER_WEIGHT_PROFILE_ARRAY`                                        | 0xC75BF8  |
+| `CARD_AI_SEARCH_DEPTH_TABLE` (search-depth table)                      | 0xC75BAF  |
+| `CARD_AI_SEARCH_POSITION_BUDGET` (positions per frame = 100)      | 0x1DFF3F4 |
+| `CARD_AI_MOVE_FRAME_BUDGET` (frames per move = 10)       | 0x1DFF394 |
+| `CARD_AI_SEARCH_NODE_STACK` (minimax per-ply node stack; root at base) | 0x1DFF2B8 |
+| `CARD_AI_BOARD_STATE` (live board the AI search reads/copies)          | 0x1DFF010 |
+| `CARD_GAME_RULES` (live)                                               | 0x1DCD794 |
+| `CARD_TRADE_RULES_ENGINE` (live)                                       | 0x1DCD766 |
+
+Patch points for the two hard-coded search limits (image base `0x400000`):
+
+| Constant | Value | Set by instruction | Immediate to patch |
+|----------|-------|--------------------|--------------------|
+| `CARD_AI_SEARCH_POSITION_BUDGET` | 100 | `mov …, 100` @ 0x53B055 (`C7 05 F4 F3 DF 01 64 00 00 00`) | `64 00 00 00` @ 0x53B05B |
+| `CARD_AI_MOVE_FRAME_BUDGET` | 10 | `mov …, 10` @ 0x53B0A9 (`C7 05 94 F3 DF 01 0A 00 00 00`) | `0A 00 00 00` @ 0x53B0AF |
