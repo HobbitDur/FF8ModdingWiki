@@ -218,13 +218,13 @@ levels, min at yours.
 
 ```mermaid
 flowchart TD
-    R{{"AI to move - take MAX"}}
+    R("AI to move - take MAX")
     R --> Q7["play Q7"]
     R --> M2["play M2"]
     R --> I5["play I5"]
-    Q7 --> Q7m{{"you reply - MIN"}}
-    M2 --> M2m{{"you reply - MIN"}}
-    I5 --> I5m{{"you reply - MIN"}}
+    Q7 --> Q7m("you reply - MIN")
+    M2 --> M2m("you reply - MIN")
+    I5 --> I5m("you reply - MIN")
     Q7m --> Q7a["+6"]
     Q7m --> Q7b["+2"]
     M2m --> M2a["-1"]
