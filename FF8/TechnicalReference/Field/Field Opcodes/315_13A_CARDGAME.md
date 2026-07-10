@@ -216,15 +216,16 @@ It builds a small tree of "what if I play here, then they play there, then I…"
 scores the boards at the bottom, and bubbles the values back up — max at its own
 levels, min at yours.
 
+{% raw %}
 ```mermaid
 flowchart TD
-    R("AI to move - take MAX")
+    R{{"AI to move - take MAX"}}
     R --> Q7["play Q7"]
     R --> M2["play M2"]
     R --> I5["play I5"]
-    Q7 --> Q7m("you reply - MIN")
-    M2 --> M2m("you reply - MIN")
-    I5 --> I5m("you reply - MIN")
+    Q7 --> Q7m{{"you reply - MIN"}}
+    M2 --> M2m{{"you reply - MIN"}}
+    I5 --> I5m{{"you reply - MIN"}}
     Q7m --> Q7a["+6"]
     Q7m --> Q7b["+2"]
     M2m --> M2a["-1"]
@@ -232,6 +233,7 @@ flowchart TD
     I5m --> I5a["+5"]
     I5m --> I5b["+3"]
 ```
+{% endraw %}
 
 Each branch is worth the **minimum** of its leaves (your best reply):
 `Q7 → +2`, `M2 → -1`, `I5 → +3`. The AI then takes the **maximum**: `+3` → it
