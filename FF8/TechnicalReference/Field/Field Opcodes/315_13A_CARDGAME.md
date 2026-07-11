@@ -81,7 +81,7 @@ cardgamemaster entity / debug), not by this opcode.
 | `0x00000008` | **Random**                       | Hand becomes 5 random cards from the collection                         |
 | `0x00000010` | **Sudden Death**                 |                                                                         |
 | `0x00000020` | *(unused)*                       | Not referenced anywhere                                                 |
-| `0x00000040` | **Same Wall**                    | Only triggers when **Same** (`0x02`) is also set                        |
+| `0x00000040` | **Wall**                         | Need **Same** (`0x02`) to get Same Wall rule                            |
 | `0x00000080` | **Elemental**                    |                                                                         |
 | `0x20000000` | **Force give cards**             | Opponent deck built with no rares; cards handed over at end (no-stakes) |
 | `0x40000000` | **Both sides AI controlled**     | Demo/auto-play (`PARTICIPANT_CONTROLLER_TYPE = 0x0303`)                 |
@@ -427,9 +427,9 @@ Together these are the real ceiling on the AI's strength: the depth table can *a
 for a deep search, but if that search would need more than ~1000 positions it never
 finishes, and the AI simply plays the best move it found so far.
 
-| Number | What it limits                                                    |
-|--------|-------------------------------------------------------------------|
-| 100    | Hypothetical placements the AI may test in a single frame         |
+| Number | What it limits                                                     |
+|--------|--------------------------------------------------------------------|
+| 100    | Hypothetical placements the AI may test in a single frame          |
 | 10     | Frames the AI may spend on one move (unused frames become a pause) |
 
 {: .note }
@@ -444,15 +444,15 @@ match at once.
 
 Script-input globals (the 7 bytes the opcode writes):
 
-| Symbol | Address |
-|--------|---------|
-| `ALLOWED_CARD_LEVEL_MASK` | 0x1DCD7B0 |
+| Symbol                                          | Address   |
+|-------------------------------------------------|-----------|
+| `ALLOWED_CARD_LEVEL_MASK`                       | 0x1DCD7B0 |
 | `AI_POWER_WEIGHT_PROFILE` (AI Strategy Profile) | 0x1DCD7AE |
-| `AI_BEHAVIOR_PROFILE` (AI Search Profile) | 0x1DCD7AF |
-| `RARE_CARD_CHANCE` | 0x1DCD7B1 |
-| `CARD_TRADES_RULES_SCRIPT` | 0x1DCD7AC |
-| `CARD_GAME_RULES_SCRIPT` | 0x1DCD7A8 |
-| `CARD_DECK_ID` (Deck ID) | 0x1DCD7AD |
+| `AI_BEHAVIOR_PROFILE` (AI Search Profile)       | 0x1DCD7AF |
+| `RARE_CARD_CHANCE`                              | 0x1DCD7B1 |
+| `CARD_TRADES_RULES_SCRIPT`                      | 0x1DCD7AC |
+| `CARD_GAME_RULES_SCRIPT`                        | 0x1DCD7A8 |
+| `CARD_DECK_ID` (Deck ID)                        | 0x1DCD7AD |
 
 Functions and engine internals:
 
@@ -467,8 +467,8 @@ Functions and engine internals:
 | `RunCardMatchTurnLoop` (trade resolution)                              | 0x534BC0  |
 | `AI_POWER_WEIGHT_PROFILE_ARRAY`                                        | 0xC75BF8  |
 | `CARD_AI_SEARCH_DEPTH_TABLE` (search-depth table)                      | 0xC75BAF  |
-| `CARD_AI_SEARCH_POSITION_BUDGET` (positions per frame = 100)      | 0x1DFF3F4 |
-| `CARD_AI_MOVE_FRAME_BUDGET` (frames per move = 10)       | 0x1DFF394 |
+| `CARD_AI_SEARCH_POSITION_BUDGET` (positions per frame = 100)           | 0x1DFF3F4 |
+| `CARD_AI_MOVE_FRAME_BUDGET` (frames per move = 10)                     | 0x1DFF394 |
 | `CARD_AI_SEARCH_NODE_STACK` (minimax per-ply node stack; root at base) | 0x1DFF2B8 |
 | `CARD_AI_BOARD_STATE` (live board the AI search reads/copies)          | 0x1DFF010 |
 | `CARD_GAME_RULES` (live)                                               | 0x1DCD794 |
@@ -476,7 +476,7 @@ Functions and engine internals:
 
 Patch points for the two hard-coded search limits (image base `0x400000`):
 
-| Constant | Value | Set by instruction | Immediate to patch |
-|----------|-------|--------------------|--------------------|
-| `CARD_AI_SEARCH_POSITION_BUDGET` | 100 | `mov …, 100` @ 0x53B055 (`C7 05 F4 F3 DF 01 64 00 00 00`) | `64 00 00 00` @ 0x53B05B |
-| `CARD_AI_MOVE_FRAME_BUDGET` | 10 | `mov …, 10` @ 0x53B0A9 (`C7 05 94 F3 DF 01 0A 00 00 00`) | `0A 00 00 00` @ 0x53B0AF |
+| Constant                         | Value | Set by instruction                                        | Immediate to patch       |
+|----------------------------------|-------|-----------------------------------------------------------|--------------------------|
+| `CARD_AI_SEARCH_POSITION_BUDGET` | 100   | `mov …, 100` @ 0x53B055 (`C7 05 F4 F3 DF 01 64 00 00 00`) | `64 00 00 00` @ 0x53B05B |
+| `CARD_AI_MOVE_FRAME_BUDGET`      | 10    | `mov …, 10` @ 0x53B0A9 (`C7 05 94 F3 DF 01 0A 00 00 00`)  | `0A 00 00 00` @ 0x53B0AF |
