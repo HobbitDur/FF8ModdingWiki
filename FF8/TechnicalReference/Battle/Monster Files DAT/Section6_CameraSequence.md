@@ -29,7 +29,7 @@ Camera opcodes < 0xC0:
 | 00 XX  | 1      | Play camera animation XX from the current camera animation collection               |
 | 01     | 0      | Yield (pause for this frame, resume next frame)                                     |
 | 02     | 0      | End the camera sequence and clear the camera pointer                                |
-| 03     | 0      | Unknown camera operation + clear flag bit 15                                        |
+| 03     | 0      | Capture the current camera pose as the idle/rest pose (`0x503300` copies the live position/look-at into the default-pose registers at `0xB8B800`) + clear flag bit 15 |
 | 04 XX  | 1      | Start a camera oscillation (wobble) task with param XX                              |
 | 05 XX  | 1      | Play camera animation whose id is read through the camera special-value reader (XX) |
 | 06     | 0      | Set camera flag bit 15                                                              |
