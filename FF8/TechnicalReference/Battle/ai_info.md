@@ -39,7 +39,8 @@ Note: descriptions are written from the monster's perspective, so "opposing part
 | 0x00   | return       | 1    | End monster's turn |
 
 This opcode is used to end the monster's turn, preventing further execution of code.  
-It is mandatory for every battle script section to end with a **_return_**.
+It is mandatory for every battle script section to end with a **_return_**.  
+Note: the underlying engine calls this opcode `stop` internally; IfritAI and this wiki use the friendlier name **_return_**.
 
 ### Parameters
 
@@ -63,7 +64,7 @@ Displays a battle message.
 |----------|------|------------|--------------------------|-----------------------|
 | 1        | 1    | **TextID** | [int](../opcode-type-list#int) | The index of the text |
 
-Texts are defined in [section 7](../FileFormat_DAT#section-7-informations--stats) of c0mxxx.dat files.  
+Texts are defined in [section 7](../monster-files-c0mxxxdat/section-7-informations-stats/) of c0mxxx.dat files.  
 Each text has an ID, starting from 0 and incrementing with each subsequent text.  
 **TextID** corresponds to this ID.  
 Note that battle message speed is ignored.
@@ -304,7 +305,7 @@ Uses the monster's *stored action*.
 
 | Opcode | IfritAI name | Size | Short description     |
 |--------|--------------|------|-----------------------|
-| 0x05   | usePrepared  | 1    | Uses stored action    |
+| 0x06   | usePrepared  | 1    | Uses stored action    |
 
 ### Parameters
 
@@ -338,7 +339,7 @@ Causes monster that executes this opcode to die.
 
 | Opcode | IfritAI name | Size | Short description     |
 |--------|--------------|------|-----------------------|
-| 0x05   | die          | 1    | Causes monster to die |
+| 0x08   | die          | 1    | Causes monster to die |
 
 ### Parameters
 
@@ -483,7 +484,7 @@ Adds value to battle var (accessible by all monsters).
 
 | Opcode | IfritAI name | Size | Short description       |
 |--------|--------------|------|-------------------------|
-| 0x13   | gadd         | 3    | Add value to global var |
+| 0x13   | badd         | 3    | Add value to battle var |
 
 ### Parameters
 
@@ -502,7 +503,7 @@ Adds value to savemap var (not sure where it is stored).
 
 | Opcode | IfritAI name | Size | Short description        |
 |--------|--------------|------|--------------------------|
-| 0x15   | sadd         | 3    | Add value to savemap var |
+| 0x15   | gadd         | 3    | Add value to savemap var |
 
 ### Parameters
 
@@ -533,7 +534,8 @@ None
 
 ### Summary
 
-Allows/Disallows escaping in the current battle.
+Allows/Disallows escaping in the current battle.  
+**Correction:** the underlying engine name for this opcode is `cannotEscape` (reference data comment: "Deactivate Run away"), which implies the boolean below is the opposite polarity of what was previously documented here. This needs to be confirmed in-game: it is likely that `True` **blocks** escape rather than allowing it.
 
 | Opcode | IfritAI name | Size | Short description      |
 |--------|--------------|------|------------------------|
@@ -543,7 +545,7 @@ Allows/Disallows escaping in the current battle.
 
 | Position | Size | Name                | Type                       | Short description                          |
 |----------|------|---------------------|----------------------------|--------------------------------------------|
-| 1        | 1    | **EscapeActivated** | [Bool](../opcode-type-list#bool) | True to allow escape, False to disallow it |
+| 1        | 1    | **EscapeActivated** | [Bool](../opcode-type-list#bool) | Previously documented as "True to allow escape, False to disallow it" — likely backwards, see correction above. **TO BE TESTED.** |
 
 ---
 
@@ -563,7 +565,7 @@ Displays a battle message, respecting the _battle message speed_ setting.
 |----------|------|------------|--------------------------|-----------------------|
 | 1        | 1    | **TextID** | [int](../opcode-type-list#int) | The index of the text |
 
-Texts are defined in [section 7](../FileFormat_DAT#section-7-informations--stats) of c0mxxx.dat files.  
+Texts are defined in [section 7](../monster-files-c0mxxxdat/section-7-informations-stats/) of c0mxxx.dat files.  
 Each text has an ID, starting from 0 and incrementing with each subsequent text.  
 **TextID** corresponds to this ID.
 
@@ -631,7 +633,7 @@ Whilst possible, it is not advisable to use **_enter_** on an encounter slot if 
 ---
 
 
-## Opcode 0x20 (32) - waitTextFaster
+## Opcode 0x20 (32) - waitTextFast
 
 ### Summary
 
@@ -641,7 +643,7 @@ Wait the previous message like wait text
 
 | Opcode | IfritAI name | Size | Short description                     |
 |--------|--------------|------|---------------------------------------|
-| 0x18   | waitText     | 2    | Waits for text/s to finish displaying |
+| 0x20   | waitTextFast | 2    | Waits for text/s to finish displaying, twice as fast as waitText |
 
 ### Parameters
 
@@ -685,13 +687,13 @@ This text can be found in the bottom left section of the scan screen, where info
 |----------|------|------------|--------------------------|-----------------------|
 | 1        | 1    | **TextID** | [int](../opcode-type-list#int) | The index of the text |
 
-Texts are defined in [section 7](../FileFormat_DAT#section-7-informations--stats) of c0mxxx.dat files.  
+Texts are defined in [section 7](../monster-files-c0mxxxdat/section-7-informations-stats/) of c0mxxx.dat files.  
 Each text has an ID, starting from 0 and incrementing with each subsequent text.  
 **TextID** corresponds to this ID.
 
 ---
 
-## Opcode 0x26 (38) - statChange
+## Opcode 0x28 (40) - statChange
 
 ### Summary
 
@@ -701,7 +703,7 @@ For example, if **_statChange_** is used to increase a stat to 500% of its origi
 
 | Opcode | IfritAI name | Size | Short description        |
 |--------|--------------|------|--------------------------|
-| 0x26   | statChange   | 3    | Changes a stat           |
+| 0x28   | statChange   | 3    | Changes a stat           |
 
 ### Parameters
 
@@ -818,4 +820,40 @@ Sets this monster's Enabled flag to _True_.
 |----------|------|------------|--------------------------|-------------------------------|
 | 1        | 1    | **Target** | [int](../opcode-type-list#int) | Encounter slot of the monster |
 
-**Target** is the monster's encounter slot, as defined in [scene.out](../BattleStructure).  
+**Target** is the monster's encounter slot, as defined in [scene.out](../BattleStructure).
+
+---
+
+## Additional opcodes (not yet fully written up)
+
+The 30 opcodes above are the ones that had a full write-up. IfritAI's reference data (`ai_vanilla.json`) confirms 59 opcodes total exist, so the following 25 were missing from this page entirely. They're real, working opcodes — just not documented in as much depth yet. Descriptions below are confirmed against the decompiled engine code (2026-07); anyone expanding these into full sections (with worked examples, like the ones above) would be doing the wiki a favor.
+
+Two of these opcodes were previously misnamed in IfritAI's reference data and have been **renamed** after this verification pass — see the callouts below.
+
+| Opcode | IfritAI name | Size | Description | Notes |
+|--------|--------------|------|--------------|-------|
+| 0x05 (5) | prepareAnim | 1 | Stores an animation ID for later use (queue-for-later, same pattern as prepareMagic/prepareMonsterAbility) | |
+| 0x09 (9) | anim | 1 | Plays an animation ID immediately | |
+| 0x19 (25) | doNothing | 1 | Reads and discards one padding byte; a true no-op | |
+| 0x1A (26) | printAndLock | 1 | Displays a battle message and blocks further script execution until that message finishes displaying | |
+| 0x1B (27) | enterAlt | 2 | Alternate "enter combat" for a target slot. Internally reuses the same command as Phoenix Pinion/kamikaze revival to bring the monster in | Rarely used; not fully worked out yet |
+| 0x1E (30) | specialAction | 1 | Queues a special action by ID, indexing the special action list | |
+| 0x22 (34) | printAlt | 2 | Displays a battle message with a configurable wait/delay time (2nd parameter). Not used by any monster script | |
+| 0x23 (35) | jump | 2 | The raw unconditional jump — this is what implements **_if_**'s else/endif branches under the hood | See [Enemy AI VM Runtime](../enemy-ai-vm-runtime/) |
+| 0x26 (38) | targetStatus | 4 | Builds a target mask from all actors matching a status condition (target type, comparator, status ID) | |
+| 0x27 (39) | autoStatus | 2 | Sets or clears a status flag on self. Status IDs ≥ 16 write to the status_2 field (offset by 16), IDs < 16 write to status_1 | |
+| 0x2B (43) | targetAllySlot | 1 | Targets an ally in a specific encounter slot (builds a single-bit target mask). The code itself is a simple one-liner; the reference data's note about needing `assignSlot` first looks like a soft/script-level dependency rather than a hard code one | |
+| 0x2C (44) | **vanish** *(renamed from `remain`)* | 0 | Silently removes this monster from battle: sets Death status, Not Targetable, and clears the "enabled" flag — with no death sequence/message. The old name `remain` described the opposite of what the code does | **Renamed 2026-07.** Only known to be used by monster IDs 87 and 91 — worth checking those scripts to see if it's used to hide a "shell" slot while another part of the same monster keeps fighting |
+| 0x2D (45) | elemDmgMod | 3 | Writes a 16-bit value into a per-monster local-var slot indexed by element ID; some later damage calculation presumably reads it back as a resistance modifier. IfritAI encodes the authored percentage as `900 - percent` when compiling — this transform is unverified against actual in-game damage output | |
+| 0x31 (49) | giveGF | 1 | Gives the player a specific GF and records it in the save data | Used by Tomberry |
+| 0x32 (50) | prepareSummon | 0 | Sets an internal "preparing a summon" flag; no parameters | |
+| 0x33 (51) | activate | 0 | Queues an "activate" battle task; no parameters | |
+| 0x35 (53) | loadAndTargetable | 1 | Loads a monster into a slot and queues it to become targetable once its intro animation finishes | |
+| 0x36 (54) | gilgamesh | 0 | Sets the savegame flag that marks Gilgamesh as available | |
+| 0x37 (55) | giveCard | 1 | Adds a specific Triple Triad card to the battle's card-drop list | |
+| 0x38 (56) | giveItem | 1 | Adds a specific item to the battle's item drop/steal list | |
+| 0x39 (57) | gameOver | 0 | Forces a Game Over | |
+| 0x3A (58) | targetableSlot | 1 | Clears the Not Targetable flag on a specific encounter slot | |
+| 0x3B (59) | assignSlot | 2 | Assigns a monster to an encounter slot; passing slot `0` makes it auto-search for the first free monster slot instead of using a fixed one | |
+| 0x3C (60) | **addCurrentHP** *(renamed from `addMaxHP`)* | 1 | Adds a signed 16-bit value directly to the monster's **current** HP. The old name and its own description ("Increase max HP (but not current)") both claimed it touched max HP — the decompiled code only ever writes `current_hp`, never `max_hp` | **Renamed 2026-07.** Negative values presumably work as direct damage; worth confirming there's no clamp to max HP |
+| 0x3D (61) | proofOfOmega | 0 | Gives the player "Proof of Omega". The item ID (127) is hardcoded in the engine function, not passed as a script parameter | Only used by monster ID 114 (Omega Weapon) |

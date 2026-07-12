@@ -16,7 +16,7 @@ $$
 \text{SurpriseRng} = [0..255] + 20 \times \text{MonsterFlagIncrease} - 20 \times \text{MonsterFlagDecrease} + 20 \times \text{AbilityAlert}
 $$
 
-With [MonsterFlagIncrease]({{site.baseurl}}/technical-reference/battle/monster-files-c0mxxxdat/#increase-surprise-rng), [MonsterFlagDecrease]({{site.baseurl}}/technical-reference/battle/monster-files-c0mxxxdat/#increase-surprise-rng) being bool (so 1 or 0). If one
+With [MonsterFlagIncrease]({{site.baseurl}}/technical-reference/battle/monster-files-c0mxxxdat/section-7-informations-stats/#increase-surprise-rng), [MonsterFlagDecrease]({{site.baseurl}}/technical-reference/battle/monster-files-c0mxxxdat/section-7-informations-stats/#increase-surprise-rng) being bool (so 1 or 0). If one
 monster has the flag on his dat file, then the flag is applied (only once so)
 With AbilityAlert being a bool (0 or 1) set to 1 if the ability [Alert]({{site.baseurl}}/technical-reference/list/ability-list/#passif-abilities) is equipped.
 
@@ -31,7 +31,7 @@ Those value defines for whom the surprise attack is.
 From this, some special cases change the result:
 
 if SurpriseNegativeForPlayer and AbilityAlert, then it's converted to NoSurprise
-if [MonsterFlagImmuneSurpriseAttack]({{site.baseurl}}/technical-reference/battle/monster-files-c0mxxxdat/#surprise-attack-immunity) and SurprisePositiveForPlayer, then it's
+if [MonsterFlagImmuneSurpriseAttack]({{site.baseurl}}/technical-reference/battle/monster-files-c0mxxxdat/section-7-informations-stats/#surprise-attack-immunity) and SurprisePositiveForPlayer, then it's
 converted to NoSurprise
 
 Now we know if a side has an advantage starting the fight. From this it is decided with $$\frac{1}{2}$$ chance if it's simply an ATB fill (strike first) or also a back attack.

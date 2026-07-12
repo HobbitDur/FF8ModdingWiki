@@ -7,26 +7,33 @@ permalink: /technical-reference/battle/enemy-ai-vm-runtime/
 
 This page documents the runtime interpreter used for enemy behavior scripts in c0mxxx.dat section 8. For per-opcode authoring details, see [Battle Scripts](../battle-scripts/).
 
+Note: the function names used in this page are the real names in the IDA database (verified 2026-07), not placeholders. An address lookup table is at the [bottom of this page](#function-address-reference) for anyone following along in a disassembler.
+
 1. TOC
 {:toc}
 
 ## Architecture
 
-Enemy AI is executed through three layers when a monster becomes active:
+Enemy AI is executed through a chain of four layers:
 
 ```
-BattleArbitration_SelectNextAction (0x485460)
-  -> EnemyAI_PrepareTurnAction (0x485610)
-     -> EnemyAI_DispatchSection (0x4877F0)
-        -> EnemyAI_VM_ExecuteScript (0x487DF0)
+BattleTurn_ProcessActionQueue
+  -> BattleAction_ExecuteCommand
+     -> MonsterAI_DispatchSection
+        -> MonsterAI
 ```
+
+- **BattleTurn_ProcessActionQueue** is the top-level per-turn scheduler. It walks the queued battle-action linked list, skips actors that are Petrified/Asleep/Stopped, and loops `BattleAction_ExecuteCommand` once per sub-hit (used for multi-hit sequences like Renzokuken) until it fails or the alive-count sentinel (`255`) is hit.
+- **BattleAction_ExecuteCommand** is *not* AI-specific. It is the generic command executor for every queued action, player or monster: it resolves multi-target magic (Triple/Double), confusion/berserk auto-targeting, Angel Wing effects, GF compatibility updates, item consumption, and Renzokuken/Duel/Limit-break paths (Zell, Irvine, Lionheart). It only calls into `MonsterAI_DispatchSection` when the queued action's command type is `COMMAND_NO_COMMAND` — i.e. when nothing has decided what this monster is doing yet and the AI script needs to run.
+- **MonsterAI_DispatchSection** routes to one of the AI script sections (see table below) and, for the sections backed by actual bytecode, calls `MonsterAI` with a pointer into the right code sub-section.
+- **MonsterAI** is the bytecode interpreter itself — it reads and executes the opcodes documented in [Battle Scripts](../battle-scripts/).
 
 Damage application also routes back into AI for counter/death behavior:
 
 ```
-Battle_ApplyDamageOrHeal (0x494410)
-  -> EnemyAI_DispatchSection(section=2 COUNTER)
-  -> EnemyAI_DispatchSection(section=3 DEATH)
+applyDamageAndHandleDeath
+  -> MonsterAI_DispatchSection(section=2 COUNTER)
+  -> MonsterAI_DispatchSection(section=3 DEATH)
 ```
 
 ## Data source
@@ -58,44 +65,33 @@ ai_subsection_base + offset[section_index]
 
 ## Section dispatch
 
-`EnemyAI_DispatchSection` (`0x4877F0`) routes execution by section index.
+`MonsterAI_DispatchSection` routes execution by section index.
 
 | Section | Name | Trigger | Description |
 |---------|------|---------|-------------|
-| 0 | Init | Monster appears | Runs once when the enemy enters battle |
-| 1 | Turn | Enemy ATB ready | Runs each enemy turn and increments `number_turn` |
-| 2 | Counter | After being hit | Checks death/petrify/berserk/sleep/stop gates first |
-| 3 | Death | HP reaches 0 | Can summon replacements, drop items, trigger events |
-| 4 | Pre-hit | Before hit resolves | Last-moment effects before damage commits |
-| 5-6 | Special | Fixed actions | Queues predefined commands |
-| 7 | Odin / Gilgamesh | Auto-trigger | Special GF summon handler |
-| 8 | Angelo | Auto-trigger | Angelo auto-action handler |
+| 0 | Init | Monster appears | Runs once when the enemy enters battle. Calls `MonsterAI` on the Init code. |
+| 1 | Turn | Enemy ATB ready | Runs each enemy turn and increments `number_turn`. Calls `MonsterAI` on the Turn code. |
+| 2 | Counter | After being hit | **Monsters** (slot ≥ 3): gated on Death/Petrify/Berserk/Sleep/Stop/Linked-Escape, then calls `MonsterAI` on the Counter code. **Playable characters** (slot 0-2): does **not** run AI bytecode at all — instead it directly resolves the character's auto-counterattack (`Counter` ability, targets the last attacker), triggers Angelo's automatic response after Rinoa is hit, and runs Auto-Potion (uses Potion → Hi-Potion → Potion+ → Hi-Potion+ → X-Potion → Elixir depending on HP lost, only once HP lost exceeds 200). A separate function, `ReturnDamage_ApplyAccumulated`, accumulates and triggers "Return Damage"/reflect-style effects outside of this dispatch. |
+| 3 | Death | HP reaches 0 | **Monsters**: calls `MonsterAI` on the Death code (can summon replacements, drop items, trigger events). **Playable characters**: triggers an Angelo auto-revive action instead of running any script. |
+| 4 | Pre-hit | Before hit resolves | Calls `MonsterAI` on the Pre-hit code. Last-moment effects before damage commits. |
+| 5 | Doom | Doom counter reaches 0 | Not AI bytecode — directly queues the `DOOM_FINISHED` command that kills the actor. |
+| 6 | Kamikaze/revive | Fixed trigger | Not AI bytecode — directly queues the `KAMIKAZE_PHOENIX_PINION_OR_FAIL` command (Phoenix Pinion / kamikaze-style auto-revive path). |
+| 7 | Odin / Gilgamesh | Auto-trigger | Special GF summon handler — queues the Odin/Gilgamesh/Phoenix summon command directly. |
+| 8 | Angelo | Auto-trigger | Angelo auto-action handler — queues an Angelo automove command directly. |
 
-For party slots (`0..2`), section 2 handles Counter ability, Cover and Return Damage rather than running enemy AI bytecode.
+For party slots (`0..2`), only sections 0, 1 and 4 run through the normal `MonsterAI` bytecode path; sections 2 and 3 are hardcoded character behavior as described above.
 
 ## VM interpreter
 
-`EnemyAI_VM_ExecuteScript` (`0x487DF0`) is the bytecode interpreter. It dispatches a 61-case switch table at `0x487EDC`.
+`MonsterAI` is the bytecode interpreter. It dispatches a switch table keyed on the opcode byte.
 
 | Behavior | Detail |
 |----------|--------|
 | Fetch | Reads one opcode byte from the current bytecode pointer |
-| Valid range | Opcodes `0x01..0x3D` plus `0x00` stop |
-| Stop | Opcode `0x00` ends script execution |
-| Default / NOP | Opcodes `0x0A`, `0x10`, `0x14`, `0x21` fall through to default |
-| Branching | Opcode `0x23` reads a 16-bit jump; opcode `0x02` conditionally skips by byte count |
-
-Observed interpreter signature:
-
-```c
-unsigned __int8 __usercall EnemyAI_VM_ExecuteScript@<al>(
-    unsigned int p_ai_subsection_init_code@<ebp>,
-    int          p_monster_slot_id,
-    uint8_t*     p_ai_current_subcode,
-    int          p_text_subsection,
-    int          p_text_offset_section
-);
-```
+| Valid range | Opcodes `0x01..0x3D` (1-61) plus `0x00` (`stop`) |
+| Stop | Opcode `0x00` (`stop`, shown as `return` in [Battle Scripts](../battle-scripts/)) ends script execution |
+| Unused / no-op | Opcodes `0x0A`, `0x10`, `0x14`, `0x21` (10, 16, 20, 33) have no assigned meaning and fall through to a default no-op case |
+| Branching | Opcode `0x23` (35, `jump`) reads a 16-bit jump; opcode `0x02` (`if`) conditionally skips by byte count |
 
 ## Runtime variables
 
@@ -112,37 +108,38 @@ unsigned __int8 __usercall EnemyAI_VM_ExecuteScript@<al>(
 
 ## Opcode groups
 
-The complete authoring reference remains [Battle Scripts](../battle-scripts/). Runtime grouping observed in the interpreter:
+The complete authoring reference remains [Battle Scripts](../battle-scripts/), which lists all 59 opcodes with their exact numeric IDs. Runtime grouping observed in the interpreter:
 
 | Group | Opcodes |
 |-------|---------|
-| Control flow | `0x00` STOP, `0x02` IF_CONDITION, `0x23` JUMP |
+| Control flow | `stop`, `if`, `jump` |
 | Attack setup | Magic, item, monster ability, ability info, drawn magic, execute action |
 | Targeting | Direct target, status target, target mask, random ability target |
 | Text / display | Display text, display and wait, text after attack, scan text |
-| Variables | Local/global variable set/add operations |
+| Variables | Local/global/savemap variable set/add operations |
 | Monster management | Enter/leave, targetable/untargetable, enable/disable |
 | Status / stat modification | Stat changes, status tests, elemental defense writes |
-| Rewards / special | Drop/steal/reward and story-special behavior |
-
-Note: wiki opcode names and byte labels should be reconciled against [Battle Scripts](../battle-scripts/) before editing individual opcode sections. Do not assume that a decompiler label maps directly to the existing IfritAI name.
-
-## Important function addresses
-
-| Address | Name | Role |
-|---------|------|------|
-| `0x487DF0` | `EnemyAI_VM_ExecuteScript` | Bytecode interpreter |
-| `0x4877F0` | `EnemyAI_DispatchSection` | Section router |
-| `0x485610` | `EnemyAI_PrepareTurnAction` | Turn preparation, context setup |
-| `0x48A680` | `EnemyAI_CompareValues` | Comparison operator implementation |
-| `0x482C90` | `EnemyAI_LookupAbilityByIndex` | `.dat` section 7 ability lookup |
-| `0x48A830` | `EnemyAI_TargetHasStatus` | Target status predicate |
-| `0x4838C0` | `EnemyAI_GetTargetMaskFromMask` | Raw mask to target bitmask |
-| `0x483EF0` | `EnemyAI_SyncAIVarsToSlot` | Sync AI vars to battle slot data |
-| `0x487590` | `EnemyAI_GetTargetMemberCount` | Count members in target mask |
-| `0x4860A0` | `EnemyAI_CountAlivePartyMembers` | Count alive party members |
-| `0x4860D0` | `EnemyAI_CountAliveMonsters` | Count alive monsters |
+| Rewards / special | Give GF/Card/Item, Proof of Omega, Game Over, and other story-special behavior |
 
 ## Special GF-related sections
 
 Section 7 is used for Odin / Gilgamesh auto-actions and section 8 for Angelo auto-actions. These paths queue direct actions instead of reading normal monster bytecode. See [GF Summon Runtime](../gf-summon-runtime/) for the dispatch path into `MagicList_Logic`.
+
+## Function address reference
+
+For readers following along in IDA / a disassembler. Names above are the ones actually set in the shared IDA database.
+
+| Name | Address | Role |
+|------|---------|------|
+| `BattleTurn_ProcessActionQueue` | `0x485460` | Top-level per-turn scheduler, walks the queued action list |
+| `BattleAction_ExecuteCommand` | `0x485610` | Generic command executor for player and monster actions; calls into AI dispatch only when no command is queued yet |
+| `MonsterAI_DispatchSection` | `0x4877F0` | Routes to the correct AI section (Init/Turn/Counter/Death/Pre-hit/Doom/Kamikaze/Odin/Angelo) |
+| `MonsterAI` | `0x487DF0` | Bytecode interpreter for the opcodes in [Battle Scripts](../battle-scripts/) |
+| `applyDamageAndHandleDeath` | `0x494410` | Applies damage/healing, routes back into `MonsterAI_DispatchSection` for Counter/Death |
+| `monsterAICompareValue` | `0x48A680` | Comparison operator implementation for `if` |
+| `GenericTargetHasStatus` | `0x48A830` | Target status predicate |
+| `getMagicTargetMask` | `0x4838C0` | Raw mask to target bitmask |
+| `ReturnDamage_ApplyAccumulated` | `0x483EF0` | Accumulates and triggers "Return Damage" (reflect-style) effects |
+| `GetNbMemberTargetGeneric` | `0x487590` | Count members in target mask |
+| `howManyCharaNotDeadOrPetrify` | `0x4860A0` | Count alive party members |
+| `howManyMonsterNotDeadOrPetrify` | `0x4860D0` | Count alive monsters |
