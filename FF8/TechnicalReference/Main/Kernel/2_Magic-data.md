@@ -80,8 +80,8 @@ permalink: /technical-reference/main/kernel/magic/
 |--------|---------|-------------------------------------------------------------------------------------------------|
 | 0x0000 | 2 bytes | Offset to spell name                                                                            |
 | 0x0002 | 2 bytes | Offset to spell description                                                                     |
-| 0x0004 | 2 bytes | Magic ID                                                                                        |
-| 0x0006 | 1 byte  | Animation triggered                                                                             |
+| 0x0004 | 2 bytes | Magic ID — **this is the effect / animation id** dispatched at runtime (Fire=2, Thunder=3, Thundara=102 → `MAG_<id>_<name>`, file `mag<id-1>`). See [Magic Spell Effect Runtime](../../battle/magic-spell-effect-runtime/) |
+| 0x0006 | 1 byte  | Animation triggered — coarse **category**, not the per-spell effect (that's +0x04): `5` for every offensive spell, `0` for curatives. Routes to a shared/secondary effect; exact use unconfirmed |
 | 0x0007 | 1 byte  | [Attack type]({site.baseurl}}/technical-reference/list/kernel#attack-type)                      |
 | 0x0008 | 1 byte  | Spell power (used in damage formula)                                                            |
 | 0x0009 | 1 byte  | Unknown                                                                                         |

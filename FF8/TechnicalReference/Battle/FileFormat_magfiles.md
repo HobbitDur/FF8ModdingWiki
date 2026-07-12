@@ -21,6 +21,14 @@ Files starting with 10 00 00 00 09 00 00 00 are obviously TIM texture. Files sta
 | 0x10   | SCOT pointer                                 |
 | 0x14   | Texture pointer                              |
 
+## Regular spell effects
+
+For how a cast spell resolves to a mag file and why the effect is procedural code (not
+keyframe data) — relevant to 60 fps work — see
+[Magic Spell Effect Runtime](../magic-spell-effect-runtime/). Key point: the per-spell
+effect id comes from the kernel magic entry field **+0x04** (e.g. Thundara = 102 → `mag101`,
+`MAG_102_THUNDARA`).
+
 ## G.F. Sequence
 
 <http://forums.qhimm.com/index.php?topic=15056.0>
