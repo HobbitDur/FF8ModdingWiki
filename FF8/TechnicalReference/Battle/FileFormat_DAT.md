@@ -291,6 +291,8 @@ The per-frame driver (`AnimSeq_UpdateEntityPerFrame` at `0x504290`) runs every b
 
 All `int16` parameters are **little-endian**.
 
+**Sequences played at battle start:** `initAnimationSequenceAtStartBattle` (`0x5027D0`, run once per entity) queues **sequence 8** as the first sequence (the battle-entrance / scene-in animation). It also sets the idle fallback `basedAnimSeq` to **1** — or to the sequence queued by the entity's initial statuses (e.g. starting dead/asleep), or to an override byte passed by the spawner for scripted mid-battle spawns. When a sequence ends (`A2`) with nothing queued, monsters fall back to `basedAnimSeq` (normally 1 = idle), while characters pick a sequence from their animation status (normal standing, low HP, defend, dead...).
+
 ### Opcode between C0 and E3: set a "current_value"
 
 Those opcode are meant to store and modify a local values (that is then used by later opcodes).  
