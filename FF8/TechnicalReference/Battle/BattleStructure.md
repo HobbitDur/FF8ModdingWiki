@@ -51,15 +51,32 @@ Similarly to [enemy flags](#enemy-flags), it's a byte and each bit determines wh
 
 ## Camera Data
 
-This is likely the data for the camera thats used at the start of the fight, before ATB time starts.  
+This byte selects the **battle-intro camera animation**: the camera sweep played when the battle starts, before ATB time starts. It is an index into the camera animation collection stored in the loaded battle stage's [.x file](../battle-stage-x/#camera-data), so the meaning of a given value depends entirely on which stage the encounter uses.
 
-| Bits               | Description  |
-|--------------------|--------------|
-| 7-4 (Upper nibble) | Camera ID    |
-| 3-0 (Lower nibble) | Animation ID |
+| Bits               | Description                                                                |
+|--------------------|----------------------------------------------------------------------------|
+| 7-4 (Upper nibble) | Camera animation **set** index (into the stage's camera animation collection) |
+| 3                  | **Unused** (masked off by the engine)                                      |
+| 2-0                | Camera animation index within the set (0-7)                                |
 
-Note that every encounter holds data for 2 cameras, we'll call the first one _Main Camera_ and the second one _Secondary Camera_.  
-The games chooses which one to use when loading the battle, and it appears to pick the _Main Camera_ about 80% of the time.  
+Each stage's camera animation collection declares its own number of sets (`NumOfSets`, first uint16 of the collection), and each set holds 8 animation pointers. If the set index is **out of range** for the stage (`set >= NumOfSets`), the engine silently does nothing: no intro animation plays and the camera stays at its default position. Values are therefore stage-dependent; for example `a0stg000.x` (Balamb Garden Quad) has 2 sets, so only `0x00`-`0x07` and `0x10`-`0x17` select an animation.
+
+### Main vs Secondary camera
+
+Every encounter holds two of these bytes; we'll call the first one (offset 0x02) _Main Camera_ and the second one (offset 0x03) _Secondary Camera_.
+
+At battle load, `BS_CameraInit` (`0x500F70`) picks one of the two with a **fair 50/50 coin flip** (`pnrg_lcg_algo() & 1` — the LCG bit used is well mixed, so there is no bias toward the main camera; earlier observations of ~80% main were sample bias).
+
+There is exactly one hardcoded exception: **encounter ID 33** (2× G-Soldier, Dollet elevator) always uses the _Main Camera_, presumably to keep that scripted Dollet sequence consistent.
+
+### Runtime pipeline (PC 2000, FF8_EN.exe)
+
+1. `FFBattleDirector_battleLoop` (`0x47CCB0`) loads the 128-byte encounter record into `CURRENT_ENCOUNTER_DATA_SCENE_OUT` (`0x1D287DC`) via `ReadSceneOutFileForSpecificEncounter` (`0x48D0E0`).
+2. During stage init, the per-stage handler (`BS_StageXXX`) receives the *load camera* command and calls `BS_CameraInit` (`0x500F70`), which picks main/secondary as described above and stores the byte into **camera-VM variable 0** (`CURRENT_CAMERA_ANIMATION`, `0x1D97728`). It then resolves the stage .x camera section pointers (camera settings + animation collection) via `BS_GetCameraAnimPointers` (`0x509970`).
+3. Every frame, `updateBattleCamera` (`0x504060`) → `BS_UpdateCameraSequence` (`0x509610`) executes the stage's *camera settings* byte-code with the shared animation-sequence VM (`computeAnimationSequence`, `0x50DB40` — the same VM used by [monster animation sequences](../monster-files-c0mxxxdat/) and [camera sequences](../monster-files-c0mxxxdat/section-6-camera-sequence/)). Stage camera scripts start with camera opcode `05 00` = "play the camera animation whose ID is read from camera variable 0" — i.e. the scene.out byte.
+4. `BS_GetCameraAnimationPointer` (`0x503520`) decodes the byte: `set = (id >> 4) & 0xF` (bounds-checked against `NumOfSets`), `anim = id & 7`, resolves the animation's relative pointer inside the stage file and spawns the `ProcessCameraAnimation` task that plays it.
+
+After the intro animation ends, this byte has no further effect: mid-battle cameras are chosen per action by `cameraWhenDoingAction` (`0x506190`), which overwrites camera variable 0 with its own animation choices.  
 
 ## Enemy Coordinates 
 
@@ -114,7 +131,13 @@ IDs are the last 3 digits of the monster's [c0mxxx.dat file](../monster-files-c0
 **Unknown 4** contains 1 byte per monster, for a total of 8 bytes.  
 
 The data is laid out sequentially, from _Monster 1_ through _Monster 8_, and each monster has its own set of values, though some values are shared between monsters.  
-It appears that the game doesn't read these fields' data, suggesting they may be remnants of a scrapped feature.  
+
+**Confirmed unused (PC 2000, FF8_EN.exe):** disassembly analysis shows that no code ever reads offsets `0x40`-`0x77` of the encounter record:
+
+- The loaded record lives at `CURRENT_ENCOUNTER_DATA_SCENE_OUT` (`0x1D287DC`) and is the game's only live copy (`ReadSceneOutFileForSpecificEncounter` at `0x48D0E0` is its only writer, and its staging buffer is not read anywhere else).
+- Every other field of the record has cross-references (camera bytes → `BS_CameraInit`, enemy flags/IDs → `setEnemyVisibility` / `setAllMonsterInfoFromDatSection` / `linkedToMonsterVisibility`, coordinates → `getZCoordinateEnemyBattleTask67`, levels → `setAllMonsterInfoFromDatSection`), but the four unknown blocks at `+0x40`, `+0x50`, `+0x60`, `+0x70` have **zero** cross-references, and all neighbouring array accesses are bounded to the 8 monster slots.
+
+They are therefore remnants of a scrapped feature (their 2/2/2/1 bytes-per-monster layout suggests planned per-monster attributes that were never hooked up), and can be repurposed freely by mods targeting the PC version. (This has only been verified against the PC executable; the PSX build has not been checked.)  
 
 ## Enemy Level
 

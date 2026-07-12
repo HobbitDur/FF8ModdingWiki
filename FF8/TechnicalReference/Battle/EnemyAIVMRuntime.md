@@ -28,13 +28,16 @@ BattleTurn_ProcessActionQueue
 - **MonsterAI_DispatchSection** routes to one of the AI script sections (see table below) and, for the sections backed by actual bytecode, calls `MonsterAI` with a pointer into the right code sub-section.
 - **MonsterAI** is the bytecode interpreter itself — it reads and executes the opcodes documented in [Battle Scripts](../battle-scripts/).
 
-Damage application also routes back into AI for counter/death behavior:
+Damage application also routes back into AI. The Pre-hit section (4) is dispatched **synchronously, inside the damage-application call itself** — after the engine computed damage and picked the default hit/death reaction animation, but before the hit data is committed:
 
 ```
-applyDamageAndHandleDeath
-  -> MonsterAI_DispatchSection(section=2 COUNTER)
-  -> MonsterAI_DispatchSection(section=3 DEATH)
+Battle_applyDamage (per target)
+  -> applyDamageAndHandleDeath
+       -> MonsterAI_DispatchSection(section=4 PRE-HIT)   // runs inline, mid-hit
+  -> computeTargetData                                   // commits hit data (incl. reaction animation)
 ```
+
+This inline timing is what allows the `setHitAnim` opcode to override the reaction animation of the very hit being processed (see [Battle Scripts](../battle-scripts/)), and why launching attacks from the Pre-hit section crashes: the engine is still resolving the current action. Counter (2) and Death (3) behavior is queued as battle tasks and runs after the hit resolves.
 
 ## Data source
 
@@ -92,6 +95,7 @@ For party slots (`0..2`), only sections 0, 1 and 4 run through the normal `Monst
 | Stop | Opcode `0x00` (`stop`, shown as `return` in [Battle Scripts](../battle-scripts/)) ends script execution |
 | Unused / no-op | Opcodes `0x0A`, `0x10`, `0x14`, `0x21` (10, 16, 20, 33) have no assigned meaning and fall through to a default no-op case |
 | Branching | Opcode `0x23` (35, `jump`) reads a 16-bit jump; opcode `0x02` (`if`) conditionally skips by byte count |
+| Berserk override | When the Turn section is requested for a monster with the Berserk status, its script is **skipped entirely**: the interpreter instead runs a small hardcoded fallback that picks a random alive player character as target and uses ability line 0. This is why Berserk-ed monsters lose all scripted behavior |
 
 ## Runtime variables
 

@@ -90,13 +90,11 @@ Starts at \~0x5d4 (see How the engine handles this file?). \[.text:00509820\]
 
 #### Camera Setting
 
-| Offset | Length                      | Description                       |
-|--------|-----------------------------|-----------------------------------|
-| 0      | char (based on disassembly) | CameraAnimMode?                   |
-| 1      | byte?                       | StopEnemyBeforeAnim?              |
-| 2      | Bitfield? (1B)              | UHM?                              |
-| 3      | ???                         | DefaultEndofCameraPosition\_Zoom? |
-| 4      | ???                         | ???                               |
+This 24-byte block is not a fixed structure: it is **byte-code** executed every frame by the shared battle animation-sequence VM (`computeAnimationSequence`, `0x50DB40` — the same interpreter used by [monster animation sequences](../monster-files-c0mxxxdat/section-5-animation-sequences/) and [camera sequences](../monster-files-c0mxxxdat/section-6-camera-sequence/)). `BS_UpdateCameraSequence` (`0x509610`) runs it with the camera opcode handlers (opcodes `< 0xC0` are camera actions dispatched by `a2ParamAnimSeqForCamera` at `0x509810`; `0xC0`+ are the generic VM control/arithmetic opcodes).
+
+This script drives the battle-intro camera. Stage scripts typically start with camera opcode `05 00` = "play the camera animation whose ID is read from camera variable 0" — and variable 0 is filled at battle load with the encounter's [camera data byte from scene.out](../battle-structure-sceneout/#camera-data). This is how each encounter picks its intro camera animation out of the stage's collection below.
+
+Example — `a0stg000.x` camera setting bytes: `05 00 C3 10 E5 7F C1 00 CB 7F EA 06 E6 07 E6 02 01 ...` (play anim from var 0, then loop while the camera-animation-playing flag is set, then end).
 
 #### Camera Animations Collection
 
@@ -109,7 +107,7 @@ Starts at \~0x5d4 (see How the engine handles this file?). \[.text:00509820\]
 
 ##### CameraAnimationSet
 
-Seems to be 8 pointers in each set.
+Each set holds exactly **8** animation pointers: the engine masks the requested animation index with `& 7` (`BS_GetCameraAnimationPointer`, `0x503520`). The same function bounds-checks the requested set index against `NumOfSets` and silently ignores the request if it is out of range (no animation plays).
 
 | Offset      | Length                           | Description     |
 |-------------|----------------------------------|-----------------|

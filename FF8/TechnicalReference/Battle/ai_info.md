@@ -12,7 +12,7 @@ Each section contains code that is executed at different times during the battle
 - Turn: executes once the monster's ATB bar fills. This happens after the monsters turn counter is incremented.
 - Counter: executes after the monster is affected by a battle command. Note that this means its impossible to change a monsters stats/elemental resists before it takes damage, and that it cannot detect _Sleep_.
 - Death: executes when the monster’s HP reaches 0 or it is afflicted with the *Death* status.  (Eject may not trigger this section - this needs further testing.)
-- Pre-Counter: similar to counter but executed before it. Needs further testing. Seems to be used mostly for checking if the monster has the *Death* status and then change its animation. Ifs, variable assignments and stat changes can also be used. Launching an attack from this section crashes the game.
+- Pre-Counter: similar to counter but executed before it. Unlike the other sections, pre-counter runs **synchronously inside the damage-application code**, at the exact moment the hit is being resolved: the engine has already computed the damage and picked the default hit/death reaction animation, but has not yet committed the hit data. This unique timing is what gives pre-counter its special powers: it is the only section where **_setHitAnim_** works (it overrides the reaction animation for the very hit being processed — the classic vanilla use is checking for the *Death* status and swapping in a custom death animation), and it is also why launching an attack from this section crashes the game (the engine is in the middle of resolving another action). Ifs, variable assignments and stat changes can also be used safely here.
 
 The order of execution when a monster is attacked is: **pre-counter** -> **death** (if killed) -> **counter**.  
 Note: **pre-counter** code will **ONLY** be executed after an attack that kills a monster if the monster's **death** section has code in it (apart from "return").  
@@ -387,9 +387,15 @@ Use one ability, requires **_target_** to have been used.
 ---
 
 
-## Opcode 0x0D (13) - unknown13
+## Opcode 0x0D (13) - noOp13
 
-Seems to jump to the op code 25 (doNothing) and just save the param.
+*(Previously documented as `unknown13`; renamed once its behavior was confirmed.)*
+
+Confirmed via decompile (2026-07): reads its 1-byte parameter into a scratch variable that nothing consumes, then continues to the next opcode (it shares its exit path with **_doNothing_**). It is a true 2-byte no-op with no side effect. Not used by any monster in the vanilla game.
+
+| Opcode | IfritAI name | Size | Short description |
+|--------|--------------|------|-------------------|
+| 0x0D   | noOp13       | 2    | No-op; parameter is read then discarded |
 
 ---
 
@@ -828,32 +834,41 @@ Sets this monster's Enabled flag to _True_.
 
 The 30 opcodes above are the ones that had a full write-up. IfritAI's reference data (`ai_vanilla.json`) confirms 59 opcodes total exist, so the following 25 were missing from this page entirely. They're real, working opcodes — just not documented in as much depth yet. Descriptions below are confirmed against the decompiled engine code (2026-07); anyone expanding these into full sections (with worked examples, like the ones above) would be doing the wiki a favor.
 
-Two of these opcodes were previously misnamed in IfritAI's reference data and have been **renamed** after this verification pass — see the callouts below.
+Six of these opcodes were previously misnamed (or named before their behavior was understood) in IfritAI's reference data and have been **renamed** after this verification pass — see the callouts below:
+
+| Old name | New name | Why |
+|----------|----------|-----|
+| `remain` | `vanish` | The code silently removes the monster from battle — the opposite of "remaining" |
+| `addMaxHP` | `addCurrentHP` | The code writes current HP, never max HP |
+| `anim` | `setHitAnim` | It doesn't play an animation — it sets the hit/death **reaction** animation of the current hit (pre-counter only) |
+| `unknown13` | `noOp13` | Behavior is now known: a verified no-op |
+| `enterAlt` | `enterWithAnim` | "Alt" said nothing; the actual difference from `enter` is the played entrance animation |
+| `targetAllySlot` | `targetBattleSlot` | The parameter is a raw battle slot, and nothing restricts it to allies |
 
 | Opcode | IfritAI name | Size | Description | Notes |
 |--------|--------------|------|--------------|-------|
-| 0x05 (5) | prepareAnim | 1 | Stores an animation ID for later use (queue-for-later, same pattern as prepareMagic/prepareMonsterAbility) | |
-| 0x09 (9) | anim | 1 | Plays an animation ID immediately | |
+| 0x05 (5) | prepareAnim | 1 | Sets the animation-sequence ID ([section 5](../monster-files-c0mxxxdat/section-5-animation-sequences/)) that will be used when the stored action is launched with **_usePrepared_**. Note that **_use_**/**_useRandom_** overwrite this with the ability's own animation from section 7, so it only has an effect on the prepare→usePrepared path | Used by monsters 11, 12, 91, 109, 122, 124, 126 |
+| 0x09 (9) | **setHitAnim** *(renamed from `anim`)* | 1 | Sets the hit/death **reaction** animation (a [section 5](../monster-files-c0mxxxdat/section-5-animation-sequences/) sequence ID) that this monster plays for the **hit currently being resolved**. How it works: when a hit lands, the engine first derives the default reaction animation from the attack's kernel data (its `animationTriggered` byte, with miss = dodge and crit = stagger overrides), *then* runs the monster's pre-counter section, *then* commits the value into the hit data. An opcode 9 call inside pre-counter therefore lands in exactly the right window to override the reaction. Outside pre-counter (Init/Turn/Counter/Death) the value is recomputed before being read, so it does nothing — which is why earlier testing from the Turn section showed "no impact in game". The engine's own default for a normal death is sequence **3**, which is why almost every vanilla usage is `setHitAnim(3)` guarded by a Death-status check (force the standard death animation), while special monsters use custom sequences (12–16, 36, 49, 59) for unique death/hit reactions | **Renamed 2026-07.** Used by ~25 vanilla monsters, exclusively in the pre-counter section |
 | 0x19 (25) | doNothing | 1 | Reads and discards one padding byte; a true no-op | |
 | 0x1A (26) | printAndLock | 1 | Displays a battle message and blocks further script execution until that message finishes displaying | |
-| 0x1B (27) | enterAlt | 2 | Alternate "enter combat" for a target slot. Internally reuses the same command as Phoenix Pinion/kamikaze revival to bring the monster in | Rarely used; not fully worked out yet |
+| 0x1B (27) | **enterWithAnim** *(renamed from `enterAlt`)* | 2 | Makes the monster in encounter slot `{param1}` enter combat **with an entrance action/animation played immediately** (battle slot = param1 + 3). Internally it queues and executes the same command family as the Phoenix-Pinion/kamikaze effects (sub-type 3), raises the same internal flag as **_prepareSummon_**, then makes the monster present (loaded, visible, targetable) once the entrance animation unlocks. This is the "scripted reinforcement with fanfare" variant of **_enter_**: compare `c0m074` (Biggs), which uses `enterWithAnim(1, 0)` for Wedge's dramatic entrance but plain `enter(2)` for a silent reinforcement | **Renamed 2026-07.** Param2 is passed down as the command's target-slot sub-parameter; its exact role is still unconfirmed |
 | 0x1E (30) | specialAction | 1 | Queues a special action by ID, indexing the special action list | |
 | 0x22 (34) | printAlt | 2 | Displays a battle message with a configurable wait/delay time (2nd parameter). Not used by any monster script | |
 | 0x23 (35) | jump | 2 | The raw unconditional jump — this is what implements **_if_**'s else/endif branches under the hood | See [Enemy AI VM Runtime](../enemy-ai-vm-runtime/) |
 | 0x26 (38) | targetStatus | 4 | Builds a target mask from all actors matching a status condition (target type, comparator, status ID) | |
 | 0x27 (39) | autoStatus | 2 | Sets or clears a status flag on self. Status IDs ≥ 16 write to the status_2 field (offset by 16), IDs < 16 write to status_1 | |
-| 0x2B (43) | targetAllySlot | 1 | Targets an ally in a specific encounter slot (builds a single-bit target mask). The code itself is a simple one-liner; the reference data's note about needing `assignSlot` first looks like a soft/script-level dependency rather than a hard code one | |
+| 0x2B (43) | **targetBattleSlot** *(renamed from `targetAllySlot`)* | 1 | Targets a **battle slot** directly: sets the pending target mask to `1 << param`, with **no +3 conversion** — so the parameter is a raw battle slot (0–2 = characters, 3+ = monsters), *not* an encounter slot as previously believed, and nothing in the code restricts it to allies. The old "seems to require assignSlot" note is now fully explained by its only vanilla user, `c0m124` (Mobile Type 8): the script first pins its two probes with `assignSlot(4, 4)` and `assignSlot(5, 5)` (encounter slot into that *same-numbered* battle slot — which is why the parameter was mistakable for an encounter slot), then uses `targetBattleSlot(4)` / `targetBattleSlot(5)` to aim its revival abilities at them. Without the assignSlot pinning, the probes' battle slots wouldn't be predictable and the hardcoded values would miss | **Renamed 2026-07** |
 | 0x2C (44) | **vanish** *(renamed from `remain`)* | 0 | Silently removes this monster from battle: sets Death status, Not Targetable, and clears the "enabled" flag — with no death sequence/message. The old name `remain` described the opposite of what the code does | **Renamed 2026-07.** Only known to be used by monster IDs 87 and 91 — worth checking those scripts to see if it's used to hide a "shell" slot while another part of the same monster keeps fighting |
 | 0x2D (45) | elemDmgMod | 3 | Writes a 16-bit value into a per-monster local-var slot indexed by element ID; some later damage calculation presumably reads it back as a resistance modifier. IfritAI encodes the authored percentage as `900 - percent` when compiling — this transform is unverified against actual in-game damage output | |
 | 0x31 (49) | giveGF | 1 | Gives the player a specific GF and records it in the save data | Used by Tomberry |
 | 0x32 (50) | prepareSummon | 0 | Sets an internal "preparing a summon" flag; no parameters | |
 | 0x33 (51) | activate | 0 | Queues an "activate" battle task; no parameters | |
-| 0x35 (53) | loadAndTargetable | 1 | Loads a monster into a slot and queues it to become targetable once its intro animation finishes | |
+| 0x35 (53) | loadAndTargetable | 1 | Finalizes a monster's entrance: once the current animation unlocks, clears the NOT Loaded, NOT Visible **and** NOT Targetable flags on the given battle slot, recomputes the enable masks and starts the slot's periodic effects (Regen ticks etc.). Parameter value 209 means "the slot filled by the most recent **_enter_**/**_assignSlot_**" | Typical pattern: `assignSlot` → … → `loadAndTargetable(209)` |
 | 0x36 (54) | gilgamesh | 0 | Sets the savegame flag that marks Gilgamesh as available | |
 | 0x37 (55) | giveCard | 1 | Adds a specific Triple Triad card to the battle's card-drop list | |
 | 0x38 (56) | giveItem | 1 | Adds a specific item to the battle's item drop/steal list | |
 | 0x39 (57) | gameOver | 0 | Forces a Game Over | |
-| 0x3A (58) | targetableSlot | 1 | Clears the Not Targetable flag on a specific encounter slot | |
-| 0x3B (59) | assignSlot | 2 | Assigns a monster to an encounter slot; passing slot `0` makes it auto-search for the first free monster slot instead of using a fixed one | |
+| 0x3A (58) | targetableSlot | 1 | Clears **only** the NOT Targetable flag on the given **battle slot** (unlike **_loadAndTargetable_**, it does not touch NOT Loaded / NOT Visible), then queues an enable-mask recompute. The "unexpected results" reported when testing it likely come from using it on a slot that isn't loaded/visible yet, or from passing an encounter slot where a battle slot is expected | |
+| 0x3B (59) | assignSlot | 2 | Brings the monster from encounter slot `{param1}` into battle slot `{param2}` — identical to **_enter_** except the destination battle slot is explicit. Battle slot `0` = auto-search the first free monster slot (confirmed in code; fails with slot 255 if none is free). Loads the monster's skeleton/weapon/animations, records the slot as "last entered" (consumable by `loadAndTargetable(209)`), and makes it present once the animation unlocks | Used by monsters 124 and 126 |
 | 0x3C (60) | **addCurrentHP** *(renamed from `addMaxHP`)* | 1 | Adds a signed 16-bit value directly to the monster's **current** HP. The old name and its own description ("Increase max HP (but not current)") both claimed it touched max HP — the decompiled code only ever writes `current_hp`, never `max_hp` | **Renamed 2026-07.** Negative values presumably work as direct damage; worth confirming there's no clamp to max HP |
 | 0x3D (61) | proofOfOmega | 0 | Gives the player "Proof of Omega". The item ID (127) is hardcoded in the engine function, not passed as a script parameter | Only used by monster ID 114 (Omega Weapon) |
