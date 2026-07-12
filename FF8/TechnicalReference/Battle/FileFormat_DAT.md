@@ -7,7 +7,7 @@ permalink: /technical-reference/battle/monster-files-c0mxxxdat/
 ---
 
 1. TOC
-{:toc}
+   {:toc}
 
 ## Header
 
@@ -144,7 +144,8 @@ More info on [OpenVIII](https://github.com/MaKiPL/OpenVIII/blob/4ac151daad7cd147
 
 ### Animation frame
 
-Each frame is one vector location and BonesCount*RotationVectorData. Vector location is used to manipulate the model in world space, where all the animation is rotating each bone.
+Each frame is one vector location and BonesCount*RotationVectorData. Vector location is used to manipulate the model in world space, where all the animation is
+rotating each bone.
 The frames work accumulatively, so in order to get the final rotation at in example frame 5, you have to add all rotations from frames 0,1,2,3 and 4.
 
 | Offset | Length                          | Description                                                              |
@@ -175,7 +176,8 @@ The frames work accumulatively, so in order to get the final rotation at in exam
 | Varies | 1 BIT                       | bUnk3       |
 | Varies | 0 if bUnk3==0, else 16 BITs | Unk3 data   |
 
-We don't know what the Unk1, Unk2 and Unk3 do. Enemies works without them, but as it's important to keep up with the current bit position, we need to read it anyway
+We don't know what the Unk1, Unk2 and Unk3 do. Enemies works without them, but as it's important to keep up with the current bit position, we need to read it
+anyway
 
 ### Position type
 
@@ -197,7 +199,8 @@ Position is BIT length. First we read the count of bits to read by reading first
 
 ### Rotation type
 
-Rotation is also BIT length. First read first bit to see, if there's rotation data. If no, continue. If yes, then read the rotation data similar to Position Type
+Rotation is also BIT length. First read first bit to see, if there's rotation data. If no, continue. If yes, then read the rotation data similar to Position
+Type
 
 | Offset  | Length           | Description                           |
 |---------|------------------|---------------------------------------|
@@ -218,7 +221,6 @@ Rotation is also BIT length. First read first bit to see, if there's rotation da
 
 Optional section, often empty.
 It contains info on dynamic texture (like blink-eyes)
-
 
 It starts with a list of offset followed by data.
 The offset list start with a 0 offset which must be ignored. Each offset is 2 bytes.
@@ -251,10 +253,10 @@ struct UV_VRAM
 
 The number of `dest_uv` depends of the `number_of_destination`.
 
-Important point is that all UV and sprite width/height is expressed in VRAM value, which mean you need to multiply the X value by 2 to get the pixel value (Y is already in pixel).
+Important point is that all UV and sprite width/height is expressed in VRAM value, which mean you need to multiply the X value by 2 to get the pixel value (Y is
+already in pixel).
 
 TODO: Add the monster list that have an animated texture section.
-
 
 ## Section 5: Animation sequences
 
@@ -269,6 +271,25 @@ Contain sequence of animation. They define specific movement/action when using a
 Some old info can be found here: [Qhimm message](https://forums.qhimm.com/index.php?topic=19362.0)
 
 Now how it works. The sequence animation is composed of opcode, followed by parameters (often 1, sometimes 2 or 0). Each op code define an action to do.
+
+### Execution model
+
+The sequences are executed by a small byte-code VM (`computeAnimationSequence` at `0x50DB40` in FF8_EN.exe). The VM itself only implements the arithmetic
+opcodes (`C0`-`E5`) and the conditional jumps (`E6`-`F3`); everything below `0xC0` is delegated to a callback. The same VM is reused with different callbacks
+for:
+
+- **Entity sequences** (this section 5): callbacks `AnimSeq_DispatchActionOpcode` (opcodes &lt; 0xC0), `AnimSeq_ReadSpecialVar_C3` (C3-family special reads) and
+  `AnimSeq_WriteSpecialVar_E5` (E5 special writes).
+- **Camera sequences** (section 6): same VM with camera-specific callbacks (see section 6).
+
+The per-frame driver (`AnimSeq_UpdateEntityPerFrame` at `0x504290`) runs every battle frame:
+
+1. If a *background sequence id* was set (opcode `9A`), that sequence is executed first, every frame.
+2. The main sequence resumes at the byte offset saved from the previous frame (`currentSequenceCurrentByte`).
+3. The interpreter runs until an opcode *pauses* it: queuing an animation (opcode &lt; 0x80), `A1` (yield), `A9` (terminate), `AC`, or `B9` (frame wait). The
+   current byte offset is then saved and execution resumes there the next frame.
+
+All `int16` parameters are **little-endian**.
 
 ### Opcode between C0 and E3: set a "current_value"
 
@@ -312,18 +333,47 @@ Do opcode & FC:
 #### Case 3 param < 0x80:
 
 On each case a specific code is done, often it just read a value in memory that as a specific purpose.
-Param values known:
+Full list (from `AnimSeq_ReadSpecialVar_C3` at `0x5044B0`):
 
-- Param < 0x07: current_value = *(BATTLE_STATE_CONTROLER + 2 * param + 20); BATTLE_STATE_CONTROLER is at 0x1D98200
-- 0x08: return_value = BATTLE_STATE_CONTROLER->some_flag;
-- 0x09:  return_value = ACTIVE_ANIM_CMD->current_frame;
-- 0x0A:  return_value = ACTIVE_ANIM_CMD->total_frames;
-- 0x0C: return_value = Randomly generated value between [0:32767]
-- 0x10: Speed depending of distance to target. On itself, speed_factor = 1000. On a target, speed_factor = 5000*distance/4096.
-- 0x11: Speed from 0x10 adjusted: Speed_0x10 - (2000*(attacker_speed_factor + target_speed_factor)/4096). Set to 1000 if on itself.
-- 0x1A: Angle between the target and the attacker
-- 0x33: Combat scene ID
-- Param > 0x77: current_value = *(E5_7F_save + 2 * (0x7F - param)); so at 0x7F it's E5_7F_save
+| Param              | Value read                                                                                                                  |
+|--------------------|-----------------------------------------------------------------------------------------------------------------------------|
+| 0x00-0x07          | Local variable `e5_data_saved[param]` of the entity (written by E5 0x00-0x07)                                               |
+| 0x08               | Battle state flags (`some_flag`)                                                                                            |
+| 0x09               | Current frame of the active animation                                                                                       |
+| 0x0A               | Total frames of the active animation                                                                                        |
+| 0x0B               | Base sequence id (`basedAnimSeq`)                                                                                           |
+| 0x0C               | Random value [0..32767]                                                                                                     |
+| 0x0D               | Position Z                                                                                                                  |
+| 0x0E               | Position X                                                                                                                  |
+| 0x0F               | Position Y                                                                                                                  |
+| 0x10               | Speed depending of distance to target. On itself, speed_factor = 1000. On a target, speed_factor = 5000\*distance/4096      |
+| 0x11               | Speed from 0x10 adjusted: Speed_0x10 - (2000\*(attacker_speed_factor + target_speed_factor)/4096). Set to 1000 if on itself |
+| 0x12               | Stored sine (set via E5 0x12)                                                                                               |
+| 0x13               | Stored cosine (set via E5 0x13)                                                                                             |
+| 0x14-0x16          | Weapon anim data words at +28/+30/+32 (writable via E5 0x14-0x16), 0 if no weapon                                           |
+| 0x17               | Y rotation & 0xFFF                                                                                                          |
+| 0x18               | Slot id of the current target                                                                                               |
+| 0x19               | Hit flag 2 of the current target (`hitType2 & 2`)                                                                           |
+| 0x1A               | Angle between the target and the attacker & 0xFFF                                                                           |
+| 0x1B               | Own slot id                                                                                                                 |
+| 0x1C               | 2048 if monster; else 0 if (rotY & 0xFFF) <= 2048, else 4096                                                                |
+| 0x1F               | Animation status flags (`anim_status`)                                                                                      |
+| 0x22               | Back attack / preemptive strike info                                                                                        |
+| 0x23               | Camera flag (shared with camera sequences)                                                                                  |
+| 0x24               | Model size scale                                                                                                            |
+| 0x25 / 0x26 / 0x27 | Z / Y / X scale                                                                                                             |
+| 0x28               | 1 if GF summon data loaded, else 0                                                                                          |
+| 0x29               | Unknown byte                                                                                                                |
+| 0x2A               | Animation speed factor                                                                                                      |
+| 0x2C               | Original sceneout position X                                                                                                |
+| 0x2E               | 1 if another entity is alive and free (not dead/stopped/petrified), else 0                                                  |
+| 0x33               | Combat scene ID                                                                                                             |
+| 0x35               | Y offset of target's effect-spawn point 0xF1 above its base Y                                                               |
+| 0x36               | Y offset of target's effect-spawn point 0xF0 above its base Y                                                               |
+| 0x37               | Invisibility flag                                                                                                           |
+| > 0x77             | `current_value = *(E5_7F_save + 2 * (0x7F - param))`; so at 0x7F it's E5_7F_save[0]                                         |
+
+Unlisted values return 0.
 
 ### E5 case:
 
@@ -333,188 +383,243 @@ Param >= 0x80: Write to stack current_value at param
 
 #### Param < 0x80
 
-- Param < 0x08: *(BATTLE_STATE_CONTROLER + 2 * sequence_command_param_1 + 20) = current_value_computed; BATTLE_STATE_CONTROLER is at 0x1D98200
-- 0x08: *(BATTLE_STATE_CONTROLER + 44) = current_value_computed;
-- 0x0F: *(BATTLE_STATE_CONTROLER + 40) = current_value_computed;
-- 0x17: rotate the sequence (0-4096)
-- 0x1D: move hit particle position ?
-- 0x1E: move selection cursor position ?
-- 0x21: same as 0x31
-- 0x24: set enemy model scale (4096 is 1x scale)
-- 0x25: set enemy's Z scale
-- 0x26: set enemy's Y scale
-- 0x27: set enemy's X scale
-- 0x2C: set enemy's X position
-- 0x2D: set target's Y scale? (seems to make target flat)
-- 0x30: set target's rotation (forwards/backwards) (gets reset when target comes back from an attack)
-- 0x31: set target's rotation (left/right) (gets reset when target comes back from an attack)
-- 0x32: set target's rotation (lean to a side) (gets reset when target comes back from an attack)
-- 0x34: set target's Y position
-- Param > 0x77: *(dword_1D9820C + 2 * (127 - sequence_command_param_1)) = current_value_computed; (so 0x7F save at 0x1D9820C)
+Full list (from `AnimSeq_WriteSpecialVar_E5` at `0x5048E0`):
 
-### 0xE6 < opcode < 0xF3
+| Param              | Effect                                                                                                                   |
+|--------------------|--------------------------------------------------------------------------------------------------------------------------|
+| 0x00-0x07          | Write local variable `e5_data_saved[param]` (readable via C3 0x00-0x07)                                                  |
+| 0x08               | Write battle state flags (`some_flag`)                                                                                   |
+| 0x0B               | Set base sequence id (`basedAnimSeq`)                                                                                    |
+| 0x0D               | Set position Z                                                                                                           |
+| 0x0E               | Set position X                                                                                                           |
+| 0x0F               | Set position Y                                                                                                           |
+| 0x12               | Compute and store sin(current_value) (readable via C3 0x12)                                                              |
+| 0x13               | Compute and store cos(current_value) (readable via C3 0x13)                                                              |
+| 0x14-0x16          | Write weapon anim data words at +28/+30/+32 (no-op if no weapon)                                                         |
+| 0x17               | Rotate the entity (Y rotation, 0-4096)                                                                                   |
+| 0x1D               | Move hit particle position (written into skeleton header)                                                                |
+| 0x1E               | Move selection cursor position (written into skeleton header)                                                            |
+| 0x20               | Hide/show a model part: value > 0 hides section-2 object (value-1), value < 0 shows object (-1-value). See opcodes 81/A6 |
+| 0x21               | Same as 0x30 (target forwards/backwards rotation)                                                                        |
+| 0x24               | Set model scale (4096 is 1x scale)                                                                                       |
+| 0x25 / 0x26 / 0x27 | Set Z / Y / X scale                                                                                                      |
+| 0x2A               | Set animation speed factor                                                                                               |
+| 0x2B               | Set the entity's camera var (readable from camera sequences via camera-C3 0x15)                                          |
+| 0x2C               | Set X position (also updates original sceneout X)                                                                        |
+| 0x2D               | Set target's Y scale (makes target flat)                                                                                 |
+| 0x2F               | Set a global linked to battle stage 137 (Edea's room)                                                                    |
+| 0x30               | Set target's rotation (forwards/backwards) (gets reset when target comes back from an attack)                            |
+| 0x31               | Set target's rotation (left/right) (gets reset when target comes back from an attack)                                    |
+| 0x32               | Set target's rotation (lean to a side) (gets reset when target comes back from an attack)                                |
+| 0x34               | Set target's Y position                                                                                                  |
+| > 0x77             | `*(E5_7F_save + 2 * (127 - param)) = current_value` (so 0x7F writes E5_7F_save[0])                                       |
 
-Those are conditional jump (if)
-Those value check the current_value and decide to either continue the flow or jump the number of hex value define by the param
+### 0xE4: set to zero (BUGGED)
 
-- E6: Jump forward X bytes, X being the param value (and a signed value).
-- E7 to EC: If condition is met, Jump X bytes, X being the param value (and a signed value). Else jump just one (so the param itself)
-    - E7: current_value > 0
-    - E8: current_value >= 0
-    - E9: current_value == 0
-    - EA: current_value != 0
-    - EB: current_value <= 0
-    - EC: current_value < 0
+`E4` sets `current_value = 0` but **never advances the instruction pointer**: the interpreter re-reads the same byte forever and the game hangs. Confirmed in
+FF8_EN.exe (`xor esi, esi` then jump back to the opcode fetch). Do not use it; use `C1 00` instead.
+
+### 0xE6 to 0xF3: jumps
+
+Those are conditional jumps (if). They check `current_value` and either continue the flow or jump. The jump target is **relative to the address of the jump
+opcode itself**: `new_position = opcode_position + offset` (the offset is signed, so backward jumps are possible — offset 0 would hang).
+
+Byte-offset versions (1 signed byte param, opcode size 2):
+
+- E6: Unconditional jump
+- E7: jump if current_value > 0
+- E8: jump if current_value >= 0
+- E9: jump if current_value == 0
+- EA: jump if current_value != 0
+- EB: jump if current_value <= 0
+- EC: jump if current_value < 0
+
+int16 versions (2 bytes little-endian offset, opcode size 3), same conditions:
+
+- ED: Unconditional jump
+- EE: current_value > 0
+- EF: current_value >= 0
+- F0: current_value == 0
+- F1: current_value != 0
+- F2: current_value <= 0
+- F3: current_value < 0
+
+When the condition is not met, execution continues after the parameter (opcode + 2 bytes for E6-EC, opcode + 3 bytes for ED-F3).
 
 ### Opcode < 0x80
 
-This queue the animation by the ID defined in section 3
+This queues the animation by the ID defined in section 3 and pauses the sequence until the animation finishes.
 Does *(BATTLE_STATE_CONTROLER + 44) |= 0xAu; and end local sequence
 
-## 0x80 < Opcode < C0
+## 0x80 <= Opcode < C0
 
-Each one of those opcode are special:
+Full opcode list (decoded from `AnimSeq_DispatchActionOpcode` at `0x504BB0` in FF8_EN.exe). Opcodes not listed (87-8F, B3) are no-ops with no parameter.
 
-- 85: Hide the yellow triangle of chara selection
-- 86: Show the yellow triangle of chara selection
-- 94: Toogle the shadow
-- 95: Reset current position to original position (X and Z)
-- 97: *param_address_anim_seq = linkedToSoundAnimSeq(*param_address_anim_seq, 128);
-- 99 XX..XX: Reated to B1 with a bool inversed. The number of parameters are infinite and finish by FF.
-- A0 XX: Queue animation XX and  *(BATTLE_STATE_CONTROLER + 44) |= 2u;
-- A1: End local sequence
-- A2: Seems to be the end of seq animation, but didn't confirm on the code
-- A5 XX: Call some function depending of the parameter, which trigger particle and sound effect
-    - 00: sub_574C80 => For character/ Boss green magic effect
-    - 01: sub_5742A0 => For GF summon
-    - 02: sub_5737C0 => Normal limit break
-    - 03: sub_574260 => Finisher limit break
-    - 04: sub_573560 => Enemy magic effect
-    - 05: sub_5736E0 => Looks a bit like 04
-- A8: Makes the enemy fade away or fade in, based on the following byte.
-    - param is 0x01: Slowly dissapear (but re-appear suddenly at the end)
-    - param 0x02 or 0x0C: re-appear (Make the animation of re-appearing, so dissapear suddenly to re-appear slowly)
-    - param is 0x03: Make it Invisible (by dissapearing and staying invisible)
-    - param is 0x06: Leave the combat by dissapearing (no xp gained)
-- AA: Dunno
-- AD X1 X2 X3 X4: Call AE and insert AE second param as FF -> AE(X1, FF, X2, X3, X4)
-- AE X1 X2 X3 X4 X5: Dunno. Third and fourth param is actually a int16. Seems to move the target
-    - X1: Called *frame selector*. Several cases: (but value not really understood)
-        - FF: Special case where the start point is the target position
-        - 0x00 to 0xFE: Starting point is the attacker position
-    - X2: Special cases for FF where some computation is ignored. Should define middle point between first param and second param.
-    - X3-X4: int16 value in little endian.
-    - X5: Define time for how long the target stay to new location
-- B0 XX..XX: From 2 to 6 param. Second param is a flag that define how many param and what to do with them. Seems to launch some particle effect.
-    - second param & 1: One more param
-    - second param & 2: One more param
-    - second param & 4: One more param
-    - second param & 8: One more param in certain condition
-    - second param & 40: 6 param and param are actually 3 int16
-- B1 XX..XX:  Reated to 99 with a bool inversed. The number of parameters are infinite and finish by FF. Play some SFX.
-- B7: Dunno
-- B8 X1 X_2 X3: Play a sound (call BdPlaySy(X1, v9, v6)). Either 2 or 3 param depending of condition
-    - X1: Some value for the sound
-    - X2: Flag:
-        - If Flag & 0x4: v6 = 128
-        - Else:
-            - If Flag & 0x1: Extract target position and compute v6 with it
-            - Else: Extract attacker position and compute v6 with it
-        - If Flag & 0x02: v9 is X3 (third param exist)
-        - Else: v9 is 0
-- B9 XX : Set BATTLE_STATE_CONTROLER + 1 to XX - 1
-- BA: Seems to play animation (but need to be already loaded)
-- BB: Handle text
-- BC XX: Seems to do nothing
-- B4: Seems to jump to other anim sequence
-- B9 XX: Unknown
-- BD XX XX: No idea
-- BE XX XX: No idea
-- BF: No idea
+| Opcode             | Params | Description                                                                                                                                                                                                                                                                                                                                          |
+|--------------------|--------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 80 XX              | 1      | Step **dynamic texture animation** XX (section 4). If `number_destination` > 0: advances the frame counter (data byte 6 = speed in 1/8th frame units, byte 7 = counter) and blits the next dest UV. If `number_destination` == 0: scrolls the texture region in VRAM by byte 6 pixels (UV scroll, e.g. conveyor/water)                               |
+| 81 XX              | 1      | Restore hidden model part XX: clears bit XX of the hidden-parts bitmask (set via E5 0x20) and runs a 15-frame re-attach effect                                                                                                                                                                                                                       |
+| 82                 | 0      | Set combat flag 0x40 (unknown purpose)                                                                                                                                                                                                                                                                                                               |
+| 83 XX              | 1      | Load battle stage camera/geometry (XX = load command bitmask)                                                                                                                                                                                                                                                                                        |
+| 84 XX              | 1      | Start a sine-wave vertex animation task (model wobble), XX = wave parameter                                                                                                                                                                                                                                                                          |
+| 85                 | 0      | Hide the yellow triangle of chara selection (clears the flag)                                                                                                                                                                                                                                                                                        |
+| 86                 | 0      | Show the yellow triangle of chara selection (sets the flag)                                                                                                                                                                                                                                                                                          |
+| 90 XX              | 1      | **Multi-part monster link**: XX < 3 unlinks the whole chain; 3 <= XX < 0x10 links self to monster slot XX; XX >= 0x10 links self to the loaded monster whose com_id == XX (used by Ultimecia final form, etc.)                                                                                                                                       |
+| 91 XX YY           | 2      | Print monster battle text XX with param YY (urgent text channel)                                                                                                                                                                                                                                                                                     |
+| 92 XX              | 1      | **Setup targeting context**: XX < 7 → target = slot XX (attacker unchanged); XX >= 7 → attacker = self, keep current target mask. Recomputes C3 0x10/0x11 speed factors, C3 0x18 target slot, C3 0x1A angle, and rotates the attacker toward the target                                                                                              |
+| 93 XX YY           | 2      | Trigger sequence YY on another entity: XX < 0x10 = slot id; XX >= 0x10 = every loaded entity (except self) with com_id == XX                                                                                                                                                                                                                         |
+| 94                 | 0      | Toggle the shadow                                                                                                                                                                                                                                                                                                                                    |
+| 95                 | 0      | Reset current position to original position (X and Z)                                                                                                                                                                                                                                                                                                |
+| 96 X1 X2 X3        | 3      | **Camera shake** (earthquake): offset interpolated from X1 to X2 over X3 frames, sign alternating every frame                                                                                                                                                                                                                                        |
+| 97                 | var    | Play actor sound effect: same encoding as B8 but plays through the actor SE path (`linkedToSoundAnimSeq(addr, 0x80)`)                                                                                                                                                                                                                                |
+| 98                 | var    | Same as 97, second variant (`linkedToSoundAnimSeq(addr, 0x81)`)                                                                                                                                                                                                                                                                                      |
+| 99 XX YY..FF       | var    | Queue **walk/step effect + sound** timeline on bone XX. Each following byte: bits 0-5 = frames to wait, bit 6 = skip effect, bit 7 = skip sound. List ends with FF                                                                                                                                                                                   |
+| 9A XX              | 1      | Set **background sequence id** XX: that sequence is executed every frame *before* the main one (cleared by writing 0; skipped while combat flag 0x08 is set)                                                                                                                                                                                         |
+| 9B XX YY           | 2      | Start texture animation XX with destination index computed through the C3 special-value reader from YY                                                                                                                                                                                                                                               |
+| 9C                 | 0      | Turn back (combat_flags  = TURN_BACK)                                                                                                                                                                                                                                                                                                                |
+| 9D                 | 0      | Mark self as dead/removed in the battle bookkeeping data (flag 0x40, status bit 0, setMaskEnable)                                                                                                                                                                                                                                                    |
+| 9E XX YY           | 2      | Move self smoothly toward entity slot XX, YY = speed/step parameter                                                                                                                                                                                                                                                                                  |
+| 9F XX..FF          | var    | **Blink timeline**: each byte = frame delay before toggling texture animation 0 on/off; ends with FF. The task auto-ends when the sequence changes                                                                                                                                                                                                   |
+| A0 XX              | 1      | Play animation XX *without* waiting; skipped if XX is already the current animation (unless in preparation phase)                                                                                                                                                                                                                                    |
+| A1                 | 0      | **Yield**: pause the sequence for this frame, resume here next frame                                                                                                                                                                                                                                                                                 |
+| A2                 | 0      | End of sequence: reset base rotation and jump to the next queued/auto sequence                                                                                                                                                                                                                                                                       |
+| A3                 | 0      | Set current sequence as base sequence; jump to the pending next sequence if it exists, else set the continue flag                                                                                                                                                                                                                                    |
+| A4                 | 0      | Set the preparation flag (0x4)                                                                                                                                                                                                                                                                                                                       |
+| A5 XX              | 1      | Trigger magic/limit effect (loads from magic.fs etc.). XX forced to 01 when battle flag 0x40000000 is set: <br>- 00: character/boss magic effect<br>- 01: GF summon<br>- 02: normal limit break<br>- 03: finisher limit break<br>- 04: enemy magic effect<br>- 05: like 04 (placeholder, unused)                                                     |
+| A6 X1 + 4×int16    | 9      | **Detach model part**: detaches section-2 object X1 from the skeleton and makes it fly off with initial velocity (vx, vy, vz); velocity decays 1/8 per frame, gravity +100/frame on Y. 4th int16 stored in the task (unknown use). The object is hidden via the hidden-parts bitmask (see E5 0x20 / opcode 81)                                       |
+| A7 XX              | 1      | Jump to sequence XX                                                                                                                                                                                                                                                                                                                                  |
+| A8 XX              | 1      | Fade / visibility: <br>- 01: slowly disappear (re-appears suddenly at the end)<br>- 02 or 0C: re-appear<br>- 03: disappear and stay invisible<br>- 06: leave combat by disappearing (no XP gained)                                                                                                                                                   |
+| A9                 | 0      | End sequence and terminate transforms (`TerminateSequenceAndUpdateTransforms`)                                                                                                                                                                                                                                                                       |
+| AA                 | 0      | Apply the pending **action result** (damage numbers, status, hit animation) to **all targets** at once                                                                                                                                                                                                                                               |
+| AB X1 X2 ... A1    | var    | **Renzokuken init**: reads two bytes, then scans the following opcodes until A1, summing the frame counts of each animation opcode into stage buckets (split at each A0). Used to build the R1-trigger timing                                                                                                                                        |
+| AC XX              | 1      | Restore the base model (undo model swap: comFileData = comFileDataBis, also for the weapon), reset rotation, queue sequence XX \| 0x1000 (auto-pick if XX = 0) and end the sequence                                                                                                                                                                  |
+| AD X1 X2X3 X4      | 4      | Same task as AE with the midpoint bone forced to FF: AE(X1, FF, X2X3, X4)                                                                                                                                                                                                                                                                            |
+| AE X1 X2 X3X4 X5   | 5      | **Drag the target**: per-frame task that pulls the target's position toward attacker bone X1 (X1 = FF: target's own base position; bit 7 of X1 selects the target reference point). X2 = second bone to average with (midpoint) unless FF. X3X4 = int16 bone interpolation factor. X5 = duration in frames. The target's shadow is hidden until done |
+| AF XX              | 1      | Trigger sequence XX on the current target                                                                                                                                                                                                                                                                                                            |
+| B0 XX FF ..        | var    | Spawn **hit particle effect on the attacker** (see flag table below)                                                                                                                                                                                                                                                                                 |
+| B1 XX YY..FF       | var    | Same as 99 but for the SFX variant (walk sound type 2)                                                                                                                                                                                                                                                                                               |
+| B2                 | 0      | Apply the action result to the current target, then **advance to the next target** (multi-target attacks)                                                                                                                                                                                                                                            |
+| B4 XX FF ..        | var    | Apply target hit reaction (snap-back if flagged) + spawn **hit particle effect on the target**. Same encoding as B0; the visual is skipped when the attack missed                                                                                                                                                                                    |
+| B5 / B6 X1 X2 (X3) | var    | Play local (monster .dat section 9 AKAO) sound X1. X2 = flag byte (see B8). X1 >= 7 unexpected                                                                                                                                                                                                                                                       |
+| B7                 | 0      | Apply the action result (damage/status/hit animation) to the current target                                                                                                                                                                                                                                                                          |
+| B8 X1 X2 (X3)      | var    | Play sound X1 from the general audio list. X2 flag byte:<br>- & 0x4: volume = 128<br>- else & 0x1: volume from target's position on screen, else from attacker's position<br>- & 0x2: one more param X3 = channel mask<br>When the attack missed, plays the miss sound instead                                                                       |
+| B9 XX              | 1      | **Wait XX - 1 frames** before executing the next opcode (pauses the interpreter)                                                                                                                                                                                                                                                                     |
+| BA                 | 0      | Advance the current animation by one frame (manual tick)                                                                                                                                                                                                                                                                                             |
+| BB                 | 0      | Print the pending battle text (ability/attack name), if one is flagged                                                                                                                                                                                                                                                                               |
+| BC XX              | 1      | Nop (parameter ignored)                                                                                                                                                                                                                                                                                                                              |
+| BD XX YY           | 2      | Start texture animation XX with destination index YY                                                                                                                                                                                                                                                                                                 |
+| BE XX              | 1      | Stop texture animation 0; XX != 0 sets the GF-hidden status flag (model hidden during GF summon), XX == 0 clears it                                                                                                                                                                                                                                  |
+| BF XX              | 1      | If the attack connected (hit animation set, no snap-back reaction pending, target not defending/invincible): trigger hit sequence XX on the target; else skip                                                                                                                                                                                        |
+
+### B0/B4 flag byte
+
+The second byte of B0/B4 defines the parameter count and the effect placement:
+
+| Bit                    | Meaning                                                                                                                                                                                                                  |
+|------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 0x01                   | One more byte (effect param 1)                                                                                                                                                                                           |
+| 0x02                   | One more byte (effect param 2; bit 7 of it is forced from the camera angle)                                                                                                                                              |
+| 0x04                   | One more byte (effect param 3)                                                                                                                                                                                           |
+| 0x08                   | Spawn the effect at a specific bone → one more byte (bone id). **Warning**: the game consumes this byte only when the attack hits; on a miss (B4) it would be executed as the next opcode. Vanilla data avoids this case |
+| 0x10                   | Spawn the effect at a random bone (no extra byte)                                                                                                                                                                        |
+| 0x20                   | Flip the effect direction (used with 0x08/0x10)                                                                                                                                                                          |
+| 0x40                   | Custom position → three more int16 LE (x, y, z)                                                                                                                                                                          |
+| none of 0x08/0x10/0x40 | Spawn the default effect on the entity                                                                                                                                                                                   |
 
 ### Example
 
-If we use the normal attack animation of bite bug, here for each opcode/param what it does:
+Normal attack sequence of the Bite Bug, fully annotated:
 
-- C3 11: Set current_value to adjusted speed
-- C5 64: Add 0x64 to current_value
-- E5 FF: Store current_value to stack 0xFF
-- C1 00: Set current_value to 0x00
-- CB FF: Substract to current_value value stored at 0xFF (so did actually put a minus in front of current_value)
-- E5 02: Store current_value to BATTLE_STATE_CONTROLER[02]
-- BB: Handle text
-- 08: Queue animation 08
-- A0 09: Queue animation 09
-- C3 0A: Set current_value to some angle
-- E5 7F: Save current_value to 0x1D9820C
-- C3 02: Set current_value to *(0x1D98218); (linked to E5_02_CASE)
-- C9 00: Substract 0 to current_value
-- E5 FF:  Store current_value to stack 0xFF
-- C3 FF: Read value from stack 0xFF
-- CF 09: Multiply the current_value by an angle
-- E5 FE: Store current_value to stack 0xFE
-- C3 FE: Set current_value to stack 0xFE
-- D3 0A: Divide current_value by an angle
-- E5 FD: Store current_value to stack 0xFD
-- C1 00: Set current_value to 0
-- C7 FD: Add to current_value value at stack FD
-- E5 0F: Set BATTLE_STATE_CONTROLER + 40 to current_value
-- A1: End local sequence
-- C3 7F: Set current_value to value stored at E5_7F_save
-- C5 FF: Add -1 to current_value
-- E5 7F: Save current_value to 0x1D9820C
-- E7 E1: Save current_value to stack 0xE1
-- A0 0A: Queue animation 0A
-- B9 06: Set BATTLE_STATE_CONTROLER + 1 to 05
-- 97: Linked to sound, seems no param but I could be wrong
-- 02: Queue anim 02
-- 01: Queue anim 01
-- BF 04: No idea
-- B4: Jump to some other anim seq ?
-- 1A: Queue animation 1A
-- 00: Queue animation 00
-- B9 04: Set BATTLE_STATE_CONTROLER + 1 to 03
-- 97 02 01: Cf upper
-- BF: Some sound effect ?
-- 04: Queue animation 04
-- B4 1A 00: Cf upper
-- B9 04: Set BATTLE_STATE_CONTROLER + 1 to 03
-- 97 02 01: cf upper
-- B4 1A 00 : cf upper
-- AA: Dunno
-- C3 08: Set current_value to BATTLE_STATE_CONTROLER + 44
-- DA 80: Current_value OR 0x80
-- E5 08 : set BATTLE_STATE_CONTROLER + 44 to current_value
-- C3 08: Set current_value to BATTLE_STATE_CONTROLER + 44
-- D9 08: current_value OR 0x08
-- E5 08: set BATTLE_STATE_CONTROLER + 44 to current_value
-- A1: End local sequence
-- A0 0B: Queue animation 0B
-- C3 0A: Set current value to some angle
-- E5 7F: Save current_value to 0x1D9820C
-- C1 00: Set current_value to 0
-- CB 02: Decrease current_value by the value at *(BATTLE_STATE_CONTROLER + 24);
-- E5 FF: Store current_value at stack 0xFF
-- C3 FF: Set current_value from stack 0xFF
-- CF 09: Multiply current_value by some angle
-- E5 FE: Write current_value to stack 0xFE
-- C3 FE: set current_value from stack 0xFE
-- D3 0A: Divide current_value by an angle
-- E5 FD: Write current_value to stack 0xFD
-- C3 02: Set current_value to value at *(BATTLE_STATE_CONTROLER + 24);
-- C7 FD:  Add to current_value value at stack FD
-- E5 0F: Set BATTLE_STATE_CONTROLER + 40 to current_value
-- A1: End local sequence
-- C3 7F: Set current_value to value stored at E5_7F_save
-- C5 FF: Add -1 to current_value
-- E5 7F: Save current_value to 0x1D9820C
-- E7 E1: If current_value > 0: continue, either jump E1 forward
-- 0C: Play animation 0C
-- A2: Dunno
+**Walk toward the target:**
+
+- `C3 11`: current_value = adjusted speed factor (distance-scaled)
+- `C5 64`: current_value += 100
+- `E5 FF`: stack[0xFF] = current_value
+- `C1 00`: current_value = 0
+- `CB FF`: current_value -= stack[0xFF] (negate: total distance to cover)
+- `E5 02`: local var e5[2] = current_value
+- `BB`: print the attack name
+- `08`: play animation 08 and wait (attack stance)
+- `A0 09`: play animation 09 without waiting (fly forward)
+- `C3 0A`: current_value = total frames of the current animation
+- `E5 7F`: E5_7F_save[0] = current_value (loop counter = frame count)
+- **loop start:**
+- `C3 02` `C9 00` `E5 FF`: stack[0xFF] = e5[2]
+- `C3 FF` `CF 09` `E5 FE`: stack[0xFE] = e5[2] * current_frame
+- `C3 FE` `D3 0A` `E5 FD`: stack[0xFD] = e5[2] * current_frame / total_frames (linear interpolation)
+- `C1 00` `C7 FD`: current_value = stack[0xFD]
+- `E5 0F`: write the position offset → the model slides toward the target
+- `A1`: yield (resume next frame)
+- `C3 7F` `C5 FF` `E5 7F`: decrement the loop counter
+- `E7 E1`: if counter > 0, jump back 0x100-0xE1 = 31 bytes (loop start)
+
+**Bite three times:**
+
+- `A0 0A`: play animation 0A without waiting (bite)
+- `B9 06`: wait 5 frames
+- `97 02 01`: play actor sound 02, volume from the target's position
+- `BF 04`: if the attack connected, trigger hit sequence 04 on the target
+- `B4 1A 00`: apply hit reaction + spawn hit effect 0x1A on the target (default placement)
+- `B9 04`: wait 3 frames
+- `97 02 01` `BF 04` `B4 1A 00`: second bite
+- `B9 04` `97 02 01` `B4 1A 00`: third bite
+- `AA`: apply the action result (damage/status) to all targets
+- `C3 08` `DA 80` `E5 08`: state flags |= 0x80
+- `C3 08` `D9 08` `E5 08`: state flags |= 0x08
+- `A1`: yield
+
+**Walk back:**
+
+- `A0 0B`: play animation 0B without waiting (fly back)
+- `C3 0A` `E5 7F`: loop counter = total frames
+- `C1 00` `CB 02` `E5 FF`: stack[0xFF] = -e5[2] (reverse direction)
+- `C3 FF` `CF 09` `E5 FE` `C3 FE` `D3 0A` `E5 FD`: interpolate as before
+- `C3 02` `C7 FD` `E5 0F`: position = e5[2] + interpolated value (slides back home)
+- `A1`: yield
+- `C3 7F` `C5 FF` `E5 7F` `E7 E1`: decrement and loop
+- `0C`: play animation 0C and wait (landing)
+- `A2`: end of sequence (jump to the next queued/idle sequence)
 
 ## Section 6: Camera sequence
 
-Not analysed, but defined camera work.
+The camera sequences reuse the **same byte-code VM** as section 5 (arithmetic `C0`-`E5` and jumps `E6`-`F3` behave identically), with camera-specific
+callbacks (`CameraSeq_DispatchActionOpcode` at `0x509810`, driver `BS_UpdateCameraSequence` at `0x509610`).
+
+Camera opcodes < 0xC0:
+
+| Opcode | Params | Description                                                                         |
+|--------|--------|-------------------------------------------------------------------------------------|
+| 00 XX  | 1      | Play camera animation XX from the current camera animation collection               |
+| 01     | 0      | Yield (pause for this frame, resume next frame)                                     |
+| 02     | 0      | End the camera sequence and clear the camera pointer                                |
+| 03     | 0      | Unknown camera operation + clear flag bit 15                                        |
+| 04 XX  | 1      | Start a camera oscillation (wobble) task with param XX                              |
+| 05 XX  | 1      | Play camera animation whose id is read through the camera special-value reader (XX) |
+| 06     | 0      | Set camera flag bit 15                                                              |
+| 07     | 0      | Clear camera flag bit 15                                                            |
+| 08     | 0      | Reset the wobble factor (4096) and the camera flag                                  |
+| 09 XX  | 1      | Nop (parameter skipped)                                                             |
+| other  | -      | Reset wobble factor and end the sequence                                            |
+
+Camera C3-family special reads (`CameraSeq_ReadSpecialVar_C3` at `0x509640`):
+
+| Param     | Value read                                                       |
+|-----------|------------------------------------------------------------------|
+| 0x00-0x07 | Camera animation local variables                                 |
+| 0x10      | Camera flag variable                                             |
+| 0x11      | Random value                                                     |
+| 0x13      | Count of party members in a specific animation state             |
+| 0x15      | Target entity's camera var (set by entity sequences via E5 0x2B) |
+| 0x16      | Target's animation status (with dead-flag fixup)                 |
+| 0x17      | Battle task value                                                |
+| 0x18      | Attacker slot id                                                 |
+| 0x19      | Target slot id                                                   |
+| 0x1A      | Number of affected targets                                       |
+| 0x1B      | Count of party members with animation status 0                   |
+| 0x1C-0x22 | Random value modulo 2..8                                         |
+| > 0x77    | Camera stack (same principle as the entity stack)                |
+
+Camera E5 writes: params < 8 write the camera animation local variables, 0x10 writes the camera flag variable, > 0x77 writes the camera stack.
 
 ## Section 7: Informations & stats
 
@@ -636,7 +741,8 @@ value_hex = value% * 255 / 100
 | 12     | 4 bytes | Offset to death code                     |
 | 16     | 4 bytes | Offset to "before dying or taking a hit" |
 
-The runtime interpreter and section dispatch are documented in [Enemy AI VM Runtime](../enemy-ai-vm-runtime/). The per-opcode authoring reference is [Battle Scripts](../battle-scripts/).
+The runtime interpreter and section dispatch are documented in [Enemy AI VM Runtime](../enemy-ai-vm-runtime/). The per-opcode authoring reference
+is [Battle Scripts](../battle-scripts/).
 
 ### Texts
 
@@ -668,12 +774,12 @@ Contains some [TIMs]({{site.baseurl}}/technical-reference/psx/tim-file-format).
 | 4 + nbTIMs \* 4 | 4 bytes           | End of file    |
 | 8 + nbTIMs \* 4 | Varies \* nbTIMs  | TIMs           |
 
-
 ## Some info on other dat info
 
 This section will grow to be independent, for the moment I write my findings.
 
-File in dXcYYY.dat are files for battle characters. the X is the ID of the character (0 for squall), and YYY to differentiate the different battle (Two texture diff for seed exam)
+File in dXcYYY.dat are files for battle characters. the X is the ID of the character (0 for squall), and YYY to differentiate the different battle (Two texture
+diff for seed exam)
 There is 7 section, the 3 first section are the same than monsters.
 
 File in dXwYYY.dat are files for weapon battle characters. the X is the ID of the character (0 for squall), and YYY the ID of the weapon (0 for gunblade)
