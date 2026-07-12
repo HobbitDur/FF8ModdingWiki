@@ -28,10 +28,10 @@ Scene.out contains no header. It is a raw list of 1024 encounters. Each encounte
 | 0x07   | 1      | "Enabled" [enemy flags](#enemy-flags)                                                             |
 | 0x08   | 48     | [Enemy Coordinates](#enemy-coordinates)                                                           |
 | 0x38   | 8      | [Enemy IDs](#enemy-ids)                                                                           |
-| 0x40   | 16     | [Unknown 1](#unknowns)                                                                            |
-| 0x50   | 16     | [Unknown 2](#unknowns)                                                                            |
-| 0x60   | 16     | [Unknown 3](#unknowns)                                                                            |
-| 0x70   | 8      | [Unknown 4](#unknowns)                                                                            |
+| 0x40   | 16     | [Unused 1](#unused)                                                                               |
+| 0x50   | 16     | [Unused 2](#unused)                                                                               |
+| 0x60   | 16     | [Unused 3](#unused)                                                                               |
+| 0x70   | 8      | [Unused 4](#unused)                                                                               |
 | 0x78   | 8      | [Enemy Levels](#enemy-level)                                                                      |
 
 ## Battle Flags
@@ -125,17 +125,17 @@ IDs are the last 3 digits of the monster's [c0mxxx.dat file](../monster-files-c0
 | 0x06       | 1    | Monster 7 ID |
 | 0x07       | 1    | Monster 8 ID |
 
-## Unknowns
+## Unused
 
-**Unknown 1, 2, and 3** each contain 2 bytes per monster, making them 16 bytes long (8 monsters \* 2 bytes).  
-**Unknown 4** contains 1 byte per monster, for a total of 8 bytes.  
+**Unused 1, 2, and 3** each contain 2 bytes per monster, making them 16 bytes long (8 monsters \* 2 bytes).  
+**Unused 4** contains 1 byte per monster, for a total of 8 bytes.  
 
 The data is laid out sequentially, from _Monster 1_ through _Monster 8_, and each monster has its own set of values, though some values are shared between monsters.  
 
 **Confirmed unused (PC 2000, FF8_EN.exe):** disassembly analysis shows that no code ever reads offsets `0x40`-`0x77` of the encounter record:
 
 - The loaded record lives at `CURRENT_ENCOUNTER_DATA_SCENE_OUT` (`0x1D287DC`) and is the game's only live copy (`ReadSceneOutFileForSpecificEncounter` at `0x48D0E0` is its only writer, and its staging buffer is not read anywhere else).
-- Every other field of the record has cross-references (camera bytes → `BS_CameraInit`, enemy flags/IDs → `setEnemyVisibility` / `setAllMonsterInfoFromDatSection` / `linkedToMonsterVisibility`, coordinates → `getZCoordinateEnemyBattleTask67`, levels → `setAllMonsterInfoFromDatSection`), but the four unknown blocks at `+0x40`, `+0x50`, `+0x60`, `+0x70` have **zero** cross-references, and all neighbouring array accesses are bounded to the 8 monster slots.
+- Every other field of the record has cross-references (camera bytes → `BS_CameraInit`, enemy flags/IDs → `setEnemyVisibility` / `setAllMonsterInfoFromDatSection` / `linkedToMonsterVisibility`, coordinates → `getZCoordinateEnemyBattleTask67`, levels → `setAllMonsterInfoFromDatSection`), but the four unused blocks at `+0x40`, `+0x50`, `+0x60`, `+0x70` have **zero** cross-references, and all neighbouring array accesses are bounded to the 8 monster slots.
 
 They are therefore remnants of a scrapped feature (their 2/2/2/1 bytes-per-monster layout suggests planned per-monster attributes that were never hooked up), and can be repurposed freely by mods targeting the PC version. (This has only been verified against the PC executable; the PSX build has not been checked.)  
 
