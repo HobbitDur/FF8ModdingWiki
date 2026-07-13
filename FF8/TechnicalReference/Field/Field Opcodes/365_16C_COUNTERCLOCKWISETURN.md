@@ -1,12 +1,12 @@
 ---
 layout: default
 parent: Field Opcodes
-title: 172_UNKNOWN7
-nav_order: 371
-permalink: /technical-reference/field/field-opcodes/172-unknown7/
+title: 16C_COUNTERCLOCKWISETURN
+nav_order: 365
+permalink: /technical-reference/field/field-opcodes/16c-counterclockwiseturn/
 ---
 
--   Opcode: **0x172**
+-   Opcode: **0x16C**
 -   Short name: **COUNTERCLOCKWISETURN**
 -   Long name: Counterclockwise Turn
 
@@ -27,4 +27,6 @@ none
 
 Turns this entity counterclockwise to face some direction. The only noticeable difference between this and the other turn functions is that the turn is always counterclockwise.
 
-It is unknown how this differs from [UNKNOWN9](../174-unknown9/).
+It is unknown how this differs from [COUNTERCLOCKWISETURN2](../16e-counterclockwiseturn2/).
+
+PC handler: `SCRIPT_COUNTERCLOCKWISETURN` at 0x527070.

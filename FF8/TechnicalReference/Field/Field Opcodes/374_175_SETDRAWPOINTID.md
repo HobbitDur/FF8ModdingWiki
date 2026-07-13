@@ -1,12 +1,12 @@
 ---
 layout: default
 parent: Field Opcodes
-title: 181_UNKNOWN16
-nav_order: 386
-permalink: /technical-reference/field/field-opcodes/181-unknown16/
+title: 175_SETDRAWPOINTID
+nav_order: 374
+permalink: /technical-reference/field/field-opcodes/175-setdrawpointid/
 ---
 
--   Opcode: **0x181**
+-   Opcode: **0x175**
 -   Short name: **SETDRAWPOINTID**
 -   Long name: Set Draw Point ID
 
@@ -24,3 +24,5 @@ none
 #### Description
 
 Assigns this draw point an ID. Draw points with identical IDs share Full/Drained status.
+
+PC handler: `SCRIPT_SETDRAWPOINTID` at 0x5230A0.

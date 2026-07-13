@@ -57,12 +57,12 @@ permalink: /technical-reference/list/status-flags/
 | 23        | 0x00800000 | Back attack            |
 | 24        | 0x01000000 | Vit0                   |
 | 25        | 0x02000000 | Angel Wing             |
-| 26        | 0x04000000 | Unknown                |
-| 27        | 0x08000000 | Unknown                |
-| 28        | 0x10000000 | Unknown                |
-| 29        | 0x20000000 | Unknown                |
-| 30        | 0x40000000 | Has Magic              |
-| 31        | 0x80000000 | Invocation pending     |
+| 26        | 0x04000000 | Unused — no name in the IDB and no reference in the battle status pipeline (`applyDamageAndHandleDeath`, `ComputeMagicAndGFDamage`, `removeStatus`, ...) |
+| 27        | 0x08000000 | Unused — as above |
+| 28        | 0x10000000 | Unused — as above |
+| 29        | 0x20000000 | Unused — as above |
+| 30        | 0x40000000 | Has Magic (`STATUS2_HAS_MAGIC`) |
+| 31        | 0x80000000 | Summon GF in progress / invocation pending — set as `status_2 \|= STATUS2_SUMMON_GF` while a GF summon plays; checked via `SLOBYTE(status_2) < 0` |
 
 # Ai status
 

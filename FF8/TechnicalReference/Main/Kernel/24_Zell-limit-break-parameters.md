@@ -10,7 +10,21 @@ permalink: /technical-reference/main/kernel/duel-parameters/
 
 | Offset | Sections | Section Size |
 |--------|----------|--------------|
-| 0x49F8 | 1        | 116 bytes    |
+| 0x49F8 | 1        | 100 bytes    |
+
+## Overview
+
+This section is the **Duel move graph** for Zell's "Duel" limit break: **25 sequence entries** of 4
+bytes each — one `StartMove` plus three `Next Sequence` bytes.
+
+- `StartMove` is the Duel move performed while that sequence is current (a value `>= 6` ends the Duel
+  with a finisher, handled by `sub_4852B0`).
+- The three `Next Sequence` bytes are the sequence indices the Duel jumps to next, chosen by the
+  player's button input from the current move.
+
+The **entry point** into this table is not stored here — it's the *Duel Start Sequence* byte for the
+character's crisis level in the [Misc section](../misc/) (0x30/0x32/0x34/0x36). `linkedToZellDuel`
+seeds the current sequence from that byte, then `sub_4852B0` walks the graph move by move.
 
 ## Section Structure
 

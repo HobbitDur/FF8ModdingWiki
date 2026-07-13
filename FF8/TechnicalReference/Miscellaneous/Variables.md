@@ -61,7 +61,7 @@ Items in grey are unused by field scripts (some of them may be used in battle sc
 | Signed Byte | 87          | Built-in engine variable. No idea what it does. Scripts always check if it's equal to 0 or 10. Related to music.                                                                                                                                                                                                           |
 | Signed Byte | 88          | Built-in engine variable. Used exclusively on save points. Never written to with field scripts. Related to Siren's Move-Find ability.                                                                                                                                                                                      |
 | Byte        | 89-103      | unused in fields                                                                                                                                                                                                                                                                                                           |
-| Long        | 104         | Seems related to SARALYDISPON/SARALYON/MUSICLOAD/PHSPOWER opcodes                                                                                                                                                                                                                                                          |
+| Long        | 104         | Seems related to SALARYDISPON/SALARYON/MUSICLOAD/PHSPOWER opcodes                                                                                                                                                                                                                                                          |
 | Long        | 108         | Music related. Used for battle music retention: a value of `-1` means "no field BGM to carry over", which makes the engine stop music after the fight (checked by `Battle_KeepMusicAfterBattle`, 0x52CE30).                                                                                                                  |
 | Long        | 112         | unused in fields                                                                                                                                                                                                                                                                                                           |
 | Byte        | 116-147     | Draw points in field                                                                                                                                                                                                                                                                                                       |
@@ -575,7 +575,7 @@ struct SavemapVariables
     __int8  EngineVar1;             // 0x57  (music-related engine var)
     __int8  EngineVar2;             // 0x58  (save-point / Siren Move-Find engine var)
     __int8  unused6[15];            // 0x59
-    VarMiscFlag miscFlag;           // 0x68  SARALYDISPON/MUSICLOAD/PHSPOWER related
+    VarMiscFlag miscFlag;           // 0x68  SALARYDISPON/MUSICLOAD/PHSPOWER related
     __int32 MusicRelated;           // 0x6C  Music retention (-1 = stop after battle)
     __int32 unused7;                // 0x70
     __int8  FieldDrawPoints[44];    // 0x74

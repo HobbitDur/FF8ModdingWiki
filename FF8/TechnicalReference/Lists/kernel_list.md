@@ -7,17 +7,20 @@ permalink: /technical-reference/list/kernel/
 
 # Target info
 
+Bits decoded by `getTargetMaskFromInfo` / `computeTargetMaskDeadUnknown1` when the engine
+auto-resolves a target mask (AI attacks, auto-summons, item randomization).
+
 | ID     | Description          |
 |--------|----------------------|
 | 0x0000 | None                 |
-| 0x0001 | Dead                 |
-| 0x0002 | ???                  |
-| 0x0004 | ???                  |
+| 0x0001 | Dead — targets KO'd units (adds the revive bit 0x4000 to the target mask) |
+| 0x0002 | Multi-target spread — adds mask bit 0x2000 (`TARGET_MASK32_TARGET_SEVERAL`; IDA `TARGET_INFO_SEVERAL_HIT_SPREAD`) |
+| 0x0004 | Unused — skipped by both target-mask decoders; no consumer found |
 | 0x0008 | Single Side          |
-| 0x0010 | Single               |
-| 0x0020 | Everyone on one side |
-| 0x0040 | Enemy                |
-| 0x0080 | ???                  |
+| 0x0010 | Single — auto-resolves to one random target of the chosen side |
+| 0x0020 | Everyone on one side — auto-resolves to the whole side |
+| 0x0040 | Enemy — selects the enemy side (otherwise the character side) |
+| 0x0080 | Unused — skipped by both target-mask decoders; no consumer found |
 
 
 # Attack Type
@@ -65,14 +68,20 @@ permalink: /technical-reference/list/kernel/
 
 ## Attack flag
 
+The low two bits form a damage-type pair stored as the target's `last_attacker_attack_flag`
+(`ATTACK_FLAG & 3`): 0 = Physical, 1 = Magical, 2 = Item/Medicine (Renzokuken finishers force 3).
+Only pure-physical hits (pair = 0) trigger the Counter ability, wake Sleep/Confusion, remove
+Back Attack, and mark the kill result on death; the AI condition `LAST ACTION DAMAGE TYPE`
+compares this pair against Physical/Magical.
+
 | ID   | Meaning          |
 |------|------------------|
-| 0x01 | Shelled          |
-| 0x02 | ?                |
-| 0x04 | ?                |
-| 0x08 | BreakDamageLimit |
-| 0x10 | Reflected        |
-| 0x20 | ?                |
-| 0x40 | ?                |
-| 0x80 | Revive?          |
+| 0x01 | Magical — Shell halves the damage/heal (`ATTACK_FLAG_MAGICAL_SHELLED`) |
+| 0x02 | Item/Medicine — healing doubled by the MedData ability (`ATTACK_FLAG_ITEM_MEDICINE`) |
+| 0x04 | Unused — never tested by any consumer of the attack flags |
+| 0x08 | Break damage limit |
+| 0x10 | Reflectable — the spell can be bounced by Reflect status (`handleSpellReflection`) |
+| 0x20 | Unused — never tested by any consumer of the attack flags |
+| 0x40 | Unused — never tested by any consumer of the attack flags |
+| 0x80 | Revive — classifies the action as revival (menu revive handling, `ATTACK_FLAG_REVIVE`) |
 

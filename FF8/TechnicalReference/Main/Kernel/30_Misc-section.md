@@ -91,3 +91,18 @@ permalink: /technical-reference/main/kernel/misc/
 | 0x0039 | 1 byte | Shot Timer Crisis Level 2          |
 | 0x003A | 1 byte | Shot Timer Crisis Level 3          |
 | 0x003B | 1 byte | Shot Timer Crisis Level 4          |
+
+## Duel / Shot crisis-level fields (0x30–0x3B)
+
+These drive **Zell's "Duel"** and **Irvine's "Shot"** limit breaks, which both scale with the
+character's crisis level (0–3, higher = lower HP / stronger limit).
+
+- **Duel Start Sequence (CL1–4)** — the starting index into the [Duel move table](../zell-limit-break-parameters/)
+  (section 24, *Duel Params*). When a Duel begins, `linkedToZellDuel` reads the byte for the current
+  crisis level (`K_MISC[0x2E + 2·crisis_level]`) and uses it to seed the "current sequence" pointer.
+  The per-tick Duel driver (`sub_4852B0`) then performs `duelMoves[seq].StartMove`, and the player's
+  button input selects one of that entry's *Next Sequence* bytes to advance to the next move. In short:
+  this byte decides **which move-chain Zell opens the Duel with at each crisis level**.
+- **Duel Timer (CL1–4)** — length of the Duel input window at that crisis level (higher crisis = longer),
+  loaded alongside the start sequence.
+- **Shot Timer (CL1–4)** — the equivalent input-window duration for Irvine's Shot at each crisis level.
