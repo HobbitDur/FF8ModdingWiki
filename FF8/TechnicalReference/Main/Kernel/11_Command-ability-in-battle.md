@@ -34,7 +34,7 @@ permalink: /technical-reference/main/kernel/command-abilities-in-battle/
 | Offset | Length  | Description           |
 |--------|---------|-----------------------|
 | 0x0000 | 2 bytes | Magic ID              |
-| 0x0002 | 1 bytes | Unknown               |
+| 0x0002 | 1 bytes | Padding (unused; IDA: 0 xrefs) |
 | 0x0003 | 1 bytes | Animation triggered   |
 | 0x0004 | 1 byte  | Attack type           |
 | 0x0005 | 1 byte  | Attack power          |

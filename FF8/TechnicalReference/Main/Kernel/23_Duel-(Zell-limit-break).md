@@ -37,9 +37,9 @@ permalink: /technical-reference/main/kernel/duel-zell-limit-break/
 | 0x0006 | 1 byte  | Attack type                 |
 | 0x0007 | 1 byte  | Attack power                |
 | 0x0008 | 1 byte  | Attack flags                |
-| 0x0009 | 1 byte  | Unknown                     |
+| 0x0009 | 1 byte  | Padding (unused; IDA: 0 xrefs) |
 | 0x000A | 1 byte  | Target Info                 |
-| 0x000B | 1 bytes | Unknown                     |
+| 0x000B | 1 bytes | Attack flags — low 2 bits stored as last-attacker flag (`ATTACK_FLAG`); in Duel the flags/animation byte order is swapped vs other command types |
 | 0x000C | 1 byte  | Hit count                   |
 | 0x000D | 1 byte  | Element Attack              |
 | 0x000E | 1 byte  | Element Attack %            |

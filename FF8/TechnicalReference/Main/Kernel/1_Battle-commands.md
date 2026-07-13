@@ -63,8 +63,8 @@ permalink: /technical-reference/main/kernel/battle-commands/
 | 0x0000 | 2 bytes | Offset to ability name                                                     |
 | 0x0002 | 2 bytes | Offset to ability description                                              |
 | 0x0004 | 1 byte  | Ability data ID                                                            |
-| 0x0005 | 1 byte  | Unknown Flags                                                              |
+| 0x0005 | 1 byte  | Unknown flags — read by `ResetAndParseBattleAndFieldCharacter` / `linkedStockFieldCharData` (character setup; purpose TBD) |
 | 0x0006 | 1 byte  | [TargetInfo]({{site.baseurl}}/technical-reference/list/kernel#target-info) |
-| 0x0007 | 1 byte  | Unknown / Unused                                                           |
+| 0x0007 | 1 byte  | Padding (unused; IDA: 0 xrefs) |
 
 

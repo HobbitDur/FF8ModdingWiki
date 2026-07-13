@@ -38,7 +38,7 @@ The skeleton/animation details below were verified against the field model runti
 | next   | 4 bytes | Offset to Model Data                                    |
 | ...    | ...     | Padding up to 0x100                                     |
 
-All offsets are absolute (from the start of the file).
+All offsets are absolute (from the start of the file), but only their low 28 bits: the engine reads every offset in this list as `value & 0x0FFFFFFF` and stops at the first negative DWORD (up to 6 textures). In multi-texture files the high byte holds a countdown of the textures remaining after the current entry — e.g. `d049.mch` declares `0x10000100, 0x00004320` (TIMs at 0x100 and 0x4320) and the three-texture `d026.mch` declares `0x20000100, 0x10004320, 0x00008540`. The PC engine ignores this countdown; a parser that treats the whole DWORD as an offset will fail on every multi-texture model. The same masking applies to the TIM offset lists of NPC entries in [chara.one](FileFormat_ONE), where a high nibble of 0xA instead marks a shared-texture reference (bits 20–27 = model id).
 
 ## Textures
 
@@ -259,7 +259,7 @@ Function addresses for the 2000 PC version:
 | 0x533F90 | Field_CharaBuildBoneRotationMatrix  | Builds a rotation matrix from 3 angles using SIN_TABLE_4096 (0xB924BC) / COS_TABLE_4096 (0xB944C0), index & 0xFFF |
 | 0x531DA0 | Field_CharaModelCommand             | Command-style API for field scripts (command 32 = read a bone's decoded pose, used by the FACEDIR opcodes) |
 | 0x532930 | Field_CharaUpdateTextureAnim        | Eye-blink texture animation (random timer, VRAM rectangle copies) |
-| 0x532AE1 | Field_CharaOne                      | chara.one loader. For main characters it patches the MCH header's animation offset to point at the chara.one animation block |
+| 0x532AE1 | Field_CharaOne                      | chara.one loader. Reads every TIM/model-data offset as `value & 0x0FFFFFFF` (high nibble = flags, list terminator = any negative DWORD, 0xA = shared-texture reference). For main characters it patches the MCH header's animation offset to point at the chara.one animation block |
 | 0x531310 | (model object constructor)          | Command 17 builds the per-model runtime object from the model data (applies the chara.one scale to vertices AND bone lengths: value * scale / 16); command 18 converts the animation section into the runtime layout (8-byte translation slot + 4 bytes per bone per frame) |
 
 Useful model instance fields (instances in `CHARA_MODEL_INSTANCE_TABLE`, 0x1DCB340): +4 runtime bone array, +8 animation data pointer, +82 frame counter (frame << 4, low bits = interpolation subframe), +98 GETA height offset, +112/113 blink texture ids, +114 flags (bit 2 = uncompressed 8-byte poses).

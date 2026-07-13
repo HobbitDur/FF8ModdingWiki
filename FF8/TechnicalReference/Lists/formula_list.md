@@ -17,6 +17,9 @@ $$
 \times \frac{[0..32] + 240}{256}
 $$
 
+{: .note }
+>`ComputeMagicAndGFDamage`@0x491ad0 reads TargetSpr from the same `BATTLE_SLOT_DATA[]` slot array for players and monsters: the SPR term is one shared code path. The only monster-related asymmetry found is on the attacker side: if the caster is a monster, magic damage dealt is halved after this formula.
+
 ## Demi, Percent
 
 $$
@@ -123,9 +126,14 @@ $$
 
 With CritDamage being 0 if no crit, 20 for Squall/Seifer if crit, 40 if crit from other characters.
 
+{: .note }
+>`ComputeWithDamageSTRFormula`@0x492c40 / `HpModifierComputationForPhysical`@0x48f600 read TargetVit from the same `BATTLE_SLOT_DATA[]` slot array used for both players (slots 0-2) and monsters (slots 3+): the VIT term is one shared code path, not separate monster/player formulas.
+
 ## Compute crit
 
-  v1 = 255 * (RELATED_TO_CRIT_BONUS + (unsigned __int8)BCI_LUCK[208 * p_attacker_slot_id]) / 255;
+$$
+\text{CritThreshold} = \frac{255 \times \left(\text{CritBonus} + \text{Luck}\right)}{255}
+$$
 
 
 # Stat
@@ -222,13 +230,27 @@ $$
 >Work in progress
 >
 
-Regular experience: X * (5 * (M - P) / P + 4), rounded down at the end, minimum of 1 provided X > 0 and it's not a boss.
+### Regular experience
 
-Kill bonus: Y * (5 * (M - C) / C + 4), rounded down at the end, minimum of 1 provided Y > 0 and it's not a boss.
+$$
+\text{Exp} = \left\lfloor X \times \left(5 \times \frac{\text{M} - \text{P}}{\text{P}} + 4\right) \right\rfloor
+$$
 
-M = monster level
-P = average party level (active members only, rounded down)
-C = level of character/GF who gets kill shot and thus kill bonus
+{: .note }
+>Minimum of 1, provided X > 0 and it's not a boss.
+
+### Kill bonus
+
+$$
+\text{KillBonusExp} = \left\lfloor Y \times \left(5 \times \frac{\text{M} - \text{C}}{\text{C}} + 4\right) \right\rfloor
+$$
+
+{: .note }
+>Minimum of 1, provided Y > 0 and it's not a boss.
+
+M = monster level  
+P = average party level (active members only, rounded down)  
+C = level of character/GF who gets kill shot and thus kill bonus  
 X and Y depend on the monster
 
 # Draw formula
@@ -243,19 +265,22 @@ $$
 
 # Crisis level
 
-crisis_value = 15300 * BATTLE_SLOT_DATA[p_attacker_slot_id].crisis_level / 255;
+$$
+\text{CrisisValue} = \frac{15300 \times \text{CrisisLevel}}{255}
+$$
 
 # Stat formula per level
 ## GF HP
 
- K_GF_JUNCTIONABLE[gf_id].gfHPModifier3
-       + gf_lvl * K_GF_JUNCTIONABLE[gf_id].gfHPModifier1
-       + 10 * gf_lvl * gf_lvl / K_GF_JUNCTIONABLE[gf_id].gfHPModifier2;
+$$
+\text{GFHP} = \text{HPMod}_3 + \text{GFLvl} \times \text{HPMod}_1 + \frac{10 \times \text{GFLvl}^2}{\text{HPMod}_2}
+$$
 
 ## GF exp for next level needed
 
-lvl * lvl * K_GF_JUNCTIONABLE[gf_id].nextLevelModifier2 / 256
-       + 10 * lvl * K_GF_JUNCTIONABLE[gf_id].nextLevelModifier1;
+$$
+\text{GFNextLevelExp} = \frac{\text{GFLvl}^2 \times \text{NextLvlMod}_2}{256} + 10 \times \text{GFLvl} \times \text{NextLvlMod}_1
+$$
 
 
 

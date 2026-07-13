@@ -412,7 +412,7 @@ permalink: /technical-reference/main/kernel/enemy-attacks/
 | 0x06   | 1 byte  | Attack type               |
 | 0x07   | 1 byte  | Attack power              |
 | 0x08   | 1 byte  | Attack flags              |
-| 0x09   | 1 byte  | Unknown — read in `computeCommandAction`; purpose not yet identified |
+| 0x09   | 1 byte  | Hit count & name flag — bits 0–6 = hit count; bit 7 = show attack name (if clear, the attack-name text is suppressed). Read in `computeCommandAction` |
 | 0x0A   | 1 byte  | Attack Element            |
 | 0x0B   | 1 byte  | Attack crit bonus         |
 | 0x0C   | 1 byte  | Status attack enabler     |

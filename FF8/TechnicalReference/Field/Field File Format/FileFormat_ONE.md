@@ -31,10 +31,21 @@ For each model. Beware: several fields are optional and their presence varies **
 | 0x04          | 4 bytes | Size of model data (often includes sector-alignment padding)                                                                    |
 | 0x08          | 4 bytes | Size of model data (bis). OPTIONAL: present only when equal to the previous DWORD — check before consuming                      |
 | next          | 4 bytes | If this DWORD &gt;&gt; 24 == 0xd0: main character model. Bits 8–23 hold the model scale (scale = value / 16, typically 0x1000 → 256). No TIM list and no model data in this file: the data block holds only the animation section |
-| next          | Varies  | NPC only: TIM offset list (relative to the "Offset to model textures + data"), ends with value 0xFFFFFFFF                       |
-| next          | 4 bytes | Model data offset (relative to the "Offset to model textures + data"); 0 for main character models                              |
+| next          | Varies  | NPC only: TIM offset list (relative to the "Offset to model textures + data"), ends with value 0xFFFFFFFF. The high nibble of each DWORD holds flags, not offset bits: the engine reads offsets as `value & 0x0FFFFFFF` and treats any negative DWORD as the terminator. A DWORD with high nibble 0xA replaces the whole list with a single shared-texture reference (see below). See the [MCH page](FileFormat_MCH) for the countdown flag found in multi-texture lists |
+| next          | 4 bytes | Model data offset (relative to the "Offset to model textures + data"), also masked `& 0x0FFFFFFF` by the engine; 0 for main character models |
 | next          | 8 bytes | OPTIONAL: model name as 4 ASCII characters (e.g. `d000`, `p065`) followed by 4 unknown bytes (often `60 70 80 00`). Present only when the 4 bytes are printable — some files omit the whole field |
+| next          | 4 bytes | Shared-texture entries only: the referenced entry index again (same value as bits 20–27 of the 0xA DWORD)                       |
 | next          | 4 bytes | OPTIONAL: end marker 0xEEEEEEEE. Some files omit it                                                                             |
+
+### Shared-texture entries
+
+Some NPC variants carry no texture of their own and reuse the texture of another model in the same file (e.g. `gfrich1a`: `o182`–`o186` reuse `o181`'s TIM). Their TIM offset list is a single DWORD of the form `0xA0000000 | (entry_index << 20) | low_bits`:
+
+- Bits 28–31: 0xA marker. The engine checks `(value & 0xF0000000) == 0xA0000000` and, instead of uploading a TIM, copies the VRAM texture/CLUT ids already registered for the referenced model.
+- Bits 20–27: index of the referenced entry in this file.
+- Bits 0–19: point inside the referenced entry's data block (consistently its last 0x800-byte sector in the vanilla files); not read by the PC engine.
+
+The data block of such an entry contains only model data (no TIM), and its header carries one extra DWORD after the name field repeating the referenced entry index. 24 of the 862 headered PC files contain such entries (60 models, all `oXXX` object variants): `bgmd2_6`, `bgpaty_1`, `bgsido_4`, `bgsido_7`, `bgsido_9`, `efenter2`, `feyard1`, `fhwise12`, `fhwise13`, `gfrich1`, `gfrich1a`, `ggkodo2`, `gmout1`, `gmpark1`, `gmpark2`, `gmtika2`, `gnroom4`, `gpbig1`, `gpbigin3`, `sspack1`, `tihtl1`, `timania1`, `tmelder1`, `tvglen5`.
 
 ## Data
 

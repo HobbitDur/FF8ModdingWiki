@@ -63,11 +63,11 @@ permalink: /technical-reference/main/kernel/battle-items/
 | 0x0009 | 1 byte  | Target info                 |
 | 0x000A | 1 byte  | Linked to selectability (IDA `linkedToSelectability`) — read by `updateBattleItemData` and `Battle_applyDamage` to gate item selectability |
 | 0x000B | 1 byte  | Attack flags                |
-| 0x000C | 1 bytes | Unknown                     |
+| 0x000C | 1 bytes | Unknown — appears only in `getTextBattleItem` array indexing (not a semantic read) |
 | 0x000D | 1 byte  | Status Attack Enabler       |
 | 0x000E | 2 bytes | status_0; //statuses 0-7    |
 | 0x0010 | 4 bytes | status_1; //statuses 8-39   |
 | 0x0014 | 1 byte  | Attack Param                |
-| 0x0015 | 1 byte  | Unknown                     |
+| 0x0015 | 1 byte  | Random-select flag — bit 0 marks the item eligible for random battle-item selection (`sub_483CA0` picks a random inventory item with this bit set) |
 | 0x0016 | 1 bytes | Hit Count                   |
 | 0x0017 | 1 bytes | Element                     |

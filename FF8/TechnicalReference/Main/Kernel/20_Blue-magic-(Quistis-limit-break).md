@@ -39,13 +39,13 @@ permalink: /technical-reference/main/kernel/blue-magic/
 |--------|---------|-----------------------------|
 | 0x0000 | 2 bytes | Offset to limit name        |
 | 0x0002 | 2 bytes | Offset to limit description |
-| 0x0004 | 2 bytes | SpecialAction ID            |
-| 0x0006 | 1 byte  | Unknown                     |
+| 0x0004 | 2 bytes | Attack animation — id of the effect / animation played (the engine "special action") |
+| 0x0006 | 1 byte  | Target hit/reaction animation ID (`HIT_TYPE_TARGET_ANIMATION_TO_PLAY`) played on the target when the ability lands |
 | 0x0007 | 1 byte  | Attack Type                 |
-| 0x0008 | 2 bytes | Unknown                     |
+| 0x0008 | 2 bytes | Unknown — byte @0x08 read by `Battle_applyDamage`; byte @0x09 is padding (IDA: 0 xrefs) |
 | 0x000A | 1 byte  | Attack Flags                |
 | 0x000B | 1 byte  | Hit Count                   |
 | 0x000C | 1 byte  | Element                     |
 | 0x000D | 1 byte  | Status Attack               |
 | 0x000E | 1 byte  | Crit Bonus                  |
-| 0x000F | 1 byte  | Unknown                     |
+| 0x000F | 1 byte  | Padding (unused; IDA: 0 xrefs) |

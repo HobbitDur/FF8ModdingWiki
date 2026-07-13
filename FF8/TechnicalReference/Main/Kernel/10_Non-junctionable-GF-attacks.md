@@ -38,13 +38,13 @@ permalink: /technical-reference/main/kernel/non-junctionable-gf-attacks/
 | Offset | Length  | Description                                                                                                                                                                                  |
 |--------|---------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | 0x0000 | 2 bytes | Offset to GF attack name                                                                                                                                                                     |
-| 0x0002 | 2 bytes | special Action ID (decides what animation to play)                                                                                                                                                    |
+| 0x0002 | 2 bytes | Attack animation — id of the effect / animation to play (the engine "special action")                                                                                                                 |
 | 0x0004 | 1 byte  | Attack type                                                                                                                                                                                  |
 | 0x0005 | 1 byte  | GF power (used in damage formula)                                                                                                                                                            |
 | 0x0006 | 1 byte  | Status attack enabler                                                                                                                                                                        |
-| 0x0007 | 1 byte  | Unknown                                                                                                                                                                                      |
-| 0x0008 | 1 byte  | Status flags                                                                                                                                                                                 |
-| 0x0009 | 1 byte | Unknown                                                                                                                                                                                  |
+| 0x0007 | 1 byte  | Target info — builds the target mask for the auto-summon attacks (Odin/Gilgamesh/Phoenix) via `getTargetMaskFromInfo` (`pre_MonsterAI`) |
+| 0x0008 | 1 byte  | Attack flags — feeds `ATTACK_FLAG` in `Battle_applyDamage` (the byte previously labeled "Status flags") |
+| 0x0009 | 1 byte | Target hit/reaction animation ID (`HIT_TYPE_TARGET_ANIMATION_TO_PLAY`) played on the target when the attack lands |
 | 0x000A | 1 byte | Hit Count                                                                                                                                                                                      |
 | 0x000B | 1 byte  | Element<br/><br/> *0x00 - Non-Elemental<br/> 0x01 - Fire<br/> 0x02 - Ice<br/> 0x04 - Thunder<br/> 0x08 - Earth<br/> 0x10 - Poison<br/> 0x20 - Wind<br/> 0x40 - Water<br/> 0x80 - Holy*       |
 | 0x000C | 1 byte  | Status 1<br/><br/> *0x00 - None<br/> 0x01 - Sleep<br/> 0x02 - Haste<br/> 0x04 - Slow<br/> 0x08 - Stop<br/> 0x10 - Regen<br/> 0x20 - Protect<br/> 0x40 - Shell<br/> 0x80 - Reflect*           |
@@ -52,6 +52,6 @@ permalink: /technical-reference/main/kernel/non-junctionable-gf-attacks/
 | 0x000E | 1 byte  | Status 3<br/><br/> *0x00 - None<br/> 0x01 - Eject<br/> 0x02 - Double<br/> 0x04 - Triple<br/> 0x08 - Defend<br/> 0x10 - ???<br/> 0x20 - ???<br/> 0x40 - ???<br/> 0x80 - ???*                  |
 | 0x000F | 1 byte  | Status 4<br/><br/> *0x00 - None<br/> 0x01 - Vit0<br/> 0x02 - ???<br/> 0x04 - ???<br/> 0x08 - ???<br/> 0x10 - ???<br/> 0x20 - ???<br/> 0x40 - ???<br/> 0x80 - ???*                            |
 | 0x0010 | 1 byte  | Status 5<br/><br/> *0x00 - None<br/> 0x01 - Death<br/> 0x02 - Poison<br/> 0x04 - Petrify<br/> 0x08 - Darkness<br/> 0x10 - Silence<br/> 0x20 - Berserk<br/> 0x40 - Zombie<br/> 0x80 - ???*    |
-| 0x0011 | 1 byte  | Unknown                                                                                                                                                                                      |
+| 0x0011 | 1 byte  | Padding (unused; IDA: 0 xrefs) |
 | 0x0012 | 1 byte  | Power Mod (used in damage formula)                                                                                                                                                           |
 | 0x0013 | 1 byte  | Level Mod (used in damage formula)                                                                                                                                                           |

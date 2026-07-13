@@ -45,4 +45,4 @@ permalink: /technical-reference/main/kernel/stat-percentage-increasing-abilities
 | 0x0004 | 1 byte  | AP needed to learn the ability |
 | 0x0005 | 1 byte  | Stat to increase               |
 | 0x0006 | 1 byte  | Increase value                 |
-| 0x0007 | 1 byte  | Unknown/Unused                 |
+| 0x0007 | 1 byte  | Padding (unused; IDA: 0 xrefs) |

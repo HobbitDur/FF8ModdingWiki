@@ -30,4 +30,4 @@ permalink: /technical-reference/main/kernel/party-abilities/
 | 0x0002 | 2 bytes | Offset to ability description                                                                                                                  |
 | 0x0004 | 1 byte  | AP Required to learn ability                                                                                                                   |
 | 0x0005 | 1 byte  | The [Party abilities flag]({{site.baseurl}}/technical-reference/list/ability-list#party-abilities) that define the flag value for this ability |
-| 0x0006 | 2 byte  | Unused                                                                                                                                         |
+| 0x0006 | 2 byte  | Padding (unused; IDA: 0 xrefs) |

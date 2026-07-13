@@ -33,9 +33,9 @@ permalink: /technical-reference/main/kernel/rinoa-combine-limit-break/
 | 0x0004 | 1 byte  | Attack type               |
 | 0x0005 | 1 byte  | Attack power              |
 | 0x0006 | 1 byte  | Attack flags              |
-| 0x0007 | 1 byte  | Unknown                   |
+| 0x0007 | 1 byte  | Padding (unused; IDA: 0 xrefs) |
 | 0x0008 | 1 byte  | Target info               |
-| 0x0009 | 1 byte  | Unknown                   |
+| 0x0009 | 1 byte  | Attack flags — low 2 bits stored as last-attacker flag (`ATTACK_FLAG`); Combine swaps the flags/animation byte order vs other command types |
 | 0x000A | 1 byte  | Hit Count                 |
 | 0x000B | 1 byte  | Element Attack            |
 | 0x000C | 1 byte  | Element Attack %          |

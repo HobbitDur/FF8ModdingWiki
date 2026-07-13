@@ -34,7 +34,7 @@ permalink: /technical-reference/main/kernel/shot-irvine-limit-breaks/
 | 0x0004 | 2 bytes | Magic ID                    |
 | 0x0006 | 1 byte  | Attack Type                 |
 | 0x0007 | 1 byte  | Attack Power                |
-| 0x0008 | 2 bytes | Unknown                     |
+| 0x0008 | 2 bytes | Target hit/reaction animation ID (`HIT_TYPE_TARGET_ANIMATION_TO_PLAY`) played on the target when the ability lands |
 | 0x000A | 1 byte  | Target Info                 |
 | 0x000B | 1 byte  | Attack Flags                |
 | 0x000C | 1 byte  | Hit Count                   |

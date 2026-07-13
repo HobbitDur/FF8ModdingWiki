@@ -105,11 +105,34 @@ value_hex = value% + 100
 
 ### Rate value
 
-The % def value follow the formula:
-value% = value_hex * 100 / 255
+The mug rate (byte 332) and drop rate (byte 333) are raw bytes (0–255), **not** stored as a percentage. The engine compares them directly against a
+uniform battle random number in the range 0–255 (`GetRandomInt` at `0x48F020`), so the true probability is out of 256, with a `+1` from the `<=` comparison.
 
-and to revert back:
-value_hex = value% * 255 / 100
+**Drop** — `ComputeProbabilityGetItemMug` (`0x486650`), rolled on kill inside `applyDamageAndHandleDeath`:
+
+```
+the drop succeeds when  GetRandomInt() <= DropRate      // GetRandomInt() ∈ [0, 255]
+=> P(drop) = (DropRate + 1) / 256
+```
+
+There is no zero-guard on the drop, so `DropRate = 0` still yields a 1/256 (≈0.39%) chance, and `DropRate = 255` is a guaranteed drop.
+
+**Mug** — `getMugObjectIdAndQuantity` (`0x4867C0`), used by the steal/Mug path:
+
+```
+if MugRate == 0            => never steal
+the mug succeeds when  GetRandomInt() <= MugRate + attacker_SPD / 2
+=> P(mug) = (MugRate + min(attacker_SPD/2, ...) + 1) / 256
+```
+
+Unlike the drop, the mug has a hard `MugRate == 0 => never` guard and adds half the attacker's SPD to the threshold, so a faster stealer succeeds more often.
+
+A convenient approximation for display is `% ≈ (value_hex + 1) / 256 * 100` (e.g. `128 ≈ 50.4%`, `255 = 100%`). The older `value_hex * 100 / 255`
+formula is close but slightly off (wrong denominator, and it ignores the `+1`).
+
+The battle module also has generic probability helpers used by the auto-summon / escape / card rolls — `isRandomProbaNumDen255` (`0x48F0F0`) and
+`isRandomNumeratorDenominator` (`0x48F0C0`) — which compute `255 * numerator / denominator` and succeed when that value `>= GetRandomInt()`. This is the same
+0–255 convention (a roll quoted as "32/255" means a threshold of 32 against the 0–255 random).
 
 ### Byte 246: Camera category
 
@@ -185,6 +208,9 @@ For readers following along in IDA / a disassembler. Names above are the ones se
 | `initAnimationSequenceAtStartBattle` | `0x5027D0`  | Per-entity battle-start init; converts byte 246 into the entity's `cameraDataRelated`                                                 |
 | `getMonsterCameraCategory`           | `0x48B9F0`  | Reads byte 246 (`camera_category`) from a monster's info section                                                            |
 | `a3ParamAnimSeqForCamera`            | `0x509640`  | Camera-sequence VM special-variable reader; C3 var `0x15` returns a target's `cameraDataRelated`                                      |
+| `ComputeProbabilityGetItemMug`       | `0x486650`  | On-kill item drop: reads byte 333 (`DropRate`), drop succeeds when `GetRandomInt() <= DropRate`                                       |
+| `getMugObjectIdAndQuantity`          | `0x4867C0`  | Mug/steal: reads byte 332 (`MugRate`); 0 = never, else succeeds when `GetRandomInt() <= MugRate + attacker_SPD/2`                     |
+| `GetRandomInt`                       | `0x48F020`  | Battle random byte generator, returns a value in `[0, 255]`                                                                           |
 | `computeDevour`                      | `0x48FC60`  | Picks the devour effect ID by level tier, stores it and byte 255 into the pending-devour block                                        |
 | `Battle_DamageGettingRelated`        | `0x4922B0`  | Resolves attack-type-specific damage; `ATTACK_TYPE_DEVOUR` case at `0x4926BC` rolls the devour and returns byte 255 as the hit damage |
 | `relatedToDevour`                    | `0x492220`  | Applies the devour effect's permanent Str/Vit/Mag/Spr/Spd/HP bonuses from the kernel devour table                                     |
