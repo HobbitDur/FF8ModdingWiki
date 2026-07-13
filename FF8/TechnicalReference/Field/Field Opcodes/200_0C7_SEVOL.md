@@ -25,4 +25,6 @@ none
 
 #### Description
 
-Does exactly what you think.
+Sets the volume of a single sound-effect channel. The handler pops the volume first (top of stack) and the channel second, then applies the volume to that channel immediately (`Sfx_SetVolume_Mask`, no transition). Returns 2.
+
+PC handler: `SCRIPT_SEVOL` at 0x520080.

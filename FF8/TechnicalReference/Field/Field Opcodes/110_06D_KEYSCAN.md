@@ -34,4 +34,6 @@ none
 
 #### Description
 
-Writes 1 to temporary variable 0 (access with PSHI\_L 0) if the user is pressing any of the indicated keys. 0 otherwise. The script does not pause while doing this, so you have to run it in a touch or push script, or inside a looping subroutine.
+Pops one value (a key mask) and writes 1 to temporary variable I[0] (access with `PSHI_L 0`) if any of those keys are currently **held** in the field's live button state (0x1CE48B0), 0 otherwise. The script does not pause while doing this, so you have to run it in a touch or push script, or inside a looping subroutine.
+
+PC handler: `SCRIPT_KEYSCAN` at 0x51DA50.

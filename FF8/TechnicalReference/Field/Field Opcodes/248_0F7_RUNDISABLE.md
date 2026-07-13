@@ -21,4 +21,6 @@ none
 
 #### Description
 
-Disables running.
+Disables running. Sets the global `RUN_DISABLE` flag to 1. Takes no stack arguments.
+
+PC handler: `SCRIPT_RUNDISABLE` at 0x526170.

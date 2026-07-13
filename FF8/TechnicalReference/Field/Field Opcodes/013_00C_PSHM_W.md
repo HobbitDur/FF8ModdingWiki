@@ -12,7 +12,7 @@ permalink: /technical-reference/field/field-opcodes/00c-pshm-w/
 
 #### Argument
 
-Memory adress.
+Byte offset into the savemap field-variable block (`VARMAP_START`), i.e. a savemap variable number — not a raw pointer.
 
 #### Stack
 
@@ -20,4 +20,6 @@ Memory adress.
 
 #### Description
 
-Push this first two bytes (word) from **Argument** onto the stack.
+Push the unsigned word stored at variable offset **Argument** onto the stack. Returns 2.
+
+PC handler: `SCRIPT_PSHM_W` at 0x51CB30.

@@ -21,4 +21,6 @@ none
 
 #### Description
 
-Not confirmed, but I'm pretty sure it halts the current entity's movements.
+Halts the current entity's scripted movement: when the entity holds the active priority it clears the "moving" bit `0x10000` of its motion-flags dword (entity+352), which stops an in-progress MOVE/MOVEA. Returns 1 (does not advance the IP that frame).
+
+PC handler: `SCRIPT_MOVEFLUSH` at 0x5247E0.

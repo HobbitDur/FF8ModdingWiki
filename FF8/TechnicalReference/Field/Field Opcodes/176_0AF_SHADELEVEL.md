@@ -19,12 +19,12 @@ none
 #### Stack
 
   
-*(?)*
+*Shade level*
 
 **SHADELEVEL**
 
 #### Description
 
-Sets some shading for the actor.
+Sets this actor's shade (lighting) level. The handler pops one byte and stores it in the entity field at `entity+609`, which the model renderer uses to darken/brighten the actor. Returns 2.
 
-Category:Unfinished FF8 Opcodes
+PC handler: `SCRIPT_SHADELEVEL` at 0x526E30.

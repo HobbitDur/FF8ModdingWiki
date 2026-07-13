@@ -25,8 +25,8 @@ none
 
 #### Description
 
-Turns this entity counterclockwise to face some direction. The only noticeable difference between this and the other turn functions is that the turn is always counterclockwise.
+Turns this entity to face a target direction, always sweeping in the counter-clockwise sense. Pops the turn **duration** (entity+578) and the **target angle** (entity+478), records the current facing as the start angle (entity+476), and forces the counter-clockwise sweep by adding 256 to the target when the start angle is above it (256 = one full FF8 field turn).
 
-It is unknown how this differs from [COUNTERCLOCKWISETURN](../16c-counterclockwiseturn/).
+The difference from [COUNTERCLOCKWISETURN](../16c-counterclockwiseturn/) is a **single byte**: this opcode writes turn-mode **2** into entity+580, whereas COUNTERCLOCKWISETURN writes **1** (selecting a different rotation-update path in the per-frame movement tick). Everything else is byte-for-byte identical. Yields until the turn finishes (tick sets entity+580 to 3).
 
 PC handler: `SCRIPT_COUNTERCLOCKWISETURN2` at 0x5271B0.

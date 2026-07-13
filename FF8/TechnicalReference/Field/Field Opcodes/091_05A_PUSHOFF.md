@@ -20,4 +20,6 @@ none
 
 #### Description
 
-Disables this entity's "push" script. See [PUSHON](../059-pushon/).
+Disables this entity's "push" script by setting its push-disabled flag (+585 = 1). No stack use. See [PUSHON](../059-pushon/).
+
+PC handler: `SCRIPT_PUSHOFF` at 0x51EC10.

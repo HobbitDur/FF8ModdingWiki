@@ -23,4 +23,6 @@ none
 
 #### Description
 
-Sets the speed of this entity's animations. Frame speed of 1 means 2 frames per second.
+Sets the speed of this entity's animations. Frame speed of 1 means 2 frames per second. The handler pops one 16-bit value and stores it into the entity's animation-speed field (+520).
+
+PC handler: `SCRIPT_ANIMESPEED` at 0x5264A0.

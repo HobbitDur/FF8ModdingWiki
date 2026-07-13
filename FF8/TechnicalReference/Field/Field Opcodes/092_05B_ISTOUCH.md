@@ -23,4 +23,6 @@ none
 
 #### Description
 
-Pushes 1 into temp variable 0 is the specified actor is within touch range of this entity. 0 Otherwise.
+Pops one value (an actor code, set with [PSHAC](../013-pshac/)) and writes into temp variable I[0] (+320) the result of a touch test between this entity and that actor: nonzero if they are in contact/touch range, 0 if the actor has no live field entity. Read the result with `PSHI_L 0`. Non-blocking.
+
+PC handler: `SCRIPT_ISTOUCH` at 0x51ED80.

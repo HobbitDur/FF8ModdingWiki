@@ -17,7 +17,7 @@ none
 #### Stack
 
   
-*0 or 1*
+*Channel slot (0 or 1)*
 
 *Volume (0-127)*
 
@@ -25,4 +25,6 @@ none
 
 #### Description
 
-Set the volume of the music. All the music functions have a parameter that's either 0 or 1.
+Sets the volume of a field music channel. The handler pops the volume first and the channel slot second (masked to 0 or 1 — the two music handles FF8 keeps). It applies the new volume with a short fixed 16-step transition (`Music_SetVolumeTrans`) and stores it in the savemap so it survives a field reset. The 0/1 parameter shared by the music opcodes selects which of the two music channels to act on. Returns 2.
+
+PC handler: `SCRIPT_MUSICVOL` at 0x51FC70.

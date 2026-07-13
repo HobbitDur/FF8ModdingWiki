@@ -20,4 +20,6 @@ none
 
 #### Description
 
-Pauses execution of this script until the current FMV movie is finished playing.
+Pauses execution of this script until the current FMV movie is finished playing (returns 1 while the movie is still running, then cleans up and returns 2). No stack use.
+
+PC handler: `SCRIPT_MOVIESYNC` at 0x51F4F0.

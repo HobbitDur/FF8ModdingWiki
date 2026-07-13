@@ -21,4 +21,6 @@ none
 
 #### Description
 
-Close the last window created by [AMES](../065-ames/). I haven't tried this for other types of windows...
+Pops one value (message channel) and closes the window on that channel: it clears the channel's "open"/"persistent" bits in `VAR_MAP unk[1]` and `unk[2]` and, if the window is still animating open, plays its close animation (retrying, return 1, until finished). Used to close a persistent window opened by [AMES](../065-ames/).
+
+PC handler: `SCRIPT_WINCLOSE` at 0x529B60.

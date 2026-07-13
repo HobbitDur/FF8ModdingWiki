@@ -25,4 +25,6 @@ none
 
 #### Description
 
-Does exactly what you think. See [Item Codes](../../Lists/Item_list) for a list of item codes.
+Does exactly what you think. See [Item Codes](../../Lists/Item_list) for a list of item codes. The handler pops the item ID and quantity and calls the inventory add routine (`AddItemToInventory`).
+
+PC handler: `SCRIPT_ADDITEM` at 0x522380.

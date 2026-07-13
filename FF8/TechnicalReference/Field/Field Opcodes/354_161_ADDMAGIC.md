@@ -28,3 +28,7 @@ none
 #### Description
 
 Does exactly what you think. See [Magic Codes](../../Lists/Magic_list) for a list of magic codes.
+
+The handler pops three values — Character ID (bottom), Magic ID, then Quantity (top). It resolves the character with `getCharIndexInParty`; if that character is in the party it calls `addMagicToPartyMember(partyMember, magicID)` up to *Quantity* times, stopping early if the stock hits its cap (100).
+
+PC handler: `SCRIPT_ADDMAGIC` at 0x5222D0.

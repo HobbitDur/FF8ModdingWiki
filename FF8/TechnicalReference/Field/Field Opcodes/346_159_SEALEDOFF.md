@@ -23,7 +23,7 @@ none
 
 #### Description
 
-Enables features of the game pertaining to the last dungeon's mechanic (items, saving, etc).
+Enables (un-seals) features of the game pertaining to the last dungeon's mechanic (items, saving, etc). Pops one value (the option flags) and **clears** those bits from the current map seal: `map_seal = ~flags & map_seal`. The result is written to `VAR_MAP_ADDRESS->map_seal`, `MAP_SEAL` and `SG_SETTING.mapSeal`, then `engine_restore_game_status` re-applies it. So each bit passed here re-enables (unlocks) the corresponding feature that [LASTIN](../157-lastin/) sealed.
 
 Whether or not these are enabled/disabled is stored in [byte 334](../../Miscellaneous/Variables). 0=Sealed, 1=Unsealed
 
@@ -45,3 +45,5 @@ Flags:
 64\. Resurrection
 
 128\. Save
+
+PC handler: `SCRIPT_SEALEDOFF` at 0x51E9C0.

@@ -37,3 +37,7 @@ Sets all future messages sent to this channel to behave differently. Behaviors:
 2: No window background
 
 The last parameter controls the color of text displayed in messages. 0=black, 4096=white. Haven't played around with it much.
+
+The handler pops three values (channel, window behavior, color). The color is applied to the message layer, and the window-behavior value is internally remapped (0→opaque, 1→translucent, 2→no window) before being applied and cached per channel for subsequent messages.
+
+PC handler: `SCRIPT_MESMODE` at 0x528D80.

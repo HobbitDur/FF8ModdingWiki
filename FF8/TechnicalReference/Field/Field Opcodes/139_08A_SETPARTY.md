@@ -27,7 +27,7 @@ none
 
 #### Description
 
-Sets the active party to be the members with the input IDs. These IDs also work with the other party related functions.
+Sets the active party to be the members with the input IDs. The handler pops the three ids and writes them to field party slots 0, 1 and 2 in push order (the first id pushed becomes the party leader), then rebuilds the battle party from those ids. A value of 255 leaves that slot blank. Afterward it refreshes game status and revives any active member left at 0 HP (HP set to 1, KO status cleared). Returns 2. These IDs also work with the other party related functions.
 
 -   0 Squall
 -   1 Zell
@@ -41,3 +41,5 @@ Sets the active party to be the members with the input IDs. These IDs also work 
 -   9 Kiros
 -   10 Ward
 -   255 Blank
+
+PC handler: `SCRIPT_SETPARTY` at 0x51E400.

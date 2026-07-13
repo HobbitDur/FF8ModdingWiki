@@ -25,4 +25,6 @@ none
 
 #### Description
 
-Turns this actor's head to face the given party member over *frame count*.
+Turns this actor's head to face the given party member over *frame count*. Identical to [FACEDIRA](../0fe-facedira/) except the target is resolved from the savemap party map (party member ID) rather than a raw actor code.
+
+PC handler: `SCRIPT_FACEDIRP` at 0x527D30.

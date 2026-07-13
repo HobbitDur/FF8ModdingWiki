@@ -47,3 +47,7 @@ Set which flags are present during random battles.
 +128: ?
 
 +256: ?
+
+The handler pops one 16-bit value and stores it both into a savemap field and into the global `ENCOUTER_BATTLE_FLAG`, which the encounter/battle setup reads when the next battle starts.
+
+PC handler: `SCRIPT_BATTLEMODE` at 0x523230.

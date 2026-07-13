@@ -12,7 +12,7 @@ permalink: /technical-reference/field/field-opcodes/137-drawpoint/
 
 #### Argument
 
-DrawPointID
+none
 
 #### Stack
 
@@ -23,7 +23,11 @@ DrawPointID
 
 #### Description
 
-Sets drawable magic to the one from hardcoded array at index: DrawPointID-1
+Runs the full Draw-Point interaction. It pops one value (`DrawPointID`), subtracts 1, and looks up that draw point's magic via `GetDrawMagic(id-1)` from the hardcoded array below (index `DrawPointID-1`). It then drives a multi-step state machine (states 0-7 kept in entity+516, returning 1/"wait" between frames): it composes and shows the "Draw <magic>" prompt, plays the draw sounds, asks which party member draws, calls `addMagicToPartyMember` up to the computed count, and on completion marks the draw point full/drained (`sub_52D190`). The number of stocks drawn is randomized (`word_1D9CDF4`, halved for a low-tier point). Because it yields, the opcode does not advance the IP until the interaction finishes.
+
+Sets drawable magic to the one from the hardcoded array at index: DrawPointID-1
+
+PC handler: `SCRIPT_DRAWPOINT` at 0x522770.
 
 **array**:
 

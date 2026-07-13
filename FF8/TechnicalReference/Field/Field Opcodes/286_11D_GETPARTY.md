@@ -23,4 +23,6 @@ none
 
 #### Description
 
-Pushes the ID of the character in the given slot to temporary variable 0. Has weird results when passed a parameter of 3 or greater (so don't do it!).
+Writes the character ID in the given party slot into temporary variable 0 (the entity's I[0] result register at +320). The handler pops the slot index and reads `SG_PARTY_FIELD1[slot]` from the savemap; only slots 0-2 are valid, so passing 3 or greater reads out of bounds and gives garbage (so don't do it!).
+
+PC handler: `SCRIPT_GETPARTY` at 0x51E640.

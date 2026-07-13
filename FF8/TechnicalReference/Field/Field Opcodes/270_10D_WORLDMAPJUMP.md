@@ -27,4 +27,6 @@ none
 
 #### Description
 
-Jumps the player to the world map. The game has a preset list of locations to jump to - there is no way AFAIK to jump to a specific XY point.
+Jumps the player to the world map. The game has a preset list of locations to jump to - there is no way AFAIK to jump to a specific XY point. The handler requests the world-map module by setting `globalFieldNextModuleID = 7`, pops three values (the destination *Location* into `MenuState_opcode_menu_id`, plus two transition parameters written to `wm2field_FieldZ` and `wm2field_FieldTarget`), and adjusts the savemap "can save here" bit. It yields (return 1) until the module switch happens.
+
+PC handler: `SCRIPT_WORLDMAPJUMP` at 0x521820.

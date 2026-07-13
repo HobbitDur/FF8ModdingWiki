@@ -20,4 +20,6 @@ none
 
 #### Description
 
-Unlocks a walkmesh triangle so things can walk over it.
+Unlocks a walkmesh triangle so things can walk over it. The handler clears the corresponding bit in the walkmesh blocked-triangle bitmap (`FIELD_WALKMESH_BLOCKED_BITS[id/8] &= ~(1 << (id%8))`). Takes no stack values. Returns 2.
+
+PC handler: `SCRIPT_IDUNLOCK` at 0x51D830.

@@ -20,4 +20,6 @@ none
 
 #### Description
 
-Pushes the results of the last battle into temp variable 0.
+Writes the outcome byte of the most recent battle (`battle_result_byte` at 0x1CFF6E7) into temp variable I[0] (+320). Read it with `PSHI_L 0`. No stack use.
+
+PC handler: `SCRIPT_BATTLERESULT` at 0x5232E0.

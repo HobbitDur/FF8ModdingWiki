@@ -21,4 +21,6 @@ none
 
 #### Description
 
-Lets the player leave a field via a field exit (ie walk off the screen to go to another area). This is the default behavior of fields. This function is only used to undo [MAPJUMPOFF](../05e-mapjumpoff/).
+Lets the player leave a field via a field exit (ie walk off the screen to go to another area) by clearing the field-exit-disable flag (byte at 0x1CE4902 = 0). This is the default behavior of fields; this opcode only undoes [MAPJUMPOFF](../05e-mapjumpoff/). No stack use.
+
+PC handler: `SCRIPT_MAPJUMPON` at 0x521CB0.

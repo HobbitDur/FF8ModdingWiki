@@ -40,5 +40,5 @@ permalink: /technical-reference/main/kernel/rinoa-combine-limit-break/
 | 0x000B | 1 byte  | Element Attack            |
 | 0x000C | 1 byte  | Element Attack %          |
 | 0x000D | 1 byte  | Status Attack Enabler     |
-| 0x000E | 2 bytes | status_0; //statuses 0-7  |
-| 0x0010 | 4 bytes | status_1; //statuses 8-39 |
+| 0x000E | 2 bytes | [Status 1]({{site.baseurl}}/technical-reference/list/status-flags#status-1) (statuses 0-15)  |
+| 0x0010 | 4 bytes | [Status 2]({{site.baseurl}}/technical-reference/list/status-flags#status-2) (statuses 16-47) |

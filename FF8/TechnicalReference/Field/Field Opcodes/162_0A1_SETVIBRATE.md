@@ -17,14 +17,14 @@ none
 #### Stack
 
   
-*(?)*
+*Vibration parameter 1*
 
-*(?)*
+*Vibration parameter 2 (flags)*
 
 **SETVIBRATE**
 
 #### Description
 
-Vibrates the controller.
+Starts a controller vibration (rumble) effect. The handler pops two values and registers a vibration entry from the vibration pattern table (`unk_B8DCB0`) using the first-pushed value as one parameter and the second-pushed value (forced to have bit 0 set, `| 1`) as the other; the returned effect handle is kept in a global (`unk_1D9CDE8`). Returns 2.
 
-Category:Unfinished FF8 Opcodes
+PC handler: `SCRIPT_SETVIBRATE` at 0x51F620.

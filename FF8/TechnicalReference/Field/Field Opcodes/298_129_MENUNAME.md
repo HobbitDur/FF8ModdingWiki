@@ -23,7 +23,7 @@ none
 
 #### Description
 
-Name a character or GF. If it's a GF, I think this also unlocks that GF.
+Name a character or GF. If it's a GF, this also marks that GF as obtained in the save. The handler pops the *Name ID*, requests the menu module (`globalFieldNextModuleID = 5`), selects the matching naming sub-menu (menu ids 2-28 depending on the ID), and for GF entries calls the "GF obtained" setter so the GF is unlocked. Returns 3 (yield).
 
 | Number | Character  |
 |--------|------------|
@@ -48,3 +48,5 @@ Name a character or GF. If it's a GF, I think this also unlocks that GF.
 | 18     | Eden       |
 | 19     | Boko       |
 | 20+    | Griever    |
+
+PC handler: `SCRIPT_MENUNAME` at 0x521DA0.

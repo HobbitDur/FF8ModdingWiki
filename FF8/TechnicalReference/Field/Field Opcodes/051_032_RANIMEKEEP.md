@@ -20,4 +20,6 @@ none
 
 #### Description
 
-Play an animation, then freeze the model on the last frame of the animation.
+Play an animation, then freeze the model on the last frame of the animation. The "R" (resume) variant of [ANIMEKEEP](../02e-animekeep/): keep-last-frame mode (`execution_flags` bit 0x80, entity+352) but returns 3 immediately without waiting, so the script keeps running.
+
+PC handler: `SCRIPT_RANIMEKEEP` at 0x526910.

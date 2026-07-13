@@ -23,4 +23,6 @@ none
 
 #### Description
 
-Sets all playing sound effects to the given volume.
+Sets the volume of all sound-effect channels at once. The handler pops one value (the volume) and applies it to every SE channel immediately (no transition). Returns 2.
+
+PC handler: `SCRIPT_ALLSEVOL` at 0x51FFA0.

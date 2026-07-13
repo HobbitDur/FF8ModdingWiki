@@ -18,7 +18,7 @@ table, i.e. every offset below equals the save format's offset minus 0x50 (80).
 |--------|-----------|------------------------------------------------------------|
 | 0x0000 | 16\*68    | [Guardian Forces](../game-save-format/#guardian-forces)   |
 | 0x0440 | 8\*152    | [Characters](../game-save-format/#characters)              |
-| 0x0900 | 400 bytes | Shops (unknown structure)                                   |
+| 0x0900 | 20\*20    | [Shops](#shops)                                             |
 | 0x0A90 | 20 bytes  | [Configuration](../game-save-format/#configuration)         |
 | 0x0AA4 | 80 bytes  | [Misc](#misc)                                                |
 | 0x0AF4 | 396 bytes | Items: 198 \* (Item ID, Quantity)                            |
@@ -37,13 +37,13 @@ from this file's own base offset (0x0AA4):
 | 0x00   | 1 byte   | Party member 1                                                  |
 | 0x01   | 1 byte   | Party member 2                                                  |
 | 0x02   | 1 byte   | Party member 3                                                  |
-| 0x03   | 1 byte   | Party member 4 (0xFF terminated)                                 |
+| 0x03   | 1 byte   | Unused padding (high byte of the 32-bit party word; never a member) |
 | 0x04   | 4 bytes  | [Unlocked weapons](#unlocked-weapons) (u32 bitmask)              |
 | 0x08   | 12 bytes | Griever name (FF8 text format)                                    |
 | 0x14   | 1 byte   | Weapon ID Laguna                                                 |
 | 0x15   | 1 byte   | Weapon ID Kiros                                                  |
 | 0x16   | 1 byte   | Weapon ID Ward                                                   |
-| 0x17   | 1 byte   | Unused                                                           |
+| 0x17   | 1 byte   | Status-menu selection index (persisted menu cursor; used, not padding) |
 | 0x18   | 4 bytes  | Amount of Gil                                                    |
 | 0x1C   | 4 bytes  | Amount of Gil (Laguna squad)                                     |
 | 0x20   | 2 bytes  | Limit Break Quistis                                              |
@@ -53,7 +53,7 @@ from this file's own base offset (0x0AA4):
 | 0x26   | 1 byte   | Limit Break Angelo completed                                     |
 | 0x27   | 1 byte   | Limit Break Angelo known                                         |
 | 0x28   | 8 bytes  | Limit Break Angelo points                                        |
-| 0x30   | 32 bytes | Items battle order                                               |
+| 0x30   | 32 bytes | [Items battle order](#items-battle-order)                        |
 
 Party member bytes hold a character id (`FF8ComId`): 0 Squall, 1 Zell, 2 Irvine, 3 Quistis,
 4 Rinoa, 5 Selphie, 6 Seifer, 7 Edea, 8 Laguna, 9 Kiros, 10 Ward, 0xFF empty.
@@ -82,6 +82,33 @@ live in the game message files, so only the anchoring entries are certain.
 | 0x26   | Angelo completed         | 8-bit bitfield  | 0-7  | Angelo commands fully learned (bit 0 Angelo Rush … bit 7 Wishing Star) |
 | 0x27   | Angelo known             | 8-bit bitfield  | 0-7  | Angelo commands known / in learning (same bit order)                 |
 | 0x28   | Angelo points            | 8 counters      | —    | Per-command remaining points to learn (counts down to 0), **not** a bitfield |
+
+### Items battle order
+
+The 32-byte block at Misc offset 0x30 is an ordering/index array (not a bitmask or id
+list): entry `n` corresponds to battle-usable item id `n + 1` (ids 1-32) and holds that
+item's display slot (0-31) in the in-battle Item menu. The game keeps it compact — on
+picking up an item it assigns the lowest free slot and shifts entries — so the battle Item
+list stays in a stable order across pickups.
+
+## Shops
+
+The 400-byte block at 0x0900 is **20 shop records of 20 bytes each**:
+
+| Offset | Size     | Data                                                              |
+|--------|----------|------------------------------------------------------------------|
+| 0x00   | 16 bytes | Per-slot availability cache (one boolean byte per shop slot: 0 hidden, 1 buyable) |
+| 0x10   | 2 bytes  | Visited flag (set to 1 on first entry; no reader found — cosmetic) |
+| 0x12   | 2 bytes  | Padding                                                          |
+
+The 16 availability bytes are a **recomputed cache, not authoritative state**. On every shop
+entry the game rebuilds them from the static `shop.bin` (each slot's item id + a per-item
+unlock threshold) and a story-progress flag — `available = ((storyFlag << 8) + threshold) >
+128` — and writes the result back over these bytes. Editing them (in `init.out` or a save)
+therefore has **no lasting effect**; to change what a shop sells or when items unlock, edit
+`shop.bin`, not this block. A new game zeroes the whole block, and no code seeds it from the
+`init.out` template. Prices come from
+[`price.bin`](../../menu/price/), also outside this file.
 
 ## Guardian Forces — learned abilities & AP
 

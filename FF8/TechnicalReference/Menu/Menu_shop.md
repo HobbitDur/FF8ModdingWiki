@@ -11,6 +11,21 @@ The file shop.bin is composed of 20 shops, each shop having 16 items. Each item 
 only if the player as the ability "[Familiar](https://finalfantasy.fandom.com/wiki/Familiar_(Final_Fantasy_VIII))" of tonberry.
 The shop list is sorted, meaning that there is no offset, and the X<sub>eme</sub> shop is hardlink to a specific shop.
 
+## How the field opens a shop (shop ID remap)
+
+A field script opens a shop with the **`MENUSHOP`** opcode (handler 0x521D60), which pops one byte — the **shop ID** — off the script stack and requests hosted menu 23 (Shop). The shop program (`Menu_Prog11_ShopMenu_Init`, 0x4EDA40) does **not** use that ID directly: it passes it through a remap table, **`SHOP_ID_REMAP_TABLE`** (0xB88918, 52 bytes), before selecting the shop:
+
+| Field shop ID | Remapped value | Result |
+|---------------|----------------|--------|
+| 0 – 20 | 0 – 20 (identity) | Item shop — shop.bin record N |
+| 21 – 31 | 0 | Falls back to item shop 0 (effectively invalid) |
+| **32 – 42** | **21** | **Junk Shop** (weapon remodel) |
+| 43 – 51 | 0 | Falls back to item shop 0 |
+
+The value **21 is a reserved sentinel**, not a real item shop: when `SHOP_ID_REMAP_TABLE[id] == 21` the program branches to the Junk Shop (`Menu_Prog12_JunkShop_Init`, weapon-upgrade menu built from mwepon.bin), never touching shop.bin. This is why **shop ID 32 appears to have "no shop"** — it is not an item shop at all, it is the first of the 11 junk-shop IDs (32–42). All eleven behave identically: the junk-shop code ignores which ID was used, so 32–42 all open the same weapon-remodel menu.
+
+Consequently shop.bin only needs records **0–20** (the 21 item shops); IDs in 21–31 and 43+ are unused and fall back to shop 0.
+
 ## Reference
 
 - [Items description](#items-description)

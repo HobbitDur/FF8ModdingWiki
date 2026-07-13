@@ -24,3 +24,7 @@ none
 #### Description
 
 This controls what shows up at the bottom of the menu and in your saved game slots.
+
+The handler pops one **word** off the stack and stores it into `SG_PREVIEW_LOCATION_ID` — the location-name index shown on the main menu and in save-slot previews.
+
+PC handler: `SCRIPT_SETPLACE` at 0x523200.

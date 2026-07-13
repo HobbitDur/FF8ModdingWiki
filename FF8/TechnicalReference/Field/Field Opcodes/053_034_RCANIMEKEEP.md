@@ -25,4 +25,6 @@ Model Animation ID
 
 #### Description
 
-Play the range of frames of an animation, then freeze the model on the last frame played. Used to make a character perform "half an animation" and then finish the animation later in a script.
+Play a frame range of an animation, then freeze the model on the last frame played. The "R" (resume) variant of [CANIMEKEEP](../030-canimekeep/): pops the first frame (top) and last frame, uses keep-last-frame mode (`execution_flags` bit 0x80, entity+352) and returns 3 immediately without waiting. Used to make a character perform "half an animation" and then finish it later in a script.
+
+PC handler: `SCRIPT_RCANIMEKEEP` at 0x5269E0.

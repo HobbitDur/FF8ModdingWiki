@@ -21,3 +21,5 @@ No change.
 #### Description
 
 Disable this entity's scripts, hides its model, and makes it throughable. Call [USE](../0e5-use/) to re-enable.
+
+PC handler: `SCRIPT_UNUSE` at 0x51DD80 (unused / no-op opcode).

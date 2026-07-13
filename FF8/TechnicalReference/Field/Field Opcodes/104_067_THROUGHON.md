@@ -20,4 +20,6 @@ none
 
 #### Description
 
-Disables players from colliding with this entity (ie makes them stop moving when too close).
+Disables collision with this entity by setting its through flag (+588 = 1), so the player can walk through it. No stack use.
+
+PC handler: `SCRIPT_THROUGHON` at 0x51ED40.

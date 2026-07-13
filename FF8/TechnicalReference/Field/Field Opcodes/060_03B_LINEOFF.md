@@ -21,4 +21,6 @@ none
 
 #### Description
 
-Disables line collisions with this entity.
+Disables line collisions with this entity by writing 0 to the line's active flag (entity+404). Returns 2 (done + continue).
+
+PC handler: `SCRIPT_LINEOFF` at 0x51DD00.

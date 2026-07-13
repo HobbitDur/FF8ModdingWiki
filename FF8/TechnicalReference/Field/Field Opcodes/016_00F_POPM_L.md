@@ -12,7 +12,7 @@ permalink: /technical-reference/field/field-opcodes/00f-popm-l/
 
 #### Argument
 
-Memory adress.
+Byte offset into the savemap field-variable block (`VARMAP_START`), i.e. a savemap variable number — not a raw pointer.
 
 #### Stack
 
@@ -20,4 +20,6 @@ Memory adress.
 
 #### Description
 
-Pop *value* from stack and store the first four bytes (long) in **Argument**.
+Pop *value* from stack and store its full 32 bits at variable offset **Argument**. Returns 2.
+
+PC handler: `SCRIPT_POPM_L` at 0x51CD00.

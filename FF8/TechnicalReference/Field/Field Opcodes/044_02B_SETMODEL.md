@@ -20,4 +20,6 @@ none
 
 #### Description
 
-Set this entity's display model.
+Set this entity's display model. The inline 16-bit argument is written to `model_id` (entity+536); the model itself is loaded/bound later by the field setup. Returns 2 (done + continue).
+
+PC handler: `SCRIPT_SETMODEL` at 0x51D8F0.

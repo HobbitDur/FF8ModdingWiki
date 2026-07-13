@@ -21,4 +21,6 @@ none
 
 #### Description
 
-Enables running.
+Enables running. Clears the global `RUN_DISABLE` flag (sets it to 0). Takes no stack arguments.
+
+PC handler: `SCRIPT_RUNENABLE` at 0x526180.

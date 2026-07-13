@@ -23,4 +23,6 @@ none
 
 #### Description
 
-Preloads a new field music track. You can start the new track by calling [MUSICCHANGE](../0b4-musicchange/).
+Preloads a new field music track. The handler pops one byte (the track number) into the savemap and kicks off an asynchronous load of that AKAO sequence. It blocks the script until the load finishes, returning 1 (wait) while loading and 2 once the track is ready. Start the loaded track with [MUSICCHANGE](../0b4-musicchange/).
+
+PC handler: `SCRIPT_MUSICLOAD` at 0x51F730.

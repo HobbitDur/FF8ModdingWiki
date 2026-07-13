@@ -20,4 +20,6 @@ none
 
 #### Description
 
-Disable user control. Player will only be able to press "ok" (and pause?) to advance through dialogue. Ends when [UCON](../04d-ucon/) is called.
+Disable user control. Sets `MENU_DISABLED` and the user-control-off flag, then freezes each of the up-to-three party field entities: their animation is reset to the base (idle) animation and their execution flags are set so the player can no longer move them. Player can still advance dialogue. No stack use. Ends when [UCON](../04d-ucon/) is called.
+
+PC handler: `SCRIPT_UCOFF` at 0x51DE90.

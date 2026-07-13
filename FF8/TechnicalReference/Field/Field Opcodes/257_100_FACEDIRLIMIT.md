@@ -27,4 +27,6 @@ none
 
 #### Description
 
-Limits how far this actor's head can turn to face an actor (so they don't go into exorcist mode).
+Limits how far this actor's head can turn to face an actor (so they don't go into exorcist mode). The handler pops three bytes and stores them into the entity's head-limit fields at +568, +569 and +570 (in stack push order).
+
+PC handler: `SCRIPT_FACEDIRLIMIT` at 0x528300.

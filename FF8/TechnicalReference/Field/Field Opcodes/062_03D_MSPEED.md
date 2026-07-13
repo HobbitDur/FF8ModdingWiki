@@ -23,4 +23,6 @@ none
 
 #### Description
 
-Sets this entity's movement speed.
+Sets this entity's movement speed. Pops one 16-bit value and stores it into both the active move-speed field (`move_speed`, entity+510) and its companion slot (entity+512, the value the [MOVE](../03e-move/) family copies back into `move_speed` and compares against a threshold to choose the walk vs. run animation). Returns 2 (done + continue).
+
+PC handler: `SCRIPT_MSPEED` at 0x5233E0.

@@ -417,5 +417,5 @@ permalink: /technical-reference/main/kernel/enemy-attacks/
 | 0x0B   | 1 byte  | Attack crit bonus         |
 | 0x0C   | 1 byte  | Status attack enabler     |
 | 0x0D   | 1 byte  | Attack Parameter          |
-| 0x0E   | 2 bytes | status_0; //statuses 0-7  |
-| 0x10   | 4 bytes | status_1; //statuses 8-31 |
+| 0x0E   | 2 bytes | [Status 1]({{site.baseurl}}/technical-reference/list/status-flags#status-1) (statuses 0-15)  |
+| 0x10   | 4 bytes | [Status 2]({{site.baseurl}}/technical-reference/list/status-flags#status-2) (statuses 16-47) |

@@ -23,4 +23,6 @@ none
 
 #### Description
 
-Probably does what you'd think, but is never used in the game.
+Sets the stereo pan of all sound-effect channels at once. The handler pops one value (the pan position) and applies it to every SE channel immediately (no transition). Returns 2. Never used in the retail game.
+
+PC handler: `SCRIPT_ALLSEPOS` at 0x520010.

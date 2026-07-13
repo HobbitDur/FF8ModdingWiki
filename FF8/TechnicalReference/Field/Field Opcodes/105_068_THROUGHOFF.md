@@ -20,4 +20,6 @@ none
 
 #### Description
 
-Enables collisions with this entity (player will stop moving when too close).
+Enables collision with this entity by clearing its through flag (+588 = 0), so the player is blocked by it. No stack use.
+
+PC handler: `SCRIPT_THROUGHOFF` at 0x51ED60.

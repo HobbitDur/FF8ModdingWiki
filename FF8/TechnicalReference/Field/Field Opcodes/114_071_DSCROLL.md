@@ -17,12 +17,14 @@ none
 #### Stack
 
   
-*????*
+*Target X*
 
-*Frames to scroll?*
+*Target Y*
 
 **DSCROLL**
 
 #### Description
 
-Scrolls the screen.
+**D**irect (instant) background scroll. Pops two values (a target X then a target Y) into the scroll-target registers (`word_1CE4790` / `word_1CE4792`) and sets the scroll mode to 3 (direct), clearing the scroll-active byte. The camera/background jumps to the given position with no interpolation, unlike the linear ([LSCROLL](../115-lscroll/)) and smooth ([CSCROLL](../116-cscroll/)) variants. Returns 3 (done + yield).
+
+PC handler: `SCRIPT_DSCROLL` at 0x520C40.

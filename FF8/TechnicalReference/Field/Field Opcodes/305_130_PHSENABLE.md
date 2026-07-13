@@ -23,4 +23,6 @@ none
 
 #### Description
 
-Enables or disables switch submenu.
+Enables or disables the PHS (switch) submenu. The handler pops one value and, unless the savemap misc flag `0x200` is set, sets (non-zero) or clears (0) bit 2 of the savemap "can save here" flags — the same bit that gates PHS access.
+
+PC handler: `SCRIPT_PHSENABLE` at 0x522280.

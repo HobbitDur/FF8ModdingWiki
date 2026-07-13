@@ -23,6 +23,8 @@ Amount
 
 #### Description
 
-Add the given amount of points to the player's SeeD level.
+Add the given amount of points to the player's SeeD level. Pops one value (the amount) and adds it to `VAR_MAP_ADDRESS->SeeDRankPoints`, then clamps the result: if below 100 it is forced to 100, and it is capped at 3100.
 
 100 points per rank - minimum 100 (rank 1), maximum 3100 (rank A)
+
+PC handler: `SCRIPT_ADDSEEDLEVEL` at 0x522480.

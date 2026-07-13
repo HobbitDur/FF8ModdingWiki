@@ -23,6 +23,6 @@ none
 
 #### Description
 
-Sets the asynchronous timer to 0 frames. See [SPUSYNC](../164-spusync/) for details.
+Pops one value (a sound-effect index) and kicks off an asynchronous load/prepare of that sound resource, resetting the async progress trackers to 0. Execution yields (returns 3) so the load runs in the background; [SPUSYNC](../164-spusync/) later waits for it to finish. On the original PSX this streamed the sound from disc (hence the drive noise).
 
-This does something to access hardware, but I don't know what. Calling it causes some drives to make noises.
+PC handler: `SCRIPT_SPUREADY` at 0x51F520.

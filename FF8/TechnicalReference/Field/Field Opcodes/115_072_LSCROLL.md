@@ -27,4 +27,8 @@ none
 
 #### Description
 
-Scrolls the screen by X and Y pixels over *frame count*. Parameters are untested, but I'd be very surprised if they're wrong.
+Starts a background/camera scroll toward target offset (*X*, *Y*), taking *frame count* frames to get there. The handler pops the three words (frame count first, then *Y*, then *X*), stores them in the shared scroll state (`FIELD_SCROLL_TARGET_X`, `FIELD_SCROLL_TARGET_Y`, `FIELD_SCROLL_DURATION`) and selects scroll **mode 4** (`FIELD_SCROLL_MODE = 4`), resetting the scroll phase to 0. The opcode only arms the scroll and returns immediately; use [SCROLLSYNC](../077-scrollsync/) to wait for completion.
+
+`LSCROLL` differs from [DSCROLL](../071-dscroll/) (mode 3) only in the mode index it writes: `DSCROLL` takes no duration (snaps directly), `LSCROLL` interpolates over *frame count*, and [CSCROLL](../073-cscroll/) (mode 5) uses the same three parameters with a different interpolation curve.
+
+PC handler: `SCRIPT_LSCROLL` at 0x520C90.

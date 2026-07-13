@@ -34,3 +34,7 @@ Plays a sound effect through the given sound channel. The channel is important b
 Unlike [EFFECTPLAY2](../021-effectplay2/). For example, when you touch a save point, it calls EFFECTPLAY on sound 30, which turns out to be sound 7880 in field IDs.
 
 Sound channel 0 appears to be able to play sounds while it's already playing sounds. Each other channels can only play one sound at a time.
+
+The handler pops all four values (volume first, then pan, then channel, then the sound id) and calls `PlayWorldSound(soundId, channel, pan, volume)`. Returns 2.
+
+PC handler: `SCRIPT_EFFECTPLAY` at 0x51FEA0.

@@ -10,7 +10,7 @@ permalink: /technical-reference/worldmap/module-runtime/
 
 # WorldMap module runtime
 
-This page describes how the world map module executes at runtime: initialization, the per-frame director, and how the module hands control back to the engine (field jumps, battles, menu). For the data formats see [wmx]({{ site.baseurl }}/technical-reference/worldmap/worldmap-wmx/), [wmset]({{ site.baseurl }}/technical-reference/worldmap/worldmap-wmset/), [texl]({{ site.baseurl }}/technical-reference/worldmap/worldmap-texl/), [chara.one]({{ site.baseurl }}/technical-reference/worldmap/worldmap-charaone/), [encounters]({{ site.baseurl }}/technical-reference/worldmap/worldmap-encounters/) and [music]({{ site.baseurl }}/technical-reference/worldmap/worldmap-music/). How the engine reaches this module is covered in [Engine startup and main loop]({{ site.baseurl }}/technical-reference/main/engine-startup-and-main-loop/).
+This page describes how the world map module executes at runtime: initialization, the per-frame director, and how the module hands control back to the engine (field jumps, battles, menu). Object instances, vehicles, trains and the chocobo/follower systems are detailed on the [objects and vehicles]({{ site.baseurl }}/technical-reference/worldmap/objects-vehicles/) page. For the data formats see [wmx]({{ site.baseurl }}/technical-reference/worldmap/worldmap-wmx/), [wmset]({{ site.baseurl }}/technical-reference/worldmap/worldmap-wmset/), [texl]({{ site.baseurl }}/technical-reference/worldmap/worldmap-texl/), [chara.one]({{ site.baseurl }}/technical-reference/worldmap/worldmap-charaone/), [encounters]({{ site.baseurl }}/technical-reference/worldmap/worldmap-encounters/) and [music]({{ site.baseurl }}/technical-reference/worldmap/worldmap-music/). How the engine reaches this module is covered in [Engine startup and main loop]({{ site.baseurl }}/technical-reference/main/engine-startup-and-main-loop/).
 
 ## Module lifecycle
 
@@ -45,7 +45,7 @@ flowchart TD
     I -->|random encounter roll<br>or Jumbo Cactuar| H
     D --> J{Buttons}
     J -->|menu, on foot/chocobo| K[wanted_mode 5]
-    J -->|board Garden/White SeeD ship| F
+    J -->|board Garden/Ragnarok| F
     J -->|info button| L[overlay menu sub-mode]
     J -->|reset combo| M[globalFieldNextModuleID = 4<br>return 1]
     D --> N[Terrain render with or without fog,<br>minimap, vehicle sounds,<br>segment streaming]
@@ -58,8 +58,8 @@ Details worth knowing:
 
 * **Exit transition** — despite its community name, `TOWN_BATTLE_SCENE` is the generic "exit transition started" flag for every destination. While set, the screen fades (`world_exit_fade_counter` += 16 per frame, done at 256) and the director then returns 1; a battle exit skips the fade.
 * **Input** — pad state is double-buffered in `world_input_states[2]` with `world_input_frame_parity` selecting the current frame; "pressed this frame" is computed by XOR with the previous frame. Menu = bit 0x20, info menu = bit 0x800, board vehicle uses the same edge detection.
-* **Field entrances** — walking onto an entrance region triggers `World_FindFieldEntrance`; the returned index is the entry in `wm2field.tbl` that the module handler uses to place the party in the destination field. Boarding the mobile Balamb Garden (vehicle 48) or the White SeeD ship (vehicle 50) jumps to fixed entrances 65 and 44; entrances 17/44/65 also update savemap `WorldmapVariantFlags` bit 0x20 depending on whether the vehicle can stay parked at the current position.
-* **Encounters** — random encounters only roll while on foot with no active event: a scripted-event check first, then the standard roll (`WM_Encounter_wm123456`) and the Jumbo Cactuar special encounter. The chosen encounter ID goes to `wanted_game_mode` exactly like a field-triggered battle.
+* **Field entrances** — walking onto an entrance region triggers `World_FindFieldEntrance`; the returned index is the entry in `wm2field.tbl` that the module handler uses to place the party in the destination field. Boarding the mobile Balamb Garden (vehicle 48) or the Ragnarok (vehicle 50) jumps to fixed entrances 65 and 44 (their interior fields); entrances 17/44/65 also update savemap `WorldmapVariantFlags` bit 0x20 depending on whether the vehicle can stay parked at the current position (`World_FindDismountPosition` probes).
+* **Encounters** — random encounters only roll while on foot with no active event: a scripted-event check first (the [world-map script VM]({{ site.baseurl }}/technical-reference/worldmap/script-vm/) evaluating wmset section 37), then the standard roll (`WM_Encounter_wm123456`) and the Jumbo Cactuar special encounter. The chosen encounter ID goes to `wanted_game_mode` exactly like a field-triggered battle.
 * **Menu** — only available on foot or on a chocobo (`world_currentVehicle` < 10 or 128); vehicles keep the button inactive.
 * **Minimap** — `world_minimapMode`: 1 = corner planet minimap, 2 = corner zoomed map, 3 = fullscreen map.
 * **Streaming** — map segments stream in continuously around the player; the loader state pauses when a music change is in flight (`World_MusicChanger`).
@@ -70,13 +70,16 @@ Details worth knowing:
 
 | `world_currentVehicle` | Meaning |
 |------------------------|---------|
-| < 10 | On foot / party members |
-| 32–40 | Cars |
-| 48 | Balamb Garden (mobile) |
-| 49 | Ragnarok |
-| 50 | White SeeD ship |
-| 128 | Chocobo |
-| 132 | (special, grouped with vehicles for engine sound) |
+| 0–9 | On foot (party leader model) |
+| 16–22 | Riding trains |
+| 32–40, 132 | Cars (consume Fuel item 0xA2 every 0x20000 distance units) |
+| 48 | Balamb Garden — mobile (clearance radius 700) |
+| 49 | Chocobo (boarding music 2, animation 5, auto-run path VM on dismount) |
+| 50 | Ragnarok (clearance 528, boarding music 5 "Ride On", map-screen fly-to) |
+| 64–66 | Boats (incl. White SeeD ship) |
+| 128 | On-foot variant (grouped with 0–9 everywhere) |
+
+The mapping was verified via `World_GetVehicleClearanceRadius` (0x54D9C0: Garden 700 / Ragnarok 528 / cars 256) and `World_GetBoardingMusicTrack` (0x5447A0: 49 → chocobo theme, 50 → Ragnarok theme).
 
 ## Address table
 

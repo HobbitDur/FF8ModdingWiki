@@ -12,23 +12,27 @@ permalink: /technical-reference/field/field-opcodes/02a-mapjump3/
 
 #### Argument
 
-Walkmesh ID
+Facing direction / Z on the destination field (16-bit; stored to `wm2field_FieldZ`).
 
 #### Stack
 
   
-*Field Map ID*
+*Destination Field Map ID*
 
-*XCoord*
+*(extra parameter)*
 
 *YCoord*
 
-*ZCoord*
+*XCoord*
 
-*(angle?)*
+*(entry parameter)*
 
 **MAPJUMP3**
 
 #### Description
 
-Jump the player to the field with the given ID at the specified coordinates. Last parameter is probably the angle to face, because it's never above 360 (the highest I've found is 240). Interestingly, the last parameter is always even, and except for the values 6 and 10, it's always a multiple of 4 in the game.
+Same as [MAPJUMP](../029-mapjump/) but pops one extra value. The five stack values are, from the top: destination field map ID (`wm2field_FieldTarget`), an extra parameter stored to `word_1CE4768`, the Y and X spawn coordinates (`wm2field_FieldY`/`wm2field_FieldX`), and a final value copied to `MenuState_opcode_menu_id`. The inline 16-bit argument is written to `wm2field_FieldZ`. It sets the low byte of `globalFieldNextModuleID` to 1 to request the field change next frame, then returns 1.
+
+The extra `word_1CE4768` value was historically guessed to be a facing angle (never above 360, usually a multiple of 4).
+
+PC handler: `SCRIPT_MAPJUMP3` at 0x521AC0.

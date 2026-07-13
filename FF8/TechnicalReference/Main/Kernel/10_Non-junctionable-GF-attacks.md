@@ -49,9 +49,9 @@ permalink: /technical-reference/main/kernel/non-junctionable-gf-attacks/
 | 0x000B | 1 byte  | Element<br/><br/> *0x00 - Non-Elemental<br/> 0x01 - Fire<br/> 0x02 - Ice<br/> 0x04 - Thunder<br/> 0x08 - Earth<br/> 0x10 - Poison<br/> 0x20 - Wind<br/> 0x40 - Water<br/> 0x80 - Holy*       |
 | 0x000C | 1 byte  | Status 1<br/><br/> *0x00 - None<br/> 0x01 - Sleep<br/> 0x02 - Haste<br/> 0x04 - Slow<br/> 0x08 - Stop<br/> 0x10 - Regen<br/> 0x20 - Protect<br/> 0x40 - Shell<br/> 0x80 - Reflect*           |
 | 0x000D | 1 byte  | Status 2<br/><br/> *0x00 - None<br/> 0x01 - Aura<br/> 0x02 - Curse<br/> 0x04 - Doom<br/> 0x08 - Invincible<br/> 0x10 - Petrifying<br/> 0x20 - Float<br/> 0x40 - Confusion<br/> 0x80 - Drain* |
-| 0x000E | 1 byte  | Status 3<br/><br/> *0x00 - None<br/> 0x01 - Eject<br/> 0x02 - Double<br/> 0x04 - Triple<br/> 0x08 - Defend<br/> 0x10 - ???<br/> 0x20 - ???<br/> 0x40 - ???<br/> 0x80 - ???*                  |
-| 0x000F | 1 byte  | Status 4<br/><br/> *0x00 - None<br/> 0x01 - Vit0<br/> 0x02 - ???<br/> 0x04 - ???<br/> 0x08 - ???<br/> 0x10 - ???<br/> 0x20 - ???<br/> 0x40 - ???<br/> 0x80 - ???*                            |
-| 0x0010 | 1 byte  | Status 5<br/><br/> *0x00 - None<br/> 0x01 - Death<br/> 0x02 - Poison<br/> 0x04 - Petrify<br/> 0x08 - Darkness<br/> 0x10 - Silence<br/> 0x20 - Berserk<br/> 0x40 - Zombie<br/> 0x80 - ???*    |
+| 0x000E | 1 byte  | Status 3<br/><br/> *0x00 - None<br/> 0x01 - Eject<br/> 0x02 - Double<br/> 0x04 - Triple<br/> 0x08 - Defend<br/> 0x10 - Immune Physical attack<br/> 0x20 - Immune Magic attack<br/> 0x40 - Charged<br/> 0x80 - Back attack*                  |
+| 0x000F | 1 byte  | Status 4<br/><br/> *0x00 - None<br/> 0x01 - Vit0<br/> 0x02 - Angel Wing<br/> 0x04 - Unused<br/> 0x08 - Unused<br/> 0x10 - Unused<br/> 0x20 - Unused<br/> 0x40 - Has Magic<br/> 0x80 - Summon GF / invocation pending*                            |
+| 0x0010 | 1 byte  | Status 5<br/><br/> *0x00 - None<br/> 0x01 - Death<br/> 0x02 - Poison<br/> 0x04 - Petrify<br/> 0x08 - Darkness<br/> 0x10 - Silence<br/> 0x20 - Berserk<br/> 0x40 - Zombie<br/> 0x80 - Unused*    |
 | 0x0011 | 1 byte  | Padding (unused; IDA: 0 xrefs) |
 | 0x0012 | 1 byte  | Power Mod (used in damage formula)                                                                                                                                                           |
 | 0x0013 | 1 byte  | Level Mod (used in damage formula)                                                                                                                                                           |

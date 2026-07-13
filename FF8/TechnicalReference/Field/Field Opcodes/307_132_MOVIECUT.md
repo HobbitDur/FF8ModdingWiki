@@ -21,4 +21,6 @@ none
 
 #### Description
 
-Only used in debug rooms. Doesn't appear to do anything.
+Sets bit `0x0100` of the field variable-map `miscFlag` (`VAR_MAP_ADDRESS->miscFlag`) and returns. This is a persistent flag on the field savemap; it takes no stack or inline arguments. Mostly seen in debug rooms, so its visible in-game effect is minimal, but it is not a pure no-op — it does flip that flag bit.
+
+PC handler: `SCRIPT_MOVIECUT` at 0x51F600.

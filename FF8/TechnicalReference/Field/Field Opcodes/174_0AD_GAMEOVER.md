@@ -23,4 +23,6 @@ none
 
 #### Description
 
-Ends the game in failure.
+Ends the game in failure. The handler sets the engine's next module to the game-over screen (`globalFieldNextModuleID = GLOBAL_STATE_SCREEN_SQUARESOFT`) and returns 1. It does **not** read or pop the stack, so any value pushed before it (the historical "1") is ignored and simply left on the stack.
+
+PC handler: `SCRIPT_GAMEOVER` at 0x523370.

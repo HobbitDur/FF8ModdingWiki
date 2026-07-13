@@ -25,4 +25,8 @@ none
 
 It uses 1 at the Esthar concourse and the Ragnarok airlock. Uses 0 in the ragnarok cockpit.
 
+The handler pops one value: non-zero calls `disableAngelo()`, zero calls `enableAngelo()` (so push 1 to disable, 0 to enable).
+
 Runtime note: controls bit `0x10` in `SG_ODIN_ANGEL_GILGA_FLAG` (`0x1CFE97A`). Angelo auto-actions require Rinoa in the party and this bit clear. See [GF Summon Runtime](../../../battle/gf-summon-runtime/).
+
+PC handler: `SCRIPT_DISABLE_ANGELO` at 0x529EB0.

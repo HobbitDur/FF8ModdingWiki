@@ -20,4 +20,6 @@ none
 
 #### Description
 
-Ends the effects of [LASTIN](../157-lastin/).
+Ends the effects of [LASTIN](../157-lastin/). Takes no arguments: clears bit `0x0800` of the field `miscFlag`, zeroes the map seal (`MAP_SEAL = 0`, `SG_SETTING.mapSeal = 0`) so all features are unlocked again, and calls `engine_restore_game_status`.
+
+PC handler: `SCRIPT_LASTOUT` at 0x51E990.

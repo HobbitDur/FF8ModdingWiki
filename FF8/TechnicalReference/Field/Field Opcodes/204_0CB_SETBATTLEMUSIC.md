@@ -36,3 +36,7 @@ Sets which battle music starts playing when a battle starts. Here are some commo
 | 76          | Maybe I'm a Lion (vs Griever)                           |
 | 90          | The Legendary Beast (Junctioned Griever))               |
 | 93          | The Extreme (Ultimecia final battle)                    |
+
+The handler pops one byte and stores it into a savemap field; the next battle started from this field reads that stored track.
+
+PC handler: `SCRIPT_SETBATTLEMUSIC` at 0x51F700.

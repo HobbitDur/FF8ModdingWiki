@@ -23,4 +23,6 @@ none
 
 #### Description
 
-Pushes the character's position in the party list into temporary variable 0. If they're not in the party, pushes -1.
+Pops one word (the character id) and writes that character's slot index in the active party (0, 1 or 2) into I register 0 (`entity+320`, script temporary variable 0). If the character is not in the active party it writes -1. Returns 2.
+
+PC handler: `SCRIPT_ISPARTY` at 0x51E5E0.

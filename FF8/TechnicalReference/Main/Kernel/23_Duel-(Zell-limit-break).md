@@ -49,8 +49,8 @@ permalink: /technical-reference/main/kernel/duel-zell-limit-break/
 | 0x0014 | 2 bytes | Sequence Button 3           |
 | 0x0016 | 2 bytes | Sequence Button 4           |
 | 0x0018 | 2 bytes | Sequence Button 5           |
-| 0x001A | 2 bytes | status_0; //statuses 0-7    |
-| 0x001C | 4 bytes | status_1; //statuses 8-39   |
+| 0x001A | 2 bytes | [Status 1]({{site.baseurl}}/technical-reference/list/status-flags#status-1) (statuses 0-15)    |
+| 0x001C | 4 bytes | [Status 2]({{site.baseurl}}/technical-reference/list/status-flags#status-2) (statuses 16-47)   |
 
 Buttons
 is finisher = 0x0001

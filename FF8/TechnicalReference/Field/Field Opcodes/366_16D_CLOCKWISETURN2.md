@@ -25,8 +25,8 @@ none
 
 #### Description
 
-Turns this entity clockwise to face some direction. The only noticeable difference between this and the other turn functions is that the turn is always clockwise.
+Turns this entity to face a target direction, always sweeping in the clockwise sense. Pops the turn **duration** (entity+578) and the **target angle** (entity+478), records the current facing as the start angle (entity+476), and forces the clockwise sweep by subtracting 256 from the target when the start angle is below it (256 = one full FF8 field turn).
 
-It is unknown how this differs from [CLOCKWISETURN](../16b-clockwiseturn/).
+The difference from [CLOCKWISETURN](../16b-clockwiseturn/) is a **single byte**: this opcode writes turn-mode **2** into entity+580, whereas CLOCKWISETURN writes **1** (selecting a different rotation-update path in the per-frame movement tick). Everything else — the popped arguments, start/target setup and the ±256 direction forcing — is byte-for-byte identical. Yields until the turn finishes (tick sets entity+580 to 3).
 
 PC handler: `SCRIPT_CLOCKWISETURN2` at 0x527110.

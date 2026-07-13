@@ -23,8 +23,12 @@ none
 
 *Frame count*
 
-**LSCROLL**
+**CSCROLL**
 
 #### Description
 
-Scrolls the screen by X and Y pixels over *frame count*. Parameters are untested, but I'd be very surprised if they're wrong.
+Starts a background/camera scroll toward target offset (*X*, *Y*) over *frame count* frames, identical to [LSCROLL](../072-lscroll/) except it selects scroll **mode 5** instead of mode 4. The handler pops the three words (frame count first, then *Y*, then *X*), stores them in the shared scroll state (`FIELD_SCROLL_TARGET_X`, `FIELD_SCROLL_TARGET_Y`, `FIELD_SCROLL_DURATION`), sets `FIELD_SCROLL_MODE = 5` and resets the scroll phase to 0. Wait for completion with [SCROLLSYNC](../077-scrollsync/).
+
+The original Square symbol for this opcode is `SCSROLL` (a typo for CSCROLL preserved in the executable).
+
+PC handler: `SCRIPT_SCSROLL` at 0x520CF0.

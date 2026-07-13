@@ -54,7 +54,7 @@ permalink: /technical-reference/main/kernel/misc/
 | 0x0014 | 1 byte | Silence Limit Effect               |
 | 0x0015 | 1 byte | Berserk Limit Effect               |
 | 0x0016 | 1 byte | Zombie Limit Effect                |
-| 0x0017 | 1 byte | Unknown Status Limit Effect        |
+| 0x0017 | 1 byte | Limit effect for the unused Status-1 bit 7 slot |
 | 0x0018 | 1 byte | Sleep Limit Effect                 |
 | 0x0019 | 1 byte | Haste Limit Effect                 |
 | 0x001A | 1 byte | Slow Limit Effect                  |
@@ -75,8 +75,8 @@ permalink: /technical-reference/main/kernel/misc/
 | 0x0029 | 1 byte | Double Limit Effect                |
 | 0x002A | 1 byte | Triple Limit Effect                |
 | 0x002B | 1 byte | Defend Limit Effect                |
-| 0x002C | 1 byte | Unknown Status Limit Effect        |
-| 0x002D | 1 byte | Unknown Status Limit Effect        |
+| 0x002C | 1 byte | Immune Physical attack limit effect |
+| 0x002D | 1 byte | Immune Magic attack limit effect    |
 | 0x002E | 1 byte | Charged Limit Effect               |
 | 0x002F | 1 byte | Back Attack Limit Effect           |
 | 0x0030 | 1 byte | Duel Start Sequence Crisis Level 1 |

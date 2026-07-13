@@ -25,4 +25,6 @@ none
 
 #### Description
 
-Display the countdown timer on the screen and start counting it down.
+Display the countdown timer on the screen and start counting it down. The handler pops the Y position first and the X position second, stores them in the savemap timer-position fields, sets the "show timer" flag in the savemap `miscFlag`, applies the on-screen position (`setFieldTimerPosition`) and enables the countdown (`setBattleCountdown(1)`). Returns 2.
+
+PC handler: `SCRIPT_DISPTIMER` at 0x521730.

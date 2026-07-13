@@ -191,6 +191,68 @@ Angelo requires Rinoa in the party (`com_file_id == 4`) and bit `0x10` of `SG_OD
 | 13 | 94 | Angelo Reverse | `0xF0` |
 | 14 | 92 | Angelo Search | `0xF0` |
 
+## Model animation & 60 fps
+
+Each GF draws an animated **creature model** loaded from the magic-effect files. Ifrit loads
+`MAG200_B.00` (→ `Magic_b_00`, 69,608 B, geometry + animation opcodes) and `MAG200_B.01`
+(→ `Magic_b_01`, 229,804 B, textures **+ a zeroed runtime scratch region**) via
+`MagicList_TextureLoad[200]` (`0xB25750`). Both use an 11-entry u32 offset-table header
+(`.00` = `[0, 0xFC, 0x8C, 0x281C, 0x1D48, 0x30, 0xE8, 0xFC, 0, 0x2540, 0]`). This is a **custom
+magic-effect format**, not the monster/character skeletal `.dat`.
+
+### The creature animation is a byte-code VM, not keyframes
+
+Decoded from the Ifrit render tree: there is **no `pose[frame][bone]` table to interpolate**.
+The animation is a **data-driven per-bone/per-axis opcode VM** (the AnimSeq VM, shared in form
+with battle `.dat` and the summon camera track) that writes **rotation velocities and
+accelerations** into each bone; a **per-frame integrator** turns those into the pose:
+
+```
+per frame, per bone:  velocity    += acceleration
+                      accumulator += velocity
+                      output Euler angle = accumulator >> 16      (4096 = 360°)
+```
+
+Bone runtime array = 8 bones × 256 B at `dword_27973EC+144` (= `Magic_b_01 + 0xFC`, zeroed
+scratch). Per-bone fields: pose accumulators `+80..+100`, velocities `+104..+124`,
+accelerations `+128..+138`, **output angles `+140/142/144` & `+148/150/152`**, per-axis
+sequence pointers `+0/+4/+8`, hold timers `+12/14/16`, frame duration `+200`. The opcode
+stream (`.00 @ 0xFC`) encodes *set velocity / add delta / randomize / wait N frames / loop*
+per channel; there is **no fixed frame count** (playback length is opcode-driven; loop count
+from GF data `caster+17`).
+
+| Function | Addr | Role |
+|---|---|---|
+| `GF_Ifrit_seqBDlink` | `0xB25DF0` | per-frame tick (advance channels → integrate → draw); tick ctr `state+50` |
+| `GF_Ifrit_AnimIntegrator` | `0xB26110` | pose integrator (`vel+=accel; accum+=vel; angle=accum>>16`) |
+| `GF_Ifrit_AdvanceAnimChannels_Neg` / `_Pos` | `0xB2FCF0` / `0xB30110` | advance opcode channels per bone/axis |
+| `GF_Ifrit_AnimVM_GenericOpcode` | `0xB2C480` | bulk opcode → writes stream data into bone vel/accel/target (descriptor `byte_1874EF0`) |
+| `GF_Ifrit_AnimVM_Op0_FrameYield` / `_Op1_SubSeqLoop` | `0xB2FEB0` / `0xB2FB20` | wait-N-frames / sub-sequence loop |
+| `GF_Ifrit_BuildMatricesAndDraw` | `0xB2ABE0` | build per-bone matrices from output angles + draw |
+| `GF_Ifrit_SetupSectionPtrs` / `_InitBones` | `0xB258D0` / `0xB2F8F0` | section-pointer + bone-array init |
+
+Each GF has its **own copy** of this VM/integrator (Ifrit's at `0xB2xxxx`), hence the
+`GF_Ifrit_*` names.
+
+### 60 fps options
+
+Frame-holding `GF_Ifrit_seqBDlink` freezes the creature (halts both opcode advance and the
+integrator) — confirmed in-game, and why the naive GF hold looked choppy and desynced. With no
+stored keyframes to bake, two clean paths remain:
+
+1. **Output-pose interpolation (recommended, least invasive):** let the VM run at native rate;
+   cache each bone's output angles (`+140..+152`) + translation each native frame and render a
+   lerp/slerp pose on the 3 in-between 60 fps frames. Motion is velocity-integrated
+   (C1-continuous) so interpolation is visually correct. No VM/timing change.
+2. **Half-rate integration:** halve the velocity contribution in `GF_Ifrit_AnimIntegrator` and
+   double every wait/hold (`bone+200`, yield count `state+62`) → native 60 fps, but this
+   touches the timing model (audio/camera sync).
+
+Because this VM shape is shared with battle `.dat` model animation, output-pose interpolation
+is a candidate **unified** fix for GF creatures *and* characters/enemies. (`mag184` **Shiva**
+is documented as having a frame-count header, so some chains may store data differently —
+verify per GF.)
+
 ## Runtime evidence summary
 
 | GF | Test id | Key confirmations |

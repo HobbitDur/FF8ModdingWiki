@@ -25,6 +25,8 @@ none
 
 #### Description
 
-Sets message speed.
+Reads two stack values (message channel and speed) and calls the text engine's set-message-speed routine with them. Higher speed values print the message faster.
 
 This is only used twice and both in the same place: During the Ragnarok scene right before the dialogue goes to "auto-play" mode and that dreadful song starts. Because it's never called anywhere else, it's safe to assume that it's field-specific. In other words, changing areas "resets" the message speed.
+
+PC handler: `SCRIPT_SETMESSPEED` at 0x528E10.

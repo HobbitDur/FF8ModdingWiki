@@ -25,4 +25,6 @@ none
 
 #### Description
 
-Turns this actor's head to face the given actor over the duration of *frame count*.
+Turns this actor's head to face the given actor over the duration of *frame count*. The handler pops the frame count and the target actor's script id, queries the target model's world position through the camera, stores it as the head-look target, and enters head-track mode. It yields until the interpolation reaches the requested frame count.
+
+PC handler: `SCRIPT_FACEDIRA` at 0x527C30.

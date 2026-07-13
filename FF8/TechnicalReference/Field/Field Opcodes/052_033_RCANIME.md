@@ -25,4 +25,6 @@ Model Animation ID
 
 #### Description
 
-Play the range of frames of an animation, then returns the model to its base animation.
+Play a frame range of an animation, then return the model to its base animation. The "R" (resume) variant of [CANIME](../02f-canime/): pops the first frame (top) and last frame, uses play-once mode (`execution_flags` bit 0x40, entity+352) and returns 3 immediately without waiting.
+
+PC handler: `SCRIPT_RCANIME` at 0x526990.

@@ -115,43 +115,77 @@ if ( C3_28_GF_data_pointer && !ExecuteTaskQueue(C3_28_GF_data_pointer) )
 Because the whole battle update runs 4× under a 60 fps uncap, this line runs 4× → every
 spell/GF effect plays 4× too fast.
 
-**Fix (one patch, all effects):** execute this `ExecuteTaskQueue` only **every 4th frame**
-(skip on 3 of 4; do not clear the pointer on skipped frames). The effect then advances at
-its native 15 fps → correct duration, spawn density, and synced SFX — for **all** spells and
-GFs, with no per-effect work and no constant rescaling.
+**The naive gate flickers.** Simply skipping the tick on 3 of 4 frames gives correct *speed*
+but **flickers**: the effect **draws inside its update tick** —
+`InitEffectSequenceFromData` (0x571C80) rebuilds the effect's geometry into the battle render
+list every frame; there is no separate render pass — so a skipped tick drops the effect's
+geometry that frame.
 
-Model/character animations are driven by the **other** `ExecuteTaskQueue` calls in the same
-function (`battle_tasks_init_*`), so they are untouched by this gate and can be smoothed
-separately via data interpolation.
+**Working fix — frame-hold (snapshot-restore).** Run the tick **every** frame (so it always
+draws), but on 3 of 4 frames **snapshot a memory window around the effect's root pointer**
+before the tick and **restore it after** — undoing the state advance while keeping the draw.
+The effect advances at 15 fps yet is drawn every frame → correct speed, **no flicker**.
+(Window used: `effect_ctx − 0x2000`, size `0x8000`; each spell's pools cluster around the root
+`C3_28_GF_data_pointer` the tick receives.)
 
-### Implementation (Hext, 2013 EN exe)
+**Only hold genuine magic casts.** The tick is shared. Draw/Stock rides the same effect tick,
+but its handler writes external state the window-restore can't undo → a **delayed crash**.
+Discriminate on the battle command type `BattleTask68Data.commandTypeWIthGunblade`
+(byte +1 of `*BATTLE_TASK_68_DATA_ADDR` @0x1D99A50), verified in-game:
 
-The gate is a 5-byte redirect of the effect-tick call (VA `0x50093A`) to a 25-byte stub in
-`.text` padding (VA `0xB68940`) that runs the real `ExecuteTaskQueue` only every 4th frame,
-using a counter in `.data` (VA `0x188B100`). Skipped frames return the (non-zero) queue
-pointer so the effect freezes instead of ending. File offsets = VA − 0x400000 (flat map).
+| commandTypeWIthGunblade | Action | Frame-hold? |
+|---|---|---|
+| 0x02 | Magic cast | **Yes** |
+| 0x06 | Draw / Stock | No — restore corrupts state (crash) |
+| 0x26 / 0xF4 / 0xFE | GF summon cinematic | Not this way — skeletal model, see [GF Summon Runtime](../gf-summon-runtime/) |
+| 0x00 | Physical attack | No |
 
-```
-10093A  = E8 01 80 66 00                                             ; call stub (rel32 0x668001)
-768940  = FF 05 00 B1 88 01 A1 00 B1 88 01 A8 03 74 05 8B 44 24 04 C3 E9 C7 FA 9F FF
-148B100 = 00 00 00 00                                                ; frame counter
-```
+Capture the holdable effect-queue pointer only when the magic-cast handlers
+(`BattleActionSequence_Tick_MagicCast` 0x50A9A0 / `_MagicEffect` 0x50B190) register it under
+cmd 0x02; hold the tick only when `effect_ctx` equals that captured pointer.
 
-To gate for a ×2 uncap instead of ×4, change `A8 03` (test al,3) to `A8 01` (test al,1).
+**Side effects re-fire on held frames** (the tick re-runs), so suppress them while holding via
+a flag:
+
+| Side effect | Function | Held-frame action |
+|---|---|---|
+| Effect SFX | `PlayWorldSound` (0x46B2A0) | no-op → plays once |
+| Damage/heal number | `BattleFx_DamageNumbers_Spawn` (0x5068B0) | no-op → shows once |
+
+Damage itself is applied once (externally guarded), so only the *display* duplicated.
+
+### Implementation (FFNx, 2013 EN exe)
+
+**Hext does not work here.** The 2013 DotEmu wrapper refuses to execute new code written into
+`.text` padding (a gate stub in the `0xB68940` cave crashes), and packed `.text` has no room
+to inline the gate. In-place edits to *existing* code do work (verified: NOP-ing the tick call
+at `0x50093A` froze the effect cleanly), but there is no cave to host the counter logic.
+
+So the gate lives in a custom **FFNx** build (shipped as `AF3DN.P`): `replace_call(0x50093A,
+gate)` for the frame-hold, plus `replace_function` hooks on the cast handlers (to capture the
+holdable pointer under cmd 0x02) and on the SFX / damage-number functions (to de-dupe).
+Confirmed in-game: **single-target magic at true 60 fps** — correct speed, no flicker, single
+SFX, single damage number, and Draw/Stock no longer crashes.
 
 ## IDB names applied
 
 Functions (FF8_EN.exe): `MAG_102_THUNDARA_Init` (0x6DC2E0), `_Tick` (0x6DC390),
 `_BoltTask` (0x6DC510); `MagicEffect05_*` tree (0x8D4430–0x8D4BA0);
-`BattleActionSequence_Tick_GF_Cinematic` (0x50B2A0), `_MagicEffect` (0x50B190).
+`BattleTask68_DispatchActionSequence` (0x50A790, action-seq handler by command type);
+`BattleActionSequence_Tick_MagicCast` (0x50A9A0, full magic cast — Firaga),
+`BattleActionSequence_Tick_MagicCast_NoTarget` (0x50BC20),
+`BattleActionSequence_Tick_GF_Cinematic` (0x50B2A0), `_MagicEffect` (0x50B190);
+`Magic_GetIDLoad` (0x50AF20); `BattleFx_DamageNumbers_Spawn` (0x5068B0),
+`BattleFx_DamageNumbers_TaskTick` (0x5069B0).
 
-Globals: `MAGIC_EFFECT_LOGIC_CALLBACK` (0x21DFEC4), `MAGIC_EFFECT_LOGIC_CALLBACK_2`
-(0x21DFEC0), `MAGICEFFECT05_TEX_FILEHANDLE` (0x27618A0), `MAGICEFFECT05_TEX_VRAM_A/B`
-(0x276C294 / 0x276C290).
+Globals: `C3_28_GF_data_pointer` (0x1D96AAC, effect-tick root), `BATTLE_TASK_68_DATA_ADDR`
+(0x1D99A50, ptr to `BattleTask68Data`), `MagicList_Logic` (0xC81774) /
+`MagicList_TextureLoad` (0xC81DB8, fn-ptr arrays indexed by effect_id−1),
+`MAGIC_EFFECT_LOGIC_CALLBACK` (0x21DFEC4), `MAGIC_EFFECT_LOGIC_CALLBACK_2` (0x21DFEC0).
 
 ### Open
 
 - Exact runtime use of the kernel +0x06 category byte (does effect 5 actually play for
   offensive spells, and when?).
-- `0x50BC20` dispatcher category (uses callback slot 2; item?).
+- Multi-target magic under the frame-hold (only single-target verified in-game so far).
 - Thundara bolt palette/CLUT source (element colour).

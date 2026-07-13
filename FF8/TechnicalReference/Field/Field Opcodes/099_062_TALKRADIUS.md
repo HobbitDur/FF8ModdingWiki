@@ -23,4 +23,6 @@ none
 
 #### Description
 
-Sets how many units maximum the player must be to fire this event's **talk** script when they press the OK button. Most humanoids have a talk radius of about 200.
+Pops one value and stores it as this entity's talk radius (+504): the maximum distance the player can be to fire this entity's **talk** script when pressing OK. Most humanoids have a talk radius of about 200.
+
+PC handler: `SCRIPT_TALKRADIUS` at 0x51EDD0.

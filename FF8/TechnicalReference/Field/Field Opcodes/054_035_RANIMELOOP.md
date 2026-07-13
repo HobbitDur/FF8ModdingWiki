@@ -7,7 +7,7 @@ permalink: /technical-reference/field/field-opcodes/035-ranimeloop/
 ---
 
 -   Opcode: **0x035**
--   Short name: **RCANIME**
+-   Short name: **RANIMELOOP**
 -   Long name: Resume script, Play looping animation
 
 #### Argument
@@ -20,4 +20,6 @@ none
 
 #### Description
 
-Loops an animation.
+Loops an animation. Starts the animation given by the inline argument in looping mode (`execution_flags` bits set to 0x20, entity+352) and returns 3 (done + yield) immediately, so the animation keeps cycling while the script continues.
+
+PC handler: `SCRIPT_RANIMELOOP` at 0x526A30.

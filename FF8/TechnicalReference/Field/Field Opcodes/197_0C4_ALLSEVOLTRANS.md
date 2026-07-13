@@ -17,12 +17,16 @@ none
 #### Stack
 
   
-*Frame count*
-
 *Final Volume (0-127)*
+
+*Frame count*
 
 **ALLSEVOLTRANS**
 
 #### Description
 
-Transitions the volume of all sound effects.
+Fades the volume of all sound-effect channels to a target level over a duration. The handler pops the frame count first (top of stack) and the final volume second, then calls `Sfx_SetAllChannelsVolumeTrans(volume, 2 × frame count)` — the transition step count is the frame value doubled. Returns 2.
+
+Note the push order: the final volume is pushed **first**, then the frame count (the reverse of most `*TRANS` opcodes).
+
+PC handler: `SCRIPT_ALLSEVOLTRANS` at 0x51FFD0.

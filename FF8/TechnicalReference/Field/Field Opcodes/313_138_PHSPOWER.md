@@ -23,4 +23,6 @@ none
 
 #### Description
 
-Enables or disables the ability to switch party members.
+Enables or disables the ability to switch party members. Pops one value: non-zero **enables** PHS (clears bit `0x0200` of the field `miscFlag`), zero **disables** it (sets bit `0x0200` of `miscFlag` and also clears bit `0x02` of `unk11[5]`).
+
+PC handler: `SCRIPT_PHSPOWER` at 0x522230.

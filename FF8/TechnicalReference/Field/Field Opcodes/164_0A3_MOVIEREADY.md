@@ -25,7 +25,7 @@ none
 
 #### Description
 
-Prepares a FMV movie to be played with [MOVIE](../04f-movie/). The second parameter is either 0 or 1, but I have no idea what it does.
+Prepares a FMV movie to be played with [MOVIE](../04f-movie/). The handler pops two stack values but only uses the first (the *Movie ID*); the second value (0 or 1) is popped and discarded by this handler. It looks up the movie file for the current disc (from savemap `unk11`) and the given Movie ID and preloads it (`prepare_movie`), then returns 3 (yield) so playback can be started. If a movie is already prepared (`miscFlag & 0x100`) it returns 2 without re-preparing.
 
 The movie that plays depends on which disc is currently active.
 
@@ -65,3 +65,5 @@ The movie that plays depends on which disc is currently active.
 | 31       |                          | Balamb Ram                        | Lunar Cry Begins              |                            |
 | 32       |                          | Escape Hatch                      |                               |                            |
 | 33       |                          | Paratrooper fight                 |                               |                            |
+
+PC handler: `SCRIPT_MOVIEREADY` at 0x51F2C0.

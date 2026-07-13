@@ -23,4 +23,6 @@ none
 
 #### Description
 
-End the current FACEDIR over the course of *frame count*, then locks the head back on the actor.
+End the current FACEDIR over the course of *frame count*, easing the head back to its neutral/model orientation. The handler pops one frame count, reads the head's current orientation from the model, and interpolates back over that many frames, clearing the head-lock flag. It yields until the interpolation completes.
+
+PC handler: `SCRIPT_FACEDIROFF` at 0x527E40.

@@ -20,4 +20,6 @@ none
 
 #### Description
 
-No apparent function. Most likely, this did various things during the game's development.
+No gameplay effect in the retail build. The handler sets a global debug flag (`unk_1D9CDC0` = 1) and yields (returns 3); the flag is not read by any shipped code path, so it is a leftover development hook.
+
+PC handler: `SCRIPT_DEBUG` at 0x51D700.

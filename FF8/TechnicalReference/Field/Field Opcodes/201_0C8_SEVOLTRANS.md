@@ -27,4 +27,6 @@ none
 
 #### Description
 
-Transitions the volume of the sound in *sound channel* over *frame count*.
+Fades the volume of one sound-effect channel to a target level over a duration. The handler pops the final volume first (top of stack), the frame count second, and the channel third, then calls `Sfx_SetVolumeTrans_Mask` with the frame count doubled as the transition step count. Returns 2.
+
+PC handler: `SCRIPT_SEVOLTRANS` at 0x5200C0.

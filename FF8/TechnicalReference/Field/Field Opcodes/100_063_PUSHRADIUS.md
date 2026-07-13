@@ -23,4 +23,6 @@ none
 
 #### Description
 
-Sets the distance at which the player has to be for this event's **push** script to be run. Most events have a push radius of 48 when active and a push radius of 1 when inactive.
+Pops one value and stores it as this entity's push radius (+502): the distance at which the player triggers this entity's **push** script. Most events have a push radius of 48 when active and a push radius of 1 when inactive.
+
+PC handler: `SCRIPT_PUSHRADIUS` at 0x51EE00.

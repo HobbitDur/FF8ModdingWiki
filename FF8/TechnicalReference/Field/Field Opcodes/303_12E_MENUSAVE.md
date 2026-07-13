@@ -20,4 +20,6 @@ none
 
 #### Description
 
-Opens the save menu.
+Opens the save menu. Requests the menu module (`globalFieldNextModuleID = 5`) with menu id 24 (save) and marks the menu state as save-enabled (value 1). Takes no stack arguments. Returns 3 (yield).
+
+PC handler: `SCRIPT_MENUSAVE` at 0x522190.
