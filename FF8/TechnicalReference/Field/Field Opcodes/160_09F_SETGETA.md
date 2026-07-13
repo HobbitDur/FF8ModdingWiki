@@ -25,4 +25,4 @@ none
 
 ?
 
-[Category:Unfinished FF8 Opcodes](../../../../Category:Unfinished_FF8_Opcodes)
+Category:Unfinished FF8 Opcodes

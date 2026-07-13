@@ -7,7 +7,7 @@ permalink: /technical-reference/main/game-region-namedicbin/
 
 ## Format
 
-Same format as: [Mngrp string section](Mngrp_string_section.md)
+Same format as: [Mngrp string section](../../menu/mngrp-string-section/)
 
 ## Contents
 

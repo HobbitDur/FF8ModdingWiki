@@ -24,6 +24,6 @@ Each width is 4 bits (two widths per byte).
 
 ### Texture
 
-Texture is a [TIM file](../PSX/TIM_format) with 8 colors: dark grey, grey, yellow, red, green, blue, purple and white.
+Texture is a [TIM file](../../../psx/tim-file-format/) with 8 colors: dark grey, grey, yellow, red, green, blue, purple and white.
 
 *TODO: Explain the palette mechanism in japanese version (16 pal instead of 8).*

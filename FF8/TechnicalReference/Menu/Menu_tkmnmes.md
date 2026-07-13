@@ -11,7 +11,7 @@ These files have a good deal of the Menu text.
 * tknmnes2.bin
 * tknmnes3.bin
 
-Note that those files are actually not use, but instead the one contains in the archive [Mngrp.bin](../Menu_mngrp_bin)
+Note that those files are actually not use, but instead the one contains in the archive [Mngrp.bin](../mngrpbin-file-format/)
 
 The data consist of a header that contains the __paddings__, corresponding to the offset to string section. Each string section contains a list of offset, followed by the strings.
 
@@ -25,6 +25,6 @@ Padding values **0x0000** must be ignored when reading but must be kept in the s
 | UInt16 | 2 * Pad_count | Paddings  | The padding value leads to the start of string section offsets.<br/> **0x0000** must be ignored.  |
 
 # String section
-Each string section correspond to a [Mngrp string section](../Menu_mngrp_strings_section)
+Each string section correspond to a [Mngrp string section](../mngrp-string-section/)
 
 **\[Start of string location\]** = **\[Start of file\]** + **\[Padding value\]** + **\[String offset value\]**

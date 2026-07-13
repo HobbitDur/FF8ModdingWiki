@@ -5,7 +5,7 @@ title: WorldMap Music
 permalink: /technical-reference/worldmap/worldmap-music/
 ---
 
-musicN.obj (where n is 0,1,2,3,4 and 5) is file, that contains AKAO frames. AKAO are probably the same as in FF7: [AKAO frames](../FF7/AKAOframes).
+musicN.obj (where n is 0,1,2,3,4 and 5) is file, that contains AKAO frames. AKAO are probably the same as in FF7.
 
 **music0.obj** - casual world map Blue Fields music
 

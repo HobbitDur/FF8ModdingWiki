@@ -20,4 +20,4 @@ none
 
 #### Description
 
-Ends the effects of [LASTIN](157_LASTIN).
+Ends the effects of [LASTIN](../157-lastin/).

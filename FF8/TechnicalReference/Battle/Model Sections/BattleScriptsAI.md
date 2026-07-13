@@ -1,12 +1,13 @@
 ---
-title: Section 8 - Battle scripts/AI
+title: Battle scripts / AI
 layout: default
-parent: Monster files (c0mxxx.dat)
-permalink: /technical-reference/battle/monster-files-c0mxxxdat/section-8-battle-scripts-ai/
+parent: Model file sections
+permalink: /technical-reference/battle/model-sections/battle-scripts-ai/
 nav_order: 8
+author: HobbitDur
 ---
 
-## Section 8: Battle scripts/AI
+## Battle scripts/AI
 
 | Offset | Length  | Description                |
 |--------|---------|-----------------------------|

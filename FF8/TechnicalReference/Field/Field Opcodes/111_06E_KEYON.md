@@ -23,4 +23,4 @@ none
 
 #### Description
 
-Enables certain keys to be pressed after they are otherwise disabled (for example with [UCOFF](../../../Script/Opcodes/04E_UCOFF)
+Enables certain keys to be pressed after they are otherwise disabled (for example with [UCOFF](../04e-ucoff/)

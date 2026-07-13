@@ -69,7 +69,7 @@ In the case of a PAL iso, there are 5 unknown sectors (a sector = 2048 bytes in 
 
 ## Field Files
 
-In the list of root files, the third file is in fact the "FIELD.BIN". This file is [LZS](../FF7/LZS_format) compressed, and contains some informations, like the list of field files position and size.
+In the list of root files, the third file is in fact the "FIELD.BIN". This file is LZS compressed, and contains some informations, like the list of field files position and size.
 
 Find the file list is approximate, I am trying to find some bytes: "\\x04\\x00\\x05\\x24\\x18\\x00\\xbf\\x8f\\x14\\x00\\xb1\\x8f\\x10\\x00\\xb0\\x8f\\x20\\x00\\xbd\\x27\\x08\\x00\\xe0\\x03\\x00\\x00\\x00\\x00" (size=28), normally, there is the list right after this sequence of bytes, and before the "\\x00\\x00\\x01\\x00\\x02\\x00\\x03\\x00" (size=8) sequence.
 
@@ -86,9 +86,9 @@ There are three LZSed files for each field: EXAMPLE.MIM, EXAMPLE.DAT and EXAMPLE
 |----------------------|----------|--------------------------------------------------------------|
 | 0                    | 4        | Location of section 3 in PSX RAM                             |
 | 4                    | 4        | Location of section 4 in PSX RAM                             |
-| 8                    | 4        | [Unknown data \[PVP](FileFormat_PVP)\]        |
+| 8                    | 4        | Unknown data \[PVP\] (was a link, target page no longer exists)        |
 | 12                   | 438272   | [Background data \[MIM](../Field/Field%20File%20Format/FileFormat_MIM)\]     |
-| 438284 (section 3)   | *Varies* | [Font data \[TDW](../Field/Field%20File%20Format/FileFormat_TDW.md)\]           |
+| 438284 (section 3)   | *Varies* | [Font data \[TDW](../../field/field-file-format/extra-font/)\]           |
 | *Varies* (section 4) | *Varies* | [Particle Image Data \[PMP](../Field/Field%20File%20Format/FileFormat_PMP)\] |
 
 ### Second file (\*.DAT)
@@ -97,14 +97,14 @@ There are three LZSed files for each field: EXAMPLE.MIM, EXAMPLE.DAT and EXAMPLE
 |--------|----------|----------------------------------------|----------------------------------------------------------------|
 | 0      | 4        | Location of section 1 in PSX RAM       | [Triggers & gateways \[INF](../Field/Field%20File%20Format/FileFormat_INF)\]   |
 | 4      | 4        | Location of section 2 in PSX RAM       | [Camera \[CA](../Field/Field%20File%20Format/FileFormat_CA)\]                  |
-| 8      | 4        | Location of section 3 in PSX RAM       | [Walkmesh \[ID](../FF7/Field/Camera_Matrix)\]          |
+| 8      | 4        | Location of section 3 in PSX RAM       | Walkmesh \[ID\]          |
 | 12     | 4        | Location of section 4 in PSX RAM       | [Background infos \[MAP](../Field/Field%20File%20Format/FileFormat_MAP)\]      |
 | 16     | 4        | Location of section 5 in PSX RAM       | [Movie cam \[MSK](../Field/Field%20File%20Format/FileFormat_MSK)\]             |
 | 20     | 4        | Location of section 6 in PSX RAM       | [Battle rate \[RAT](../Field/Field%20File%20Format/FileFormat_RAT_MRT)\]       |
 | 24     | 4        | Location of section 7 in PSX RAM       | [Battle formations \[MRT](../Field/Field%20File%20Format/FileFormat_RAT_MRT)\] |
 | 28     | 4        | Location of section 8 in PSX RAM       | Sounds/AKAOs                                                   |
 | 32     | 4        | Location of section 9 in PSX RAM       | [Texts \[MSD](../Field/Field%20File%20Format/FileFormat_MSD)\]                 |
-| 36     | 4        | Location of section 10 in PSX RAM      | [Particle Infos \[PMD](FileFormat_PMD)\]        |
+| 36     | 4        | Location of section 10 in PSX RAM      | Particle Infos \[PMD\] (was a link, target page no longer exists)        |
 | 40     | 4        | Location of section 11 in PSX RAM      | [Scripts \[JSM](../Field/Field%20File%20Format/FileFormat_JSM)\]               |
 | 44     | 4        | Location of the end of file in PSX RAM |                                                                |
 | 48     | *varies* | Triggers and gateways                  |                                                                |

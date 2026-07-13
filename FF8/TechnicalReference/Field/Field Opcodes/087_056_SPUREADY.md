@@ -23,6 +23,6 @@ none
 
 #### Description
 
-Sets the asynchronous timer to 0 frames. See [SPUSYNC](164_SPUSYNC) for details.
+Sets the asynchronous timer to 0 frames. See [SPUSYNC](../164-spusync/) for details.
 
 This does something to access hardware, but I don't know what. Calling it causes some drives to make noises.

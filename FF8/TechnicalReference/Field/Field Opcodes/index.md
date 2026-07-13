@@ -41,7 +41,7 @@ if(var1024 == 6)  {
 ## Reading Documentation
 
 Each Opcode's page lists all the parameters for that function in the order you would put them on the stack before the function call. The inline argument is
-listed separately, if the function requires one. For example, on the page for [SET3](01E-set3), the parameters are listed like this:
+listed separately, if the function requires one. For example, on the page for [SET3](01e-set3/), the parameters are listed like this:
 
 *XCoord*
 

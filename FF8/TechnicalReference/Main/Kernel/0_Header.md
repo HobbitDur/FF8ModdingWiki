@@ -19,32 +19,32 @@ permalink: /technical-reference/main/kernel/header/
 | 0x0000 | 4 bytes | Number of sections                                                                                                |
 | 0x0004 | 4 bytes | Offset to [**Battle commands** section                              ](../battle-commands)                         |
 | 0x0008 | 4 bytes | Offset to [**Magic data** section                                   ](../magic)                                   |
-| 0x000C | 4 bytes | Offset to [**Junctionable GFs** section                             ](../junctionable-GFs)                        |
+| 0x000C | 4 bytes | Offset to [**Junctionable GFs** section                             ](../junctionable-gfs/)                        |
 | 0x0010 | 4 bytes | Offset to [**Enemy attacks** section                                ](../enemy-attacks)                           |
 | 0x0014 | 4 bytes | Offset to [**Weapons** section                                      ](../weapons)                                 |
 | 0x0018 | 4 bytes | Offset to [**Renzokuken finishers** section                         ](../renzokuken-finishers)                    |
 | 0x001C | 4 bytes | Offset to [**Characters** section                                   ](../characters)                              |
 | 0x0020 | 4 bytes | Offset to [**Battle items** section                                 ](../battle-items)                            |
-| 0x0024 | 4 bytes | Offset to [**Non-battle item name and description offsets** section ](../non-battle-item-and-description-offsets) |
-| 0x0028 | 4 bytes | Offset to [**Non-junctionable GF attacks** section                  ](../non-junctionable-GF-attacks)             |
+| 0x0024 | 4 bytes | Offset to [**Non-battle item name and description offsets** section ](../non-battle-item-name-and-description-offset) |
+| 0x0028 | 4 bytes | Offset to [**Non-junctionable GF attacks** section                  ](../non-junctionable-gf-attacks/)             |
 | 0x002C | 4 bytes | Offset to [**Command abilities in battle** section                  ](../command-abilities-in-battle)             |
 | 0x0030 | 4 bytes | Offset to [**Junction abilities** section                           ](../junction-abilities)                      |
 | 0x0034 | 4 bytes | Offset to [**Command abilities GF** section                         ](../command-abilities-gf)                    |
-| 0x0038 | 4 bytes | Offset to [**Stat percentage increasing abilities** section         ](../stat-percentage-increasin-abilities)     |
-| 0x003C | 4 bytes | Offset to [**Character abilities** section                          ](../character-abilities)                     |
+| 0x0038 | 4 bytes | Offset to [**Stat percentage increasing abilities** section         ](../stat-percentage-increasing-abilities)     |
+| 0x003C | 4 bytes | Offset to [**Character abilities** section                          ](../characters-abilities)                     |
 | 0x0040 | 4 bytes | Offset to [**Party abilities** section                              ](../party-abilities)                         |
 | 0x0044 | 4 bytes | Offset to [**GF abilities** section                                 ](../gf-abilities)                            |
 | 0x0048 | 4 bytes | Offset to [**Menu abilities** section                               ](../menu-abilities)                          |
-| 0x004C | 4 bytes | Offset to [**Temporary character limit breaks** section             ](../temporary-character-limit-breaks)        |
+| 0x004C | 4 bytes | Offset to [**Temporary character limit breaks** section             ](../temporary-characters-limit-breaks)        |
 | 0x0050 | 4 bytes | Offset to [**Blue magic (Quistis limit break)** section             ](../blue-magic)                              |
 | 0x0054 | 4 bytes | Offset to [**Blue magic Parameters** section                        ](../blue-magic-parameters)                   |
-| 0x0058 | 4 bytes | Offset to [**Shot (Irvine limit break)** section                    ](../shot-(irvine-limit-breaks))              |
-| 0x005C | 4 bytes | Offset to [**Duel (Zell limit break)** section                      ](../duel-(zell-limit-breaks))                |
-| 0x0060 | 4 bytes | Offset to [**Duel Params** section                                  ](../duel-params)                             |
+| 0x0058 | 4 bytes | Offset to [**Shot (Irvine limit break)** section                    ](../shot-irvine-limit-breaks)              |
+| 0x005C | 4 bytes | Offset to [**Duel (Zell limit break)** section                      ](../duel-zell-limit-break)                |
+| 0x0060 | 4 bytes | Offset to [**Duel Params** section                                  ](../duel-parameters)                             |
 | 0x0064 | 4 bytes | Offset to [**Rinoa limit breaks (part 1)** section                  ](../rinoa-commands)                          |
 | 0x0068 | 4 bytes | Offset to [**Rinoa limit breaks (part 2)** section                  ](../rinoa-combine-limit-break)               |
-| 0x006C | 4 bytes | Offset to [**Slots Array** section                                  ](../slots-array)                             |
-| 0x0070 | 4 bytes | Offset to [**Slots Sets** section                                   ](../slots-seets)                             |
+| 0x006C | 4 bytes | Offset to [**Slots Array** section                                  ](../slot-array)                             |
+| 0x0070 | 4 bytes | Offset to [**Slots Sets** section                                   ](../slot-sets)                             |
 | 0x0074 | 4 bytes | Offset to [**Devour** section                                       ](../devour)                                  |
 | 0x0078 | 4 bytes | Offset to [**Misc** section                                         ](../misc)                                    |
 | 0x007C | 4 bytes | Offset to [**Misc text pointers** section                           ](../misc-text-pointers)                      |

@@ -23,4 +23,4 @@ none
 
 #### Description
 
-Pauses this script until *frame count* frames have passed since [SPUREADY](056_SPUREADY) was called.
+Pauses this script until *frame count* frames have passed since [SPUREADY](../056-spuready/) was called.

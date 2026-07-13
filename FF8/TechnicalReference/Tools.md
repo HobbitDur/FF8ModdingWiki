@@ -51,7 +51,7 @@ permalink: /technical-reference/tools/
 - **PuPuSharp**: _FF8 Field Importer/Exporter_
     - __Author(s)__: @julianxhokaxhiu
     - __Link__:  [Download link](https://github.com/julianxhokaxhiu/PuPuSharp/releases)
-- **Quezacotl**: _Final Fantasy VIII init.out editor_
+- **Quezacotl**: _Final Fantasy VIII [init.out](../miscellaneous/init-out/) editor_
     - __Author(s)__: DarkShinryu
     - __Link__:  [Download link](https://github.com/HobbitDur/quezacotl-enhanced/releases)
 - **Rinoa-s-Toolset**: _All-in-one modding toolset for FF8_

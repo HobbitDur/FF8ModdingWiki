@@ -8,7 +8,7 @@ permalink: /technical-reference/list/battle-animation-state/
 1. TOC
 {:toc}
 
-Reference for the per-entity animation state used by the [animation sequences]({{site.baseurl}}/technical-reference/battle/monster-files-c0mxxxdat/section-5-animation-sequences/) (readable/writable via the C3/E5 special variables).
+Reference for the per-entity animation state used by the [animation sequences]({{site.baseurl}}/technical-reference/battle/model-sections/animation-sequences/) (readable/writable via the C3/E5 special variables).
 
 # Entity animation status flags (anim_status)
 

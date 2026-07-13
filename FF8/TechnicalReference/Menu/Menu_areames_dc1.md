@@ -7,7 +7,7 @@ permalink: /technical-reference/menu/areamesdc1-file-format/
 
 ## Format
 
-Same format as: **[Menu mngrp string section](../Menu_mngrp_strings_section)**
+Same format as: **[Menu mngrp string section](../mngrp-string-section/)**
 
 ## Contents
 

@@ -80,19 +80,19 @@ permalink: /technical-reference/main/kernel/magic/
 |--------|---------|-------------------------------------------------------------------------------------------------|
 | 0x0000 | 2 bytes | Offset to spell name                                                                            |
 | 0x0002 | 2 bytes | Offset to spell description                                                                     |
-| 0x0004 | 2 bytes | Magic ID — **this is the effect / animation id** dispatched at runtime (Fire=2, Thunder=3, Thundara=102 → `MAG_<id>_<name>`, file `mag<id-1>`). See [Magic Spell Effect Runtime](../../battle/magic-spell-effect-runtime/) |
+| 0x0004 | 2 bytes | Magic ID — **this is the effect / animation id** dispatched at runtime (Fire=2, Thunder=3, Thundara=102 → `MAG_<id>_<name>`, file `mag<id-1>`). See [Magic Spell Effect Runtime](../../../battle/magic-spell-effect-runtime/) |
 | 0x0006 | 1 byte  | Animation triggered — coarse **category**, not the per-spell effect (that's +0x04): `5` for every offensive spell, `0` for curatives. Routes to a shared/secondary effect; exact use unconfirmed |
 | 0x0007 | 1 byte  | [Attack type]({site.baseurl}}/technical-reference/list/kernel#attack-type)                      |
 | 0x0008 | 1 byte  | Spell power (used in damage formula)                                                            |
-| 0x0009 | 1 byte  | Unknown                                                                                         |
+| 0x0009 | 1 byte  | Unknown — real per-spell byte, copied into the field character data during menu magic setup (`setMenuFlagMagicOnCharaData`, `linkedStockFieldCharData`); exact gameplay meaning not yet identified |
 | 0x000A | 1 byte  | [TargetInfo]({{site.baseurl}}/technical-reference/list/kernel#target-info)                      |
 | 0x000B | 1 byte  | Attack Flags                                                                                    |
 | 0x000C | 1 byte  | Draw resist (how hard is the magic to draw)                                                     |
 | 0x000D | 1 byte  | Hit count (works with meteor animation, not sure about others)                                  |
 | 0x000E | 1 byte  | [Element]({{site.baseurl}}/technical-reference/list/magic-list#element)                         |
-| 0x000F | 1 byte  | Unknown                                                                                         |
+| 0x000F | 1 byte  | Unused (padding) — no code references this byte (IDA: 0 xrefs)                                  |
 | 0x0010 | 4 bytes | [Status 2]({{site.baseurl}}/technical-reference/list/status-flags#status-2)                     |
-| 0x0012 | 2 bytes | [Status 1]({{site.baseurl}}/technical-reference/list/status-flags#status-1)                     |
+| 0x0014 | 2 bytes | [Status 1]({{site.baseurl}}/technical-reference/list/status-flags#status-1)                     |
 | 0x0016 | 1 byte  | Status attack Accuracy                                                                          |
 | 0x0017 | 1 byte  | Characters HP junction value                                                                    |
 | 0x0018 | 1 byte  | Characters STR junction value                                                                   |
@@ -127,4 +127,4 @@ permalink: /technical-reference/main/kernel/magic/
 | 0x0037 | 1 byte  | Cactuar compatibility                                                                           |
 | 0x0038 | 1 byte  | Tonberry compatibility                                                                          |
 | 0x0039 | 1 byte  | Eden compatibility                                                                              |
-| 0x003A | 2 bytes | Unknown                                                                                         |
+| 0x003A | 2 bytes | Unused (padding) — no code references these bytes (IDA: 0 xrefs)                                |

@@ -42,7 +42,7 @@ All offsets are absolute (from the start of the file).
 
 ## Textures
 
-Standard [TIM format](../PSX/TIM_format) textures, 128x128, 4-bit (16 colors) or 8-bit (256 colors) paletted. The face's `texture index` (section 4) selects the TIM in header order.
+Standard [TIM format](../../../psx/tim-file-format/) textures, 128x128, 4-bit (16 colors) or 8-bit (256 colors) paletted. The face's `texture index` (section 4) selects the TIM in header order.
 
 ## Model Data
 
@@ -66,7 +66,7 @@ The model data starts with a 64-byte header. All offsets in it are relative to t
 | 0x30   | 4 bytes | Offset of unknown data (section 5)     |
 | 0x34   | 4 bytes | Offset of skin objects (section 6)     |
 | 0x38   | 4 bytes | Offset of animation data (section 7)   |
-| 0x3C   | 4 bytes | Unknown (often 0x01040118 / 0x01180104-like values) |
+| 0x3C   | 4 bytes | Special bone ids (e.g. 0x01180104, 0x01FF0104): byte 0 and byte 1 = the two look-at bones (neck/head, used by the FACEDIR field script opcodes), byte 2 = extra bone (0x18 = bone 24 on the Squall variants, 0xFF = none). Copied to the model instance at load (sub_531310 command 17) |
 
 ## Section 1: Skeleton
 
@@ -196,7 +196,7 @@ Then for each animation:
 
 ### Uncompressed frames (main_chr MCH rest pose)
 
-The single animation embedded in a main_chr MCH uses plain 16-bit values. Frame layout:
+The single animation embedded in a main_chr MCH uses plain 16-bit values. **The game never reads it**: the loader (Field_CharaOne) patches the MCH's animation offset to point at the chara.one animation block before the model is converted, so this rest pose is dev-tool leftover data. Frame layout:
 
 | Offset | Length          | Description                                        |
 |--------|-----------------|----------------------------------------------------|
@@ -259,7 +259,8 @@ Function addresses for the 2000 PC version:
 | 0x533F90 | Field_CharaBuildBoneRotationMatrix  | Builds a rotation matrix from 3 angles using SIN_TABLE_4096 (0xB924BC) / COS_TABLE_4096 (0xB944C0), index & 0xFFF |
 | 0x531DA0 | Field_CharaModelCommand             | Command-style API for field scripts (command 32 = read a bone's decoded pose, used by the FACEDIR opcodes) |
 | 0x532930 | Field_CharaUpdateTextureAnim        | Eye-blink texture animation (random timer, VRAM rectangle copies) |
-| 0x532AE1 | Field_CharaOne                      | chara.one loader |
+| 0x532AE1 | Field_CharaOne                      | chara.one loader. For main characters it patches the MCH header's animation offset to point at the chara.one animation block |
+| 0x531310 | (model object constructor)          | Command 17 builds the per-model runtime object from the model data (applies the chara.one scale to vertices AND bone lengths: value * scale / 16); command 18 converts the animation section into the runtime layout (8-byte translation slot + 4 bytes per bone per frame) |
 
 Useful model instance fields (instances in `CHARA_MODEL_INSTANCE_TABLE`, 0x1DCB340): +4 runtime bone array, +8 animation data pointer, +82 frame counter (frame << 4, low bits = interpolation subframe), +98 GETA height offset, +112/113 blink texture ids, +114 flags (bit 2 = uncompressed 8-byte poses).
 

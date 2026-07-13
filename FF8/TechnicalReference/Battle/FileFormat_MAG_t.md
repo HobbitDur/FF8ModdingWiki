@@ -51,7 +51,7 @@ Example:
 
 -   Note: yes, there's no texture sign in name
 
-To know, how to find out if the given file is texture, please reffer to [MAGfiles\_Generic](FileFormat_magfiles.md)
+To know, how to find out if the given file is texture, please reffer to [MAGfiles\_Generic](../mag-file-format/)
 
 ### Type C (chaos like)
 
@@ -65,4 +65,4 @@ Example:
 
 -   Note: yes, there's no texture sign in name
 
-To know, how to find out if the given file is texture, please reffer to [MAGfiles\_Generic](FileFormat_magfiles.md)
+To know, how to find out if the given file is texture, please reffer to [MAGfiles\_Generic](../mag-file-format/)

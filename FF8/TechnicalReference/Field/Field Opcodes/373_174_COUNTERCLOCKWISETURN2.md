@@ -27,4 +27,4 @@ none
 
 Turns this entity counterclockwise to face some direction. The only noticeable difference between this and the other turn functions is that the turn is always counterclockwise.
 
-It is unknown how this differs from [UNKNOWN7](172_UNKNOWN7).
+It is unknown how this differs from [UNKNOWN7](../172-unknown7/).

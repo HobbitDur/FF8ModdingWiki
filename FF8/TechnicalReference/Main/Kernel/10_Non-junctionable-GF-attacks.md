@@ -45,7 +45,7 @@ permalink: /technical-reference/main/kernel/non-junctionable-gf-attacks/
 | 0x0007 | 1 byte  | Unknown                                                                                                                                                                                      |
 | 0x0008 | 1 byte  | Status flags                                                                                                                                                                                 |
 | 0x0009 | 1 byte | Unknown                                                                                                                                                                                  |
-| 0x0009 | 1 byte | Hit Count                                                                                                                                                                                      |
+| 0x000A | 1 byte | Hit Count                                                                                                                                                                                      |
 | 0x000B | 1 byte  | Element<br/><br/> *0x00 - Non-Elemental<br/> 0x01 - Fire<br/> 0x02 - Ice<br/> 0x04 - Thunder<br/> 0x08 - Earth<br/> 0x10 - Poison<br/> 0x20 - Wind<br/> 0x40 - Water<br/> 0x80 - Holy*       |
 | 0x000C | 1 byte  | Status 1<br/><br/> *0x00 - None<br/> 0x01 - Sleep<br/> 0x02 - Haste<br/> 0x04 - Slow<br/> 0x08 - Stop<br/> 0x10 - Regen<br/> 0x20 - Protect<br/> 0x40 - Shell<br/> 0x80 - Reflect*           |
 | 0x000D | 1 byte  | Status 2<br/><br/> *0x00 - None<br/> 0x01 - Aura<br/> 0x02 - Curse<br/> 0x04 - Doom<br/> 0x08 - Invincible<br/> 0x10 - Petrifying<br/> 0x20 - Float<br/> 0x40 - Confusion<br/> 0x80 - Drain* |

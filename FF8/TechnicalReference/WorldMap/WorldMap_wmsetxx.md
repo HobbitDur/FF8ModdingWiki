@@ -455,50 +455,54 @@ Compact token streams used to assemble dynamic dialog. Each template is a sequen
 
 ---
 
-## Section 34: World-map draw points
+## Section 34: World-map draw points (positions / trigger table)
 
-Magic / GF draw-point locations on the world map. The first 44 bytes (0x2C) are reserved/unused header padding; records follow as 4 bytes each.
+The world-map draw-point table. It holds the **trigger position** of each world draw point — **not** its magic. When the player presses the action button near a draw point, the world map uses this section to work out *which* draw-point index the player is standing on, then reads that index's magic / refill / high-yield byte from the EXE `DrawPointData` table (see [Draw point]({{site.baseurl}}/technical-reference/exedata/draw-point/)). So this section answers "*where* is world draw point N", while the EXE answers "*what* does it give".
 
-| Offset       | Length  | Description                |
-|--------------|---------|----------------------------|
-| 0x00         | 44 bytes| Unused header              |
-| 0x2C + N × 4 | 4 bytes | `DrawPoint`                |
+> **Correction:** earlier notes described byte 2 of each record as a `magic_id` (with a `+0x80` offset) and reproduced a magic table. That is wrong. Byte 2 is a location discriminator, and world draw-point magic is stored in the EXE, not here. The old magic table is dropped.
+
+### Layout
+
+| Offset       | Length   | Description                    |
+|--------------|----------|--------------------------------|
+| 0x00         | 40 bytes | Block table: 5 × `BlockRange`  |
+| 0x28         | 4 bytes  | `records_base` (always `0x2C`) |
+| 0x2C + N × 4 | 4 bytes  | `DrawPoint` record (128 total) |
+
+The section is `0x2C` (44) bytes of header followed by exactly **128** four-byte records (index `N = 0..127`). The record count is fixed; records are stored in draw-ID order.
+
+**BlockRange** (8 bytes) — one per world-map draw-point block:
+
+| Offset | Length  | Type   | Field        |
+|--------|---------|--------|--------------|
+| 0      | 4 bytes | uint32 | `start_off`  |
+| 4      | 4 bytes | uint32 | `end_off`    |
+
+`start_off` / `end_off` are byte offsets (relative to the section start) delimiting that block's slice of the record array. In `wmsetus.obj` the five blocks are `[0x2C,0x200)`, `[0x200,0x204)`, `[0x204,0x208)`, `[0x208,0x210)`, `[0x210,0x228)` — i.e. record ranges `0..116`, `117`, `118`, `119..120`, `121..126`. The runtime picks a block per world region through a small EXE lookup table (`0xC76E70`, indexed by `region & 0x1F`), so only the draw points in the player's current region are scanned. Because records never move, the block table stays valid when records are edited in place.
 
 **DrawPoint** (4 bytes):
 
-| Offset | Length  | Type   | Field      |
-|--------|---------|--------|------------|
-| 0      | 1 byte  | uint8  | `x`        |
-| 1      | 1 byte  | uint8  | `y`        |
-| 2      | 2 bytes | uint16 | `magic_id` |
+| Offset | Length  | Type   | Field    |
+|--------|---------|--------|----------|
+| 0      | 1 byte  | uint8  | `x`      |
+| 1      | 1 byte  | uint8  | `y`      |
+| 2      | 1 byte  | uint8  | `sub_id` |
+| 3      | 1 byte  | uint8  | padding (always `0`) |
 
-To get the real magic ID, add `0x80` to `magic_id` (so the on-disk value `0` corresponds to magic ID `0x81`).
+- `x`, `y` together form the 16-bit world-map **block id** (`x | y << 8`) that the draw point is anchored to. `x` is the block column, `y` the block row. (Per legacy notes, `x` spans `0x00..0xFF` with the high bit selecting the lower of two stacked rows within a segment; `y` is the segment/row index.)
+- `sub_id` is a **location discriminator**: several draw points can share the same `(x, y)` block, and `sub_id` tells them apart. On the islands (Closest to Heaven / Hell) many records share a block and differ only by `sub_id` — e.g. block `(113, 10)` carries three draw points with `sub_id` `15`, `27`, `33`.
 
-**Coordinate encoding (per legacy notes):** `X` ranges over `0x00..0xFF` where `rowBlockAmount = 4 × segments_per_row = 128 = 0x80`. The high bit of `X` selects the lower of two stacked rows, so `X = 0x00..0x7F` is the first row and `X = 0x80..0xFF` the second. `Y` increments when `X` overflows.
+### How a draw is resolved (runtime)
 
-**Magic ID reference (original release)**: the on-disk byte `m` maps to magic ID `m + 0x81`. Reproduced from the original wiki dump (`ID, ?, ?, Name`):
+`WorldMap_DrawPointsParsing_wmset35` (`0x54F920`) scans the block for the record whose `(x,y)` equals the current block id **and** whose `sub_id` equals the current location index, and returns the **record index** `N` (0..127). `World_Interaction_Draw_SubQuest` (`0x54E9B0`) then:
 
-```
-129 0 1 Cure        130 0 1 Esuna       131 0 1 Thunder     132 0 1 Fira
-133 0 1 Thundara    134 0 1 Blizzara    135 0 1 Blizzard    136 0 1 Fire
-137 0 1 Cure        138 0 1 Water       139 0 1 Cura        140 0 1 Esuna
-141 0 1 Scan        142 0 1 Shell       143 0 1 Haste       144 0 1 Aero
-145 0 1 Bio         146 0 1 Life        147 0 1 Demi        148 0 1 Protect
-149 0 1 Holy        150 0 1 Thundaga    151 0 1 Stop        152 0 1 Firaga
-153 0 1 Regen       154 0 1 Blizzaga    155 0 1 Confuse     156 0 1 Flare
-157 0 1 Dispel      158 0 1 Slow        159 0 1 Quake       160 0 1 Curaga
-161 0 1 Tornado     162 0 0 Full-Life   163 0 1 Reflect     164 0 0 Aura
-165 0 0 Quake       166 0 1 Double      167 0 1 Break       168 0 0 Meteor
-169 0 0 Ultima      170 0 1 Triple      171 0 1 Confuse     172 0 1 Blind
-173 1 1 Quake       174 0 1 Sleep       175 0 1 Silence     176 1 1 Flare
-177 0 1 Death       178 0 1 Drain       179 1 1 Pain        180 0 1 Berserk
-181 0 1 Float       182 0 1 Zombie      183 0 1 Meltdown    184 1 0 Ultima
-185 1 1 Tornado     186 1 1 Quake       187 1 1 Meteor      188 1 1 Holy
-189 1 1 Flare       190 1 1 Aura        191 1 1 Ultima      192 1 1 Triple
-193 1 1 Full-Life   194 1 1 Tornado     195 1 1 Quake       196 1 1 Meteor
-197 1 1 Holy        198 1 1 Flare       199 1 1 Aura        200 1 1 Ultima
-... (full table extends to 256 1 1 Scan)
-```
+1. adds `128` → EXE `DrawPointData` index (`128..255`);
+2. calls `GetDrawMagic` (`0x52D1E0`) → reads the magic / refill / high-yield byte from the EXE table at `0xB92328`;
+3. decodes it exactly like a field draw point (`magic = byte & 0x3F`, `refill = byte & 0x40`, `high_yield = byte & 0x80`).
+
+### Mapping to the EXE draw table
+
+Record index `N` (0..127) is world draw point `N`; its magic/refill/high-yield lives at EXE `DrawPointData[128 + N]`, i.e. **Draw ID `129 + N`** in the 1-based numbering used by [Draw point]({{site.baseurl}}/technical-reference/exedata/draw-point/). Record 127 is the unused final entry (`x=y=sub_id=0`, Draw ID 256). The section is parsed by `Wmset_ParseSections` (`0x542DA0`) into the global `dword_2040124`.
 
 ---
 

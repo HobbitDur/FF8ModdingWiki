@@ -20,4 +20,4 @@ none
 
 #### Description
 
-Stops the currently playing background music and starts playing music loaded by [MUSICLOAD](0B5_MUSICLOAD).
+Stops the currently playing background music and starts playing music loaded by [MUSICLOAD](../0b5-musicload/).

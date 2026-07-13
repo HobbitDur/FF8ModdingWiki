@@ -22,4 +22,4 @@ none
 
 Disables random battles.
 
-Runtime note: this sets the temporary field encounter disable flag checked by the field encounter tick. It prevents field random encounters without changing scripted battles started by [BATTLE](../069-battle/). See [Encounter Trigger Runtime](../../battle/encounter-trigger-runtime/).
+Runtime note: this sets the temporary field encounter disable flag checked by the field encounter tick. It prevents field random encounters without changing scripted battles started by [BATTLE](../069-battle/). See [Encounter Trigger Runtime](../../../battle/encounter-trigger-runtime/).

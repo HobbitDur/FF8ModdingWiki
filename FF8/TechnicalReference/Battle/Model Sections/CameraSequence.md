@@ -1,14 +1,15 @@
 ---
-title: Section 6 - Camera sequence
+title: Camera sequence
 layout: default
-parent: Monster files (c0mxxx.dat)
-permalink: /technical-reference/battle/monster-files-c0mxxxdat/section-6-camera-sequence/
+parent: Model file sections
+permalink: /technical-reference/battle/model-sections/camera-sequence/
 nav_order: 6
+author: HobbitDur
 ---
 
-## Section 6: Camera sequence
+## Camera sequence
 
-The camera sequences reuse the **same byte-code VM** as [section 5](../section-5-animation-sequences/) (arithmetic `C0`-`E5` and jumps `E6`-`F3` behave identically), with camera-specific
+The camera sequences reuse the **same byte-code VM** as [animation sequences](../animation-sequences/) (arithmetic `C0`-`E5` and jumps `E6`-`F3` behave identically), with camera-specific
 callbacks (`CameraSeq_DispatchActionOpcode` at `0x509810`, driver `BS_UpdateCameraSequence` at `0x509610`).
 
 ### Who starts a camera sequence
@@ -18,7 +19,9 @@ A camera data blob starts with a small header containing two relative offsets: o
 A camera sequence is started by calling `Battle_PlayCameraAnimation` (`0x5099A0`) with a pointer to such a blob, which registers both pointers (`CURRENT_CAMERA_SETTING_ADDR` / `CURRENT_CAMERA_ANIMATION_COLLECTION_HEADER_ADDR`). In practice this is called:
 
 - at battle start by `BS_CameraInit` (the battle stage's idle camera),
-- by **every spell/ability effect routine** (the `MAG_xxx` functions in magic.fs and the monster-attack effect inits) when the action's visual effect begins — each effect embeds/points to its own camera data. For monster abilities the camera comes from this section 6; the ability's *camera flag* byte in [section 7](../section-7-informations-stats/) selects the camera behaviour.
+- by **every spell/ability effect routine** (the `MAG_xxx` functions in magic.fs and the monster-attack effect inits) when the action's visual effect begins — each effect embeds/points to its own camera data. For monster abilities the camera comes from this section.
+
+A camera sequence can adapt its framing to the monster it is filming through the [camera category](../information-stats/#byte-246-camera-category) ([information & stats](../information-stats/) byte 246): that per-monster value is converted at battle start into the entity's camera variable, which camera sequences read back via camera-C3 `0x15` (see the table below).
 
 From then on, the battle camera update (`updateBattleCamera` at `0x504060`, every frame unless battle is paused) calls `BS_UpdateCameraSequence`, which interprets the sequence: it runs until opcode `01` (yield, one frame), and stops when it reaches `02` (or any unknown opcode), releasing the camera back to the default behaviour.
 
@@ -46,7 +49,7 @@ Camera C3-family special reads (`CameraSeq_ReadSpecialVar_C3` at `0x509640`):
 | 0x10      | Camera flag variable                                             |
 | 0x11      | Random value                                                     |
 | 0x13      | Count of party members in a specific animation state             |
-| 0x15      | Target entity's camera var (set by entity sequences via E5 0x2B) |
+| 0x15      | Target entity's camera var: its [camera category](../information-stats/#byte-246-camera-category) ([information & stats](../information-stats/) byte 246), also overridable at runtime by entity sequences via E5 0x2B |
 | 0x16      | Target's animation status (with dead-flag fixup)                 |
 | 0x17      | Battle task value                                                |
 | 0x18      | Attacker slot id                                                 |

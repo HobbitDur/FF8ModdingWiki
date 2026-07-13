@@ -20,4 +20,4 @@ none
 
 #### Description
 
-Disables this entity's "push" script. See [PUSHON](059_PUSHON).
+Disables this entity's "push" script. See [PUSHON](../059-pushon/).

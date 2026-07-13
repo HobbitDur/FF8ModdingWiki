@@ -42,7 +42,7 @@ For NPCs: TIM textures at the listed offsets, then model data using the same str
 
 For main characters: the data block is just the animation section (packed format, starting with the uint16 animation count). The game loads the geometry from `main_chr.fs` using the model name.
 
-In the PlayStation version, each model textures + data is [LZS](../FF7/LZS_format) compressed.
+In the PlayStation version, each model textures + data is LZS compressed.
 
 ## Headerless variant
 

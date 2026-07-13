@@ -56,6 +56,17 @@ In the code, the values start at:
     - OG (2013): 0x1CFEA2C
     - Remaster:
 
+## World draw points (position vs. magic)
+
+Draw IDs **129–256** are the world-map draw points, but their data is split across two files:
+
+- **Magic / refill / high-yield** live in this same `DrawPointData` table (the byte layout above is identical to field draw points). The world map reads it through `GetDrawMagic` (`0x52D1E0`) using the EXE index `128 + record`, i.e. Draw ID `129 + record`.
+- **Position** lives in `wmsetxx.obj` **Section 34**, not in the EXE. Each of the 128 world records stores `{x, y, sub_id, pad}`; the runtime finds the record the player is standing on, then adds `128` to get the index into this table. See [WorldMap wmsetxx - Section 34]({{site.baseurl}}/technical-reference/worldmap/worldmap-wmsetxx-file-format/#section-34-world-map-draw-points-positions--trigger-table).
+
+So to move a world draw point, edit wmset Section 34; to change what it gives, edit this table (Draw ID 129–256).
+
+> The per-entry addresses in the table below (from an older dump) drift after ID 010: the real table is **contiguous** from `0xB92328`, so Draw ID `N` is at `0xB92328 + (N − 1)`. The `Hex Value` / magic columns are still a useful reference, but trust the contiguous address, not the `Address` column, for IDs past 010.
+
 ## Draw Points refill process
 
 This part need to be improved

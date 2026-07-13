@@ -23,4 +23,4 @@ none
 
 #### Description
 
-Stop the sound effect currently playing on the given channel. Channel is defined in the call to [EFFECTPLAY2](021_EFFECTPLAY2) and must be a power of 2.
+Stop the sound effect currently playing on the given channel. Channel is defined in the call to [EFFECTPLAY2](../021-effectplay2/) and must be a power of 2.

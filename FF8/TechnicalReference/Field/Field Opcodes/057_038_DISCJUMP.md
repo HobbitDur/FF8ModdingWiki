@@ -31,4 +31,4 @@ Walkmesh ID
 
 #### Description
 
-Same as [MAPJUMP3](FF8/Field/Script/Opcodes/02A_MAPJUMP3 "wikilink"), but also initiate a [DISC](11F_DISC) switch.
+Same as [MAPJUMP3](../02a-mapjump3/), but also initiate a [DISC](../11f-disc/) switch.

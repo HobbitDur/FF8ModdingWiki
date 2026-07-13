@@ -23,4 +23,4 @@ none
 
 #### Description
 
-Preloads a new field music track. You can start the new track by calling [MUSICCHANGE](0B4_MUSICCHANGE).
+Preloads a new field music track. You can start the new track by calling [MUSICCHANGE](../0b4-musicchange/).

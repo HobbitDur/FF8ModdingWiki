@@ -21,4 +21,4 @@ none
 
 #### Description
 
-Returns this entity to its [base animation](02C_BASEANIME).
+Returns this entity to its [base animation](../02c-baseanime/).

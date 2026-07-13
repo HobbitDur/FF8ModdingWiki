@@ -27,6 +27,6 @@ Field SFXID (in the SFX list for that field)
 
 #### Description
 
-Plays a sound effect through the given sound channel. The channel is important because it's the parameter used in [SESTOP](0CD_SESTOP), so you can theoretically have 20 sounds playing at once. 0 doesn't seem like it's a usable channel, but this is untested.
+Plays a sound effect through the given sound channel. The channel is important because it's the parameter used in [SESTOP](../0cd-sestop/), so you can theoretically have 20 sounds playing at once. 0 doesn't seem like it's a usable channel, but this is untested.
 
-Note: It seems each area can have a maximum of 32 sounds predefined (meaning sound ID 31 is the highest you can play with this). You have to use [EFFECTPLAY](0BC_EFFECTPLAY) to use more than 32 sounds.
+Note: It seems each area can have a maximum of 32 sounds predefined (meaning sound ID 31 is the highest you can play with this). You have to use [EFFECTPLAY](../0bc-effectplay/) to use more than 32 sounds.

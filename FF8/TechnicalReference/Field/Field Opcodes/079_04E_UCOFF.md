@@ -20,4 +20,4 @@ none
 
 #### Description
 
-Disable user control. Player will only be able to press "ok" (and pause?) to advance through dialogue. Ends when [UCON](04D_UCON) is called.
+Disable user control. Player will only be able to press "ok" (and pause?) to advance through dialogue. Ends when [UCON](../04d-ucon/) is called.

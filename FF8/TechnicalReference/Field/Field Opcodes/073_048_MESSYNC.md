@@ -23,4 +23,4 @@ none
 
 #### Description
 
-After [AMES](FF8/Field/Script/Opcodes/065_AMES "wikilink") is called, the window it creates stays until either [WINCLOSE](04C_WINCLOSE).
+After [AMES](../065-ames/) is called, the window it creates stays until either [WINCLOSE](../04c-winclose/).

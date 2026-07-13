@@ -42,7 +42,7 @@ permalink: /technical-reference/main/kernel/junctionable-gfs/
 | 0x0004 | 2 bytes | [SpecialAction]({{site.baseurl}}/technical-reference/list/specialaction-list)                    |
 | 0x0006 | 1 byte  | Attack type                                                                                      |
 | 0x0007 | 1 byte  | GF power (used in damage formula)                                                                |
-| 0x0008 | 2 bytes | Unknown                                                                                          |                                                                                       
+| 0x0008 | 2 bytes | Unknown — read in `ResetAndParseBattleAndFieldCharacter`; purpose not yet identified              |                                                                                       
 | 0x000A | 1 byte  | Attack Flags                                                                                     |
 | 0x000B | 1 bytes | HIT_TYPE_TARGET_ANIMATION_TO_PLAY                                                                |
 | 0x000C | 1 bytes | Hit count                                                                                        |
@@ -157,10 +157,9 @@ permalink: /technical-reference/main/kernel/junctionable-gfs/
 | 0x007D | 1 byte  | Cactuar compatibility                                                                            |
 | 0x007E | 1 byte  | Tonberry compatibility                                                                           |
 | 0x007F | 1 byte  | Eden compatibility                                                                               |
-| 0x0080 | 1 byte  | Padding                                                                                          |
-| 0x0082 | 2 byte  | Unknown                                                                                          |
-| 0x0083 | 1 byte  | Power Mod (used in damage formula)                                                               |
-| 0x0084 | 1 byte  | Level Mod (used in damage formula)                                                               |
+| 0x0080 | 2 bytes | Unknown                                                                                          |
+| 0x0082 | 1 byte  | Power Mod (used in damage formula)                                                               |
+| 0x0083 | 1 byte  | Level Mod (used in damage formula)                                                               |
 
 
 

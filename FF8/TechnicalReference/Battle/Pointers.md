@@ -7,7 +7,7 @@ permalink: /technical-reference/battle/battle-stage-pointers/
 
 By MaKiPL.
 
-FF8 engine reads [Battle Stage files](../FileFormat_X)
+FF8 engine reads [Battle Stage files](../battle-stage-x/)
 
 **Here's the list:**
 ```

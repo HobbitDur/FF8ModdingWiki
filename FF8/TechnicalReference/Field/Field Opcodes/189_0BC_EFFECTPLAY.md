@@ -29,8 +29,8 @@ none
 
 #### Description
 
-Plays a sound effect through the given sound channel. The channel is important because it's the parameter used in [SESTOP](0CD_SESTOP).
+Plays a sound effect through the given sound channel. The channel is important because it's the parameter used in [SESTOP](../0cd-sestop/).
 
-Unlike [EFFECTPLAY2](021_EFFECTPLAY2). For example, when you touch a save point, it calls EFFECTPLAY on sound 30, which turns out to be sound 7880 in field IDs.
+Unlike [EFFECTPLAY2](../021-effectplay2/). For example, when you touch a save point, it calls EFFECTPLAY on sound 30, which turns out to be sound 7880 in field IDs.
 
 Sound channel 0 appears to be able to play sounds while it's already playing sounds. Each other channels can only play one sound at a time.

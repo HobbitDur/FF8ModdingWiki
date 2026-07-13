@@ -5,7 +5,7 @@ title: Mngrphd.bin File Format
 permalink: /technical-reference/menu/mngrphdbin-file-format/
 ---
 
-This is the map for [Mngrp.bin](../Menu_mngrp_bin). Locations to data and the size of the section.
+This is the map for [Mngrp.bin](../mngrpbin-file-format/). Locations to data and the size of the section.
 
 Useless entry (with size = 0 or seek = 0xFF) need to be kept or the game crash.
 

@@ -65,7 +65,7 @@ Displays a battle message.
 |----------|------|------------|--------------------------|-----------------------|
 | 1        | 1    | **TextID** | [int](../opcode-type-list#int) | The index of the text |
 
-Texts are defined in [section 7](../monster-files-c0mxxxdat/section-7-informations-stats/) of c0mxxx.dat files.  
+Texts are defined in [section 7](../model-sections/information-stats/) of c0mxxx.dat files.  
 Each text has an ID, starting from 0 and incrementing with each subsequent text.  
 **TextID** corresponds to this ID.  
 Note that battle message speed is ignored.
@@ -572,7 +572,7 @@ Displays a battle message, respecting the _battle message speed_ setting.
 |----------|------|------------|--------------------------|-----------------------|
 | 1        | 1    | **TextID** | [int](../opcode-type-list#int) | The index of the text |
 
-Texts are defined in [section 7](../monster-files-c0mxxxdat/section-7-informations-stats/) of c0mxxx.dat files.  
+Texts are defined in [section 7](../model-sections/information-stats/) of c0mxxx.dat files.  
 Each text has an ID, starting from 0 and incrementing with each subsequent text.  
 **TextID** corresponds to this ID.
 
@@ -635,7 +635,7 @@ Whilst possible, it is not advisable to use **_enter_** on an encounter slot if 
 |----------|------|------------|--------------------------|-------------------------------|
 | 1        | 1    | **Target** | [int](../opcode-type-list#int) | Encounter slot of the monster |
 
-**Target** is the monster's encounter slot, as defined in [scene.out](../BattleStructure).  
+**Target** is the monster's encounter slot, as defined in [scene.out](../battle-structure-sceneout/).  
 
 ---
 
@@ -694,7 +694,7 @@ This text can be found in the bottom left section of the scan screen, where info
 |----------|------|------------|--------------------------|-----------------------|
 | 1        | 1    | **TextID** | [int](../opcode-type-list#int) | The index of the text |
 
-Texts are defined in [section 7](../monster-files-c0mxxxdat/section-7-informations-stats/) of c0mxxx.dat files.  
+Texts are defined in [section 7](../model-sections/information-stats/) of c0mxxx.dat files.  
 Each text has an ID, starting from 0 and incrementing with each subsequent text.  
 **TextID** corresponds to this ID.
 
@@ -827,7 +827,7 @@ Sets this monster's Enabled flag to _True_.
 |----------|------|------------|--------------------------|-------------------------------|
 | 1        | 1    | **Target** | [int](../opcode-type-list#int) | Encounter slot of the monster |
 
-**Target** is the monster's encounter slot, as defined in [scene.out](../BattleStructure).
+**Target** is the monster's encounter slot, as defined in [scene.out](../battle-structure-sceneout/).
 
 ---
 
@@ -848,8 +848,8 @@ Six of these opcodes were previously misnamed (or named before their behavior wa
 
 | Opcode | IfritAI name | Size | Description | Notes |
 |--------|--------------|------|--------------|-------|
-| 0x05 (5) | prepareAnim | 1 | Sets the animation-sequence ID ([section 5](../monster-files-c0mxxxdat/section-5-animation-sequences/)) that will be used when the stored action is launched with **_usePrepared_**. Note that **_use_**/**_useRandom_** overwrite this with the ability's own animation from section 7, so it only has an effect on the prepare→usePrepared path | Used by monsters 11, 12, 91, 109, 122, 124, 126 |
-| 0x09 (9) | **setHitAnim** *(renamed from `anim`)* | 1 | Sets the hit/death **reaction** animation (a [section 5](../monster-files-c0mxxxdat/section-5-animation-sequences/) sequence ID) that this monster plays for the **hit currently being resolved**. How it works: when a hit lands, the engine first derives the default reaction animation from the attack's kernel data (its `animationTriggered` byte, with miss = dodge and crit = stagger overrides), *then* runs the monster's pre-counter section, *then* commits the value into the hit data. An opcode 9 call inside pre-counter therefore lands in exactly the right window to override the reaction. Outside pre-counter (Init/Turn/Counter/Death) the value is recomputed before being read, so it does nothing — which is why earlier testing from the Turn section showed "no impact in game". The engine's own default for a normal death is sequence **3**, which is why almost every vanilla usage is `setHitAnim(3)` guarded by a Death-status check (force the standard death animation), while special monsters use custom sequences (12–16, 36, 49, 59) for unique death/hit reactions | **Renamed 2026-07.** Used by ~25 vanilla monsters, exclusively in the pre-counter section |
+| 0x05 (5) | prepareAnim | 1 | Sets the animation-sequence ID ([section 5](../model-sections/animation-sequences/)) that will be used when the stored action is launched with **_usePrepared_**. Note that **_use_**/**_useRandom_** overwrite this with the ability's own animation from section 7, so it only has an effect on the prepare→usePrepared path | Used by monsters 11, 12, 91, 109, 122, 124, 126 |
+| 0x09 (9) | **setHitAnim** *(renamed from `anim`)* | 1 | Sets the hit/death **reaction** animation (a [section 5](../model-sections/animation-sequences/) sequence ID) that this monster plays for the **hit currently being resolved**. How it works: when a hit lands, the engine first derives the default reaction animation from the attack's kernel data (its `animationTriggered` byte, with miss = dodge and crit = stagger overrides), *then* runs the monster's pre-counter section, *then* commits the value into the hit data. An opcode 9 call inside pre-counter therefore lands in exactly the right window to override the reaction. Outside pre-counter (Init/Turn/Counter/Death) the value is recomputed before being read, so it does nothing — which is why earlier testing from the Turn section showed "no impact in game". The engine's own default for a normal death is sequence **3**, which is why almost every vanilla usage is `setHitAnim(3)` guarded by a Death-status check (force the standard death animation), while special monsters use custom sequences (12–16, 36, 49, 59) for unique death/hit reactions | **Renamed 2026-07.** Used by ~25 vanilla monsters, exclusively in the pre-counter section |
 | 0x19 (25) | doNothing | 1 | Reads and discards one padding byte; a true no-op | |
 | 0x1A (26) | printAndLock | 1 | Displays a battle message and blocks further script execution until that message finishes displaying | |
 | 0x1B (27) | **enterWithAnim** *(renamed from `enterAlt`)* | 2 | Makes the monster in encounter slot `{param1}` enter combat **with an entrance action/animation played immediately** (battle slot = param1 + 3). Internally it queues and executes the same command family as the Phoenix-Pinion/kamikaze effects (sub-type 3), raises the same internal flag as **_prepareSummon_**, then makes the monster present (loaded, visible, targetable) once the entrance animation unlocks. This is the "scripted reinforcement with fanfare" variant of **_enter_**: compare `c0m074` (Biggs), which uses `enterWithAnim(1, 0)` for Wedge's dramatic entrance but plain `enter(2)` for a silent reinforcement | **Renamed 2026-07.** Param2 is passed down as the command's target-slot sub-parameter; its exact role is still unconfirmed |

@@ -17,7 +17,7 @@ none
 #### Stack
 
   
-*Actor code* (set by [PSHAC](013_PSHAC)
+*Actor code* (set by [PSHAC](../013-pshac/)
 
 **ISTOUCH**
 

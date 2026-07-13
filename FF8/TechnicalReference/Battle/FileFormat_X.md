@@ -10,7 +10,7 @@ author:
 permalink: /technical-reference/battle/battle-stage-x/
 ---
 
-Complete list of original battle stages: [List of battle stages](../BS_list)
+Complete list of original battle stages: [List of battle stages](../battle-stage-list/)
 
 ## Info
 
@@ -36,9 +36,11 @@ FF8 loads specific file and reads it from hardcoded (written in FF8 code) positi
 | 8      | uint32 | Objects group \#2          |
 | 12     | uint32 | Objects group \#3          |
 | 16     | uint32 | Objects group \#4          |
-| 20     | uint32 | Texture \[unused in code\] |
+| 20     | uint32 | End of groups = [Texture animation](#texture-animation) block. Equals the texture offset below when the stage has no animation |
 | 24     | uint32 | Texture                    |
-| 28     | uint32 | Relative to EOF            |
+| 28     | uint32 | Relative to EOF \[unused in code\] |
+
+The first value (Number of sections) is fixed `06 00 00 00`; groups \#1..\#4 always follow, and group \#1 is always at offset `20` (`0x20`). The last value (Relative to EOF) is the geometry section size and, like Number of sections, is not read by the engine.
 
 #### Objects Group
 
@@ -90,7 +92,7 @@ Starts at \~0x5d4 (see How the engine handles this file?). \[.text:00509820\]
 
 #### Camera Setting
 
-This 24-byte block is not a fixed structure: it is **byte-code** executed every frame by the shared battle animation-sequence VM (`computeAnimationSequence`, `0x50DB40` — the same interpreter used by [monster animation sequences](../monster-files-c0mxxxdat/section-5-animation-sequences/) and [camera sequences](../monster-files-c0mxxxdat/section-6-camera-sequence/)). `BS_UpdateCameraSequence` (`0x509610`) runs it with the camera opcode handlers (opcodes `< 0xC0` are camera actions dispatched by `a2ParamAnimSeqForCamera` at `0x509810`; `0xC0`+ are the generic VM control/arithmetic opcodes).
+This 24-byte block is not a fixed structure: it is **byte-code** executed every frame by the shared battle animation-sequence VM (`computeAnimationSequence`, `0x50DB40` — the same interpreter used by [monster animation sequences](../model-sections/animation-sequences/) and [camera sequences](../model-sections/camera-sequence/)). `BS_UpdateCameraSequence` (`0x509610`) runs it with the camera opcode handlers (opcodes `< 0xC0` are camera actions dispatched by `a2ParamAnimSeqForCamera` at `0x509810`; `0xC0`+ are the generic VM control/arithmetic opcodes).
 
 This script drives the battle-intro camera. Stage scripts typically start with camera opcode `05 00` = "play the camera animation whose ID is read from camera variable 0" — and variable 0 is filled at battle load with the encounter's [camera data byte from scene.out](../battle-structure-sceneout/#camera-data). This is how each encounter picks its intro camera animation out of the stage's collection below.
 
@@ -332,6 +334,25 @@ Complete list (without replacing bit order - as is in HEX editor/memory):
 | \#14    | 01000000 00111111 | 40 3F |
 | \#15    | 10000000 00111111 | 80 3F |
 | \#16    | 11000000 00111111 | C0 3F |
+
+## Texture animation
+
+Optional block pointed to by geometry header offset `20` (present when that value differs from the texture offset). It animates parts of the stage texture by copying rectangles inside VRAM every few frames — waterfalls, scrolling conveyors, blinking lights. The engine runs it each frame in `BS_UpdateTextureAnimation` (`0x50CB20`); the pointer to the block is kept in `dword_1D98A50`.
+
+The block starts with an array of `uint16` entry offsets (in **words**, relative to the block start; a `0` entry is an unused slot), each pointing to one animated region:
+
+| Offset | Length                   | Description                                                       |
+|--------|--------------------------|-------------------------------------------------------------------|
+| 0      | sint16                   | Destination X (VRAM)                                              |
+| 2      | sint16                   | Destination Y (VRAM)                                              |
+| 4      | sint16                   | Width                                                            |
+| 6      | sint16                   | Height                                                           |
+| 8      | uint8                    | Number of frames (`0` = continuous 1-line scroll)                |
+| 9      | uint8                    | Speed                                                           |
+| 10     | uint16                   | Frame counter \[runtime\]                                        |
+| 12     | sint16 \* 2 \* nbFrames  | Per-frame source origin (X, Y) in VRAM (Y is stored minus 256)   |
+
+Each tick the counter advances by `speed`; on a frame change the engine blits the source rectangle `(srcX, srcY + 256, width, height)` over the destination rectangle, cycling through the frames. Only 17 retail stages use this block.
 
 ## Texture
 

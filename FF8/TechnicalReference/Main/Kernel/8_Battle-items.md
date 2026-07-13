@@ -61,7 +61,7 @@ permalink: /technical-reference/main/kernel/battle-items/
 | 0x0007 | 1 byte  | Attack power                |
 | 0x0008 | 1 byte  | Battle flag                 |
 | 0x0009 | 1 byte  | Target info                 |
-| 0x000A | 1 byte  | Unknown                     |
+| 0x000A | 1 byte  | Linked to selectability (IDA `linkedToSelectability`) — read by `updateBattleItemData` and `Battle_applyDamage` to gate item selectability |
 | 0x000B | 1 byte  | Attack flags                |
 | 0x000C | 1 bytes | Unknown                     |
 | 0x000D | 1 byte  | Status Attack Enabler       |
