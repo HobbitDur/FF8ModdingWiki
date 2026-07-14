@@ -34,6 +34,9 @@ $$
 
 ## Classic damage:
 
+`ComputeMagicAndGFDamage`@0x491ad0 (GF-damage case). `Power` = the `gfPower` byte (offset 0x07);
+`LevelMod`/`PowerMod` = the `levelMod`/`powerMod` tail bytes (offsets 0x83/0x82).
+
 $$
 \text{Damage} = 
 \left
@@ -118,7 +121,7 @@ $$
 
 # Physical
 
-## Classic
+## Classic {#physical-classic}
 
 Base physical damage, straight from the engine (`ComputeWithDamageSTRFormula`@0x492c40 and the
 hit+crit-rolling `computeAttackPhysical`@0x492e10 — identical arithmetic):
@@ -142,7 +145,7 @@ Then `HpModifierComputationForPhysical`@0x48f600 applies, in order: **Protect** 
 `dmg += dmg × elemAttack% × (800 − elemDef)/10000`. (VIT is read from the same `BATTLE_SLOT_DATA[]`
 slot array for players and monsters — one shared code path.)
 
-## Compute crit
+## Compute crit {#compute-crit}
 
 Rolled in `Damage_RollCrit`@0x492b60: **crit if a random byte `0..255` ≤ `CritBonus + LUCK`** (the
 `255×x/255` in the code is a no-op), so
@@ -154,7 +157,7 @@ $$
 `CritBonus` is the weapon's crit bonus (or the enemy attack's / Shot's crit increase), staged in
 `RELATED_TO_CRIT_BONUS`. A crit doubles the physical damage above.
 
-## Hit %
+## Hit % {#hit-rate}
 
 Physical accuracy, from `computeAttackPhysical`@0x492e10:
 
@@ -166,6 +169,44 @@ $$
 The attack lands if `255 × hit% / 100 ≥ rand(0..255)`. **`HitRate = 255` always hits** (the roll is
 skipped); **Darkness** quarters `HitRate` first; **Sleep/Stop** targets are always hit.
 
+## Status inflict chance {#status-accuracy}
+
+Every "Status attack accuracy" byte across the kernel (Magic, GF, Enemy attacks, Renzokuken,
+Battle items, Non-J GF, Command abilities, Blue Magic, Shot, Duel, Rinoa, ...) is the SAME kernel
+field — but which formula actually reads it (if any) depends entirely on the ability's own
+[Attack Type]({{site.baseurl}}/technical-reference/list/kernel#attack-type) byte, which selects a
+damage-compute function in `Battle_DamageGettingRelated`@0x4922b0. Each function below was
+individually decompiled — nothing here is inferred from the byte's *name* alone:
+
+| Attack Types | Function | Behaviour |
+|---|---|---|
+| Physical Attack, % Physical Damage, Renzokuken Finisher, Squall Gunblade Attack, Kamikaze, Everyone's Grudge, Physical Attack (Ignore Target VIT) | `Battle_ApplyStatusWithResistRoll`@0x48f9f0 via the STR/VIT physical core | `chance = accuracy + STR/4 − VIT/4 − resistance`, rolled |
+| Magic Attack, % Magic Damage, GF, GF (Ignore Target SPR), % GF Damage, Magic Attack (Ignore Target SPR), LV? Attack, Unknown 4 | same roll, via `Damage_ComputeMagicAndGF`'s MAG/SPR path | `chance = accuracy + MAG/4 − SPR/4 − resistance`, rolled |
+| Curative Item, White Wind, Give Percentage HP (Angelo Recover) | `Damage_ComputeCurativeItemSpecial`@0x493450 | `cures if accuracy > rand(1..100)` — flat %, no stat terms. **Cures** the listed statuses, doesn't inflict them |
+| Curative Magic, Unknown 1 (Demi-type) | `Damage_ComputeCurativeMagic`@0x493280 | `checkDoubleStatusApply` runs **unconditionally** — `HIT_ATTACK_ACCURACY` is never read. **Byte is dead** |
+| Revive, Revive At Full HP | `GetReviveHP`@0x491940 | Clears Death unconditionally if present and not sealed — accuracy never read. **Byte is dead**, except reviving a Zombie-status target instead deals unmissable magic damage via the Magic-dispatch path |
+| LV Down, LV Up | `computeLvlUpDown`@0x493650 | `succeeds if accuracy > rand(0..255)` — gates the WHOLE level-change action (not a status roll at all); also fails outright if the target is level-change-immune |
+| Fixed Damage, Target Current HP - 1, Fixed Magic Damage Based on GF Level, 1 HP Damage | `Damage_ComputeFixedSpecial`@0x4931c0 | No reference to `HIT_ATTACK_ACCURACY` anywhere in the function. **Byte is dead** |
+| Card | `Battle_RollCardCommand`@0x48fba0 | Capture depends on the **target's HP ratio**, not this byte: `chance = (256 − 255×curHP/maxHP)/256` (~0.4% at full HP → 100% near 0 HP); a second `rand < 16` (6.25%) gives the rare card. **Byte is dead** |
+| Devour | dispatcher case @0x4926cf | Success needs `attackerHP ≥ targetHP`, then `chance = (attackerHP − targetHP)/attackerHP`; the Devour effect comes from the Devour kernel section. **Byte is dead** |
+| Scan, Angelo Search, Moogle Dance | dispatcher cases @0x4925a6 / @0x49284b / @0x4928d3 | Utility actions (reveal info / find item / GF HP recovery) — no roll, accuracy never read. **Byte is dead** |
+| None, Summon Item?, Unknown 2, Unknown 3 | dispatcher `LABEL_46` / no-op default | No damage or status roll at all. **Byte is dead** |
+
+```
+Battle_ApplyStatusWithResistRoll roll (the two confirmed-rolled rows above):
+chance = accuracy + atkStat/4 − tgtStat/4 − targetResistance
+accuracy = 255      -> guaranteed (stat/resistance check skipped entirely)
+chance ≤ 0          -> fails (0%)
+accuracy 250..254   -> guaranteed, as long as chance > 0
+otherwise           -> roll floor(chance × 255 / 100) against rand(0..255)
+(fails outright if the target already has the status, or per-status resistance ≥100)
+```
+
+{: .note }
+>All 37 defined Attack Types (0–36) are accounted for above — every one was read out of the
+>dispatcher `Battle_DamageGettingRelated`@0x4922b0. Only two groups actually consume the
+>status-accuracy byte (the STR/VIT and MAG/SPR rows); for the rest it is genuinely dead, or the
+>Attack Type has its own success mechanic (Card HP-ratio, Devour HP-ratio, LV Up/Down action gate).
 
 # Stat
 

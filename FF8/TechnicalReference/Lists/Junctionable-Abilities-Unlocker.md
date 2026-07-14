@@ -5,6 +5,16 @@ parent: List
 permalink: /technical-reference/list/junctionable-abilities-unlocker/
 ---
 
+{: .warning }
+>Despite the page name, these values are the **"level/prereq" byte** of a GF ability slot (byte+1),
+>which is the *actual* unlock condition read by `BuildGFAbilityList`. The byte the kernel struct
+>calls the "unlocker" (byte+0) is **not** read for learning and is `0` in every retail GF — see
+>[Junctionable GFs]({{site.baseurl}}/technical-reference/main/kernel/junctionable-gfs/).
+
+`0x00` = none / `0x01`–`0x64` = the GF must reach that level; `0x65`–`0x79` = instead of a level,
+the ability in slot `(value − 0x65)` on this same GF must be fully learned first (a same-GF unlock
+chain — e.g. SumMag+20% requires SumMag+10%).
+
 | ID   | Description  |
 |------|--------------|
 | 0x00 | None         |

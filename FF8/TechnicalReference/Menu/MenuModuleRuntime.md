@@ -53,7 +53,7 @@ Inside the host, menus run as **programs** on a small stack machine. The request
 
 Hosted ids: 0/default = main menu (param = "can save here") · 1 = party select · 2/3/4 = name entry Squall/Rinoa/Angelo · 5–20 = name entry GF 0–15 (post-battle GF naming = GF id + 5) · 22 = save-point menu (param = save flags) · 23 = shop (param = shop index; 21 opens the junk shop) · 24 = game-over Continue · 25 = title · 26 = tutorial · 27/28 = name Boko/Griever · 29 = tutorial direct page.
 
-Program table (index = program id): 0 root idle · 1 main menu · 2 item · 3 magic · 4 GF · 5 status · 6 game-over title variant · 7 card album · 8 config · 9/10 party select · 11 shop · 12 junk shop (weapon remodel) · 13 save menu · 14 Tonberry Call Shop · 15 name entry · 16 title · 17 junction · 18 junction demo · 19 refine (incl. Card Mod) · 20 tutorial · 21 Chocobo World transfer · 22 tutorial child · 23 SeeD written test · 24 GF demo · 25/26/31 tutorial demo pages · 27 title Continue/load · 28 status demo · 29 party demo · 30 tutorial direct · 32 partyRest (no UI). The main menu maps its entries to submenu program ids through a small byte table (low 5 bits per entry).
+Program table (index = program id): 0 root idle · 1 main menu · 2 item · 3 magic · 4 GF · 5 status · 6 game-over title variant · 7 card album · 8 config · 9/10 party select · 11 shop · 12 junk shop (weapon remodel) · 13 save menu · 14 Tonberry Call Shop · 15 name entry · 16 title · 17 junction · 18 junction demo · 19 refine (incl. Card Mod) · 20 tutorial · 21 Information hypertext browser ([TextBox pages](../mngrp-textbox-section/)) · 22 game-controls image browser (raw 63-65) · 23 SeeD written test · 24 GF demo · 25/26/31 [tutorial book viewers](../mmag/) (battle tutorial / card rules / card icons) · 27 Chocobo World screen ([mmag2.bin](../mmag2/)) · 28 limit-break demos · 29 character-switch demo · 30 tutorial direct · 32 partyRest (no UI). The main menu maps its entries to submenu program ids through a small byte table (low 5 bits per entry).
 
 ## Text engine (TEXT_LAYER)
 
@@ -75,7 +75,7 @@ Each 20-byte ring entry is `{status, file_id, group_id, dest, callback, cb_arg}`
 |-------|----------|
 | 0/1/2 | tkmnmes1/2/3: group-0 text buffer / shared text kind 1 / kind 2 |
 | 3 | Chocobo World menu data (`ChocoboWorld_Prog27Menu_Update`) |
-| 7 | Background tile descriptors for magita.tim, loaded by the tutorial, magazine and save-point card viewers |
+| 7 | Magazine picture sprites (SP2 quad-list format), loaded by the tutorial, magazine and save-point card viewers |
 | 9, 10 | face1/face2: the two main-menu UI texture pages, reloaded on every sub-screen exit |
 | 12 | magita.tim: tutorial/magazine/item-use background texture |
 | 20/24/28/44/48/71/180 | Magazine category bases; page = base + mmag.bin entry byte 23 (Weapons Monthly 1st / Pet Pals / Weapons Monthly monthly / Occult Fan / Cards / Combat King & TT tutorial / Chocobo World) |

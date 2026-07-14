@@ -27,6 +27,21 @@ padded with 0. The engine itself only trusts the offset/size pairs of mngrphd.bi
 capacity of the destination buffer each section is loaded into, so avoid growing a section beyond its original
 0x800-multiple size.
 
+## Duplicated files: which copy is authoritative
+
+Some menu files exist both as standalone files in the menu archive and as sections inside mngrp.bin. In every
+case **the mngrp.bin copy is the one the game uses**:
+
+* **tkmnmes1/2/3.bin**: the standalone files are never opened by the engine; menu text is read exclusively
+  from mngrp raw entries 0-2.
+* **m000-m004.bin / .msg**: the standalone files *are* loaded into buffers at menu startup, but those buffers
+  are dead (their only references are the loader and the free routine); the refine menus read the copies at
+  raw entries 188-192 / 196-200.
+
+The other standalone menu files (mmag.bin, mmag2.bin, mtmag.bin, mitem.bin, mwepon.bin, mmagic.bin,
+mag_sort.bin, shop.bin, price.bin, pet_exp.bin, mthomas.bin, cyocobo.bin, areames.dc1/dc2, icon.sp1, face.sp2,
+cardanm.sp2...) have **no copy inside mngrp.bin** — they are loaded by name from `ff8/data/eng/menu/`.
+
 ## Mapped Data
 
 | Pos | Header entry | Seek     | Size    | Filename                                                 | Content of the section                                                                  | Present in <br/>ShumiTranslator |
@@ -35,14 +50,14 @@ capacity of the destination buffer each section is loaded into, so avoid growing
 | 1   | 1           | 0x800    | 0x1800  | [tkmnmes2.bin](../tknmnesxbin-file-format/)                          | Menu text                                                                               | Yes                             |
 | 2   | 2           | 0x2000   | 0x2000  | [tkmnmes3.bin](../tknmnesxbin-file-format/)                          | Menu text                                                                               | Yes                             |
 | 3   | 3           | 0x4000   | 0xE000  |                                                          | Chocobo World PocketStation image: a complete 7-block PS1 save file ("SC" magic, MCX app marker, SJIS title "ＦＦ８／Ｃｈｏｃｏｂｏ　Ｗｏｒｌｄ") installed on the emulated memory card by the save screen | No                              |
-| 4   | 7           | 0x12000  | 0x1000  |                                                          | Background tile descriptors for magita.tim (always loaded together with it): string-section-shaped, 79 offset slots (39 used), 16-byte records {UInt32 quad count, quadrant x/y, texture location, width 128, height 96/104, CLUT}. Exact renderer not identified yet | No                              |
+| 4   | 7           | 0x12000  | 0x1000  |                                                          | Magazine picture sprites in the [SP2 quad-list format](#the-sp2-quad-list-sprite-format-pos-4): 79 declared sprite ids, 39 used. Referenced by the picture overlay slots of [mmag.bin](../mmag/) entries | No                              |
 | 5   | 9           | 0x13000  | 0x6800  | face1.bin                                                | Character portraits (main menu UI texture, reloaded on every sub-screen exit)           | No                              |
 | 6   | 10          | 0x19800  | 0x6800  | face2.bin                                                | GF portraits (main menu UI texture, reloaded on every sub-screen exit)                  | No                              |
 | 7   | 12          | 0x20000  | 0x800   | magita.tim                                               | Tutorial/magazine background texture                                                    | No                              |
 | 8   | 16          | 0x20800  | 0xE000  | start00_and_start01.tim                                  | Title screen logo                                                                       | No                              |
-| 9   | 20          | 0x2E800  | 0xC800  | mag00.tim                                                | Weapons Monthly, 1st Issue                                                              | No                              |
-| 10  | 24          | 0x3B000  | 0xC800  | mag07.tim                                                | Pet Pals                                                                                | No                              |
-| 11  | 28          | 0x47800  | 0xC800  | mag00.tim                                                | Weapons Monthly, 1st Issue duplicate of 0x2E800                                         | No                              |
+| 9   | 20          | 0x2E800  | 0xC800  |                                                          | Combat King 001-005 pictures ([magazine viewer](../mmag/) category 1)                   | No                              |
+| 10  | 24          | 0x3B000  | 0xC800  | mag07.tim                                                | Pet Pals Vol.1-6 pictures ([magazine viewer](../mmag/) category 2)                      | No                              |
+| 11  | 28          | 0x47800  | 0xC800  | mag00.tim                                                | Weapons Monthly, 1st Issue                                                              | No                              |
 | 12  | 29          | 0x54000  | 0xC800  | mag01.tim                                                | Weapons Monthly, March Issue                                                            | No                              |
 | 13  | 30          | 0x60800  | 0xC800  | mag02.tim                                                | Weapons Monthly, April Issue                                                            | No                              |
 | 14  | 31          | 0x6D000  | 0xC800  | mag03.tim                                                | Weapons Monthly, May Issue                                                              | No                              |
@@ -72,7 +87,7 @@ capacity of the destination buffer each section is loaded into, so avoid growing
 | 38  | 87          | 0x1A8000 | 0x3000  | [Mngrp_string_section00](../mngrp-string-section/)  | Book text                                                                               | Yes                             |
 | 39  | 88          | 0x1AB000 | 0x800   | [Mngrp_string_section01](../mngrp-string-section/)  | Battle tutorial                                                                         | Yes                             |
 | 40  | 89          | 0x1AB800 | 0x1000  | [Mngrp_string_section02](../mngrp-string-section/)  | Card rules + Icon                                                                       | Yes                             |
-| 41  | 90          | 0x1AC800 | 0x1000  | [Mngrp_string_section03](../mngrp-string-section/)  | Chocobo World intro story, shown by the save-point Chocobo World screen                | Yes                             |
+| 41  | 90          | 0x1AC800 | 0x1000  | [Mngrp_string_section03](../mngrp-string-section/)  | Chocobo World screen text: story slides (0-4) + Solo RPG manual pages (5-14), referenced by [mmag2.bin](../mmag2/) | Yes                             |
 | 42  | 95          | 0x1AD800 | 0x800   | [Mngrp_string_section04](../mngrp-string-section/)  | Test seed generic text (congrats, fail,...)                                             | Yes                             |
 | 43  | 96          | 0x1AE000 | 0x800   | [Mngrp_string_section05](../mngrp-string-section/)  | Test seed 1                                                                             | Yes                             |
 | 44  | 97          | 0x1AE800 | 0x800   | [Mngrp_string_section06](../mngrp-string-section/)  | Test seed 2                                                                             | Yes                             |
@@ -105,7 +120,7 @@ capacity of the destination buffer each section is loaded into, so avoid growing
 | 71  | 124         | 0x1BC000 | 0x800   | [Mngrp_string_section33](../mngrp-string-section/)  | Test seed 29                                                                            | Yes                             |
 | 72  | 125         | 0x1BC800 | 0x800   | [Mngrp_string_section34](../mngrp-string-section/)  | Test seed 30                                                                            | Yes                             |
 | 73  | 126         | 0x1BD000 | 0x800   | [Mngrp_string_section35](../mngrp-string-section/)  | Test seed 31: unused (the engine caps the test number at 30) and a byte-exact duplicate of Test seed 30 | Yes                             |
-| 74  | 127         | 0x1BD800 | 0x800   | [Mngrp_TextBox_map](../mngrp-textbox-section/)       | Map for Complex Strings 00-05                                                           | Yes                             |
+| 74  | 127         | 0x1BD800 | 0x800   | [Mngrp_TextBox_map](../mngrp-textbox-section/)       | Information browser page directory (per page id: {offset, TextBox section 0-5})         | Yes                             |
 | 75  | 128         | 0x1BE000 | 0x4800  | [Mngrp_TextBox_section00](../mngrp-textbox-section/) | TextBox                                                                                 | Yes                             |
 | 76  | 129         | 0x1C2800 | 0x4000  | [Mngrp_TextBox_section01](../mngrp-textbox-section/) | TextBox                                                                                 | Yes                             |
 | 77  | 130         | 0x1C6800 | 0x4800  | [Mngrp_TextBox_section02](../mngrp-textbox-section/) | TextBox                                                                                 | Yes                             |
@@ -132,11 +147,11 @@ capacity of the destination buffer each section is loaded into, so avoid growing
 | 98  | 177         | 0x1DF000 | 0x800   |                                                          | [Tutorial demo](../mngrp-demo-script/) mock GF records A (16 × 68-byte savemap GF records; names misspelled, e.g. "Quetcoatl", replaced by the real save's names in game) | No                              |
 | 99  | 178         | 0x1DF800 | 0x800   |                                                          | [Tutorial demo](../mngrp-demo-script/) mock characters B (variant used by elemental/status junction and character switch demos) | No                              |
 | 100 | 179         | 0x1E0000 | 0x800   |                                                          | [Tutorial demo](../mngrp-demo-script/) mock GF records B.<br/> Very similar to 0x1DF000                          | No                              |
-| 101 | 180         | 0x1E0800 | 0xC800  | mag15.tim                                                | Chocobo world cartoon                                                                   | No                              |
-| 102 | 181         | 0x1ED000 | 0xC800  | mag16.tim                                                | Tutorial image                                                                          | No                              |
-| 103 | 182         | 0x1F9800 | 0xC800  | mag17.tim                                                | Tutorial image                                                                          | No                              |
-| 104 | 183         | 0x206000 | 0xC800  | mag18.tim                                                | Chocobo world sketch cartoon                                                            | No                              |
-| 105 | 184         | 0x212800 | 0xC800  | mag19.tim                                                | Chocobo world sketch cartoon.<br/> Duplicate of 0x206000                                | No                              |
+| 101 | 180         | 0x1E0800 | 0xC800  | mag15.tim                                                | Chocobo World story pictures ([mmag2.bin](../mmag2/) category 6, page 0)                 | No                              |
+| 102 | 181         | 0x1ED000 | 0xC800  | mag16.tim                                                | Chocobo World Solo RPG manual pictures ([mmag2.bin](../mmag2/) category 6, page 1)       | No                              |
+| 103 | 182         | 0x1F9800 | 0xC800  | mag17.tim                                                | Card icon explanation pictures ([magazine viewer](../mmag/) category 6)                 | No                              |
+| 104 | 183         | 0x206000 | 0xC800  | mag18.tim                                                | Chocobo world sketch cartoon. Apparently unused: no [mmag.bin](../mmag/)/[mmag2.bin](../mmag2/) entry selects category 6 page 3 | No                              |
+| 105 | 184         | 0x212800 | 0xC800  | mag19.tim                                                | Chocobo world sketch cartoon, duplicate of 0x206000. Apparently unused (category 6 page 4) | No                              |
 | 106 | 188         | 0x21F000 | 0x800   | [m000.bin](../gf-refinement/refine-abilities/)              | Locations for msg file and Refine values.                                               | Yes                             |
 | 107 | 189         | 0x21F800 | 0x800   | [m001.bin](../gf-refinement/refine-abilities/)              | Locations for msg file and Refine values.                                               | Yes                             |
 | 108 | 190         | 0x220000 | 0x800   | [m002.bin](../gf-refinement/refine-abilities/)              | Locations for msg file and Refine values.                                               | Yes                             |
@@ -149,6 +164,35 @@ capacity of the destination buffer each section is loaded into, so avoid growing
 | 115 | 200         | 0x226000 | 0x1800  | [m004.msg](../gf-refinement/refine-abilities/)              |                                                                                         | Yes                             |
 | 116 | 204         | 0x227800 | 0x800   | [Mngrp_string_section44](../mngrp-string-section/)  | Character switch tutorial                                                               | Yes                             |
 | 117 | 205         | 0x228000 | 0x800   |                                                          | [Tutorial demo script](../mngrp-demo-script/): Character switch demo                                             | No                              |
+
+## The SP2 quad-list sprite format (Pos 4)
+
+Pos 4 uses the same sprite format as the standalone .sp2 files (cardanm.sp2, face.sp2 — see
+[Menu sprite tables](../sp1-sp2/) for the full .sp1/.sp2 reference), all rendered by the same function:
+
+| Offset | Size | Description                                                            |
+|--------|------|---------------------------------------------------------------------------|
+| 0x00   | 4    | UInt32 sprite count (79 in Pos 4)                                        |
+| 0x04   | 4×N  | UInt32 offsets from the start of the file, one per sprite id (0 = unused id) |
+| ...    | -    | Sprite records                                                            |
+
+Each sprite record is a UInt32 quad count followed by 12 bytes per quad:
+
+| Offset | Size | Description                                    |
+|--------|------|----------------------------------------------------|
+| 0x00   | 1    | Texture U                                          |
+| 0x01   | 1    | Texture V                                          |
+| 0x02   | 2    | CLUT id                                            |
+| 0x04   | 2    | Width                                              |
+| 0x06   | 2    | Height                                             |
+| 0x08   | 1    | Signed X offset from the sprite draw position      |
+| 0x09   | 1    | Signed Y offset from the sprite draw position      |
+| 0x0A   | 2    | Texture page (PS1 GPU E1 bits, masked with 0x9FF)  |
+
+In Pos 4 every used sprite is a single quad selecting a 128×96 or 128×104 region of the magazine page picture
+texture currently loaded (chosen by the category/page fields of the [mmag.bin](../mmag/) entry). The magazine
+text overlays use a different path: a [string section](../mngrp-string-section/) (raw 87 + the entry's text
+file index) loaded into a dedicated buffer, not the menu VRAM arena.
 
 ## The Chocobo World PocketStation image (Pos 3)
 

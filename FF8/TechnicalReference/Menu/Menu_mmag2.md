@@ -1,47 +1,40 @@
 ---
 layout: default
 parent: Menu
-title: ChocoboWorld items (mtmag2.bin file format)
+title: Chocobo World pages (mmag2.bin file format)
 permalink: /technical-reference/menu/mmag2/
 author: hobbitdur
 ---
 
-Seems to be related to choco World item/reward database.
+mmag2.bin drives the save-point **Chocobo World screen** (menu program 27): the Mog story slides and the
+"Solo RPG" manual pages. It uses **the same 68-byte entry format as [mmag.bin](../mmag/)** — see that page for
+the field layout. The file is 12 entries (816 bytes), no header.
 
-Each entry is 68 bytes, to probably 11 entries.
+Differences from the magazine viewer in how the fields are used:
 
-Here a guess from the AI (didn't analyze it) for the first entry:
+* **Text overlays** (offset 0x34): the string ids reference the [string section](../mngrp-string-section/)
+  raw file 90 (Chocobo World text: story slides = strings 0-4, Solo RPG manual = strings 5-14), loaded to a
+  different buffer than the magazines' book text. The text file index at 0x15 is not used.
+* **Picture overlays** (offset 0x24): sprite ids 58-76 of the
+  [SP2 quad-list table](../mngrp/#the-sp2-quad-list-sprite-format-pos-4) at Pos 4 of mngrp.bin — the high
+  sprite ids of that table belong to this screen.
+* **Page textures**: all entries use category 6 (base raw file 180): page 0 = raw 180 (story pictures),
+  page 1 = raw 181 (manual pictures).
 
-| Offset | Bytes (hex) | Bytes (dec) | Possible meaning                         |
-|--------|-------------|-------------|------------------------------------------|
-| 0x00   | 18 00       | 24, 0       | Word: Entry ID or item type              |
-| 0x02   | 38 00       | 56, 0       | Word: Unknown                            |
-| 0x04   | 50 01       | 336, 1      | Word: Item ID or quantity? (336 = 0x150) |
-| 0x06   | 9E 00       | 158, 0      | Word: Unknown                            |
-| 0x08   | 0D 00       | 13, 0       | Word: Unknown                            |
-| 0x0A   | 54 00       | 84, 0       | Word: Unknown                            |
-| 0x0C   | 00 00       | 0, 0        | Word: Padding/unused                     |
-| 0x0E   | 00 00       | 0, 0        | Word: Padding/unused                     |
-| 0x10   | 73 23 00 00 | 29555, 0    | Dword: Pointer or value                  |
-| 0x14   | C0 05 06 00 | 1472, 6, 0  | Unknown (multiple bytes)                 |
-| 0x18   | FF FF FF FF | -1          | 4 bytes: Sentinel/flag                   |
-| 0x1C   | A9 00       | 169, 0      | Word: GF or item ID? (169 = A9)          |
-| 0x1E   | 66 80       | 102, 128    | Word: Unknown                            |
-| 0x20   | 00 00       | 0, 0        | Word: Padding                            |
-| 0x22   | 00 00       | 0, 0        | Word: Padding                            |
-| 0x24   | 0A 00       | 10, 0       | Word: Quantity or level                  |
-| 0x26   | 0C 3A       | 12, 58      | Word: Unknown (0x3A0C = 14860)           |
-| 0x28   | 00 00       | 0, 0        | Word: Padding                            |
-| 0x2A   | 00 FF       | 0, 255      | Word: Flags                              |
-| 0x2C   | 00 00       | 0, 0        | Word: Padding                            |
-| 0x2E   | 00 FF       | 0, 255      | Word: Flags                              |
-| 0x30   | 00 00       | 0, 0        | Word: Padding                            |
-| 0x32   | 00 FF       | 0, 255      | Word: Flags                              |
-| 0x34   | 93 00       | 147, 0      | Word: Spell/ability ID? (147 = 0x93)     |
-| 0x36   | 06 00       | 6, 0        | Word: Quantity                           |
-| 0x38   | 0D 00       | 13, 0       | Word: Unknown                            |
-| 0x3A   | 76 01       | 118, 1      | Word: Unknown (0x176 = 374)              |
-| 0x3C   | A9 00       | 169, 0      | Word: GF or item ID (same as 0x1C)       |
-| 0x3E   | 56 FF       | 86, 255     | Word: Unknown                            |
-| 0x40   | 00 00       | 0, 0        | Word: Padding                            |
-| 0x42   | 00 FF       | 0, 255      | Word: Flags (terminator?)                |
+## Entry map (English PC release)
+
+| Entries | Content                                  | Text ids (raw 90) | Page picture |
+|---------|----------------------------------------------|-------------------|--------------|
+| 0-2     | Story slides (Mog goes treasure hunting)     | 0-4               | raw 180      |
+| 3       | "What is Solo RPG?" (manual 1/8)             | 5                 | raw 181      |
+| 4-11    | Manual pages 2/8 - 8/8                       | 6-14              | raw 181      |
+
+## Addresses (FF8 PC 2000 EN)
+
+| Address   | Name                                   | Description                                    |
+|-----------|----------------------------------------|------------------------------------------------|
+| 0x4CFC20  | Menu_ChocoboWorld_Init                 | Program 27 init (reloads cyocobo.bin, music)   |
+| 0x4D1D30  | Menu_ChocoboWorld_Draw                 | Draws the screen incl. the mmag2-driven page   |
+| 0x4D22F0  | Menu_ChocoboWorld_DrawTextOverlays     | Text overlay slots from raw 90                 |
+| 0x4D2270  | Menu_ChocoboWorld_DrawPictureOverlays  | Picture overlay slots from the Pos 4 SP2 table |
+| 0x1D2BB74 | mmag2bin                               | Pointer to the loaded mmag2.bin                |

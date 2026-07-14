@@ -1,17 +1,28 @@
 ---
 layout: default
 parent: Menu
-title: mtmag.bin file format
+title: Tutorial books (mtmag.bin file format)
 permalink: /technical-reference/menu/mtmag/
 author: hobbitdur
 ---
 
-Seems to be related to diablos lamp.
+mtmag.bin defines the three books available from the tutorial menu by pointing at ranges of
+[mmag.bin](../mmag/) entries. The file is 3 entries of 4 bytes:
 
-Here the data from the file:
+| Offset | Size | Description                              |
+|--------|------|----------------------------------------------|
+| 0x00   | 1    | First [mmag.bin](../mmag/) entry of the book |
+| 0x01   | 1    | Last mmag.bin entry of the book              |
+| 0x02   | 2    | Padding                                      |
 
-| Offset | Bytes       | Entry   | Byte 0    | Byte 1    | Byte 2 | Byte 3 |
-|--------|-------------|---------|-----------|-----------|--------|--------|
-| 0x00   | 2B 32 00 00 | Entry 0 | 0x2B (43) | 0x32 (50) | 0x00   | 0x00   |
-| 0x04   | 33 3F 00 00 | Entry 1 | 0x33 (51) | 0x3F (63) | 0x00   | 0x00   |
-| 0x08   | 40 43 00 00 | Entry 2 | 0x40 (64) | 0x43 (67) | 0x00   | 0x00   |
+Retail data (English PC release):
+
+| Entry | Range | Book                       | Tutorial menu program |
+|-------|-------|--------------------------------|-----------------------|
+| 0     | 43-50 | Battle tutorial (8 pages)      | 25                    |
+| 1     | 51-63 | Card rules (13 pages)          | 26                    |
+| 2     | 64-67 | Card icon explanation (4 pages) | 31                   |
+
+The tutorial menu stores the selected book's range in Menu_Magazine_FirstEntry / Menu_Magazine_LastEntry
+(0x1D7D3A5 / 0x1D7D3A6) and starts the matching magazine viewer program, which pages between those two
+mmag entries.

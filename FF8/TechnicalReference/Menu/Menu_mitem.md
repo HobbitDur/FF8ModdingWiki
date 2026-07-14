@@ -26,7 +26,7 @@ Each entry is 4 bytes, with no padding or alignment.
 | Offset | Name     | Description                                                                                       |
 |--------|----------|---------------------------------------------------------------------------------------------------|
 | `0`    | `type`   | Item category. Drives dispatch. See [Item types](#item-types).                                    |
-| `1`    | `flags`  | Targeting and usability bitfield. Returned verbatim by `sub_4F7530(itemId)`. See [Flags](#flags). |
+| `1`    | `flags`  | Targeting and usability bitfield, read through `Mitem_GetEffectiveFlags` (0x4F7530), which overrides it for types 9/12/13/14/15/19. See [Flags](#flags). |
 | `2`    | `param1` | Type-dependent. Heal amount, GF id, ability id, magazine start page, …                            |
 | `3`    | `param2` | Type-dependent. Status mask, stat mask, compatibility amount, magazine end page, …                |
 
@@ -49,8 +49,17 @@ The meaning of `param1` and `param2` **depends entirely on `type`**. See the per
 | 6   | `0x40` | `QUISTIS_ONLY`     | Target mask is forced to party slot 3 (Quistis). Used by all limit-break items.                   |
 | 7   | `0x80` | `GF_COMPAT_OTHERS` | *(type 16 only)* Also applies `param2 / 2` as a penalty to every non-target GF.                   |
 
-**Exception:** for `type == 9` (magazines), byte `flags` does **not** appear to be a targeting bitfield. Magazines bypass the flag checks entirely (they are intercepted before
-targeting), and the observed values run `0x01, 0x02, 0x03, 0x04` in blocks that do not align with the magazine series. Purpose unknown.
+**Exception:** for `type == 9` (magazines), byte `flags` is **dead data**. An exhaustive sweep of the engine
+(all three in-memory copies of mitem.bin — items, shop, status/demo modules — every accessor function and every
+direct read) shows the byte is never read for magazine rows: `Mitem_GetEffectiveFlags` returns the constant
+`0x11` for types 9, 13 and 15 without touching the file, and the raw-flags getter has no callers at all.
+
+The stored values themselves are decoded, though: they are the **magazine series id** (1 = Weapons Monthly,
+2 = Combat King, 3 = Pet Pals, 4 = Occult Fan) — but computed from `param1 - 1` (the previous
+[mmag.bin](../mmag/) entry) instead of `param1`, an off-by-one artifact of whatever tool generated the file.
+The formula `series(param1 - 1)` matches all 22 magazine rows exactly, while the correct series only matches
+19. So the byte was probably meant as a series tag and was never fixed because nothing consumes it (possibly a
+PSX-era leftover).
 
 ---
 
@@ -94,7 +103,7 @@ LUT value `0` (and the unused `7`) mean *no effect* — the item cannot be consu
 | 6    | `FULL_RESTORE`      | 4   | —                     | `0x7F`               | Blocked unless `sub_4B2D50() & 1` (world map / save point)          |
 | 7    | `BATTLE_ONLY`       | 0   | —                     | —                    | Usable in battle only                                               |
 | 8    | `AMMO`              | 0   | —                     | —                    | Irvine's ammunition                                                 |
-| 9    | `MAGAZINE`          | —   | first page            | last page            | Opens the magazine reader (states 80–93), reads `mmagbuffer`        |
+| 9    | `MAGAZINE`          | —   | first page            | last page            | Opens the magazine reader (states 80–93). Pages are [mmag.bin](../mmag/) entry indices; the reader uses the items module's own mmag.bin copy (`mmagbuffer`) |
 | 10   | `REFINE_ONLY`       | 0   | —                     | —                    | Inert; exists only as refine input                                  |
 | 11   | `RENAME_CARD`       | —   | —                     | —                    | Queues field event `(gfIndex + 3) \| 0x80`                          |
 | 12   | `PET_NAMETAG`       | —   | —                     | —                    | Queues field event `130`; blocked by `MAP_SEAL_RESURRECTION_LOCKED` |

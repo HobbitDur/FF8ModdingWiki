@@ -30,7 +30,7 @@ permalink: /technical-reference/main/kernel/misc/
 ## Section Structure
 
 The 14 status timers at 0x00–0x0D are loaded into the battle countdown as
-`4 × (battleSpeed + 1) × value` ticks (`setupStatus2Timer`). Each battle frame,
+`4 × (battleSpeed + 1) × value` ticks (`setupStatus2Timer` @0x4832f0). Each idle battle frame,
 `computeTimerStatus` (0x483470) subtracts `timer_speed_multiplier` from the timer — **2 by
 default**, 3 under Haste, 1 under Slow, 0 under Stop — so at the ~15 fps battle rate about **30
 ticks are consumed per second**. The real duration is therefore
@@ -39,9 +39,13 @@ ticks are consumed per second**. The real duration is therefore
 seconds ≈ 4 × (battleSpeed + 1) × value / (2 × 15)
 ```
 
-i.e. roughly `value × 8/15` s at the default battle speed (3) — about half of a naive
-"one-tick-per-frame" estimate. Timers only tick during idle ATB time, not during actions; Haste
-makes them expire ~1.5× faster and Slow ~2× slower.
+`battleSpeed` is the config **Battle Speed, `0` (fast) … `4` (slow)** — five settings, *not* a
+0–255 value (`Battle_SetMaxAtbFromBattleSpeed` @0x484490: `max_atb = 4000 × (battleSpeed + 1)`, the
+same tick unit as the timers). At the midpoint (2) that is `value × 0.4` s; it scales from
+`value × 0.2` s (fast, 0) to `value × 1.0` s (slow, 4). The ~15 fps rate is pinned by the Regen
+tick, which heals every 30 frames (≈ 2 s). Timers only tick during **idle ATB time**, not during
+action animations, so a real fight feels longer than this estimate; Haste makes them expire ~1.5×
+faster and Slow ~2× slower.
 
 | Offset | Length | Description                        |
 |--------|--------|------------------------------------|
@@ -59,7 +63,7 @@ makes them expire ~1.5× faster and Slow ~2× slower.
 | 0x000B | 1 byte | Invincible Timer                   |
 | 0x000C | 1 byte | Petrifying Timer                   |
 | 0x000D | 1 byte | Float Timer                        |
-| 0x000E | 1 byte | ATB Speed Multiplier               |
+| 0x000E | 1 byte | ATB Speed Multiplier — scales how fast **every** battler's ATB gauge fills: `cur_atb += 10 × this × (SPD+30) / 100`, applied **3× per rendered frame** (`Battle_TickAtbGaugesAndGfCountdown` @0x4842b0, called from `isBattle_HUDdisplay`, itself called 3× per frame by `battle_cardgame_main_loop`). Retail value is **10**, not a %-of-normal multiplier despite the name. Because it ticks on the render loop rather than a fixed logic clock, real fill time depends on framerate — the PC port's well-known "ATB speeds up at high FPS" quirk. `max_atb = 4000 × (battleSpeed+1)` (`Battle_SetMaxAtbFromBattleSpeed` @0x484490, same battleSpeed 0–4 as the status timers) |
 | 0x000F | 1 byte | Gilgamesh/Angelo summon interval (a.k.a. "Dead Timer") — **not** a character-death countdown. Interval between the random Gilgamesh/Angelo/Phoenix auto-summon checks: `summonGilgaAngelStartFight` decrements it once per battle tick (called from `FFBattleDirector_battleLoop`); at 0 it rolls to summon Gilgamesh (12/255, if owned and not yet summoned this fight) or fire an Angelo/Phoenix auto-action, then reloads this value into `DEAD_TIMER_TO_SUMMON_GILGA`. Lower = checks more often |
 The 32 status limit effects at 0x10–0x2F are how much each active status contributes to a
 character's crisis/Limit-Break gauge, read by `Battle_ComputeCrisisLevelAndLimitFlag`. Every
