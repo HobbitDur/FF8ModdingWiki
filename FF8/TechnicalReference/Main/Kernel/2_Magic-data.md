@@ -84,7 +84,7 @@ permalink: /technical-reference/main/kernel/magic/
 | 0x0006 | 1 byte  | Target hit/reaction animation ID (`HIT_TYPE_TARGET_ANIMATION_TO_PLAY`) — 5 for offensive spells, 0 for curatives; sets the target's reaction animation when the spell lands |
 | 0x0007 | 1 byte  | [Attack type]({site.baseurl}}/technical-reference/list/kernel#attack-type)                      |
 | 0x0008 | 1 byte  | Spell power (used in damage formula)                                                            |
-| 0x0009 | 1 byte  | Unused menu copy — copied into the field character data during menu magic setup (`setMenuFlagMagicOnCharaData`), but that slot is never read back (IDA: 0 readers); effectively vestigial |
+| 0x0009 | 1 byte  | [Status window flags]({{site.baseurl}}/technical-reference/list/battle/#status-window-flags) — bit 0x80 clear = show the ally status panel while targeting (heals use 0x00, Esuna & co. use 0x40 for the ailment view) |
 | 0x000A | 1 byte  | [TargetInfo]({{site.baseurl}}/technical-reference/list/kernel#target-info)                      |
 | 0x000B | 1 byte  | Attack Flags                                                                                    |
 | 0x000C | 1 byte  | Draw resist (how hard is the magic to draw)                                                     |

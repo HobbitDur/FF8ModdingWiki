@@ -36,14 +36,14 @@ permalink: /technical-reference/main/kernel/duel-zell-limit-break/
 | 0x0004 | 2 bytes | Magic ID                    |
 | 0x0006 | 1 byte  | Attack type                 |
 | 0x0007 | 1 byte  | Attack power                |
-| 0x0008 | 1 byte  | Attack flags                |
+| 0x0008 | 1 byte  | Target hit animation — the hit/impact animation byte. Duel swaps the flags/animation byte order vs. Magic/Enemy-attack layouts (`Battle_applyDamage`) |
 | 0x0009 | 1 byte  | Padding (unused; IDA: 0 xrefs) |
 | 0x000A | 1 byte  | Target Info                 |
-| 0x000B | 1 bytes | Attack flags — low 2 bits stored as last-attacker flag (`ATTACK_FLAG`); in Duel the flags/animation byte order is swapped vs other command types |
+| 0x000B | 1 bytes | Attack flags — behavior bitfield (low 2 bits also stored as the last-attacker `ATTACK_FLAG`) |
 | 0x000C | 1 byte  | Hit count                   |
 | 0x000D | 1 byte  | Element Attack              |
 | 0x000E | 1 byte  | Element Attack %            |
-| 0x000F | 1 byte  | Status Attack Enabler       |
+| 0x000F | 1 byte  | Status attack accuracy       |
 | 0x0010 | 2 bytes | Sequence Button 1           |
 | 0x0012 | 2 bytes | Sequence Button 2           |
 | 0x0014 | 2 bytes | Sequence Button 3           |

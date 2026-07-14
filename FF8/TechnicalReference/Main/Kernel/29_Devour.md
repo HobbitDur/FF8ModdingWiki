@@ -39,7 +39,7 @@ permalink: /technical-reference/main/kernel/devour/
 |--------|---------|-----------------------------------------------------------------------------------------------------------------------------------------------|
 | 0x0000 | 2 bytes | Offset to devour description                                                                                                                  |
 | 0x0002 | 1 byte  | Damage or heal HP and Status _<br/><br/> 0x1E - Cure   <br/> 0x1F - Damage_                                                                   |
-| 0x0003 | 1 byte  | HP Heal/DMG Quantity Flag _<br/><br/> 0x00 - 0% <br/> 0x01 - 6.25% <br/> 0x02 - 12.50% <br/> 0x04 - 25%<br/> 0x08 - 50%<br/> 0x10 - 100%_     |
+| 0x0003 | 1 byte  | HP heal/dmg quantity — NOT an enum/flag; a plain linear value in **sixteenths of max HP** (`value/16 * 100%`). Confirmed against every retail entry, e.g. `8`=50%, `12`=75%, `16`=100% |
 | 0x0004 | 4 bytes | [Status 2]({{site.baseurl}}/technical-reference/list/status-flags#status-2) (statuses 16-47)                                                                                                                     |
 | 0x0008 | 2 bytes | [Status 1]({{site.baseurl}}/technical-reference/list/status-flags#status-1) (statuses 0-15)                                                                                                                      |
 | 0x000A | 1 byte  | Raised Stat Flag _<br/><br/> 0x00 - None <br/> 0x01 - STR <br/> 0x02 - VIT <br/> 0x04 - MAG<br/> 0x08 - SPR<br/> 0x10 - SPD<br/> 0x20 - LUCK_ |

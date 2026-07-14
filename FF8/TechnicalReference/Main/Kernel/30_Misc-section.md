@@ -21,13 +21,17 @@ permalink: /technical-reference/main/kernel/misc/
 |--------|-----------------------------|----------|
 | 0x4CCC | Status Timers               | 14 bytes |
 | 0x4CDA | ATB Speed Multiplier        | 1 byte   |
-| 0x4CDB | Dead Timer                  | 1 byte   |
+| 0x4CDB | Gilgamesh/Angelo summon interval ("Dead Timer") | 1 byte   |
 | 0x4CDC | Status Limit Effects        | 32 bytes |
 | 0x4CFC | Duel Timers and Start Moves | 8 bytes  |
 | 0x4D04 | Shot Timers                 | 4 bytes  |
 
 
 ## Section Structure
+
+The 14 status timers at 0x00–0x0D are loaded into the battle countdown as
+`4 × (battleSpeed + 1) × value` ticks (`setupStatus2Timer`); at the PC battle tick rate
+(~15/s) that is roughly `value × 16/15` seconds at the default battle speed.
 
 | Offset | Length | Description                        |
 |--------|--------|------------------------------------|
@@ -46,7 +50,22 @@ permalink: /technical-reference/main/kernel/misc/
 | 0x000C | 1 byte | Petrifying Timer                   |
 | 0x000D | 1 byte | Float Timer                        |
 | 0x000E | 1 byte | ATB Speed Multiplier               |
-| 0x000F | 1 byte | Dead Timer                         |
+| 0x000F | 1 byte | Gilgamesh/Angelo summon interval (a.k.a. "Dead Timer") — **not** a character-death countdown. Interval between the random Gilgamesh/Angelo/Phoenix auto-summon checks: `summonGilgaAngelStartFight` decrements it once per battle tick (called from `FFBattleDirector_battleLoop`); at 0 it rolls to summon Gilgamesh (12/255, if owned and not yet summoned this fight) or fire an Angelo/Phoenix auto-action, then reloads this value into `DEAD_TIMER_TO_SUMMON_GILGA`. Lower = checks more often |
+The 32 status limit effects at 0x10–0x2F are how much each active status contributes to a
+character's crisis/Limit-Break gauge, read by `Battle_ComputeCrisisLevelAndLimitFlag`. Every
+active status (across both Status 1 and Status 2) adds its byte here into one running total
+each frame:
+
+```
+crisis = (10*(statusSum + 4*(5*deadAllies + 40)) - 10*crisisLevelHPMultiplier*curHP/maxHP)
+         / (rand(0..255) + 160) - 4          [clamped 0-4]
+```
+
+Higher values push the crisis level (and so Limit Break availability) up faster; `0` means
+that status doesn't affect it at all. There's no term that lowers crisis level — every listed
+status only ever pushes it up, which is why Death/Poison/etc. all have a value here despite
+being harmful.
+
 | 0x0010 | 1 byte | Death Limit Effect                 |
 | 0x0011 | 1 byte | Poison Limit Effect                |
 | 0x0012 | 1 byte | Petrify Limit Effect               |

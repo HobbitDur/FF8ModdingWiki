@@ -424,28 +424,30 @@ This ID define which list should be check. Seifer is a special case for seifer b
 
 # Junction abilities
 
+The kernel's [Junction ability]({{site.baseurl}}/technical-reference/main/kernel/junction-abilities/) "flag" field (offset 0x0005, 3 bytes) is a real 24-bit bitfield — one dedicated bit per ability below, ORed into the character's `FF8CharaAbilities` bitmask (`ResetAndParseBattleAndFieldCharacter`) for every junction ability equipped. In the retail kernel every entry sets exactly its own bit and no others; the list's own "Dummy/Unused" entry (offset 0x40E0) sets none (raw value `0`). Bit 19 is unused by any retail entry.
+
 | Bit Position | Flag    | Ability       |
 |--------------|---------|---------------|
-| 0            | 0x0001  | Dummy/Unused  |
-| 1            | 0x0002  | HP-J          |
-| 2            | 0x0004  | Str-J         |
-| 3            | 0x0008  | Vit-J         |
-| 4            | 0x0010  | Mag-J         |
-| 5            | 0x0020  | Spr-J         |
-| 6            | 0x0040  | Spd-J         |
-| 7            | 0x0080  | Eva-J         |
-| 8            | 0x0100  | Hit-J         |
-| 9            | 0x0200  | Luck-J        |
-| 10           | 0x0400  | Elem-Atk-J    |
-| 11           | 0x0800  | ST-Atk-J      |
-| 12           | 0x1000  | Elem-Def-J    |
-| 13           | 0x2000  | ST-Def-J      |
-| 14           | 0x4000  | Elem-Defx2    |
-| 15           | 0x8000  | Elem-Defx4    |
-| 16           | 0x10000 | ST-Def-Jx2    |
-| 17           | 0x20000 | ST-Def-Jx4    |
-| 18           | 0x40000 | Abilityx3     |
-| 19           | 0x80000 | Abilityx4     |
+| 0            | 0x0001  | HP-J          |
+| 1            | 0x0002  | Str-J         |
+| 2            | 0x0004  | Vit-J         |
+| 3            | 0x0008  | Mag-J         |
+| 4            | 0x0010  | Spr-J         |
+| 5            | 0x0020  | Spd-J         |
+| 6            | 0x0040  | Eva-J         |
+| 7            | 0x0080  | Hit-J         |
+| 8            | 0x0100  | Luck-J        |
+| 9            | 0x0200  | Elem-Atk-J    |
+| 10           | 0x0400  | ST-Atk-J      |
+| 11           | 0x0800  | Elem-Def-J    |
+| 12           | 0x1000  | ST-Def-J      |
+| 13           | 0x2000  | Elem-Defx2    |
+| 14           | 0x4000  | Elem-Defx4    |
+| 15           | 0x8000  | ST-Def-Jx2    |
+| 16           | 0x10000 | ST-Def-Jx4    |
+| 17           | 0x20000 | Abilityx3     |
+| 18           | 0x40000 | Abilityx4     |
+| 19           | 0x80000 | Unused        |
 
 # FF8 abilities
 
@@ -537,35 +539,39 @@ This ID define which list should be check. Seifer is a special case for seifer b
 
 # Chara abilities
 
+The kernel's [Character ability]({{site.baseurl}}/technical-reference/main/kernel/characters-abilities/) "flag" field (offset 0x0005, 3 bytes) is a real 24-bit bitfield, same `JFlag` mechanism as [Junction abilities](#junction-abilities) - one dedicated bit per ability, ORed into `FF8CharaAbilities` by `ResetAndParseBattleAndFieldCharacter` for every equipped character ability. Bit assignment does **not** follow the section's list order (verified against retail data):
+
 | Bit Position | Flag    | Ability       |
 |--------------|---------|---------------|
-| 1            | 0x00001 | Mug           |
-| 2            | 0x00002 | Med Data      |
-| 3            | 0x00004 | Counter       |
-| 4            | 0x00008 | Return Damage |
-| 5            | 0x00010 | Cover         |
-| 6            | 0x00020 | Initiative    |
-| 7            | 0x00040 | Move-HP Up    |
-| 8            | 0x00080 | HP Bonus      |
-| 9            | 0x00100 | Str Bonus     |
-| 10           | 0x00200 | Vit Bonus     |
-| 11           | 0x00400 | Mag Bonus     |
-| 12           | 0x00800 | Spr Bonus     |
-| 13           | 0x01000 | Auto-Protect  |
-| 14           | 0x02000 | Auto-Shell    |
-| 15           | 0x04000 | Auto-Reflect  |
-| 16           | 0x08000 | Auto-Haste    |
-| 17           | 0x10000 | Auto-Potion   |
-| 18           | 0x20000 | Expendx2-1    |
-| 19           | 0x40000 | Expendx3-1    |
-| 20           | 0x80000 | Ribbon        |
+| 0            | 0x00001 | Mug           |
+| 1            | 0x00002 | Med Data      |
+| 2            | 0x00004 | Counter       |
+| 3            | 0x00008 | Return Damage |
+| 4            | 0x00010 | Cover         |
+| 5            | 0x00020 | Expendx2-1    |
+| 6            | 0x00040 | Expendx3-1    |
+| 7            | 0x00080 | HP Bonus      |
+| 8            | 0x00100 | Str Bonus     |
+| 9            | 0x00200 | Vit Bonus     |
+| 10           | 0x00400 | Mag Bonus     |
+| 11           | 0x00800 | Spr Bonus     |
+| 12           | 0x01000 | Auto-Reflect  |
+| 13           | 0x02000 | Auto-Shell    |
+| 14           | 0x04000 | Auto-Protect  |
+| 15           | 0x08000 | Auto-Haste    |
+| 16           | 0x10000 | Initiative    |
+| 17           | 0x20000 | Move-HP Up    |
+| 18           | 0x40000 | Auto-Potion   |
+| 19           | 0x80000 | Ribbon        |
 
 # Party abilities
+
+Same bitfield mechanism as Chara/Junction abilities, [Party ability]({{site.baseurl}}/technical-reference/main/kernel/party-abilities/) offset 0x0005 (1 byte); ORed into `PASSIF_ABILITIES_ACTIVE`. Bit assignment does **not** follow the section's list order (verified against retail data):
 
 | Bit Position | Flag   | Ability   |
 |--------------|--------|-----------|
 | 0            | 0x0001 | Alert     |
-| 1            | 0x0002 | Move-Find |
+| 1            | 0x0002 | Rare Item |
 | 2            | 0x0004 | Enc-Half  |
 | 3            | 0x0008 | Enc-None  |
-| 4            | 0x0010 | Rare Item |
+| 4            | 0x0010 | Move-Find |

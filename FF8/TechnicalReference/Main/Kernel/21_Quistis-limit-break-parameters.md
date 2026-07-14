@@ -88,4 +88,4 @@ permalink: /technical-reference/main/kernel/blue-magic-parameters/
 | 0x0000 | 4 bytes | Status 1     |
 | 0x0004 | 2 bytes | Status 0     |
 | 0x0006 | 1 bytes | Attack Power |
-| 0x0007 | 1 byte  | Attack Param |
+| 0x0007 | 1 byte  | Hit rate — physical accuracy vs. the target's Evade (`Battle_applyDamage` → `HIT_ATTACK_HITPERCENT`, the Hit%-stat slot); `0xFF` = always hits |

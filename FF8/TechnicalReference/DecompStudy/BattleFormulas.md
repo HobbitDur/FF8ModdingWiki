@@ -32,7 +32,9 @@ From the .dat info_stat 4-byte curves: **STR/MAG** `= (C + lvl·A/10 + lvl/B −
 dmg = [ P × ((265 − VIT) × (STR + STR²/16) / 256) / 16 ] × randVar / 256
 ```
 
-Vit 0 sets VIT = 0. Hit roll (0x492BA0): `255×(HIT + LUCK_atk/2 − EVA_tgt − LUCK_tgt)/100 ≥ rand255` (attacker Darkness quarters HIT); Sleep/Stop on target or accuracy 255 = auto-hit. Crit roll (0x492B30): `LUCK + critBonus ≥ rand255` → damage ×2. Modifiers (0x48F600): Protect ÷2, back attack ×2, zombie target ÷2, Defend ÷2; attack element: `dmg += dmg × elem% × (800 − elemDef)/10000`.
+Vit 0 sets VIT = 0. Hit roll (0x492BA0): `255×(HIT + LUCK_atk/2 − EVA_tgt − LUCK_tgt)/100 ≥ rand255` (attacker Darkness quarters HIT); Sleep/Stop on target or accuracy 255 = auto-hit. Crit roll (0x492B30): `LUCK + critBonus ≥ rand255` → damage ×2. Modifiers (0x48F600): Protect ÷2, back attack ×2, zombie target ÷2; attack element: `dmg += dmg × elem% × (800 − elemDef)/10000`.
+
+⚠ **Defend fully nullifies physical damage** (returns 0, *not* a ÷2). Every physical attack type is gated before the formula: the dispatcher (0x4922B0, cases Attack / %-physical / Renzokuken finisher) and the built-in-roll variant (`Damage_ComputePhysicalWithHitCritRoll` 0x492E10, Everyone's Grudge / ignore-VIT) both bail out with `return 0` if the target has **Defend** (status_2 bit 19), **Invincible**, **Immune Physical attack** (status_2 bit 20), or **Petrify** (status_1). It is the same immunity gate for all four statuses — Defend behaves identically to Immune-Physical/Invincible here — and only the "ignore immunity" hit flag (`STATUS2_LINK_DRAIN_MAYBE_IGNORE_IMMUNITY`) bypasses it. Defend does **not** protect against magic/GF, where it only halves — see below.
 
 **Gunblade** (0x48F480): `dmg = [(CRIT_BONUS/20 + 2) × 4·P × ((265−VIT)×(STR + STR²/16)/256) / 128] × randVar/256`; the trigger gives a flat ×1.5-style boost via that leading term and **no crit roll happens**.
 

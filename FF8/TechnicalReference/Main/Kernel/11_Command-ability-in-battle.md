@@ -41,6 +41,6 @@ permalink: /technical-reference/main/kernel/command-abilities-in-battle/
 | 0x0006 | 1 byte  | Attack flags          |
 | 0x0007 | 1 byte  | Hit Count             |
 | 0x0008 | 1 byte  | Element               |
-| 0x0009 | 1 byte  | Status attack enabler |
+| 0x0009 | 1 byte  | Status attack accuracy |
 | 0x000A | 2 bytes | Status1               |
 | 0x000C | 4 bytes | Status2               |

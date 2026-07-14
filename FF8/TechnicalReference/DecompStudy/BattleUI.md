@@ -48,6 +48,8 @@ Three 13-px rows in the (122,165,190,51) region, backed by `BATTLE_CHARA_UI` (0x
 
 Magic list (with Draw-stock counts), GF list, two-column item list, the Draw window (draw/cast choice), and four special list types share a generic scrolling-list engine (`BattleMenu_ListWindow_*`, 0x4FDD90). Zell's Duel input replaces slot 6. Target selection (`BattleMenu_OpenTargetSelection`, 8 states) polls a target bitmask, supports the ALL toggle for spells flagged multi-target, and confirms into the pending-selection buffer.
 
+`BattleMenu_ExecuteSelectedCommand` (0x4BC770) is what opens each of these sub-windows; the full bit layout and id-to-function table lives in [Menu flags]({{site.baseurl}}/technical-reference/list/battle/#menu-flags).
+
 ## Text and graphics sources
 
 * Command/magic/item names and descriptions come from **kernel.bin** text sections at runtime (`getAddressAbilityName`, `getMagicText`, `getBattleCommandDescription`); monster names come from scene.out; top captions are queued as print-text battle tasks with config-controlled speed; variables are expanded by `ProcessBattleTextExpansion`.

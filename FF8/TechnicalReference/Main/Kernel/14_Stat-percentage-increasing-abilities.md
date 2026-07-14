@@ -43,6 +43,6 @@ permalink: /technical-reference/main/kernel/stat-percentage-increasing-abilities
 | 0x0000 | 2 bytes | Offset to ability name         |
 | 0x0002 | 2 bytes | Offset to ability description  |
 | 0x0004 | 1 byte  | AP needed to learn the ability |
-| 0x0005 | 1 byte  | Stat to increase               |
+| 0x0005 | 1 byte  | Stat to increase — NOT a bitfield; a plain index picking one of the 9 standard stats (`0`=HP, `1`=STR, `2`=VIT, `3`=MAG, `4`=SPR, `5`=SPD, `6`=EVA, `7`=HIT (unused by any retail ability), `8`=LUCK). `sub_4962C0` tests it with a straight equality compare against the stat being computed, once per owned Stat% ability; matching abilities' Increase Value bytes sum onto a 100 base (owning both HP+20% and HP+40% gives 100+20+40=160%). Applied in `Stat_RefreshCharaBattleStats`: `stat = multiplier * baseStat / 100` |
 | 0x0006 | 1 byte  | Increase value                 |
 | 0x0007 | 1 byte  | Padding (unused; IDA: 0 xrefs) |

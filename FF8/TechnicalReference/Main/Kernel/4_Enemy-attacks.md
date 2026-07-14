@@ -398,8 +398,8 @@ permalink: /technical-reference/main/kernel/enemy-attacks/
 | 0x3554 | 379 - Holy                                |
 | 0x3568 | 380 - Quake                               |
 | 0x357C | 381 - Tornado                             |
-| 0x3590 | 382 - A382                                |
-| 0x35A4 | 383 - A383                                |
+| 0x3590 | 382 - Unused (dev filler; placeholder name "A382", generic data, no monster reference) |
+| 0x35A4 | 383 - Unused (dev filler; placeholder name "A383", generic data, no monster reference) |
 
 ## Section Structure
 
@@ -415,7 +415,7 @@ permalink: /technical-reference/main/kernel/enemy-attacks/
 | 0x09   | 1 byte  | Hit count & name flag — bits 0–6 = hit count; bit 7 = show attack name (if clear, the attack-name text is suppressed). Read in `computeCommandAction` |
 | 0x0A   | 1 byte  | Attack Element            |
 | 0x0B   | 1 byte  | Attack crit bonus         |
-| 0x0C   | 1 byte  | Status attack enabler     |
-| 0x0D   | 1 byte  | Attack Parameter          |
+| 0x0C   | 1 byte  | Status attack accuracy     |
+| 0x0D   | 1 byte  | Hit rate — physical accuracy rolled against the target's Evade to decide hit vs. miss. `0xFF` = always hits. `Battle_applyDamage` loads it into `HIT_ATTACK_HITPERCENT`, the same slot a character's Hit% stat fills; distinct from Status attack accuracy (0x0C), which governs status infliction |
 | 0x0E   | 2 bytes | [Status 1]({{site.baseurl}}/technical-reference/list/status-flags#status-1) (statuses 0-15)  |
 | 0x10   | 4 bytes | [Status 2]({{site.baseurl}}/technical-reference/list/status-flags#status-2) (statuses 16-47) |

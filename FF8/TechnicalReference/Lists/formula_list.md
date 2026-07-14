@@ -139,8 +139,16 @@ $$
 # Stat
 
 ## Character stat
-Each character stat as 4 part (noted with a low number between 0 and 3)
-Those stat can be seen with [doomtrain](https://github.com/DarkShinryu/doomtrain) for example.
+Each character stat is defined by 4 coefficients (noted `stat_0`..`stat_3`, i.e. the four
+bytes stored per stat in the [Characters kernel section]({{site.baseurl}}/technical-reference/main/kernel/characters/#stat-curves)).
+There are three distinct curve shapes — HP, the STR family, and the SPD/LCK pair — all read
+below from the engine (`Stat_ComputeCharaMaxHP`@0x496310 for HP, `Stat_ComputeCharaStat`@0x496440
+for the rest; the final sum is clamped by `CapTo255`@0x495930).
+
+{: .warning }
+>The [doomtrain](https://github.com/DarkShinryu/doomtrain) editor charts SPD and LCK with the
+>STR-family formula, which is **incorrect** — those two use the simpler linear shape below
+>(no quadratic term, no `/4`). Its HP and STR/VIT/MAG/SPR charts are correct.
 
 ### LCK & SPD
 
@@ -187,6 +195,10 @@ $$
 + \text{hp}_2
 + \text{magicAmount} \times \text{magicJunctionnedValue}
 $$
+
+{: .note }
+>Only 3 of HP's 4 coefficients are used: `hp_3` (the 4th byte) is never read. There is no cap
+>in this function; the final battle max-HP is `junctionMultiplier% × charaHP`, capped at 9999.
 
 
 ## Monster stat

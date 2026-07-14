@@ -68,20 +68,61 @@ auto-resolves a target mask (AI attacks, auto-summons, item randomization).
 
 ## Attack flag
 
-The low two bits form a damage-type pair stored as the target's `last_attacker_attack_flag`
-(`ATTACK_FLAG & 3`): 0 = Physical, 1 = Magical, 2 = Item/Medicine (Renzokuken finishers force 3).
-Only pure-physical hits (pair = 0) trigger the Counter ability, wake Sleep/Confusion, remove
-Back Attack, and mark the kill result on death; the AI condition `LAST ACTION DAMAGE TYPE`
-compares this pair against Physical/Magical.
-
 | ID   | Meaning          |
 |------|------------------|
-| 0x01 | Magical — Shell halves the damage/heal (`ATTACK_FLAG_MAGICAL_SHELLED`) |
-| 0x02 | Item/Medicine — healing doubled by the MedData ability (`ATTACK_FLAG_ITEM_MEDICINE`) |
-| 0x04 | Unused — never tested by any consumer of the attack flags |
-| 0x08 | Break damage limit |
+| 0x03 | Damage-type pair (bits 0-1) — see below |
+| 0x04 | Unused — no reader anywhere (also set on nothing in retail) |
+| 0x08 | Break damage limit (dmg cap 9999 → 60000) |
 | 0x10 | Reflectable — the spell can be bounced by Reflect status (`handleSpellReflection`) |
-| 0x20 | Unused — never tested by any consumer of the attack flags |
-| 0x40 | Unused — never tested by any consumer of the attack flags |
-| 0x80 | Revive — classifies the action as revival (menu revive handling, `ATTACK_FLAG_REVIVE`) |
+| 0x20 | Read **only for battle items** — `updateBattleItemData` (`test byte, 20h`) drives the item's battle-menu selectability/greyed state. On magic / GF / Blue Magic / limits this bit is **inert**, even though it is set on virtually every player ability (an authoring convention: set on all player abilities, clear on all 384 enemy attacks) |
+| 0x40 | Unused — no reader anywhere. It is deliberately set on the curative/beneficial magics (Cure family, Life, Esuna, Dispel, Float, and — oddly — Fire) and on every curative item, but nothing in the engine tests it. The actual "beneficial → default-target allies / revive" behaviour is driven by `0x80` (Revive) plus the separate [TargetInfo]({{site.baseurl}}/technical-reference/list/kernel#target-info) byte, not this bit |
+| 0x80 | Revive — classifies the action as revival; drives the field/battle menu revive handling and the ally-default targeting (`ATTACK_FLAG_REVIVE`) |
+
+### Damage-type pair (bits 0-1)
+
+The low two bits form a damage-type pair, stored per hit as the target's
+`last_attacker_attack_flag` (`ATTACK_FLAG & 3`). It is **not** a free bitfield — it's one of four
+mutually-exclusive values. The kernel `attackFlags` byte holds the "resting" value; the runtime
+overrides some (Gunblade/Renzokuken force `3`; on a Gunblade *hit* the value becomes the source's
+own type).
+
+| Pair | Name | Set by |
+|------|------|--------|
+| 0 | Physical | Attack, most physical commands |
+| 1 | Magical | Magic, GF, most offensive spells |
+| 2 | Item/Medicine | Battle items |
+| 3 | (special) | Forced by Renzokuken finishers / Gunblade |
+
+**What pair = 0 (Physical) uniquely enables** — pure-physical hits are the *only* ones that:
+trigger the target's **Counter** ability, **wake** a Sleeping/Confused target, **remove Back
+Attack** status, and mark the **kill result** on a killing blow. Magical, Item and special hits do
+none of these. The monster-AI condition `LAST ACTION DAMAGE TYPE` also compares this pair against
+Physical/Magical, so an attack's type decides which AI branches fire.
+
+**What pair = 1 (Magical) does** — the target's **Shell** status halves the damage *or heal*
+(`ATTACK_FLAG_MAGICAL_SHELLED`). This is unconditional in `computeCurativeMagic`, so **curative
+magic is always Shell-halved** — a penalty spells cannot avoid.
+
+**What pair = 2 (Item/Medicine) does** — it is the gate for the **Med Data** doubling in
+`Damage_ComputeCurativeItemSpecial`:
+
+```
+if ((ATTACK_FLAG & 3) == 2 && attacker is a player character && attacker knows Med Data)
+    heal *= 2;
+```
+
+Curative-item heals use `50 × power` (Potion, power 4 → 200 HP; doubled to 400 with Med Data). But
+the *implications of the pair value* matter just as much as the doubling:
+
+- **Fun fact — items dodge Shell.** Because a curative item is pair 2 (not 1/Magical), a target's
+  Shell status does **not** halve its healing (`Damage_ComputeCurativeItemSpecial` has no Shell
+  check). The Shell penalty that hits a Cure *spell* (pair 1, halved unconditionally in
+  `computeCurativeMagic`) simply never applies to a Potion.
+- **Fun fact — Med Data never provokes a counter.** Med Data doubling only exists on the Item path
+  (pair 2), which is non-Physical, so a doubled heal can never trigger the target's Counter — you get
+  the boost with none of the physical-hit side effects.
+- **Fun fact — Phoenix Down ignores this flag entirely.** Its Med Data boost (maxHP/8 → maxHP/4
+  revive) lives in `GetReviveHP` and checks `command == Item` **directly**, not `ATTACK_FLAG & 3`. So
+  the flag governs *curative-item HP restore*, while revival amount is gated separately by the command
+  type.
 

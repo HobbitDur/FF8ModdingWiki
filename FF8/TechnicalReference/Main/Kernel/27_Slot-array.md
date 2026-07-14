@@ -84,4 +84,4 @@ permalink: /technical-reference/main/kernel/slot-array/
 
 | Offset | Length | Description |
 |--------|--------|-------------|
-| 0x0000 | 1 byte | Slot Set ID |
+| 0x0000 | 1 byte | Slot Set ID — index (0-15) into the [Selphie limit-break sets]({{site.baseurl}}/technical-reference/main/kernel/slot-sets/) (kernel section 28), which holds 16 sets of 8 magic/count pairs. This section only stores which set to roll; what each set actually contains is a separate section |

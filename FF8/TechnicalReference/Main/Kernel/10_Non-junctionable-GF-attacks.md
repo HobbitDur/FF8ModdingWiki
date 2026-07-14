@@ -41,7 +41,7 @@ permalink: /technical-reference/main/kernel/non-junctionable-gf-attacks/
 | 0x0002 | 2 bytes | Attack animation — id of the effect / animation to play (the engine "special action")                                                                                                                 |
 | 0x0004 | 1 byte  | Attack type                                                                                                                                                                                  |
 | 0x0005 | 1 byte  | GF power (used in damage formula)                                                                                                                                                            |
-| 0x0006 | 1 byte  | Status attack enabler                                                                                                                                                                        |
+| 0x0006 | 1 byte  | Status attack accuracy                                                                                                                                                                        |
 | 0x0007 | 1 byte  | Target info — builds the target mask for the auto-summon attacks (Odin/Gilgamesh/Phoenix) via `getTargetMaskFromInfo` (`pre_MonsterAI`) |
 | 0x0008 | 1 byte  | Attack flags — feeds `ATTACK_FLAG` in `Battle_applyDamage` (the byte previously labeled "Status flags") |
 | 0x0009 | 1 byte | Target hit/reaction animation ID (`HIT_TYPE_TARGET_ANIMATION_TO_PLAY`) played on the target when the attack lands |
