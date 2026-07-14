@@ -65,7 +65,47 @@ All menu and dialog text renders through 8 window slots of 60 bytes at **`TEXT_L
 
 ## mngrp group loading
 
-At session begin the host loads `mngrphd.bin` (the offset index into [mngrp.bin]({{ site.baseurl }}/technical-reference/menu/menu-mngrp-bin/)). `Menu_LoadMngrpGroupAsync(group)` then loads the program's file group and its shared text sub-file into menu VRAM (+0x2E000), where `getMenuString(1, section, index, variant)` reads the two-level word-offset (tkmnmes) format. Requests go through an 8-entry async ring (0x1D750D0); TIM sub-files are flagged by `Menu_RegisterTexUpload` for VRAM upload after the read. Per-menu inits load extras (SeeD-test images = file 96+level, refine lists = files 188–200, magsort.bin, pet_exp.bin…).
+At session begin the host loads `mngrphd.bin` (the offset index into [mngrp.bin]({{ site.baseurl }}/technical-reference/menu/menu-mngrp-bin/)). `Menu_LoadMngrpGroupAsync(group)` then loads the program's file group and its shared text sub-file into menu VRAM (+0x2E000), where `getMenuString(1, section, index, variant)` reads the two-level word-offset (tkmnmes) format. Requests go through an 8-entry async ring (0x1D750D0); TIM sub-files are flagged by `Menu_RegisterTexUpload` for VRAM upload after the read.
+
+Each 20-byte ring entry is `{status, file_id, group_id, dest, callback, cb_arg}`. `Menu_FileLoadQueue_Process` pops entries: a `file_id` ≥ 0 is a **raw mngrphd entry index** (entry = `mngrphd + 8·file_id`); `file_id` = -1 loads the whole named file of `Menu_GroupFileTable[group]` (the PSX menuXXX.ovl names, mngrp.bin for group 17). Bit 0 of the mngrphd seek selects the copy mode: set → raw copy from `seek − 1` (all 118 PC entries); clear → LZS decompression via `File_LoadRange_LZSDecompress` (PSX leftover, unused on PC). Groups 1/8/11/12 share text kind 1 (tkmnmes2, entry 1), the other groups kind 2 (tkmnmes3, entry 2); group 0 text (tkmnmes1, entry 0) lives in its own 0x800 buffer.
+
+### mngrp section consumers (raw mngrphd entry indices)
+
+| Entry | Consumer |
+|-------|----------|
+| 0/1/2 | tkmnmes1/2/3: group-0 text buffer / shared text kind 1 / kind 2 |
+| 3 | Chocobo World menu data (`ChocoboWorld_Prog27Menu_Update`) |
+| 7 | Background tile descriptors for magita.tim, loaded by the tutorial, magazine and save-point card viewers |
+| 9, 10 | face1/face2: the two main-menu UI texture pages, reloaded on every sub-screen exit |
+| 12 | magita.tim: tutorial/magazine/item-use background texture |
+| 20/24/28/44/48/71/180 | Magazine category bases; page = base + mmag.bin entry byte 23 (Weapons Monthly 1st / Pet Pals / Weapons Monthly monthly / Occult Fan / Cards / Combat King & TT tutorial / Chocobo World) |
+| 48 + page | Card Album pages 0-9 (mc00–mc09) |
+| 87 | Book/magazine viewer text |
+| 90 | Chocobo World intro story (save-point screen) |
+| 95 | SeeD written test generic text |
+| 96 + test | SeeD written test questions; the engine caps test < 30, so entry 126 ("Test seed 31") is unreachable |
+| 127 | TextBox map, loaded to 0x1D82E4C for the info browser |
+| 128 + group | TextBox sections 0-5 (info browser pages) |
+| 160–167 | Tutorial demo text (junction ×4, GF, Squall/Zell/Rinoa limit breaks) |
+| 168–175 | Tutorial demo scripts, paired one-to-one with 160–167 |
+| 176/177, 178/179 | Tutorial demo mock save data + mock GF records (two variants A/B) |
+| 180 + page | Chocobo World pages from mmag2.bin entries |
+| 188–192 | m000–m004.bin refine recipes → buffer 0x1D8A864 |
+| 196–200 | m000–m004.msg refine text → buffer 0x1D85864 |
+| 204, 205 | Character switch tutorial text + demo script |
+
+### Tutorial demo records
+
+Full format on the [tutorial demo scripts page]({{ site.baseurl }}/technical-reference/menu/mngrp-demo-script/).
+The tutorial menu's demo entries come from a table of 12-byte records at 0xB88360:
+`{demo_id, program_id, variant, mock_gf_file, mock_save_file, text_file, script_file, flag, help_id, pad[3]}` —
+the four file bytes are raw mngrphd entry indices, loaded to menu VRAM +0x2A000 / +0x29000 / +0x1B000 / +0x1F000
+respectively before invoking `program_id` (18 = junction demos, 24 = GF demo, 28 = limit break demos with
+`variant` 0/1/4 for Squall/Zell/Rinoa, 29 = character switch). The mock save/GF files give the demo its fake
+party ("Quetcoatl", Shiva, Ifrit… with 2000 HP, 9999 gil and a preset inventory). The tutorial page-browser list
+at 0xB88570 is `{63, 64, 65, -1}` — the three PSX controller diagram TIMs.
+
+Per-menu inits also load extras outside mngrp (magsort.bin, pet_exp.bin, shop.bin, price.bin, mitem.bin…) as standalone files. The standalone copies of tkmnmes and m00X that also exist in the menu archive are loaded by `MenuReadFiles` but never read.
 
 ## Address table
 
@@ -84,6 +124,15 @@ At session begin the host loads `mngrphd.bin` (the offset index into [mngrp.bin]
 | `Menu_InvokeProgram` | 0x4BDB30 | Push child program + load its mngrp group |
 | `Menu_ProgramTable` | 0xB87ED8 | 33 × {init_fn, mngrp_group} dispatch table |
 | `Menu_LoadMngrpGroupAsync` | 0x4AC200 | Group + shared text loading |
+| `Menu_LoadMngrpFileAsync` | 0x4AC030 | Queue one mngrp section load by raw mngrphd index |
+| `Menu_FileLoadQueue_Process` | 0x4AC0A0 | Pops the async ring, raw copy vs LZS path |
+| `Menu_FileLoadQueue` | 0x1D750D0 | 8 × 20-byte async load ring |
+| `Menu_GroupFileTable` | 0x1D751C0 | 19 × {dest, name} group file table (menuXXX.ovl / mngrp.bin / init.out) |
+| `Menu_InitGroupFileTable` | 0x4ABD80 | Fills Menu_GroupFileTable |
+| `File_LoadRange_LZSDecompress` | 0x52D770 | Load file range + LZS decompress (mngrphd seek bit 0 clear) |
+| `LZS_DecompressBuffer` | 0x5305D0 | LZS decompressor (4-byte size header, 12-bit window) |
+| `getMenuString` | 0x4BD630 | Two-level positional string lookup (ignores count words; entry = 2·index+variant) |
+| `mngrphd_binBuffer` | 0x1D2BB18 | Loaded mngrphd.bin (256 × {seek, size}) |
 | `TEXT_LAYER` | 0x1D2B330 | 8 × 60-byte text window slots |
 | `Text_Window_UpdateStateMachine` | 0x49FEB0 | Typewriter/choice state machine |
 | `Text_RenderGlyphs` | 0x4A1570 | Glyph sprite emission |

@@ -13,3 +13,6 @@ For text menu, there is a dedicated wiki in the [ShumiTranslator](https://github
 -   [mngrp strings](mngrp-string-section/)
 -   [mngrp complex strings](mngrp-textbox-section/)
 -   [m00\*.bin and m00\*.msg](gf-refinement/refine-abilities/)
+-   [mngrp tutorial demo scripts](mngrp-demo-script/)
+-   [cyocobo.bin (Chocobo World item table)](cyocobobin-file-format/)
+-   [Menu module runtime](menu-module-runtime/)

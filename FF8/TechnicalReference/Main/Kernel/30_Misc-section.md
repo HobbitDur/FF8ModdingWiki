@@ -30,8 +30,18 @@ permalink: /technical-reference/main/kernel/misc/
 ## Section Structure
 
 The 14 status timers at 0x00–0x0D are loaded into the battle countdown as
-`4 × (battleSpeed + 1) × value` ticks (`setupStatus2Timer`); at the PC battle tick rate
-(~15/s) that is roughly `value × 16/15` seconds at the default battle speed.
+`4 × (battleSpeed + 1) × value` ticks (`setupStatus2Timer`). Each battle frame,
+`computeTimerStatus` (0x483470) subtracts `timer_speed_multiplier` from the timer — **2 by
+default**, 3 under Haste, 1 under Slow, 0 under Stop — so at the ~15 fps battle rate about **30
+ticks are consumed per second**. The real duration is therefore
+
+```
+seconds ≈ 4 × (battleSpeed + 1) × value / (2 × 15)
+```
+
+i.e. roughly `value × 8/15` s at the default battle speed (3) — about half of a naive
+"one-tick-per-frame" estimate. Timers only tick during idle ATB time, not during actions; Haste
+makes them expire ~1.5× faster and Slow ~2× slower.
 
 | Offset | Length | Description                        |
 |--------|--------|------------------------------------|

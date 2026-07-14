@@ -20,10 +20,15 @@ but only the one contains in the [mngrp.bin](https://github.com/HobbitDur/ShumiT
 
 The [mngrphd.bin](https://github.com/HobbitDur/ShumiTranslator/wiki/Mngrphd_bin) contains offset for mngrp and is different for every language.
 
+At runtime, the refine menu (Menu_Prog19_RefineMenu_Init at 0x4D7180 in FF8_EN.exe) loads the mngrp copies by raw
+mngrphd entry index: entries **188-192** for m000.bin-m004.bin (into the buffer at 0x1D8A864) and entries
+**196-200** for m000.msg-m004.msg (into 0x1D85864). The 8-byte entry stride is confirmed by the executable.
+
 # BIN
 
-There is 4 bin files:
+There is 5 bin files:
 
+* m000.bin
 * m001.bin
 * m002.bin
 * m003.bin
@@ -99,8 +104,8 @@ Each m00x file has a specific number of entries, which are listed here.
 
 | Ability                                 | \# of Entries | mngrp.bin Location         | Offset | Description                                |
 |-----------------------------------------|---------------|----------------------------|--------|--------------------------------------------|
-| [[Mid-Mag-RF\|Refinement#mid-mag-rf]]   | 4 entries     | (mngrp.bin loc: 0x2200000) | 0x0    | Upgrade Magic from low level to mid level  |
-| [[High-Mag-RF\|Refinement#high-mag-rf]] | 6 entries     | (mngrp.bin loc: 0x2200020) | 0x20   | Upgrade Magic from mid level to high level |
+| [[Mid-Mag-RF\|Refinement#mid-mag-rf]]   | 4 entries     | (mngrp.bin loc: 0x220000) | 0x0    | Upgrade Magic from low level to mid level  |
+| [[High-Mag-RF\|Refinement#high-mag-rf]] | 6 entries     | (mngrp.bin loc: 0x220020) | 0x20   | Upgrade Magic from mid level to high level |
 
 ### Entry
 

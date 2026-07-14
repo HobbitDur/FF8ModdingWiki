@@ -37,7 +37,8 @@ permalink: /technical-reference/main/kernel/characters/
 | 0x0003 | 1 byte  | Gender<br/><br/> 0x00 - Male<br/> 0x01 - Female                                                                                                        |
 | 0x0004 | 1 byte  | Limit Break ID                                                                                                                                         |
 | 0x0005 | 1 byte  | Limit Break Param<br/><br/> _used for the power of each renzokuken hit before finisher_                                                                |
-| 0x0006 | 2 bytes | EXP modifier                                                                                                                                           |
+| 0x0006 | 1 byte  | EXP curve — linear factor (low byte): EXP/level ×10. Retail 100 → 1000 EXP/level. See [Character level-up curve]({{site.baseurl}}/technical-reference/list/formula/#character-level-up-curve) |
+| 0x0007 | 1 byte  | EXP curve — quadratic factor (high byte): acceleration ÷256. Retail 0 (flat curve)                                                                     |
 | 0x0008 | 4 bytes | HP curve — 4 coefficients c1..c4 (see [Stat curves](#stat-curves))                                                                                     |
 | 0x000C | 4 bytes | STR curve — 4 coefficients c1..c4                                                                                                                      |
 | 0x0010 | 4 bytes | VIT curve — 4 coefficients c1..c4                                                                                                                      |

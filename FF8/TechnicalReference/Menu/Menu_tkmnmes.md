@@ -28,3 +28,11 @@ Padding values **0x0000** must be ignored when reading but must be kept in the s
 Each string section correspond to a [Mngrp string section](../mngrp-string-section/)
 
 **\[Start of string location\]** = **\[Start of file\]** + **\[Padding value\]** + **\[String offset value\]**
+
+# How the engine reads the file
+
+getMenuString (0x4BD630 in FF8_EN.exe) **never reads Pad_Count**: it directly indexes the padding table with the
+requested section number (`file + 2 + 2 * section`) and treats a **0x0000** padding as "no section" (empty string
+returned). The padding slot index is the menu group id, which is why the table always has 17 slots and why empty
+slots must stay in place. Inside a string section, the requested string is looked up as offset index
+`2 * text_id + variant`, so the offsets work in pairs.
