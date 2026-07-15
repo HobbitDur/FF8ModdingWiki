@@ -14,7 +14,11 @@ spell (no GF cinematic, no summon model): everything it does is representative o
 Read [Magic Effect Anatomy & Authoring](../magic-effect-anatomy/) first for the general model;
 this page is the worked example. All addresses are the **2013 Steam English `FF8_EN.exe`**.
 The **Fujin** subtool in FF8UltimateEditor shows the same functions (read-only, decompiled) and
-previews the texture, read live from the exe.
+previews the texture.
+
+Firaga is the **director-on-a-frame-timeline** archetype. For the other archetype — a
+**state machine** — see the companion [Case study: Cure animation](../cure-case-study/); between
+the two you can read essentially every regular spell effect.
 
 1. TOC
 {:toc}

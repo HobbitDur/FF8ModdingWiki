@@ -93,7 +93,8 @@ effect is finished.
 All of the following is per-spell code/static data; every other spell follows the same
 pattern with different constants. For the full frame-by-frame walkthrough of this spell —
 every task, every particle, the data block, and concrete edit recipes — see the dedicated
-[Case study: Firaga animation](../firaga-case-study/).
+[Case study: Firaga animation](../firaga-case-study/). For the other archetype (a **state
+machine**, used by the heal/status family), see [Case study: Cure animation](../cure-case-study/).
 
 ### 1. Texture loader — `MAG_143_FIRAGA_FL` @0x61BFC0
 
