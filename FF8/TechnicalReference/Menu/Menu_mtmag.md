@@ -23,6 +23,12 @@ Retail data (English PC release):
 | 1     | 51-63 | Card rules (13 pages)          | 26                    |
 | 2     | 64-67 | Card icon explanation (4 pages) | 31                   |
 
-The tutorial menu stores the selected book's range in Menu_Magazine_FirstEntry / Menu_Magazine_LastEntry
-(0x1D7D3A5 / 0x1D7D3A6) and starts the matching magazine viewer program, which pages between those two
-mmag entries.
+The tutorial menu stores the selected book's range in `Menu_Magazine_FirstEntry` / `Menu_Magazine_LastEntry`
+and starts the matching magazine viewer program, which pages between those two mmag entries.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `Menu_Magazine_FirstEntry` | 0x1D7D3A5 | First mmag entry of the currently open book (global variable/data, not a function) |
+| `Menu_Magazine_LastEntry` | 0x1D7D3A6 | Last mmag entry of the currently open book (global variable/data, not a function) |

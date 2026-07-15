@@ -29,4 +29,10 @@ none
 
 Fades a field music channel's volume to a target level over a duration. The handler pops the final volume first, the transition time second, and the channel slot third (masked to 0 or 1). It calls `Music_SetVolumeTrans` with the transition time doubled internally (the step count passed is 2 × the frame value) and stores the target volume in the savemap. The 0/1 parameter selects which of the two music channels to act on. Returns 2.
 
-PC handler: `SCRIPT_MUSICVOLTRANS` at 0x51FCD0.
+PC handler: `SCRIPT_MUSICVOLTRANS`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_MUSICVOLTRANS` | 0x51FCD0 | Field script opcode handler (verified IDA function) |

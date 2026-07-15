@@ -40,4 +40,10 @@ The last parameter controls the color of text displayed in messages. 0=black, 40
 
 The handler pops three values (channel, window behavior, color). The color is applied to the message layer, and the window-behavior value is internally remapped (0→opaque, 1→translucent, 2→no window) before being applied and cached per channel for subsequent messages.
 
-PC handler: `SCRIPT_MESMODE` at 0x528D80.
+PC handler: `SCRIPT_MESMODE`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_MESMODE` | 0x528D80 | Field script opcode handler (verified IDA function) |

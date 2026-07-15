@@ -22,4 +22,10 @@ none
 
 Disables collision with this entity by setting its through flag (+588 = 1), so the player can walk through it. No stack use.
 
-PC handler: `SCRIPT_THROUGHON` at 0x51ED40.
+PC handler: `SCRIPT_THROUGHON`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_THROUGHON` | 0x51ED40 | Field script opcode handler (verified IDA function) |

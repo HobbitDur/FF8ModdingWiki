@@ -32,8 +32,8 @@ All three run a 60 fps frame limiter (busy-wait on the high-resolution timer) �
 
 Two globals select what the menu module shows:
 
-* `menu_id` (`0x1D2BB98`) — the menu to open. Observed values: 25 = title screen, 0x80000000 = the full in-game pause menu, `GF id + 5` = the "GF obtained" tutorial screens, and field scripts pass their menu ID through `MenuState_opcode_menu_id` (MENUNORMAL, MENUSHOP, MENUNAME... opcodes).
-* `menu_sub_id` (`0xB87798`) — sub-parameter; for the pause menu it carries the save-enabled bits (`canSaveHere | 1` when opened from the field).
+* `menu_id` — the menu to open. Observed values: 25 = title screen, 0x80000000 = the full in-game pause menu, `GF id + 5` = the "GF obtained" tutorial screens, and field scripts pass their menu ID through `MenuState_opcode_menu_id` (MENUNORMAL, MENUSHOP, MENUNAME... opcodes).
+* `menu_sub_id` — sub-parameter; for the pause menu it carries the save-enabled bits (`canSaveHere | 1` when opened from the field).
 
 ## The menu host state machine
 
@@ -49,7 +49,7 @@ The return value is 0 while the menu runs. **Bit 0x400 = menu closed**; the low 
 
 ## Menu programs and the dispatch table
 
-Inside the host, menus run as **programs** on a small stack machine. The requested menu ID (a *hosted id*) is mapped by `Menu_StartHostedProgram` (0x4B3140) to a *program id* — an index into **`Menu_ProgramTable`** (0xB87ED8, 33 entries of `{init_function, mngrp_group}`). Programs invoke children with `Menu_InvokeProgram` (0x4BDB30), which pushes the program stack and loads the child's mngrp file group.
+Inside the host, menus run as **programs** on a small stack machine. The requested menu ID (a *hosted id*) is mapped by `Menu_StartHostedProgram` to a *program id* — an index into **`Menu_ProgramTable`** (33 entries of `{init_function, mngrp_group}`). Programs invoke children with `Menu_InvokeProgram`, which pushes the program stack and loads the child's mngrp file group.
 
 Hosted ids: 0/default = main menu (param = "can save here") · 1 = party select · 2/3/4 = name entry Squall/Rinoa/Angelo · 5–20 = name entry GF 0–15 (post-battle GF naming = GF id + 5) · 22 = save-point menu (param = save flags) · 23 = shop (param = shop index; 21 opens the junk shop) · 24 = game-over Continue · 25 = title · 26 = tutorial · 27/28 = name Boko/Griever · 29 = tutorial direct page.
 
@@ -57,9 +57,9 @@ Program table (index = program id): 0 root idle · 1 main menu · 2 item · 3 ma
 
 ## Text engine (TEXT_LAYER)
 
-All menu and dialog text renders through 8 window slots of 60 bytes at **`TEXT_LAYER`** (0x1D2B330): rect, encoded-text pointer + current line, typewriter speed/progress, color/flags, render target, open-animation scale (0–4096), choice block (first/last/current/cancel line), page-arrow blink, wait counter and draw callback. The world map's 13 message windows allocate from the same pool.
+All menu and dialog text renders through 8 window slots of 60 bytes at **`TEXT_LAYER`**: rect, encoded-text pointer + current line, typewriter speed/progress, color/flags, render target, open-animation scale (0–4096), choice block (first/last/current/cancel line), page-arrow blink, wait counter and draw callback. The world map's 13 message windows allocate from the same pool.
 
-* **Flow**: `Text_SetLayerText[WithChoices]` assigns text → `Text_Window_UpdateStateMachine` (0x49FEB0) advances typewriter and choice cursor each tick → `Text_DrawWindowLayer`/`Text_RenderGlyphs` emit frame, cursor and glyph sprites.
+* **Flow**: `Text_SetLayerText[WithChoices]` assigns text → `Text_Window_UpdateStateMachine` advances typewriter and choice cursor each tick → `Text_DrawWindowLayer`/`Text_RenderGlyphs` emit frame, cursor and glyph sprites.
 * **Glyphs**: sysfnt font texture, 12×12 cells, 21 per row (`u = 12·(g%21)`, `v = 12·(g/21)`); proportional widths from packed nibbles in `font_char_width_table`; extended pages via lead bytes 0x19–0x1B, second sheet for 0x1C–0x1F. Line height 16 px.
 * **Control codes**: 0x00 end · 0x01/0x07 end of page (wait confirm) · 0x02 newline (+32 px indent on choice lines) · 0x05+n icon from aicon.sp1 (0x20–0x2F = button icons, remapped by key config) · 0x06+n color (low nibble = CLUT, high = blink variants) · 0x08+p typewriter speed (32 instant, 33 pause, else 4096/(p−33)) · 0x09 wait. Variable inserts (names, numbers) are pre-expanded by `ProcessBattleTextExpansion`.
 
@@ -97,19 +97,19 @@ Each 20-byte ring entry is `{status, file_id, group_id, dest, callback, cb_arg}`
 ### Tutorial demo records
 
 Full format on the [tutorial demo scripts page]({{ site.baseurl }}/technical-reference/menu/mngrp-demo-script/).
-The tutorial menu's demo entries come from a table of 12-byte records at 0xB88360:
+The tutorial menu's demo entries come from `Menu_TutorialDemoRecords`, a table of 12-byte records:
 `{demo_id, program_id, variant, mock_gf_file, mock_save_file, text_file, script_file, flag, help_id, pad[3]}` —
 the four file bytes are raw mngrphd entry indices, loaded to menu VRAM +0x2A000 / +0x29000 / +0x1B000 / +0x1F000
 respectively before invoking `program_id` (18 = junction demos, 24 = GF demo, 28 = limit break demos with
 `variant` 0/1/4 for Squall/Zell/Rinoa, 29 = character switch). The mock save/GF files give the demo its fake
-party ("Quetcoatl", Shiva, Ifrit… with 2000 HP, 9999 gil and a preset inventory). The tutorial page-browser list
-at 0xB88570 is `{63, 64, 65, -1}` — the three PSX controller diagram TIMs.
+party ("Quetcoatl", Shiva, Ifrit… with 2000 HP, 9999 gil and a preset inventory). The `Menu_TutorialPageList`
+tutorial page-browser list is `{63, 64, 65, -1}` — the three PSX controller diagram TIMs.
 
 Per-menu inits also load extras outside mngrp (magsort.bin, pet_exp.bin, shop.bin, price.bin, mitem.bin…) as standalone files. The standalone copies of tkmnmes and m00X that also exist in the menu archive are loaded by `MenuReadFiles` but never read.
 
-## Address table
+## Function addresses
 
-| Name | Address | Description |
+| Function | Address | Description |
 |------|---------|-------------|
 | `LoadMenuFiles` | 0x470340 | One-time menu resource loading (engine exit_main) |
 | `MenuReadFiles` | 0x4A1BF0 | mngrp & co. file loading |
@@ -140,5 +140,7 @@ Per-menu inits also load extras outside mngrp (magsort.bin, pet_exp.bin, shop.bi
 | `menu_id` | 0x1D2BB98 | Requested menu ID |
 | `menu_sub_id` | 0xB87798 | Menu sub-parameter (save-enable bits...) |
 | `menu_result_flags` | 0x1D2BB9C | Result returned to the module handler |
+| `Menu_TutorialDemoRecords` | 0xB88360 | 9 × 12-byte tutorial demo records (global variable/data, not a function) |
+| `Menu_TutorialPageList` | 0xB88570 | Tutorial page-browser TIM list `{63, 64, 65, -1}` (global variable/data, not a function) |
 
 Addresses are for FF8_EN.exe (2000 PC release) as mapped in IDA (image base 0x400000).

@@ -27,4 +27,10 @@ Pauses this script until *frame count* frames have passed since [SPUREADY](../05
 
 The handler compares the popped *frame count* against the elapsed-frame counter (`unk_1D9CDCC`): while fewer frames have elapsed it returns 1 (retry next frame) without advancing the IP. A frame count of 0 (or negative) instead waits on the SPU-ready poll `sub_5305C0`.
 
-PC handler: `SCRIPT_SPUSYNC` at 0x51F5B0.
+PC handler: `SCRIPT_SPUSYNC`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_SPUSYNC` | 0x51F5B0 | Field script opcode handler (verified IDA function) |

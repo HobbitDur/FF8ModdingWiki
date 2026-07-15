@@ -23,4 +23,10 @@ none
 
 Disables line collisions with this entity by writing 0 to the line's active flag (entity+404). Returns 2 (done + continue).
 
-PC handler: `SCRIPT_LINEOFF` at 0x51DD00.
+PC handler: `SCRIPT_LINEOFF`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_LINEOFF` | 0x51DD00 | Field script opcode handler (verified IDA function) |

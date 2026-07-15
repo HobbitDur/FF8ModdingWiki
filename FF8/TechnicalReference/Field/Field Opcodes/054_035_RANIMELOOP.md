@@ -22,4 +22,10 @@ none
 
 Loops an animation. Starts the animation given by the inline argument in looping mode (`execution_flags` bits set to 0x20, entity+352) and returns 3 (done + yield) immediately, so the animation keeps cycling while the script continues.
 
-PC handler: `SCRIPT_RANIMELOOP` at 0x526A30.
+PC handler: `SCRIPT_RANIMELOOP`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_RANIMELOOP` | 0x526A30 | Field script opcode handler (verified IDA function) |

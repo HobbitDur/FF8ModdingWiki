@@ -22,4 +22,10 @@ none
 
 Enables the payment of salaries.
 
-PC handler: `SCRIPT_SALARYON` at 0x51DBC0.
+PC handler: `SCRIPT_SALARYON`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_SALARYON` | 0x51DBC0 | Field script opcode handler (verified IDA function) |

@@ -25,4 +25,10 @@ none
 
 Pops one word (the character id) and writes that character's slot index in the active party (0, 1 or 2) into I register 0 (`entity+320`, script temporary variable 0). If the character is not in the active party it writes -1. Returns 2.
 
-PC handler: `SCRIPT_ISPARTY` at 0x51E5E0.
+PC handler: `SCRIPT_ISPARTY`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_ISPARTY` | 0x51E5E0 | Field script opcode handler (verified IDA function) |

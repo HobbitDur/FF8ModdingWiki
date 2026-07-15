@@ -23,4 +23,10 @@ none
 
 Enables running. Clears the global `RUN_DISABLE` flag (sets it to 0). Takes no stack arguments.
 
-PC handler: `SCRIPT_RUNENABLE` at 0x526180.
+PC handler: `SCRIPT_RUNENABLE`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_RUNENABLE` | 0x526180 | Field script opcode handler (verified IDA function) |

@@ -36,4 +36,10 @@ PSHN\_L 0
 
 MUSICSTOP
 
-PC handler: `SCRIPT_MUSICSTOP` at 0x51FBD0.
+PC handler: `SCRIPT_MUSICSTOP`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_MUSICSTOP` | 0x51FBD0 | Field script opcode handler (verified IDA function) |

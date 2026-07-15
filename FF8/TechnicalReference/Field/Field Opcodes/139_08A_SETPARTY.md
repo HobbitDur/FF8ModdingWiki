@@ -42,4 +42,10 @@ Sets the active party to be the members with the input IDs. The handler pops the
 -   10 Ward
 -   255 Blank
 
-PC handler: `SCRIPT_SETPARTY` at 0x51E400.
+PC handler: `SCRIPT_SETPARTY`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_SETPARTY` | 0x51E400 | Field script opcode handler (verified IDA function) |

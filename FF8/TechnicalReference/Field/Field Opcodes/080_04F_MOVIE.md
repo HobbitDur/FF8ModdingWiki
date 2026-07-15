@@ -22,4 +22,10 @@ none
 
 Plays an FMV movie prepared by [MOVIEREADY](../0a3-movieready/). Waits (return 1) until the movie subsystem is ready, then starts playback (`start_movie`). No stack use.
 
-PC handler: `SCRIPT_MOVIE` at 0x51F390.
+PC handler: `SCRIPT_MOVIE`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_MOVIE` | 0x51F390 | Field script opcode handler (verified IDA function) |

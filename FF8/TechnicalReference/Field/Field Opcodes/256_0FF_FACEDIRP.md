@@ -27,4 +27,10 @@ none
 
 Turns this actor's head to face the given party member over *frame count*. Identical to [FACEDIRA](../0fe-facedira/) except the target is resolved from the savemap party map (party member ID) rather than a raw actor code.
 
-PC handler: `SCRIPT_FACEDIRP` at 0x527D30.
+PC handler: `SCRIPT_FACEDIRP`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_FACEDIRP` | 0x527D30 | Field script opcode handler (verified IDA function) |

@@ -17,7 +17,7 @@ entries 160-179 and 204-205).
 
 ## Demo record table
 
-The nine demos come from a table of 12-byte records in the executable (`Menu_TutorialDemoRecords`, 0xB88360):
+The nine demos come from a table of 12-byte records in the executable (`Menu_TutorialDemoRecords`):
 
 | Offset | Type  | Value          | Description                                                        |
 |--------|-------|----------------|----------------------------------------------------------------------|
@@ -91,18 +91,18 @@ engine's pad state, so the hosted menu program navigates as if the player presse
 ...
 ```
 
-## Engine addresses (FF8 PC 2000, FF8_EN.exe)
+## Function addresses
 
-| Address   | Name                          | Role                                                        |
+| Function | Address | Description |
 |-----------|-------------------------------|---------------------------------------------------------------|
-| 0x4BE100  | Menu_ReadPad_OrRunDemoScript  | Per-frame input hook: runs the script VM when a demo is active, otherwise reads the real pad |
-| 0x4BE050  | Menu_DemoScript_Start         | Arms the VM with a script buffer and a caption text section |
-| 0xB88360  | Menu_TutorialDemoRecords      | The 9 × 12-byte demo records                                |
-| 0xB88570  | Menu_TutorialPageList         | Tutorial page-browser TIM list {63, 64, 65, -1}             |
-| 0x1D76BC0 | Menu_DemoScript_IP            | Current script word pointer                                 |
-| 0x1D76AB4 | Menu_DemoScript_TextSection   | Caption string section pointer                              |
-| 0x1D77078 | Menu_DemoScript_Active        | 1 while a demo script drives the input                      |
-| 0x1D76B40 | Menu_DemoScript_Cancelled     | Set when the player cancels the demo                        |
-| 0x4C99E0  | Menu_Demo_ApplyMockSave       | Copies the mock character/GF records over the live savemap  |
-| 0x4CADA0  | Menu_Demo_RestoreRealSave     | Restores the real save backup when the demo ends            |
-| 0x1D771AC | Menu_Demo_UseRealRosterFlag   | Record flag byte: demo party from the real roster           |
+| `Menu_ReadPad_OrRunDemoScript` | 0x4BE100 | Per-frame input hook: runs the script VM when a demo is active, otherwise reads the real pad |
+| `Menu_DemoScript_Start` | 0x4BE050 | Arms the VM with a script buffer and a caption text section |
+| `Menu_TutorialDemoRecords` | 0xB88360 | The 9 × 12-byte demo records |
+| `Menu_TutorialPageList` | 0xB88570 | Tutorial page-browser TIM list {63, 64, 65, -1} |
+| `Menu_DemoScript_IP` | 0x1D76BC0 | Current script word pointer |
+| `Menu_DemoScript_TextSection` | 0x1D76AB4 | Caption string section pointer |
+| `Menu_DemoScript_Active` | 0x1D77078 | 1 while a demo script drives the input |
+| `Menu_DemoScript_Cancelled` | 0x1D76B40 | Set when the player cancels the demo |
+| `Menu_Demo_ApplyMockSave` | 0x4C99E0 | Copies the mock character/GF records over the live savemap |
+| `Menu_Demo_RestoreRealSave` | 0x4CADA0 | Restores the real save backup when the demo ends |
+| `Menu_Demo_UseRealRosterFlag` | 0x1D771AC | Record flag byte: demo party from the real roster |

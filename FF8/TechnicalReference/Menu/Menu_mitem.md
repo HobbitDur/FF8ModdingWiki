@@ -26,7 +26,7 @@ Each entry is 4 bytes, with no padding or alignment.
 | Offset | Name     | Description                                                                                       |
 |--------|----------|---------------------------------------------------------------------------------------------------|
 | `0`    | `type`   | Item category. Drives dispatch. See [Item types](#item-types).                                    |
-| `1`    | `flags`  | Targeting and usability bitfield, read through `Mitem_GetEffectiveFlags` (0x4F7530), which overrides it for types 9/12/13/14/15/19. See [Flags](#flags). |
+| `1`    | `flags`  | Targeting and usability bitfield, read through `Mitem_GetEffectiveFlags`, which overrides it for types 9/12/13/14/15/19. See [Flags](#flags). |
 | `2`    | `param1` | Type-dependent. Heal amount, GF id, ability id, magazine start page, …                            |
 | `3`    | `param2` | Type-dependent. Status mask, stat mask, compatibility amount, magazine end page, …                |
 
@@ -69,8 +69,8 @@ Byte `type` is dispatched in two places.
 
 **Layer 1** — `case 5` of the state machine, on confirm, *before* target selection. Types `9, 12, 13, 14, 15, 16` are intercepted here (16 only for a precondition check).
 
-**Layer 2** — `case 17`, *after* target selection. Types `11, 18, 19` branch to dedicated sub-menus; everything else indexes the action LUT `K_ITEM_TYPE_TO_ACTION` (`byte_B88AC4`,
-28 bytes at `0x00B88AC4`):
+**Layer 2** — `case 17`, *after* target selection. Types `11, 18, 19` branch to dedicated sub-menus; everything else indexes the action LUT `K_ITEM_TYPE_TO_ACTION` (`byte_B88AC4` in the community IDB,
+28 bytes):
 
 ```
 type   0  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 21
@@ -391,3 +391,10 @@ Types **0/3**, **1/4** and **2/5** are pairwise identical from the field menu's 
 | 0xC4 | Occult Fan II     | 9      | MAGAZINE         | 0x04    | GF                       | 40   | 40   | pages 40-40                                                         |
 | 0xC5 | Occult Fan III    | 9      | MAGAZINE         | 0x04    | GF                       | 41   | 41   | pages 41-41                                                         |
 | 0xC6 | Occult Fan IV     | 9      | MAGAZINE         | 0x04    | GF                       | 42   | 42   | pages 42-42                                                         |
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `Mitem_GetEffectiveFlags` | 0x4F7530 | Computes the effective `flags` byte, overriding it for types 9/12/13/14/15/19 |
+| `K_ITEM_TYPE_TO_ACTION` | 0xB88AC4 | 28-byte item-type → action LUT (global variable/data, not a function; named `byte_B88AC4` in the community IDB) |

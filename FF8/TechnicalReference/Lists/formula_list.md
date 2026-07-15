@@ -18,7 +18,7 @@ $$
 $$
 
 {: .note }
->`ComputeMagicAndGFDamage`@0x491ad0 reads TargetSpr from the same `BATTLE_SLOT_DATA[]` slot array for players and monsters: the SPR term is one shared code path. The only monster-related asymmetry found is on the attacker side: if the caster is a monster, magic damage dealt is halved after this formula.
+>`ComputeMagicAndGFDamage` reads TargetSpr from the same `BATTLE_SLOT_DATA[]` slot array for players and monsters: the SPR term is one shared code path. The only monster-related asymmetry found is on the attacker side: if the caster is a monster, magic damage dealt is halved after this formula.
 
 ## Demi, Percent
 
@@ -34,7 +34,7 @@ $$
 
 ## Classic damage:
 
-`ComputeMagicAndGFDamage`@0x491ad0 (GF-damage case). `Power` = the `gfPower` byte (offset 0x07);
+`ComputeMagicAndGFDamage` (GF-damage case). `Power` = the `gfPower` byte (offset 0x07);
 `LevelMod`/`PowerMod` = the `levelMod`/`powerMod` tail bytes (offsets 0x83/0x82).
 
 $$
@@ -123,8 +123,8 @@ $$
 
 ## Classic {#physical-classic}
 
-Base physical damage, straight from the engine (`ComputeWithDamageSTRFormula`@0x492c40 and the
-hit+crit-rolling `computeAttackPhysical`@0x492e10 — identical arithmetic):
+Base physical damage, straight from the engine (`ComputeWithDamageSTRFormula` and the
+hit+crit-rolling `computeAttackPhysical` — identical arithmetic):
 
 $$
 \text{Damage} = \left\lfloor
@@ -140,14 +140,14 @@ where `AttackPower` = weapon attack power, `STR` = attacker STR (with the weapon
 >by an order of magnitude (for STR 128: 1152 vs 114). This page previously used the wrong term and
 >a spurious `(CritDamage+40)/20` factor; neither is in the exe.
 
-Then `HpModifierComputationForPhysical`@0x48f600 applies, in order: **Protect** ÷2, **Back Attack**
+Then `HpModifierComputationForPhysical` applies, in order: **Protect** ÷2, **Back Attack**
 ×2, **Critical** ×2, **Zombie target** ÷2, and the elemental term
 `dmg += dmg × elemAttack% × (800 − elemDef)/10000`. (VIT is read from the same `BATTLE_SLOT_DATA[]`
 slot array for players and monsters — one shared code path.)
 
 ## Compute crit {#compute-crit}
 
-Rolled in `Damage_RollCrit`@0x492b60: **crit if a random byte `0..255` ≤ `CritBonus + LUCK`** (the
+Rolled in `Damage_RollCrit`: **crit if a random byte `0..255` ≤ `CritBonus + LUCK`** (the
 `255×x/255` in the code is a no-op), so
 
 $$
@@ -159,7 +159,7 @@ $$
 
 ## Hit % {#hit-rate}
 
-Physical accuracy, from `computeAttackPhysical`@0x492e10:
+Physical accuracy, from `computeAttackPhysical`:
 
 $$
 \text{hit\%} = \text{HitRate} + \left\lfloor\frac{\text{LUCK}}{2}\right\rfloor - \text{EVA}_{tgt} - \text{LUCK}_{tgt}
@@ -175,21 +175,21 @@ Every "Status attack accuracy" byte across the kernel (Magic, GF, Enemy attacks,
 Battle items, Non-J GF, Command abilities, Blue Magic, Shot, Duel, Rinoa, ...) is the SAME kernel
 field — but which formula actually reads it (if any) depends entirely on the ability's own
 [Attack Type]({{site.baseurl}}/technical-reference/list/kernel#attack-type) byte, which selects a
-damage-compute function in `Battle_DamageGettingRelated`@0x4922b0. Each function below was
+damage-compute function in `Battle_DamageGettingRelated`. Each function below was
 individually decompiled — nothing here is inferred from the byte's *name* alone:
 
 | Attack Types | Function | Behaviour |
 |---|---|---|
-| Physical Attack, % Physical Damage, Renzokuken Finisher, Squall Gunblade Attack, Kamikaze, Everyone's Grudge, Physical Attack (Ignore Target VIT) | `Battle_ApplyStatusWithResistRoll`@0x48f9f0 via the STR/VIT physical core | `chance = accuracy + STR/4 − VIT/4 − resistance`, rolled |
+| Physical Attack, % Physical Damage, Renzokuken Finisher, Squall Gunblade Attack, Kamikaze, Everyone's Grudge, Physical Attack (Ignore Target VIT) | `Battle_ApplyStatusWithResistRoll` via the STR/VIT physical core | `chance = accuracy + STR/4 − VIT/4 − resistance`, rolled |
 | Magic Attack, % Magic Damage, GF, GF (Ignore Target SPR), % GF Damage, Magic Attack (Ignore Target SPR), LV? Attack, Unknown 4 | same roll, via `Damage_ComputeMagicAndGF`'s MAG/SPR path | `chance = accuracy + MAG/4 − SPR/4 − resistance`, rolled |
-| Curative Item, White Wind, Give Percentage HP (Angelo Recover) | `Damage_ComputeCurativeItemSpecial`@0x493450 | `cures if accuracy > rand(1..100)` — flat %, no stat terms. **Cures** the listed statuses, doesn't inflict them |
-| Curative Magic, Unknown 1 (Demi-type) | `Damage_ComputeCurativeMagic`@0x493280 | `checkDoubleStatusApply` runs **unconditionally** — `HIT_ATTACK_ACCURACY` is never read. **Byte is dead** |
-| Revive, Revive At Full HP | `GetReviveHP`@0x491940 | Clears Death unconditionally if present and not sealed — accuracy never read. **Byte is dead**, except reviving a Zombie-status target instead deals unmissable magic damage via the Magic-dispatch path |
-| LV Down, LV Up | `computeLvlUpDown`@0x493650 | `succeeds if accuracy > rand(0..255)` — gates the WHOLE level-change action (not a status roll at all); also fails outright if the target is level-change-immune |
-| Fixed Damage, Target Current HP - 1, Fixed Magic Damage Based on GF Level, 1 HP Damage | `Damage_ComputeFixedSpecial`@0x4931c0 | No reference to `HIT_ATTACK_ACCURACY` anywhere in the function. **Byte is dead** |
-| Card | `Battle_RollCardCommand`@0x48fba0 | Capture depends on the **target's HP ratio**, not this byte: `chance = (256 − 255×curHP/maxHP)/256` (~0.4% at full HP → 100% near 0 HP); a second `rand < 16` (6.25%) gives the rare card. **Byte is dead** |
-| Devour | dispatcher case @0x4926cf | Success needs `attackerHP ≥ targetHP`, then `chance = (attackerHP − targetHP)/attackerHP`; the Devour effect comes from the Devour kernel section. **Byte is dead** |
-| Scan, Angelo Search, Moogle Dance | dispatcher cases @0x4925a6 / @0x49284b / @0x4928d3 | Utility actions (reveal info / find item / GF HP recovery) — no roll, accuracy never read. **Byte is dead** |
+| Curative Item, White Wind, Give Percentage HP (Angelo Recover) | `Damage_ComputeCurativeItemSpecial` | `cures if accuracy > rand(1..100)` — flat %, no stat terms. **Cures** the listed statuses, doesn't inflict them |
+| Curative Magic, Unknown 1 (Demi-type) | `Damage_ComputeCurativeMagic` | `checkDoubleStatusApply` runs **unconditionally** — `HIT_ATTACK_ACCURACY` is never read. **Byte is dead** |
+| Revive, Revive At Full HP | `GetReviveHP` | Clears Death unconditionally if present and not sealed — accuracy never read. **Byte is dead**, except reviving a Zombie-status target instead deals unmissable magic damage via the Magic-dispatch path |
+| LV Down, LV Up | `computeLvlUpDown` | `succeeds if accuracy > rand(0..255)` — gates the WHOLE level-change action (not a status roll at all); also fails outright if the target is level-change-immune |
+| Fixed Damage, Target Current HP - 1, Fixed Magic Damage Based on GF Level, 1 HP Damage | `Damage_ComputeFixedSpecial` | No reference to `HIT_ATTACK_ACCURACY` anywhere in the function. **Byte is dead** |
+| Card | `Battle_RollCardCommand` | Capture depends on the **target's HP ratio**, not this byte: `chance = (256 − 255×curHP/maxHP)/256` (~0.4% at full HP → 100% near 0 HP); a second `rand < 16` (6.25%) gives the rare card. **Byte is dead** |
+| Devour | Devour dispatcher case | Success needs `attackerHP ≥ targetHP`, then `chance = (attackerHP − targetHP)/attackerHP`; the Devour effect comes from the Devour kernel section. **Byte is dead** |
+| Scan, Angelo Search, Moogle Dance | Scan / Angelo Search / Moogle Dance dispatcher cases | Utility actions (reveal info / find item / GF HP recovery) — no roll, accuracy never read. **Byte is dead** |
 | None, Summon Item?, Unknown 2, Unknown 3 | dispatcher `LABEL_46` / no-op default | No damage or status roll at all. **Byte is dead** |
 
 ```
@@ -204,7 +204,7 @@ otherwise           -> roll floor(chance × 255 / 100) against rand(0..255)
 
 {: .note }
 >All 37 defined Attack Types (0–36) are accounted for above — every one was read out of the
->dispatcher `Battle_DamageGettingRelated`@0x4922b0. Only two groups actually consume the
+>dispatcher `Battle_DamageGettingRelated`. Only two groups actually consume the
 >status-accuracy byte (the STR/VIT and MAG/SPR rows); for the rest it is genuinely dead, or the
 >Attack Type has its own success mechanic (Card HP-ratio, Devour HP-ratio, LV Up/Down action gate).
 
@@ -214,8 +214,8 @@ otherwise           -> roll floor(chance × 255 / 100) against rand(0..255)
 Each character stat is defined by 4 coefficients (noted `stat_0`..`stat_3`, i.e. the four
 bytes stored per stat in the [Characters kernel section]({{site.baseurl}}/technical-reference/main/kernel/characters/#stat-curves)).
 There are three distinct curve shapes — HP, the STR family, and the SPD/LCK pair — all read
-below from the engine (`Stat_ComputeCharaMaxHP`@0x496310 for HP, `Stat_ComputeCharaStat`@0x496440
-for the rest; the final sum is clamped by `CapTo255`@0x495930).
+below from the engine (`Stat_ComputeCharaMaxHP` for HP, `Stat_ComputeCharaStat`
+for the rest; the final sum is clamped by `CapTo255`).
 
 {: .warning }
 >The [doomtrain](https://github.com/DarkShinryu/doomtrain) editor charts SPD and LCK with the
@@ -276,13 +276,13 @@ $$
 ## Monster stat
 
 Read from the exe. Coefficient blocks live in the monster's battle-`.dat` info section
-(`ff8_battle_monster_info`): 4 bytes per stat. HP: `computeMonsterHP`@0x48c500; the other
-stats: `Stat_ComputeMonsterStatCurve`@0x48c3f0 (with SPR/SPD computed inline in
-`updateStatChange`@0x48c1c0). Curve→stat mapping: STR and MAG use the quadratic curve; VIT,
+(`ff8_battle_monster_info`): 4 bytes per stat. HP: `computeMonsterHP`; the other
+stats: `Stat_ComputeMonsterStatCurve` (with SPR/SPD computed inline in
+`updateStatChange`). Curve→stat mapping: STR and MAG use the quadratic curve; VIT,
 SPR, SPD, EVA use the linear curve. All divisions truncate.
 
 {: .note }
->`updateStatChange`@0x48c1c0 applies a final per-monster multiplier to every battle stat:
+>`updateStatChange` applies a final per-monster multiplier to every battle stat:
 >`finalStat = CapTo255(curveResult × statMult / 10)`. `statMult` defaults to **10 (×1.0)**, so
 >the curve formulas below give the base value; AI scripts can scale a stat via this byte.
 
@@ -342,7 +342,7 @@ $$
 $$
 
 {: .note }
->`Stat_ComputeLevelFromExp`@0x4961d0 accumulates this threshold per level and returns the first
+>`Stat_ComputeLevelFromExp` accumulates this threshold per level and returns the first
 >level whose threshold exceeds the character's EXP. Retail value **100** (`expLow=100, expHigh=0`)
 >gives a flat **1000 EXP per level** (99 000 to reach level 100). A non-zero high byte makes the
 >curve accelerate.
@@ -395,7 +395,7 @@ $$
 # Stat formula per level
 ## GF HP
 
-`getGFhpForLvl`@0x496120. The quadratic term is genuinely **added** (unlike character HP, which
+`getGFhpForLvl`. The quadratic term is genuinely **added** (unlike character HP, which
 subtracts it). `HPMod_1/2/3` = the `gfHPModifier1/2/3` bytes at kernel offsets 0x14/0x15/0x16.
 
 $$
@@ -403,18 +403,50 @@ $$
 $$
 
 {: .note }
->No clamp in this function; the caller `computeGFBattleStats`@0x495e6b does
+>No clamp in this function; the caller `computeGFBattleStats` does
 >`gf_hp = percentHPBonus% × GFHP` (default ×1.0, raised by HP-Up abilities), capped at 9999.
 
 ## GF exp for next level needed
 
-`getGFExpNeededForNextLevel`@0x496080 (÷256 confirmed). `NextLvlMod_1/2` = the
+`getGFExpNeededForNextLevel` (÷256 confirmed). `NextLvlMod_1/2` = the
 `nextLevelModifier1/2` bytes at kernel offsets 0x18/0x19.
 
 $$
 \text{GFNextLevelExp} = \frac{\text{GFLvl}^2 \times \text{NextLvlMod}_2}{256} + 10 \times \text{GFLvl} \times \text{NextLvlMod}_1
 $$
 
+# Function addresses
 
+Reverse-engineering addresses for the functions referenced above, for readers who want to look them up in the exe.
+
+| Function | Address |
+|---|---|
+| `ComputeMagicAndGFDamage` | 0x491ad0 |
+| `ComputeWithDamageSTRFormula` | 0x492c40 |
+| `computeAttackPhysical` | 0x492e10 |
+| `HpModifierComputationForPhysical` | 0x48f600 |
+| `Damage_RollCrit` | 0x492b60 |
+| `Battle_DamageGettingRelated` | 0x4922b0 |
+| `Battle_ApplyStatusWithResistRoll` | 0x48f9f0 |
+| `Damage_ComputeCurativeItemSpecial` | 0x493450 |
+| `Damage_ComputeCurativeMagic` | 0x493280 |
+| `GetReviveHP` | 0x491940 |
+| `computeLvlUpDown` | 0x493650 |
+| `Damage_ComputeFixedSpecial` | 0x4931c0 |
+| `Battle_RollCardCommand` | 0x48fba0 |
+| Devour dispatcher case | 0x4926cf |
+| Scan dispatcher case | 0x4925a6 |
+| Angelo Search dispatcher case | 0x49284b |
+| Moogle Dance dispatcher case | 0x4928d3 |
+| `Stat_ComputeCharaMaxHP` | 0x496310 |
+| `Stat_ComputeCharaStat` | 0x496440 |
+| `CapTo255` | 0x495930 |
+| `computeMonsterHP` | 0x48c500 |
+| `Stat_ComputeMonsterStatCurve` | 0x48c3f0 |
+| `updateStatChange` | 0x48c1c0 |
+| `Stat_ComputeLevelFromExp` | 0x4961d0 |
+| `getGFhpForLvl` | 0x496120 |
+| `computeGFBattleStats` | 0x495e6b |
+| `getGFExpNeededForNextLevel` | 0x496080 |
 
 

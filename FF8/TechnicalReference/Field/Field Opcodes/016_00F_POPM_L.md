@@ -22,4 +22,10 @@ Byte offset into the savemap field-variable block (`VARMAP_START`), i.e. a savem
 
 Pop *value* from stack and store its full 32 bits at variable offset **Argument**. Returns 2.
 
-PC handler: `SCRIPT_POPM_L` at 0x51CD00.
+PC handler: `SCRIPT_POPM_L`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_POPM_L` | 0x51CD00 | Field script opcode handler (verified IDA function) |

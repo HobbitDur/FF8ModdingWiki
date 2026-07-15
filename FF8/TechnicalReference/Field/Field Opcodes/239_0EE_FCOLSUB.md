@@ -37,4 +37,10 @@ none
 
 Runs a full-screen color fade in **subtract** mode. The handler sets the field fade state to 6 (subtractive), then pops seven values (start RGB, end RGB, and the transition duration in frames) into the fade-color registers and mirrors all of them into the savemap fade block so the effect survives across frames. Over *Transition Time* frames the screen color is interpolated from the start RGB to the end RGB and subtracted from the rendered image.
 
-PC handler: `SCRIPT_FCOLSUB` at 0x528B20.
+PC handler: `SCRIPT_FCOLSUB`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_FCOLSUB` | 0x528B20 | Field script opcode handler (verified IDA function) |

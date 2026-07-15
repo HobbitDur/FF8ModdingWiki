@@ -50,8 +50,8 @@ Observed values across the retail file:
 
 **Important — what the PC executable actually reads:** the magic-menu code touches this buffer at only two places, and both mask it with `& 1`:
 
-- Drawing a magic-list row (`sub_4F7140`, at `0x4F71E9`) — `menuUsableFlags & 1` picks the text colour: bit clear → the spell is drawn greyed-out/disabled; bit set → normal, selectable.
-- The main field magic menu (`linked_menu_magic_sub_4F02F0`, at `0x4F0625`) — same `& 1` test to decide whether the entry is enabled.
+- Drawing a magic-list row (`sub_4F7140`) — `menuUsableFlags & 1` picks the text colour: bit clear → the spell is drawn greyed-out/disabled; bit set → normal, selectable.
+- The main field magic menu (`linked_menu_magic_sub_4F02F0`) — same `& 1` test to decide whether the entry is enabled.
 
 So on the PC port **only bit 0 (`0x01`) is consulted** — `0x03` and `0x23` are treated identically (both "usable"). The higher bits (`0x02`, `0x20`) are never read.
 

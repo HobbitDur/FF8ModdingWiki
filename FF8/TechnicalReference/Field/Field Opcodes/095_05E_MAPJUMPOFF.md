@@ -21,6 +21,13 @@ none
 
 #### Description
 
-Prevents the player from leaving the field via a field exit (ie walking off the screen to get to the next area) by setting the field-exit-disable flag (byte at 0x1CE4902 = 1). Undone by [MAPJUMPON](../05d-mapjumpon/). No stack use.
+Prevents the player from leaving the field via a field exit (ie walking off the screen to get to the next area) by setting the field-exit-disable flag (= 1). Undone by [MAPJUMPON](../05d-mapjumpon/). No stack use.
 
-PC handler: `SCRIPT_MAPJUMPOFF` at 0x521CC0.
+PC handler: `SCRIPT_MAPJUMPOFF`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_MAPJUMPOFF` | 0x521CC0 | Field script opcode handler (verified IDA function) |
+| field-exit-disable flag byte | 0x1CE4902 | Global byte, not a function |

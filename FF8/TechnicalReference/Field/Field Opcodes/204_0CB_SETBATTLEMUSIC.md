@@ -39,4 +39,10 @@ Sets which battle music starts playing when a battle starts. Here are some commo
 
 The handler pops one byte and stores it into a savemap field; the next battle started from this field reads that stored track.
 
-PC handler: `SCRIPT_SETBATTLEMUSIC` at 0x51F700.
+PC handler: `SCRIPT_SETBATTLEMUSIC`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_SETBATTLEMUSIC` | 0x51F700 | Field script opcode handler (verified IDA function) |

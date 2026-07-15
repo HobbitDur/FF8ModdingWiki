@@ -34,4 +34,10 @@ Pops one value (a party slot 0-2), resolves it to that slot's field entity (via 
 
 (I[3] is left untouched.) Temp variables can be accessed with `PSHI_L`.
 
-PC handler: `SCRIPT_PGETINFO` at 0x51EEB0.
+PC handler: `SCRIPT_PGETINFO`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_PGETINFO` | 0x51EEB0 | Field script opcode handler (verified IDA function) |

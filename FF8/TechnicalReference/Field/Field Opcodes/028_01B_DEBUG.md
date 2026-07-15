@@ -22,4 +22,10 @@ none
 
 No gameplay effect in the retail build. The handler sets a global debug flag (`unk_1D9CDC0` = 1) and yields (returns 3); the flag is not read by any shipped code path, so it is a leftover development hook.
 
-PC handler: `SCRIPT_DEBUG` at 0x51D700.
+PC handler: `SCRIPT_DEBUG`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_DEBUG` | 0x51D700 | Field script opcode handler (verified IDA function) |

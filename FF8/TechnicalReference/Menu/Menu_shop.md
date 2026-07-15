@@ -13,7 +13,7 @@ The shop list is sorted, meaning that there is no offset, and the X<sub>eme</sub
 
 ## How the field opens a shop (shop ID remap)
 
-A field script opens a shop with the **`MENUSHOP`** opcode (handler 0x521D60), which pops one byte — the **shop ID** — off the script stack and requests hosted menu 23 (Shop). The shop program (`Menu_Prog11_ShopMenu_Init`, 0x4EDA40) does **not** use that ID directly: it passes it through a remap table, **`SHOP_ID_REMAP_TABLE`** (0xB88918, 52 bytes), before selecting the shop:
+A field script opens a shop with the **`MENUSHOP`** opcode (handler `SCRIPT_MENUSHOP`), which pops one byte — the **shop ID** — off the script stack and requests hosted menu 23 (Shop). The shop program (`Menu_Prog11_ShopMenu_Init`) does **not** use that ID directly: it passes it through a remap table, **`SHOP_ID_REMAP_TABLE`** (52 bytes), before selecting the shop:
 
 | Field shop ID | Remapped value | Result |
 |---------------|----------------|--------|
@@ -123,3 +123,11 @@ Consequently shop.bin only needs records **0–20** (the 21 item shops); IDs in 
 | 0x11    | Esthar Pet Shop (Cheryl's store)            |
 | 0x12    | Esthar Book Store (Karen's shop)            |
 | 0x13    | Esthar Shop!!! (Johnny's shop)              |
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_MENUSHOP` | 0x521D60 | `MENUSHOP` field-script opcode handler |
+| `Menu_Prog11_ShopMenu_Init` | 0x4EDA40 | Shop menu program init |
+| `SHOP_ID_REMAP_TABLE` | 0xB88918 | 52-byte field shop ID → shop.bin record remap table (global variable/data, not a function) |

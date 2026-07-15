@@ -25,4 +25,10 @@ none
 
 Pops one value (a sound-effect index) and kicks off an asynchronous load/prepare of that sound resource, resetting the async progress trackers to 0. Execution yields (returns 3) so the load runs in the background; [SPUSYNC](../164-spusync/) later waits for it to finish. On the original PSX this streamed the sound from disc (hence the drive noise).
 
-PC handler: `SCRIPT_SPUREADY` at 0x51F520.
+PC handler: `SCRIPT_SPUREADY`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_SPUREADY` | 0x51F520 | Field script opcode handler (verified IDA function) |

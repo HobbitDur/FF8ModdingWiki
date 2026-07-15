@@ -23,4 +23,10 @@ none
 
 Disables running. Sets the global `RUN_DISABLE` flag to 1. Takes no stack arguments.
 
-PC handler: `SCRIPT_RUNDISABLE` at 0x526170.
+PC handler: `SCRIPT_RUNDISABLE`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_RUNDISABLE` | 0x526170 | Field script opcode handler (verified IDA function) |

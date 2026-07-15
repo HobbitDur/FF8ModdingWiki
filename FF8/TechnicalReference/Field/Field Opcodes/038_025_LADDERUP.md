@@ -33,4 +33,10 @@ Moves this entity onto a ladder and climbs "up". The top stack value is an anima
 
 Identical to [LADDERDOWN](../026-ladderdown/) except for the direction seed (1 for up, 0 for down).
 
-PC handler: `SCRIPT_LADDERUP` at 0x525900.
+PC handler: `SCRIPT_LADDERUP`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_LADDERUP` | 0x525900 | Field script opcode handler (verified IDA function) |

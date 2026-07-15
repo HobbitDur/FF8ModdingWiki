@@ -22,4 +22,10 @@ none
 
 Fades the screen to black. Takes no arguments and pops nothing; the handler simply sets the field fade state to 4 (both the runtime `FIELD_FADE_STATE` and the savemap copy) and returns 2. The fade itself is carried out by the field fade system.
 
-PC handler: `SCRIPT_FADEBLACK` at 0x528D10.
+PC handler: `SCRIPT_FADEBLACK`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_FADEBLACK` | 0x528D10 | Field script opcode handler (verified IDA function) |

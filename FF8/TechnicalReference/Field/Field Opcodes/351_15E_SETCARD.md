@@ -33,4 +33,10 @@ If you give the player (deck 240) a non-rare card, it adds one to their collecti
 
 The handler pops two values — Deck ID (top) and Card ID — calls the card-move routine `sub_5347F0(deckID, cardID)`, and stores its return value into temp variable 0 (I[0], entity+320).
 
-PC handler: `SCRIPT_SETCARD` at 0x522500.
+PC handler: `SCRIPT_SETCARD`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_SETCARD` | 0x522500 | Field script opcode handler (verified IDA function) |

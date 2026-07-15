@@ -22,4 +22,10 @@ none
 
 Turns off the display of salary alerts.
 
-PC handler: `SCRIPT_SALARYDISPOFF` at 0x51DBF0.
+PC handler: `SCRIPT_SALARYDISPOFF`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_SALARYDISPOFF` | 0x51DBF0 | Field script opcode handler (verified IDA function) |

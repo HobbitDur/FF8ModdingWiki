@@ -21,10 +21,16 @@ They are in [FF8 String]({{site.baseurl}}/FF8/TechnicalReference/Miscellaneous/F
 
 # How the engine reads the section
 
-getMenuString (0x4BD630 in FF8_EN.exe) **never reads Offset_Count**: it indexes the offset table directly with
+`getMenuString` **never reads Offset_Count**: it indexes the offset table directly with
 `2 * text_id + variant` (the offsets work in pairs) and returns an empty string when the offset is **0x0000**.
 This is why offsets are positional: a string is identified by its offset slot, so zero offsets must stay in place
 and offsets cannot be reordered or removed.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `getMenuString` | 0x4BD630 | Two-level positional string lookup (ignores Offset_Count; entry = 2·text_id+variant) |
 
 
 # Test seed cases

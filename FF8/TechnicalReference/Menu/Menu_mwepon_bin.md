@@ -37,7 +37,9 @@ The game reads each field as a byte from `mweaponbinbuffer + 12 * weapon_id`. Af
 uses `gil >= 10 * price`, and both the "can afford" scan and the purchase loop iterate the four
 item/quantity pairs starting at byte 4.
 
-| Function                            | Address    |
-|-------------------------------------|------------|
-| JunkShop_UpgradeMenuHandler         | 0x4EA890   |
-| JunkShop_BuildAvailableUpgradeList  | 0x4EA770   |
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `JunkShop_UpgradeMenuHandler` | 0x4EA890 | Junk Shop weapon-upgrade menu state machine |
+| `JunkShop_BuildAvailableUpgradeList` | 0x4EA770 | Builds the list of affordable upgrades for the selected weapon |

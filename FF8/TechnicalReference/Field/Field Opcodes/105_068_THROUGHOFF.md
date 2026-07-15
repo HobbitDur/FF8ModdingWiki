@@ -22,4 +22,10 @@ none
 
 Enables collision with this entity by clearing its through flag (+588 = 0), so the player is blocked by it. No stack use.
 
-PC handler: `SCRIPT_THROUGHOFF` at 0x51ED60.
+PC handler: `SCRIPT_THROUGHOFF`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_THROUGHOFF` | 0x51ED60 | Field script opcode handler (verified IDA function) |

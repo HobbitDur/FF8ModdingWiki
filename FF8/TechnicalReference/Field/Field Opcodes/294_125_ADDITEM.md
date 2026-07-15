@@ -27,4 +27,10 @@ none
 
 Does exactly what you think. See [Item Codes](../../Lists/Item_list) for a list of item codes. The handler pops the item ID and quantity and calls the inventory add routine (`AddItemToInventory`).
 
-PC handler: `SCRIPT_ADDITEM` at 0x522380.
+PC handler: `SCRIPT_ADDITEM`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_ADDITEM` | 0x522380 | Field script opcode handler (verified IDA function) |

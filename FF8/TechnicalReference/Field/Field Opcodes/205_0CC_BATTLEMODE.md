@@ -50,4 +50,10 @@ Set which flags are present during random battles.
 
 The handler pops one 16-bit value and stores it both into a savemap field and into the global `ENCOUTER_BATTLE_FLAG`, which the encounter/battle setup reads when the next battle starts.
 
-PC handler: `SCRIPT_BATTLEMODE` at 0x523230.
+PC handler: `SCRIPT_BATTLEMODE`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_BATTLEMODE` | 0x523230 | Field script opcode handler (verified IDA function) |

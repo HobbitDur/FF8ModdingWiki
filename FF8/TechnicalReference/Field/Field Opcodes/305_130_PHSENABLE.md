@@ -25,4 +25,10 @@ none
 
 Enables or disables the PHS (switch) submenu. The handler pops one value and, unless the savemap misc flag `0x200` is set, sets (non-zero) or clears (0) bit 2 of the savemap "can save here" flags — the same bit that gates PHS access.
 
-PC handler: `SCRIPT_PHSENABLE` at 0x522280.
+PC handler: `SCRIPT_PHSENABLE`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_PHSENABLE` | 0x522280 | Field script opcode handler (verified IDA function) |

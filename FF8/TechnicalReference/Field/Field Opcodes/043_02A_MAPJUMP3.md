@@ -35,4 +35,10 @@ Same as [MAPJUMP](../029-mapjump/) but pops one extra value. The five stack valu
 
 The extra `word_1CE4768` value was historically guessed to be a facing angle (never above 360, usually a multiple of 4).
 
-PC handler: `SCRIPT_MAPJUMP3` at 0x521AC0.
+PC handler: `SCRIPT_MAPJUMP3`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_MAPJUMP3` | 0x521AC0 | Field script opcode handler (verified IDA function) |

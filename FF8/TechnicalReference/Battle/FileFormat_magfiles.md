@@ -29,6 +29,12 @@ keyframe data) — relevant to 60 fps work — see
 effect id comes from the kernel magic entry field **+0x04** (e.g. Thundara = 102 → `mag101`,
 `MAG_102_THUNDARA`).
 
+For the full internal anatomy of a spell effect (BdLink task queues, director timeline,
+prim models embedded in the exe, and the roadmap for **editing or creating new** effects)
+see [Magic Effect Anatomy & Authoring](../magic-effect-anatomy/). Note that for regular
+spells the mag file only carries the **TIM texture** — geometry, camera and timing are in
+the exe.
+
 ## G.F. Sequence
 
 <http://forums.qhimm.com/index.php?topic=15056.0>

@@ -46,4 +46,10 @@ Flags:
 
 128\. Save
 
-PC handler: `SCRIPT_SEALEDOFF` at 0x51E9C0.
+PC handler: `SCRIPT_SEALEDOFF`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_SEALEDOFF` | 0x51E9C0 | Field script opcode handler (verified IDA function) |

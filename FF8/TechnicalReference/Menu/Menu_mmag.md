@@ -92,27 +92,28 @@ file is base + page number:
 | 68      | Empty terminator entry                         | -               | -                   |
 
 Entries 0-42 are the item-menu magazines: using a magazine item opens the items module's own reader
-(a parallel implementation of this viewer, draw functions at 0x4FC990/0x4FD6E0), whose entry range comes from
-bytes 2/3 of the item's [mitem.bin](../mitem/) row and which uses a second in-memory copy of mmag.bin
-(`mmagbuffer`, 0x1D2BB6C). **The unlock fields (0x18-0x22) are only processed by this item-menu reader** —
+(a parallel implementation of this viewer, draw functions `Menu_ItemMagazine_Draw`/`Menu_ItemMagazine_DrawPage`),
+whose entry range comes from bytes 2/3 of the item's [mitem.bin](../mitem/) row and which uses a second
+in-memory copy of mmag.bin (`mmagbuffer`). **The unlock fields (0x18-0x22) are only processed by this item-menu reader** —
 reading the page is what unlocks weapons, Duel moves and Angelo moves, every frame the page is displayed.
 The tutorial-book viewer ignores those fields (entries 43-67 have them at 0xFF). Entries 43-67 are the three
 tutorial-menu books, whose first/last entry indices come from [mtmag.bin](../mtmag/).
 
-## Addresses (FF8 PC 2000 EN)
+## Function addresses
 
-| Address   | Name                              | Description                                                  |
+| Function | Address   | Description                                                  |
 |-----------|-----------------------------------|--------------------------------------------------------------|
-| 0x4C9060  | Menu_Magazine_Update              | Viewer state machine (page turning, zoom)                    |
-| 0x4C9330  | Menu_Magazine_Draw                | Draws window, page picture, text overlays, footer            |
-| 0x4C9670  | Menu_Magazine_DrawPictureOverlays | Draws the 4 picture overlay slots                            |
-| 0x4C95A0  | Menu_Magazine_DrawPageImage       | Draws the scaled page picture quad                           |
-| 0x4C9920  | Menu_Magazine_LoadPageTexture     | Loads the page picture TIM from category/page                |
-| 0x4C96F0  | Menu_Magazine_DrawPaperBackground | Draws the paper background in 64-pixel strips                |
-| 0x1D7D3A5 | Menu_Magazine_FirstEntry          | First mmag entry of the currently open book                  |
-| 0x1D7D3A6 | Menu_Magazine_LastEntry           | Last mmag entry of the currently open book                   |
-| 0x4FDCA0  | Menu_DrawSp2Sprite                | Generic SP2 quad-list sprite renderer (also cardanm.sp2)     |
-| 0x4FC990  | Menu_ItemMagazine_Draw            | Item-menu reader main draw (parallel implementation)         |
-| 0x4FD6E0  | Menu_ItemMagazine_DrawPage        | Item-menu page draw, incl. the unlock fields 0x18-0x22       |
-| 0x1D773A4 | Menu_BookTextBuffer               | Static buffer receiving the book-text string section         |
-| 0x1D2BAF8 | mmagbinbuffer                     | Pointer to the loaded mmag.bin                               |
+| `Menu_Magazine_Update` | 0x4C9060  | Viewer state machine (page turning, zoom)                    |
+| `Menu_Magazine_Draw` | 0x4C9330  | Draws window, page picture, text overlays, footer            |
+| `Menu_Magazine_DrawPictureOverlays` | 0x4C9670  | Draws the 4 picture overlay slots                            |
+| `Menu_Magazine_DrawPageImage` | 0x4C95A0  | Draws the scaled page picture quad                           |
+| `Menu_Magazine_LoadPageTexture` | 0x4C9920  | Loads the page picture TIM from category/page                |
+| `Menu_Magazine_DrawPaperBackground` | 0x4C96F0  | Draws the paper background in 64-pixel strips                |
+| `Menu_Magazine_FirstEntry` | 0x1D7D3A5 | First mmag entry of the currently open book                  |
+| `Menu_Magazine_LastEntry` | 0x1D7D3A6 | Last mmag entry of the currently open book                   |
+| `Menu_DrawSp2Sprite` | 0x4FDCA0  | Generic SP2 quad-list sprite renderer (also cardanm.sp2)     |
+| `Menu_ItemMagazine_Draw` | 0x4FC990  | Item-menu reader main draw (parallel implementation)         |
+| `Menu_ItemMagazine_DrawPage` | 0x4FD6E0  | Item-menu page draw, incl. the unlock fields 0x18-0x22       |
+| `Menu_BookTextBuffer` | 0x1D773A4 | Static buffer receiving the book-text string section         |
+| `mmagbinbuffer` | 0x1D2BAF8 | Pointer to the loaded mmag.bin                               |
+| `mmagbuffer` | 0x1D2BB6C | Second in-memory copy of mmag.bin used by the item-menu reader |

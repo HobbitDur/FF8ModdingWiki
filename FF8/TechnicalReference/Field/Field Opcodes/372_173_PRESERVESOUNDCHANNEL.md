@@ -27,4 +27,10 @@ Prevents the given sound channel from being silenced when a new field is loaded.
 
 Does not work on channel 0.
 
-PC handler: `SCRIPT_PRESERVESOUNDCHANNEL` at 0x520230.
+PC handler: `SCRIPT_PRESERVESOUNDCHANNEL`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_PRESERVESOUNDCHANNEL` | 0x520230 | Field script opcode handler (verified IDA function) |

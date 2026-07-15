@@ -332,7 +332,7 @@ A 16-entry header pointing into 16 formation groups. Each group is itself an off
 
 Used to organise encounter formations by type/tier.
 
-At runtime, `WM_Encounter_RollAndSelectScene` (`0x541C80`) selects from the wmset encounter tables by region/terrain. There are 8 formations per terrain; if the selected formation matches `WM_LAST_FORMATION_ID` (`0x20400A0`), the game can re-roll up to two times before handing the scene id to the battle module. See [World Map Encounters](worldmap_encounters) and [Encounter Trigger Runtime](../../battle/encounter-trigger-runtime/).
+At runtime, `WM_Encounter_wm123456` (renamed from `WM_Encounter_RollAndSelectScene` in the community IDB) selects from the wmset encounter tables by region/terrain. There are 8 formations per terrain; if the selected formation matches `WM_LAST_FORMATION_ID`, the game can re-roll up to two times before handing the scene id to the battle module. See [World Map Encounters](worldmap_encounters) and [Encounter Trigger Runtime](../../battle/encounter-trigger-runtime/).
 
 ---
 
@@ -478,7 +478,7 @@ The section is `0x2C` (44) bytes of header followed by exactly **128** four-byte
 | 0      | 4 bytes | uint32 | `start_off`  |
 | 4      | 4 bytes | uint32 | `end_off`    |
 
-`start_off` / `end_off` are byte offsets (relative to the section start) delimiting that block's slice of the record array. In `wmsetus.obj` the five blocks are `[0x2C,0x200)`, `[0x200,0x204)`, `[0x204,0x208)`, `[0x208,0x210)`, `[0x210,0x228)` — i.e. record ranges `0..116`, `117`, `118`, `119..120`, `121..126`. The runtime picks a block per world region through a small EXE lookup table (`0xC76E70`, indexed by `region & 0x1F`), so only the draw points in the player's current region are scanned. Because records never move, the block table stays valid when records are edited in place.
+`start_off` / `end_off` are byte offsets (relative to the section start) delimiting that block's slice of the record array. In `wmsetus.obj` the five blocks are `[0x2C,0x200)`, `[0x200,0x204)`, `[0x204,0x208)`, `[0x208,0x210)`, `[0x210,0x228)` — i.e. record ranges `0..116`, `117`, `118`, `119..120`, `121..126`. The runtime picks a block per world region through a small EXE region-to-block lookup table (indexed by `region & 0x1F`), so only the draw points in the player's current region are scanned. Because records never move, the block table stays valid when records are edited in place.
 
 **DrawPoint** (4 bytes):
 
@@ -494,15 +494,15 @@ The section is `0x2C` (44) bytes of header followed by exactly **128** four-byte
 
 ### How a draw is resolved (runtime)
 
-`WorldMap_DrawPointsParsing_wmset35` (`0x54F920`) scans the block for the record whose `(x,y)` equals the current block id **and** whose `sub_id` equals the current location index, and returns the **record index** `N` (0..127). `World_Interaction_Draw_SubQuest` (`0x54E9B0`) then:
+`WorldMap_DrawPointsParsing_wmset35` scans the block for the record whose `(x,y)` equals the current block id **and** whose `sub_id` equals the current location index, and returns the **record index** `N` (0..127). `World_Interaction_Draw_SubQuest` then:
 
 1. adds `128` → EXE `DrawPointData` index (`128..255`);
-2. calls `GetDrawMagic` (`0x52D1E0`) → reads the magic / refill / high-yield byte from the EXE table at `0xB92328`;
+2. calls `GetDrawMagic` → reads the magic / refill / high-yield byte from the EXE `DrawPointData` table;
 3. decodes it exactly like a field draw point (`magic = byte & 0x3F`, `refill = byte & 0x40`, `high_yield = byte & 0x80`).
 
 ### Mapping to the EXE draw table
 
-Record index `N` (0..127) is world draw point `N`; its magic/refill/high-yield lives at EXE `DrawPointData[128 + N]`, i.e. **Draw ID `129 + N`** in the 1-based numbering used by [Draw point]({{site.baseurl}}/technical-reference/exedata/draw-point/). Record 127 is the unused final entry (`x=y=sub_id=0`, Draw ID 256). The section is parsed by `Wmset_ParseSections` (`0x542DA0`) into the global `dword_2040124`.
+Record index `N` (0..127) is world draw point `N`; its magic/refill/high-yield lives at EXE `DrawPointData[128 + N]`, i.e. **Draw ID `129 + N`** in the 1-based numbering used by [Draw point]({{site.baseurl}}/technical-reference/exedata/draw-point/). Record 127 is the unused final entry (`x=y=sub_id=0`, Draw ID 256). The section is parsed by `Wmset_ParseSections` into the global `dword_2040124`.
 
 ---
 
@@ -798,3 +798,18 @@ nb_pal = (pal_size − 12) / (one_pal_size × 2)
 
 - `wmx.obj` — the world-map geometry stream (segment grid). Section 28 in `wmsetxx.obj` is a duplicate of one of its water segments. See addon source `src/wmx/` for parsing details (32 × 24 segments, 16 blocks per segment, polygons reference `wmsetxx.obj` textures via `(tex_page, clut_id)`).
 - `texl.obj` — paged world textures. 20 slots of `0x12800` bytes each; each slot is a TIM identical in layout to the ones in Section 37.
+
+## Function addresses
+
+Reverse-engineering addresses for the runtime functions/globals referenced above (not to be confused with the in-file section offsets documented throughout this page).
+
+| Function | Address | Description |
+|---|---|---|
+| `WM_Encounter_wm123456` | 0x541C80 | Encounter roll/selection (renamed from `WM_Encounter_RollAndSelectScene` in the community IDB) |
+| `WM_LAST_FORMATION_ID` | 0x20400A0 | Global variable/data, not a function |
+| `WorldMap_DrawPointsParsing_wmset35` | 0x54F920 | Verified IDA function |
+| `World_Interaction_Draw_SubQuest` | 0x54E9B0 | Verified IDA function |
+| `GetDrawMagic` | 0x52D1E0 | Verified IDA function |
+| `DrawPointData` | 0xB92328 | Global variable/data, not a function |
+| `Wmset_ParseSections` | 0x542DA0 | Verified IDA function |
+| Region-to-block lookup table | 0xC76E70 | Global variable/data, not a function |

@@ -56,13 +56,13 @@ curve shapes, verified against the engine:
 
 | Stat(s) | Base formula | Coefficients | Function |
 |---------|-------------|--------------|----------|
-| **HP** | `L·c1 − 10·L² / c2 + c3` | c1, c2, c3 (**c4 unused**) | `Stat_ComputeCharaMaxHP` @ 0x496310 |
-| **STR, VIT, MAG, SPR** | `( L·c1/10 + L/c2 − L² / (2·c4) + c3 ) / 4` | all 4 | `Stat_ComputeCharaStat` @ 0x496440 |
-| **SPD, LUCK** | `L·c1 + L/c2 − L/c4 + c3` | all 4 | `Stat_ComputeCharaStat` @ 0x496440 (separate branch) |
+| **HP** | `L·c1 − 10·L² / c2 + c3` | c1, c2, c3 (**c4 unused**) | `Stat_ComputeCharaMaxHP` |
+| **STR, VIT, MAG, SPR** | `( L·c1/10 + L/c2 − L² / (2·c4) + c3 ) / 4` | all 4 | `Stat_ComputeCharaStat` |
+| **SPD, LUCK** | `L·c1 + L/c2 − L/c4 + c3` | all 4 | `Stat_ComputeCharaStat` (separate branch) |
 
 All divisions are integer/truncating. HP has no cap in the base function (the final battle
 max-HP is `junctionMultiplier% × base`, capped at 9999). STR/VIT/MAG/SPR and SPD/LUCK are
-clamped to a maximum of **255** by `CapTo255` (0x495930) after base + bonus + junction are
+clamped to a maximum of **255** by `CapTo255` after base + bonus + junction are
 summed.
 
 > **Note:** SPD and LUCK use the plain **linear** shape (no quadratic term, no `/4`), *not*
@@ -71,3 +71,11 @@ summed.
 
 Worked example — Squall's base **STR** at level 100 (coefficients `30, 5, 2, 38`):
 `(100·30/10 + 100/5 − 100²/(2·38) + 2) / 4 = (300 + 20 − 131 + 2) / 4 = 47`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `Stat_ComputeCharaMaxHP` | 0x496310 | HP base-stat curve |
+| `Stat_ComputeCharaStat` | 0x496440 | STR/VIT/MAG/SPR and SPD/LUCK base-stat curves |
+| `CapTo255` | 0x495930 | Clamps a stat to 0–255 |

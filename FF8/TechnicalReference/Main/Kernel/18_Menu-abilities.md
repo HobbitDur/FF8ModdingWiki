@@ -54,7 +54,7 @@ permalink: /technical-reference/main/kernel/menu-abilities/
 
 ## Refine table record format (menu.fs, not kernel.bin)
 
-The item/magic conversions themselves are **not** in kernel.bin — they live in `menu.fs`'s `mngrp.bin`, in the mngrp section pair each table loads: `188`/`196` for table 0, `189`/`197` for table 1, `190`/`198` for table 2, `191`/`199` for table 3, **`192`/`200` for table 4 (Card Mod)** (`Menu_Prog19_RefineMenu_Init` @ 0x4D7180). Card Mod's on-screen list is built at runtime from the cards you own, but the card→item recipes it slices with Start/End offset are still this static section 192. Decoded via `sub_4D9600`/`sub_4D9660` (the Refine screen's row-name resolvers), each record is 8 bytes:
+The item/magic conversions themselves are **not** in kernel.bin — they live in `menu.fs`'s `mngrp.bin`, in the mngrp section pair each table loads: `188`/`196` for table 0, `189`/`197` for table 1, `190`/`198` for table 2, `191`/`199` for table 3, **`192`/`200` for table 4 (Card Mod)** (`Menu_Prog19_RefineMenu_Init`). Card Mod's on-screen list is built at runtime from the cards you own, but the card→item recipes it slices with Start/End offset are still this static section 192. Decoded via `sub_4D9600`/`sub_4D9660` (the Refine screen's row-name resolvers), each record is 8 bytes:
 
 | Offset | Length | Field |
 |--------|--------|-------|
@@ -68,3 +68,9 @@ The item/magic conversions themselves are **not** in kernel.bin — they live in
 Verified against the retail `menu.fs` and matches the well-known FF8 Refine chart, e.g. T Mag-RF: `1x Coral Fragment → 20x Thundara`, `1x Dynamo Stone → 20x Thundaga`, ...; Mid Mag-RF: `1x Fire → 1x Fira`, ...; Card Mod: `1x Geezard → 5x Screw`, `1x Fungar → 1x M-Stone Piece`, `1x Blobra → 1x Rune Armlet`, ...
 
 SolomonRing's Menu Abilities tab can load `mngrphd.bin`/`mngrp.bin` and show the decoded table for the selected ability directly (reference only — this data isn't part of kernel.bin, so there's nothing to save back).
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `Menu_Prog19_RefineMenu_Init` | 0x4D7180 | Refine screen init: loads the mngrp section pair, computes the item slice |

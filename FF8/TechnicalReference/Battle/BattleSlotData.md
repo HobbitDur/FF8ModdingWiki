@@ -97,7 +97,7 @@ Example: slot 3 is `0x1D27B10 + 3 * 0xD0 = 0x1D27D80`.
 
 ## ATB update
 
-`BattleATB_TickAndReady` (`0x4842B0`) is called every active battle frame from `BattleUI_InputPollAndMenuState` (`0x4A8772`).
+`Battle_TickAtbGaugesAndGfCountdown` (renamed from `BattleATB_TickAndReady`) is called every active battle frame from `isBattle_HUDdisplay` (renamed from `BattleUI_InputPollAndMenuState`). See [Function addresses](#function-addresses).
 
 Per slot, the ATB increment is:
 
@@ -116,7 +116,7 @@ A slot is processed only when it is active, alive, not petrified, not asleep/sto
 | `status_1 & 0x20` or `status_2 & 0x2004000` | Auto-command path via `Battle_ProcessAutoCommand` |
 | Otherwise | Normal menu path via `BattleUI_EnqueueCommand(slot, 17, 128, 0)` |
 
-For party slots, the ATB values are mirrored to `BATTLE_ATB_UI_MIRROR` (`0x1CFF180`) for gauge display.
+For party slots, the ATB values are mirrored to `BATTLE_ATB_UI_MIRROR` for gauge display.
 
 ## flag_data notes
 
@@ -128,3 +128,11 @@ For party slots, the ATB values are mirrored to `BATTLE_ATB_UI_MIRROR` (`0x1CFF1
 | Enemy init (`0x48BBD0`) | `*(_DWORD *)&slot.flag_data = 0x0011` |
 
 Note: treat `flag_data` as an opaque bitfield unless the exact writer/reader has been confirmed.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `Battle_TickAtbGaugesAndGfCountdown` (formerly documented as `BattleATB_TickAndReady`) | 0x4842B0 | Per-frame ATB tick (verified IDA function) |
+| `isBattle_HUDdisplay` (formerly documented as `BattleUI_InputPollAndMenuState`) | 0x4A84E0 | HUD/input driver; the `0x4A8772` previously cited on this page is an interior offset of this function (verified IDA function) |
+| `BATTLE_ATB_UI_MIRROR` | 0x1CFF180 | Global variable/data, not a function |

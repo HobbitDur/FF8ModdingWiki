@@ -31,4 +31,10 @@ Starts a background/camera scroll toward target offset (*X*, *Y*) over *frame co
 
 The original Square symbol for this opcode is `SCSROLL` (a typo for CSCROLL preserved in the executable).
 
-PC handler: `SCRIPT_SCSROLL` at 0x520CF0.
+PC handler: `SCRIPT_SCSROLL`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_SCSROLL` | 0x520CF0 | Field script opcode handler (verified IDA function) |

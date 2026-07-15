@@ -25,4 +25,10 @@ none
 
 Enables or disables saving. The handler pops one value and sets (non-zero) or clears (0) the "can save here" bit in the savemap flags.
 
-PC handler: `SCRIPT_SAVEENABLE` at 0x5221B0.
+PC handler: `SCRIPT_SAVEENABLE`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_SAVEENABLE` | 0x5221B0 | Field script opcode handler (verified IDA function) |

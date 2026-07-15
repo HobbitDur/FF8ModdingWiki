@@ -24,4 +24,10 @@ Enables random battles.
 
 Runtime note: this clears the temporary field encounter disable flag checked by the field encounter tick. Random encounters are still blocked by cutscenes, field state, map encounter settings and Enc-None. Concretely it clears the savemap `battleOff` flag (unless a cutscene lock is active, in which case it just clears the pending disable bit). No stack use. See [Encounter Trigger Runtime](../../../battle/encounter-trigger-runtime/).
 
-PC handler: `SCRIPT_BATTLEON` at 0x523300.
+PC handler: `SCRIPT_BATTLEON`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_BATTLEON` | 0x523300 | Field script opcode handler (verified IDA function) |

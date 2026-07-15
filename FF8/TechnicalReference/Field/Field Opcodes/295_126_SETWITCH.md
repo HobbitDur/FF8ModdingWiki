@@ -25,6 +25,13 @@ none
 
 This is only called once in the whole game - the first time you enter the Ragnarok in space. It unlocks Rinoa's alternate limit break after she becomes a sorceress.
 
-Runtime note: the handler pops one value; if it is non-zero it calls the sorceress-unlock setter (which sets bit `0x20` in `SG_ODIN_ANGEL_GILGA_FLAG`, `0x1CFE97A`), otherwise it calls the clear routine. The same byte also stores Odin, Phoenix, Gilgamesh and Angelo-related battle flags. See [GF Summon Runtime](../../../battle/gf-summon-runtime/).
+Runtime note: the handler pops one value; if it is non-zero it calls the sorceress-unlock setter (which sets bit `0x20` in `SG_ODIN_ANGEL_GILGA_FLAG`), otherwise it calls the clear routine. The same byte also stores Odin, Phoenix, Gilgamesh and Angelo-related battle flags. See [GF Summon Runtime](../../../battle/gf-summon-runtime/).
 
-PC handler: `SCRIPT_SETWITCH` at 0x523180.
+PC handler: `SCRIPT_SETWITCH`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_SETWITCH` | 0x523180 | Field script opcode handler (verified IDA function) |
+| `SG_ODIN_ANGEL_GILGA_FLAG` | 0x1CFE97A | Global byte, not a function |

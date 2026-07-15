@@ -27,4 +27,10 @@ First ladder animation ID.
 
 Registers this entity's three ladder-climb animation IDs, the ladder counterpart of [BASEANIME](../02c-baseanime/). The inline 8-bit argument becomes `ladderanim1` (entity+594), the top stack value becomes `ladderanim2` (entity+595) and the next becomes `ladderanim3` (entity+596). These are the animations used while the entity is on a ladder ([LADDERUP2](../027-ladderup2/) / [LADDERDOWN2](../028-ladderdown2/) modes). Returns 2 (done + continue).
 
-PC handler: `SCRIPT_LADDERANIME` at 0x51DA00.
+PC handler: `SCRIPT_LADDERANIME`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_LADDERANIME` | 0x51DA00 | Field script opcode handler (verified IDA function) |

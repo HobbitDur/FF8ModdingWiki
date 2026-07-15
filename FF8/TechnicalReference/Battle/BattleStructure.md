@@ -65,18 +65,20 @@ Each stage's camera animation collection declares its own number of sets (`NumOf
 
 Every encounter holds two of these bytes; we'll call the first one (offset 0x02) _Main Camera_ and the second one (offset 0x03) _Secondary Camera_.
 
-At battle load, `BS_CameraInit` (`0x500F70`) picks one of the two with a **fair 50/50 coin flip** (`pnrg_lcg_algo() & 1` — the LCG bit used is well mixed, so there is no bias toward the main camera; earlier observations of ~80% main were sample bias).
+At battle load, `BS_CameraInit` picks one of the two with a **fair 50/50 coin flip** (`pnrg_lcg_algo() & 1` — the LCG bit used is well mixed, so there is no bias toward the main camera; earlier observations of ~80% main were sample bias).
 
 There is exactly one hardcoded exception: **encounter ID 33** (2× G-Soldier, Dollet elevator) always uses the _Main Camera_, presumably to keep that scripted Dollet sequence consistent.
 
 ### Runtime pipeline (PC 2000, FF8_EN.exe)
 
-1. `FFBattleDirector_battleLoop` (`0x47CCB0`) loads the 128-byte encounter record into `CURRENT_ENCOUNTER_DATA_SCENE_OUT` (`0x1D287DC`) via `ReadSceneOutFileForSpecificEncounter` (`0x48D0E0`).
-2. During stage init, the per-stage handler (`BS_StageXXX`) receives the *load camera* command and calls `BS_CameraInit` (`0x500F70`), which picks main/secondary as described above and stores the byte into **camera-VM variable 0** (`CURRENT_CAMERA_ANIMATION`, `0x1D97728`). It then resolves the stage .x camera section pointers (camera settings + animation collection) via `BS_GetCameraAnimPointers` (`0x509970`).
-3. Every frame, `updateBattleCamera` (`0x504060`) → `BS_UpdateCameraSequence` (`0x509610`) executes the stage's *camera settings* byte-code with the shared animation-sequence VM (`computeAnimationSequence`, `0x50DB40` — the same VM used by [monster animation sequences](../monster-files-c0mxxxdat/) and [camera sequences](../model-sections/camera-sequence/)). Stage camera scripts start with camera opcode `05 00` = "play the camera animation whose ID is read from camera variable 0" — i.e. the scene.out byte.
-4. `BS_GetCameraAnimationPointer` (`0x503520`) decodes the byte: `set = (id >> 4) & 0xF` (bounds-checked against `NumOfSets`), `anim = id & 7`, resolves the animation's relative pointer inside the stage file and spawns the `ProcessCameraAnimation` task that plays it.
+1. `FFBattleDirector_battleLoop` loads the 128-byte encounter record into `CURRENT_ENCOUNTER_DATA_SCENE_OUT` via `ReadSceneOutFileForSpecificEncounter`.
+2. During stage init, the per-stage handler (`BS_StageXXX`) receives the *load camera* command and calls `BS_CameraInit`, which picks main/secondary as described above and stores the byte into **camera-VM variable 0** (`CURRENT_CAMERA_ANIMATION`). It then resolves the stage .x camera section pointers (camera settings + animation collection) via `BS_GetCameraHeaderPointers` (renamed from `BS_GetCameraAnimPointers`).
+3. Every frame, `updateBattleCamera` → `BS_UpdateCameraSequence` executes the stage's *camera settings* byte-code with the shared animation-sequence VM (`computeAnimationSequence` — the same VM used by [monster animation sequences](../monster-files-c0mxxxdat/) and [camera sequences](../model-sections/camera-sequence/)). Stage camera scripts start with camera opcode `05 00` = "play the camera animation whose ID is read from camera variable 0" — i.e. the scene.out byte.
+4. `BS_GetCameraAnimationPointer` decodes the byte: `set = (id >> 4) & 0xF` (bounds-checked against `NumOfSets`), `anim = id & 7`, resolves the animation's relative pointer inside the stage file and spawns the `ProcessCameraAnimation` task that plays it.
 
-After the intro animation ends, this byte has no further effect: mid-battle cameras are chosen per action by `cameraWhenDoingAction` (`0x506190`), which overwrites camera variable 0 with its own animation choices.  
+After the intro animation ends, this byte has no further effect: mid-battle cameras are chosen per action by `cameraWhenDoingAction`, which overwrites camera variable 0 with its own animation choices.  
+
+See [Function addresses](#function-addresses) for the raw exe addresses.
 
 ## Enemy Coordinates 
 
@@ -134,7 +136,7 @@ The data is laid out sequentially, from _Monster 1_ through _Monster 8_, and eac
 
 **Confirmed unused (PC 2000, FF8_EN.exe):** disassembly analysis shows that no code ever reads offsets `0x40`-`0x77` of the encounter record:
 
-- The loaded record lives at `CURRENT_ENCOUNTER_DATA_SCENE_OUT` (`0x1D287DC`) and is the game's only live copy (`ReadSceneOutFileForSpecificEncounter` at `0x48D0E0` is its only writer, and its staging buffer is not read anywhere else).
+- The loaded record lives at `CURRENT_ENCOUNTER_DATA_SCENE_OUT` and is the game's only live copy (`ReadSceneOutFileForSpecificEncounter` is its only writer, and its staging buffer is not read anywhere else).
 - Every other field of the record has cross-references (camera bytes → `BS_CameraInit`, enemy flags/IDs → `setEnemyVisibility` / `setAllMonsterInfoFromDatSection` / `linkedToMonsterVisibility`, coordinates → `getZCoordinateEnemyBattleTask67`, levels → `setAllMonsterInfoFromDatSection`), but the four unused blocks at `+0x40`, `+0x50`, `+0x60`, `+0x70` have **zero** cross-references, and all neighbouring array accesses are bounded to the 8 monster slots.
 
 They are therefore remnants of a scrapped feature (their 2/2/2/1 bytes-per-monster layout suggests planned per-monster attributes that were never hooked up), and can be repurposed freely by mods targeting the PC version. (This has only been verified against the PC executable; the PSX build has not been checked.)  
@@ -170,3 +172,19 @@ By default, the enemy level is determined by the average level of the current te
 
 No more than 4 enemies can be **Enabled** at any given time.  
 Using a value lower than 0x10 for an enemy ID will crash the game on battle start, as the first 16 IDs are reserved for playable characters.  
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `BS_CameraInit` | 0x500F70 | Picks main/secondary camera via a coin flip (verified IDA function) |
+| `FFBattleDirector_battleLoop` | 0x47CCB0 | Battle state machine (verified IDA function) |
+| `CURRENT_ENCOUNTER_DATA_SCENE_OUT` | 0x1D287DC | Global variable/data, not a function |
+| `ReadSceneOutFileForSpecificEncounter` | 0x48D0E0 | Loads the 128-byte scene.out record (verified IDA function) |
+| `CURRENT_CAMERA_ANIMATION` | 0x1D97728 | Global variable/data, not a function (camera-VM variable 0) |
+| `BS_GetCameraHeaderPointers` (formerly documented as `BS_GetCameraAnimPointers`) | 0x509970 | Resolves the stage .x camera section pointers (verified IDA function) |
+| `updateBattleCamera` | 0x504060 | Per-frame camera driver (verified IDA function) |
+| `BS_UpdateCameraSequence` | 0x509610 | Executes the camera settings byte-code (verified IDA function) |
+| `computeAnimationSequence` | 0x50DB40 | Shared animation-sequence VM (verified IDA function) |
+| `BS_GetCameraAnimationPointer` | 0x503520 | Decodes the camera byte into an animation pointer (verified IDA function) |
+| `cameraWhenDoingAction` | 0x506190 | Mid-battle per-action camera selection (verified IDA function) |

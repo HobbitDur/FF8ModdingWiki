@@ -36,4 +36,10 @@ Controls transparency/blinking effects on models (might also control whether Squ
 
 Any other value only issues the texture command.
 
-PC handler: `SCRIPT_ACTORMODE` at 0x51F1F0.
+PC handler: `SCRIPT_ACTORMODE`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_ACTORMODE` | 0x51F1F0 | Field script opcode handler (verified IDA function) |

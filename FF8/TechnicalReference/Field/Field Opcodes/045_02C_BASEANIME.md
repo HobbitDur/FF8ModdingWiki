@@ -27,4 +27,10 @@ Idle animation ID.
 
 Registers this entity's three "base" locomotion animation IDs. The inline 8-bit argument becomes `baseanim1` (entity+591, the idle animation restored when movement stops), the top stack value becomes `baseanim2` (entity+592, the walk animation) and the next becomes `baseanim3` (entity+593, the run animation). The [MOVE](../03e-move/) family selects `baseanim2` or `baseanim3` automatically from the entity's move speed, and restores `baseanim1` on arrival. Returns 2 (done + continue).
 
-PC handler: `SCRIPT_BASEANIME` at 0x51D9B0.
+PC handler: `SCRIPT_BASEANIME`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_BASEANIME` | 0x51D9B0 | Field script opcode handler (verified IDA function) |

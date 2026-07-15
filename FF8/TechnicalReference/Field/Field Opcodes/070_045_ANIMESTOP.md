@@ -23,4 +23,10 @@ none
 
 Returns this entity to its [base animation](../02c-baseanime/). The handler reloads the idle animation `baseanim1` (entity+591) as the current animation, resets the animation frame counters, and switches the animation mode to looping (`execution_flags` bits set to 0x20, entity+352). Takes no arguments; returns 3 (done + yield).
 
-PC handler: `SCRIPT_ANIMESTOP` at 0x5264F0.
+PC handler: `SCRIPT_ANIMESTOP`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_ANIMESTOP` | 0x5264F0 | Field script opcode handler (verified IDA function) |

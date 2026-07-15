@@ -29,4 +29,10 @@ none
 
 Transitions the pan of the sound in *sound channel* over *frame count* toward *final pan*. 0=left, 255=right. Pops three values (channel mask, frame count, final pan) and calls `Sfx_SetPanTrans_Mask`. Note the handler passes **2×*frame count*** as the transition duration.
 
-PC handler: `SCRIPT_SEPOSTRANS` at 0x520150.
+PC handler: `SCRIPT_SEPOSTRANS`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_SEPOSTRANS` | 0x520150 | Field script opcode handler (verified IDA function) |

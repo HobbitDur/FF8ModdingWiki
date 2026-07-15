@@ -12,7 +12,7 @@ The following information documents the PC 2000 battle runtime state machine and
 
 ## Module entry
 
-The battle module is entered through `FFModuleHandler_main_loop` (`0x4706B0`). Field and world-map modules write a pending battle scene id, then the module handler stores it in `COMBAT_SCENE_ID` before launching the battle module.
+The battle module is entered through `FFModuleHandler_main_loop`. Field and world-map modules write a pending battle scene id, then the module handler stores it in `COMBAT_SCENE_ID` before launching the battle module.
 
 | Address | Name | Role |
 |---------|------|------|
@@ -62,7 +62,7 @@ Within the active tick, the engine processes player input, ATB, pending actions,
 
 ## Preemptive / back attack
 
-`Battle_InitPreemptiveBackAttackStatus` (`0x48AFD0`) runs during battle initialization after scene data has been loaded. Scripted battle flags can force or suppress specific outcomes.
+`computeBattleSurpriseAttack` (renamed from `Battle_InitPreemptiveBackAttackStatus`) runs during battle initialization after scene data has been loaded. Scripted battle flags can force or suppress specific outcomes.
 
 | Flag | Value | Effect |
 |------|-------|--------|
@@ -83,11 +83,11 @@ Random encounters normally use `ENCOUTER_BATTLE_FLAG == 0`. When no flag forces 
 | `3` | Pincer | Known value, details not confirmed here |
 | `4` | Side Attack | Enemy side receives back-attack status |
 
-The result is stored in `BACK_PREEMTIVE_INFO` (`0x1D28E08`).
+The result is stored in `BACK_PREEMTIVE_INFO`.
 
 ## Battle end
 
-Battle end detection is part of the battle initialization/state machine family, not a separate module. `BATTLE_RESULT_CODE` (`0x1CFF6E7`) stores the final result code used by the end transition and post-battle handling.
+Battle end detection is part of the battle initialization/state machine family, not a separate module. `BATTLE_RESULT_CODE` stores the final result code used by the end transition and post-battle handling.
 
 | Value | Meaning |
 |-------|---------|
@@ -97,3 +97,12 @@ Battle end detection is part of the battle initialization/state machine family, 
 | `3` | Escape |
 
 Note: Phoenix can intercept party wipe before game-over is committed. See [GF Summon Runtime](../gf-summon-runtime/) for the Phoenix auto-trigger path.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `FFModuleHandler_main_loop` | 0x4706B0 | Top-level module dispatcher (verified IDA function) |
+| `computeBattleSurpriseAttack` (formerly documented as `Battle_InitPreemptiveBackAttackStatus`) | 0x48AFD0 | Preemptive/back-attack resolution (verified IDA function) |
+| `BACK_PREEMTIVE_INFO` | 0x1D28E08 | Global variable/data, not a function |
+| `BATTLE_RESULT_CODE` | 0x1CFF6E7 | Global variable/data, not a function (also documented as `battle_result_byte` on [Battle transition and module entry](../battle-transition-module/)) |

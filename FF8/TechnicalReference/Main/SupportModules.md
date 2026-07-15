@@ -49,7 +49,7 @@ The hardcoded table (`SEED_SALARY_TABLE`, 32 word entries — value × 10 = gil)
 | 7 | 5000 | 15 | 12500 | 23 | 16500 | 31 (A) | 30000 |
 | 8 | 6000 | 16 | 13000 | 24 | 17000 | | |
 
-The table sits directly after the field opcode handler table, at `0xB8E474`.
+The table sits directly after the field opcode handler table (see `SEED_SALARY_TABLE` in the address table below).
 
 ## New game / load setup (newgame_startgame)
 

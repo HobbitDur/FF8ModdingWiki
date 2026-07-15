@@ -18,9 +18,9 @@ Every jump, whatever triggered it, fills the same handful of globals and lets th
 
 | Global | Address | Meaning |
 |--------|---------|---------|
-| `globalFieldNextModuleID` | 0x1CE4760 | Destination module: **1** = field, **6** = disc change (cdcheck), **7** = world map, **4** = intro/credits |
+| `globalFieldNextModuleID` | see table below | Destination module: **1** = field, **6** = disc change (cdcheck), **7** = world map, **4** = intro/credits |
 | `MenuState_opcode_menu_id` | — | Multi-purpose "next module parameter"; for a field jump = **destination field ID** |
-| `wm2field_FieldX` / `FieldY` | 0x1CE4764 / … | Spawn X/Y on the destination field (0x7FFF = keep current position) |
+| `wm2field_FieldX` / `FieldY` | see table below | Spawn X/Y on the destination field (0x7FFF = keep current position) |
 | `wm2field_FieldZ` | — | Destination walkmesh triangle / Z |
 | `wm2field_FieldTarget` | — | Facing direction on arrival |
 
@@ -40,11 +40,11 @@ Field scripts pop their arguments off the entity script stack and set the global
 
 ### Gateways (walked field exits)
 
-`Field_Collision_CheckGatewayCrossing` (0x477980) tests the 12 gateway records in the `.inf` file (`.inf`+100, 32 bytes each). A gateway fires when the player is within touch radius of its line **and** the cross-product sign against the line flips between the previous and current position. On firing it sets the same globals from the record: destination field ID (`< 0x48` routes to the world map = module 7, otherwise a field = module 1), spawn X/Y, triangle and facing. See the gateway record layout on the rendering/collision page.
+`Field_Collision_CheckGatewayCrossing` tests the 12 gateway records in the `.inf` file (`.inf`+100, 32 bytes each). A gateway fires when the player is within touch radius of its line **and** the cross-product sign against the line flips between the previous and current position. On firing it sets the same globals from the record: destination field ID (`< 0x48` routes to the world map = module 7, otherwise a field = module 1), spawn X/Y, triangle and facing. See the gateway record layout on the rendering/collision page.
 
 ### World map → field
 
-Boarding an entrance on the world map calls `World_FindFieldEntrance`, whose returned index selects a record in **`wm2field.tbl`**. The module handler (0x4708AC) reads that record to fill `CURRENT_FIELD_ID` + spawn globals, then enters the field.
+Boarding an entrance on the world map calls `World_FindFieldEntrance`, whose returned index selects a record in **`wm2field.tbl`**. The module handler (`FFModuleHandler_main_loop`) reads that record to fill `CURRENT_FIELD_ID` + spawn globals, then enters the field.
 
 ## wm2field.tbl record format
 
@@ -62,11 +62,11 @@ Boarding an entrance on the world map calls `World_FindFieldEntrance`, whose ret
 
 ## Field ID → filename: the maplist
 
-`Field_LoadResources` (0x471010) resolves the numeric field ID to a field name through **`mapdata\maplist`** — a plain newline-separated text file, one field name per line:
+`Field_LoadResources` resolves the numeric field ID to a field name through **`mapdata\maplist`** — a plain newline-separated text file, one field name per line:
 
 > **A field's ID is simply its 0-based line number in `maplist`.**
 
-The loader (0x4710B1) reads maplist into a buffer and walks it: it skips control characters (`< 16`, i.e. CR/LF) between lines, counting lines until the count equals `CURRENT_FIELD_ID`, then copies that line's printable characters (`> 16`) as `CURRENT_FIELD_NAME`. That name builds the field archive path and each section file is loaded:
+The loader (part of `Field_LoadResources`) reads maplist into a buffer and walks it: it skips control characters (`< 16`, i.e. CR/LF) between lines, counting lines until the count equals `CURRENT_FIELD_ID`, then copies that line's printable characters (`> 16`) as `CURRENT_FIELD_NAME`. That name builds the field archive path and each section file is loaded:
 
 `.inf` (gateways/triggers) · `.ca` (camera) · `.id` (walkmesh) · `.map` + `.mim` (background) · `.msk` (movie mask) · `.rat` / `.mrt` (encounter) · `.msd` (dialog) · `.gsm` / `.sfx` (sound) · `.pmd` (particles) · `.jsm` (scripts) · `.pcb` (extra).
 
@@ -74,8 +74,8 @@ The loader (0x4710B1) reads maplist into a buffer and walks it: it skips control
 
 `CURRENT_FIELD_ID` is set from different sources depending on the trigger:
 
-* **World → field**: the `wm2field.tbl` record's field-ID word (module handler 0x4708CC).
-* **Field → field / disc jump**: `MenuState_opcode_menu_id`, which the jump opcode set (copied to `CURRENT_FIELD_ID` on field re-entry; the disc path copies it at 0x470EC0 after the disc check).
+* **World → field**: the `wm2field.tbl` record's field-ID word (in `FFModuleHandler_main_loop`).
+* **Field → field / disc jump**: `MenuState_opcode_menu_id`, which the jump opcode set (copied to `CURRENT_FIELD_ID` on field re-entry; the disc path copies it in `FFModuleHandler_main_loop` after the disc check).
 * A few hardcoded returns exist (e.g. field 0x4B on a specific game-over return).
 
 ## End-to-end flow
@@ -93,18 +93,23 @@ flowchart TD
     G --> H[Field running]
 ```
 
-## Address table
+## Function addresses
 
-| Name | Address |
-|------|---------|
-| `Field_Collision_CheckGatewayCrossing` | 0x477980 |
-| `SCRIPT_MAPJUMP` / `MAPJUMP0` / `MAPJUMP3` | 0x521A20 / 0x521C30 / 0x521AC0 |
-| `SCRIPT_WORLDMAPJUMP` / `DISCJUMP` | 0x521820 / 0x521B70 |
-| `FFModuleHandler_main_loop` (module switch) | 0x4706B0 |
-| `Field_LoadResources` (maplist + archive load) | 0x471010 |
-| `Field_Walkmesh_PlaceEntitiesOnLoad` (spawn) | 0x477C90 |
-| `jumpFromWorldmapToField` | 0x52C579 |
-| `globalFieldNextModuleID` | 0x1CE4760 |
-| `CURRENT_FIELD_ID` / `CURRENT_FIELD_NAME` | 0x1CD2FC0 / 0x1CD2DB0 |
+| Function | Address | Description |
+|---|---|---|
+| `Field_Collision_CheckGatewayCrossing` | 0x477980 | Gateway line-crossing test |
+| `SCRIPT_MAPJUMP` | 0x521A20 | MAPJUMP field-script opcode |
+| `SCRIPT_MAPJUMP0` | 0x521C30 | MAPJUMP0 field-script opcode |
+| `SCRIPT_MAPJUMP3` | 0x521AC0 | MAPJUMP3 field-script opcode |
+| `SCRIPT_WORLDMAPJUMP` | 0x521820 | WORLDMAPJUMP field-script opcode |
+| `SCRIPT_DISCJUMP` | 0x521B70 | DISCJUMP field-script opcode (renamed from `DISCJUMP` in the community IDB) |
+| `FFModuleHandler_main_loop` | 0x4706B0 | Module switch handler (also resolves `wm2field.tbl` records and copies `CURRENT_FIELD_ID`) |
+| `Field_LoadResources` | 0x471010 | Resolves field ID to name via maplist and loads field archive sections |
+| `Field_Walkmesh_PlaceEntitiesOnLoad` | 0x477C90 | Spawns entities at the destination triangle |
+| `jumpFromWorldmapToField` | 0x52BC00 | World-map-to-field jump handler |
+| `globalFieldNextModuleID` | 0x1CE4760 | Global variable/data, not a function — destination module id |
+| `CURRENT_FIELD_ID` | 0x1CD2FC0 | Global variable/data, not a function — active field ID |
+| `CURRENT_FIELD_NAME` | 0x1CD2DB0 | Global variable/data, not a function — active field name |
+| `wm2field_FieldX` | 0x1CE4764 | Global variable/data, not a function — spawn X on destination field |
 
 Addresses are for FF8_EN.exe (2000 PC release) as mapped in IDA (image base 0x400000).

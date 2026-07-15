@@ -22,4 +22,10 @@ none
 
 Opens the save menu. Requests the menu module (`globalFieldNextModuleID = 5`) with menu id 24 (save) and marks the menu state as save-enabled (value 1). Takes no stack arguments. Returns 3 (yield).
 
-PC handler: `SCRIPT_MENUSAVE` at 0x522190.
+PC handler: `SCRIPT_MENUSAVE`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_MENUSAVE` | 0x522190 | Field script opcode handler (verified IDA function) |

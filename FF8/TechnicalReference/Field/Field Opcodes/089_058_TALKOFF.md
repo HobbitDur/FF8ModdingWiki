@@ -22,4 +22,10 @@ none
 
 Disables talking to this entity by setting its talk-disabled flag (+587 = 1). No stack use.
 
-PC handler: `SCRIPT_TALKOFF` at 0x51EBD0.
+PC handler: `SCRIPT_TALKOFF`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_TALKOFF` | 0x51EBD0 | Field script opcode handler (verified IDA function) |

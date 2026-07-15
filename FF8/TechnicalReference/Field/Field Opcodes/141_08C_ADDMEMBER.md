@@ -27,4 +27,10 @@ Adds a PC to the available roster (not to the active party). The handler pops on
 
 See [SETPARTY](../08a-setparty/) for the character id list.
 
-PC handler: `SCRIPT_ADDMEMBER` at 0x51E670.
+PC handler: `SCRIPT_ADDMEMBER`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_ADDMEMBER` | 0x51E670 | Field script opcode handler (verified IDA function) |

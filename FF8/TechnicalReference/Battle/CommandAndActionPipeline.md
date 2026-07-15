@@ -50,7 +50,7 @@ On command confirmation, the staged command is flushed to `BattlePendingAction_W
 
 ## Pending action entry
 
-Pending actions are stored at `BATTLE_PENDING_ACTION_BUFFER` (`0x1D28D44`). There are three entries, each 8 bytes.
+Pending actions are stored at `BATTLE_PENDING_ACTION_BUFFER`. There are three entries, each 8 bytes.
 
 | Offset | Size | Field | Description |
 |--------|------|-------|-------------|
@@ -130,7 +130,7 @@ GF `command_arg` values are kernel GF IDs, not zero-based indices. The resolver 
 
 ## Damage pipeline
 
-`BattleAction_ResolveAndApplyDamage` (`0x48FE20`) first resolves metadata into hit globals:
+`Battle_applyDamage` (renamed from `BattleAction_ResolveAndApplyDamage`) first resolves metadata into hit globals:
 
 | Global | Source |
 |--------|--------|
@@ -141,7 +141,7 @@ GF `command_arg` values are kernel GF IDs, not zero-based indices. The resolver 
 | `HIT_ATTACK_HITPERCENT` | Kernel table `.hitPercent` |
 | `ATTACK_FLAG` | Kernel table `.attackFlags` |
 
-`Damage_ComputeRawDeltaFromAttackType` (`0x4922B0`) then dispatches by `attackType`:
+`Damage_DispatchByAttackType` (renamed from `Damage_ComputeRawDeltaFromAttackType`) then dispatches by `attackType`:
 
 | Attack type path | Function |
 |------------------|----------|
@@ -149,7 +149,7 @@ GF `command_arg` values are kernel GF IDs, not zero-based indices. The resolver 
 | Curative | `computeCurativeMagic` (`0x493280`) / `computeCurativeGFMagicItem` |
 | Physical | Physical formula path |
 
-Finally, `Battle_ApplyDamageOrHeal` (`0x494410`) writes HP, clamps it to `[0, max_hp]`, sets KO when HP reaches 0, and performs attacker/target bookkeeping. `Battle_UpdateDamage` writes a 24-byte event record to `BATTLE_DAMAGE_RESULT_BUFFER` (`0x1D28344 + 24 * ATTACK_HIT_COUNT_1`) for the presentation layer.
+Finally, `applyDamageAndHandleDeath` (renamed from `Battle_ApplyDamageOrHeal`) writes HP, clamps it to `[0, max_hp]`, sets KO when HP reaches 0, and performs attacker/target bookkeeping. `Battle_UpdateDamage` writes a 24-byte event record to `BATTLE_DAMAGE_RESULT_BUFFER` (base + `24 * ATTACK_HIT_COUNT_1`) for the presentation layer.
 
 ## Status pipeline
 
@@ -167,20 +167,33 @@ Status application is split into a gating layer and an execution layer.
 
 ## Draw system
 
-`Draw_ComputeStealCount` (`0x48FD20`) computes draw quantity (0-9) from attacker level, target level, attacker magic stat, `K_MAGIC[magic_id].drawResist`, and randomness.
+`Battle_ComputeDrawQuantity` (renamed from `Draw_ComputeStealCount`) computes draw quantity (0-9) from attacker level, target level, attacker magic stat, `K_MAGIC[magic_id].drawResist`, and randomness.
 
-`getText` (`0x48D554`) has two draw paths:
+`computeCommandAction` (the `getText` name and `0x48D554` previously cited here were an interior offset of this function) has two draw paths:
 
 | Parameter | Path |
 |-----------|------|
 | `9` | Draw -> Cast; validates draw quantity, then casts the spell |
 | `10` | Draw -> Stock; computes quantity and loops stock increments |
 
-`Battle_MutateMagicStock` (`0x486A10`) adds one unit at a time to the magic stock for a slot and caps each stocked spell at 100.
+`updateCharaMagicInventory` (renamed from `Battle_MutateMagicStock`) adds one unit at a time to the magic stock for a slot and caps each stocked spell at 100.
 
 ## Open questions
 
 - Exact formula inside `ComputeMagicAndGFDamage`.
 - How `ATTACK_FLAG` and `HIT_TYPE_2` modify edge cases such as misses and drain.
 - Whether support status applications bypass `BattleStatus_CanApplyHitStatus`.
-- Whether `Battle_MutateMagicStock` is the only stock mutation path outside battle.
+- Whether `updateCharaMagicInventory` is the only stock mutation path outside battle.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `BATTLE_PENDING_ACTION_BUFFER` | 0x1D28D44 | Global variable/data, not a function |
+| `Battle_applyDamage` (formerly documented as `BattleAction_ResolveAndApplyDamage`) | 0x48FE20 | Per-hit damage resolution entry point (verified IDA function) |
+| `Damage_DispatchByAttackType` (formerly documented as `Damage_ComputeRawDeltaFromAttackType`) | 0x4922B0 | Dispatches the raw damage formula by attack type (verified IDA function) |
+| `applyDamageAndHandleDeath` (formerly documented as `Battle_ApplyDamageOrHeal`) | 0x494410 | Writes HP, clamps, sets KO, attacker/target bookkeeping (verified IDA function) |
+| `BATTLE_DAMAGE_RESULT_BUFFER` | 0x1D28344 | Global variable/data, not a function |
+| `Battle_ComputeDrawQuantity` (formerly documented as `Draw_ComputeStealCount`) | 0x48FD20 | Computes draw quantity 0-9 (verified IDA function) |
+| `computeCommandAction` | 0x48D200 | Command menu action handler; the `getText` name and `0x48D554` previously cited on this page were an interior offset of this function (verified IDA function) |
+| `updateCharaMagicInventory` (formerly documented as `Battle_MutateMagicStock`) | 0x486A10 | Adds stock units, caps at 100 (verified IDA function) |

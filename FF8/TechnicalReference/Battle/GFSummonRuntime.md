@@ -12,7 +12,7 @@ This page documents the runtime dispatch for Guardian Force summon effects, spec
 
 ## MagicList_Logic
 
-`MagicList_Logic` at `0xC81774` is a 400-entry array of battle effect callbacks. Magic spells, GF summon cinematics, enemy attacks, item animations and boss cinematics all share this table.
+`MagicList_Logic` is a 400-entry array of battle effect callbacks. Magic spells, GF summon cinematics, enemy attacks, item animations and boss cinematics all share this table.
 
 | Address | Name | Type | Role |
 |---------|------|------|------|
@@ -38,7 +38,7 @@ gf_index = command_arg - 0x40
 effect_id = K_GF_JUNCTIONABLE[gf_index].magicID
 ```
 
-The effect id is written to the action context at offset `+6`. `BattleActionSequence_Tick_GF_Cinematic` (`0x50B2A0`) later reads it and calls `BattleGF_LoadCallbackByMagicID`.
+The effect id is written to the action context at offset `+6`. `BattleActionSequence_Tick_GF_Cinematic` later reads it and calls `BattleGF_LoadCallbackByMagicID`.
 
 | Context offset | Size | Field | Description |
 |----------------|------|-------|-------------|
@@ -73,7 +73,7 @@ Runtime evidence quality varies by GF. Keep the Confidence and Runtime fields wh
 | Tonberry | `0x4E` | 90 | `0x762360` | `0x8DC540` shared | `0x7624D0` | `0x7625F9` | `0x762611` | SharedInit | 95 | PASS |
 | Eden | `0x4F` | 206 | `0xAE2DD0` | inline | `0xAE3470` | `0xAE347A` | `0xAE3681` | Atypical | 70 | Tier-3 partial |
 
-Note: Diablos has a thunk wrapper at `0x6541E0` in `MagicList_Logic`; it forwards to the real entry at `0x654210`.
+Note: Diablos has a thunk wrapper (`MAG_325_UNKNOWN` in IDA) in `MagicList_Logic`; it forwards to the real entry (unnamed in IDA, shown as `sub_654210`). See [Function addresses](#function-addresses).
 
 ## GF families
 
@@ -92,10 +92,10 @@ return ((unsigned int)~*(WORD*)(statePtr + 10) >> 14) & 2;
 
 ## Shared GF infrastructure
 
-`BdLinkTask_CreateAndInitContext` (`0x8DC540`) is a shared task constructor used by multiple GFs.
+`Effect_AddTaskAndInitFromCtx` (renamed from `BdLinkTask_CreateAndInitContext`) is a shared task constructor used by multiple GFs.
 
 ```c
-int __cdecl BdLinkTask_CreateAndInitContext(
+int __cdecl Effect_AddTaskAndInitFromCtx(
     _DWORD *dst_ctx,
     int tick_fn,
     int ctx_size,
@@ -137,7 +137,7 @@ Shared cinematic globals are reused across all GFs; only one GF cinematic runs a
 
 ## Odin and Gilgamesh
 
-`SG_ODIN_ANGEL_GILGA_FLAG` (`0x1CFE97A`) controls Odin, Phoenix, Gilgamesh, Angelo suppression and Witch-related state.
+`SG_ODIN_ANGEL_GILGA_FLAG` controls Odin, Phoenix, Gilgamesh, Angelo suppression and Witch-related state.
 
 | Bit | Value | Meaning | Set by |
 |-----|-------|---------|--------|
@@ -147,9 +147,9 @@ Shared cinematic globals are reused across all GFs; only one GF cinematic runs a
 | 4 | `0x10` | Suppress Angelo | Field script opcode |
 | 5 | `0x20` | Witch | `SETWITCH` field opcode |
 
-Odin is checked only at battle init (`mode_3_subsubsubstep == 3`). `ZANTETSUKEN_sub_482DF0` (`0x482E00`) requires the Odin flag and skips if any enemy has death immunity. The RNG is `32/255`, about 12.5%.
+Odin is checked only at battle init (`mode_3_subsubsubstep == 3`). `rollOdinAutoSummon` (renamed from `ZANTETSUKEN_sub_482DF0`) requires the Odin flag and skips if any enemy has death immunity. The RNG is `32/255`, about 12.5%.
 
-Gilgamesh can trigger during battle init (`8/255`, about 3.1%) or during the active tick through `AngeloOdin_SpecialActionTick` (`0x482F80`) at `12/255` per checked tick. `GILGAMESH_ONESHOT_FLAG` prevents more than one Gilgamesh action in the same battle.
+Gilgamesh can trigger during battle init (`8/255`, about 3.1%) or during the active tick through `summonGilgaAngelStartFight` (renamed from `AngeloOdin_SpecialActionTick`) at `12/255` per checked tick. `GILGAMESH_ONESHOT_FLAG` prevents more than one Gilgamesh action in the same battle.
 
 In the Seifer disc-3 battle, monster AI opcode 54 clears Odin and sets Gilgamesh:
 
@@ -162,7 +162,7 @@ SG_ODIN_ANGEL_GILGA_FLAG |= 0x08;
 
 Phoenix auto-triggers on party wipe only. It does not have a spontaneous per-frame trigger like Gilgamesh.
 
-`BattleFrame_PartyWipeCheck` (`0x486450`) scans party slots each active battle frame. If all party members are dead or petrified, it calls `Phoenix_BattleFrame_TriggerCheck` (`0x483270`).
+`managePhoenixInvocWhenGameOver` (renamed from `BattleFrame_PartyWipeCheck`) scans party slots each active battle frame. If all party members are dead or petrified, it calls `computePhoenixInvoc` (renamed from `Phoenix_BattleFrame_TriggerCheck`; same function documented on [Enemy AI VM Runtime](../enemy-ai-vm-runtime/#function-address-reference)).
 
 | Condition | Required value |
 |-----------|----------------|
@@ -180,7 +180,7 @@ Angelo requires Rinoa in the party (`com_file_id == 4`) and bit `0x10` of `SG_OD
 
 | Path | Function | Behavior |
 |------|----------|----------|
-| Per-frame auto-trigger | `AngeloOdin_SpecialActionTick` (`0x482F80`) | Recover, Reverse, Rush-like or Search priority cascade |
+| Per-frame auto-trigger | `summonGilgaAngelStartFight` (renamed from `AngeloOdin_SpecialActionTick`) | Recover, Reverse, Rush-like or Search priority cascade |
 | Turn counter | `Angelo_TurnCounter_TriggerCheck` (`0x482E80`) | Rinoa turn: Recover or Rush |
 | Damage counter | `Angelo_DamageCounter_ReverseCheck` (`0x482F10`) | Enemy attacks Rinoa: Angelo Reverse |
 
@@ -196,7 +196,7 @@ Angelo requires Rinoa in the party (`com_file_id == 4`) and bit `0x10` of `SG_OD
 Each GF draws an animated **creature model** loaded from the magic-effect files. Ifrit loads
 `MAG200_B.00` (→ `Magic_b_00`, 69,608 B, geometry + animation opcodes) and `MAG200_B.01`
 (→ `Magic_b_01`, 229,804 B, textures **+ a zeroed runtime scratch region**) via
-`MagicList_TextureLoad[200]` (`0xB25750`). Both use an 11-entry u32 offset-table header
+`MagicList_TextureLoad[200]` (`MAG_201_IFRIT_SUMMON_HELL_FIRE_FL` in IDA). Both use an 11-entry u32 offset-table header
 (`.00` = `[0, 0xFC, 0x8C, 0x281C, 0x1D48, 0x30, 0xE8, 0xFC, 0, 0x2540, 0]`). This is a **custom
 magic-effect format**, not the monster/character skeletal `.dat`.
 
@@ -264,3 +264,19 @@ verify per GF.)
 | Siren | GF_SIREN_001/002 | Silence infliction |
 | Pandemona | GF_PANDEMONA_001 | cmd_arg `0x48`, pending transfer, enemy HP decrease |
 | Tonberry | GF_TONBERRY_002 | Tick, counter and completion confirmed |
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `MagicList_Logic` | 0xC81774 | Global variable/data, not a function |
+| `SG_ODIN_ANGEL_GILGA_FLAG` | 0x1CFE97A | Global variable/data, not a function |
+| `BattleActionSequence_Tick_GF_Cinematic` | 0x50B2A0 | Reads the GF effect id and dispatches to `MagicList_Logic` (verified IDA function) |
+| `MAG_325_UNKNOWN` (Diablos `MagicList_Logic` thunk) | 0x6541E0 | Thunk that forwards to the real Diablos entry (verified IDA function) |
+| Diablos real entry (`sub_654210` in IDA) | 0x654210 | Diablos GF entry point (verified IDA function, not yet named in IDA) |
+| `Effect_AddTaskAndInitFromCtx` (formerly documented as `BdLinkTask_CreateAndInitContext`) | 0x8DC540 | Shared task constructor used by multiple GFs (verified IDA function) |
+| `rollOdinAutoSummon` (formerly documented as `ZANTETSUKEN_sub_482DF0`) | 0x482E00 | Battle-start Odin roll (verified IDA function) |
+| `summonGilgaAngelStartFight` (formerly documented as `AngeloOdin_SpecialActionTick`) | 0x482F80 | Per-frame Gilgamesh/Angelo auto-action tick (verified IDA function) |
+| `managePhoenixInvocWhenGameOver` (formerly documented as `BattleFrame_PartyWipeCheck`) | 0x486450 | Scans party slots for a wipe each active battle frame (verified IDA function) |
+| `computePhoenixInvoc` (formerly documented as `Phoenix_BattleFrame_TriggerCheck`) | 0x483270 | Phoenix trigger roll; same function as on Enemy AI VM Runtime (verified IDA function) |
+| `MAG_201_IFRIT_SUMMON_HELL_FIRE_FL` (`MagicList_TextureLoad[200]`) | 0xB25750 | Ifrit's texture loader entry (verified IDA function) |

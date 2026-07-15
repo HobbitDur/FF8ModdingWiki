@@ -22,4 +22,10 @@ none
 
 Play an animation, then freeze the model on the last frame of the animation. The "R" (resume) variant of [ANIMEKEEP](../02e-animekeep/): keep-last-frame mode (`execution_flags` bit 0x80, entity+352) but returns 3 immediately without waiting, so the script keeps running.
 
-PC handler: `SCRIPT_RANIMEKEEP` at 0x526910.
+PC handler: `SCRIPT_RANIMEKEEP`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_RANIMEKEEP` | 0x526910 | Field script opcode handler (verified IDA function) |

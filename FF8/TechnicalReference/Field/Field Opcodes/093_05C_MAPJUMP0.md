@@ -27,4 +27,10 @@ none
 
 Jump the player to the field with the given ID and starting on the given walkmesh triangle. The walkmesh is almost always 0 because MAPJUMP0 is intended to be used for teleporting the player into a cutscene, and the cutscenes place the characters where they need to be on initialization, so it doesn't matter where they're initially teleported.
 
-PC handler: `SCRIPT_MAPJUMP0` at 0x521C30.
+PC handler: `SCRIPT_MAPJUMP0`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_MAPJUMP0` | 0x521C30 | Field script opcode handler (verified IDA function) |

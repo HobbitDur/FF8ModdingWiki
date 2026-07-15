@@ -29,4 +29,10 @@ The handler pops one value into the field var-map (`hidden` flag), registers thi
 
 -- By MaKiPL
 
-PC handler: `SCRIPT_SETDRAWPOINT` at 0x523030.
+PC handler: `SCRIPT_SETDRAWPOINT`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_SETDRAWPOINT` | 0x523030 | Field script opcode handler (verified IDA function) |

@@ -27,4 +27,10 @@ none
 
 Sets this actor's shade (lighting) level. The handler pops one byte and stores it in the entity field at `entity+609`, which the model renderer uses to darken/brighten the actor. Returns 2.
 
-PC handler: `SCRIPT_SHADELEVEL` at 0x526E30.
+PC handler: `SCRIPT_SHADELEVEL`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_SHADELEVEL` | 0x526E30 | Field script opcode handler (verified IDA function) |

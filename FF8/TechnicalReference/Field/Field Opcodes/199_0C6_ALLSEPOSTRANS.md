@@ -27,4 +27,10 @@ none
 
 Fades the stereo pan of all sound-effect channels to a target position over a duration. The handler pops two values (not three): the frame count first (top of stack) and the final pan second, then calls the all-channel pan-transition routine with the frame count doubled as the step count. Returns 2. Never used in the retail game (only in a test area).
 
-PC handler: `SCRIPT_ALLSEPOSTRANS` at 0x520040.
+PC handler: `SCRIPT_ALLSEPOSTRANS`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_ALLSEPOSTRANS` | 0x520040 | Field script opcode handler (verified IDA function) |

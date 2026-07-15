@@ -31,8 +31,14 @@ Each string section correspond to a [Mngrp string section](../mngrp-string-secti
 
 # How the engine reads the file
 
-getMenuString (0x4BD630 in FF8_EN.exe) **never reads Pad_Count**: it directly indexes the padding table with the
+`getMenuString` **never reads Pad_Count**: it directly indexes the padding table with the
 requested section number (`file + 2 + 2 * section`) and treats a **0x0000** padding as "no section" (empty string
 returned). The padding slot index is the menu group id, which is why the table always has 17 slots and why empty
 slots must stay in place. Inside a string section, the requested string is looked up as offset index
 `2 * text_id + variant`, so the offsets work in pairs.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `getMenuString` | 0x4BD630 | Two-level positional string lookup (ignores Pad_Count; entry = 2·text_id+variant) |

@@ -33,4 +33,10 @@ Moves this entity onto a ladder and climbs "down". The top stack value is an ani
 
 Identical to [LADDERUP](../025-ladderup/) except for the direction seed (1 for up, 0 for down).
 
-PC handler: `SCRIPT_LADDERDOWN` at 0x525A30.
+PC handler: `SCRIPT_LADDERDOWN`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_LADDERDOWN` | 0x525A30 | Field script opcode handler (verified IDA function) |

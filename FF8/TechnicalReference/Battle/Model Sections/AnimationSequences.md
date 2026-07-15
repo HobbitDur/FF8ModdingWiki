@@ -26,7 +26,7 @@ Now how it works. The sequence animation is composed of opcode, followed by para
 
 ### Execution model
 
-The sequences are executed by a small byte-code VM (`computeAnimationSequence` at `0x50DB40` in FF8_EN.exe). The VM itself only implements the arithmetic
+The sequences are executed by a small byte-code VM (`computeAnimationSequence` in FF8_EN.exe). The VM itself only implements the arithmetic
 opcodes (`C0`-`E5`) and the conditional jumps (`E6`-`F3`); everything below `0xC0` is delegated to a callback. The same VM is reused with different callbacks
 for:
 
@@ -34,7 +34,7 @@ for:
   `AnimSeq_WriteSpecialVar_E5` (E5 special writes).
 - **Camera sequences** ([camera sequence](../camera-sequence/)): same VM with camera-specific callbacks (see that section).
 
-The per-frame driver (`AnimSeq_UpdateEntityPerFrame` at `0x504290`) runs every battle frame:
+The per-frame driver (`AnimSeq_UpdateEntityPerFrame`) runs every battle frame:
 
 1. If a *background sequence id* was set (opcode `9A`), that sequence is executed first, every frame.
 2. The main sequence resumes at the byte offset saved from the previous frame (`currentSequenceCurrentByte`).
@@ -43,7 +43,7 @@ The per-frame driver (`AnimSeq_UpdateEntityPerFrame` at `0x504290`) runs every b
 
 All `int16` parameters are **little-endian**.
 
-**Sequences played at battle start:** `initAnimationSequenceAtStartBattle` (`0x5027D0`, run once per entity) queues **sequence 8** as the first sequence (the battle-entrance / scene-in animation). It also sets the idle fallback `basedAnimSeq` to **1** — or to the sequence queued by the entity's initial statuses (e.g. starting dead/asleep), or to an override byte passed by the spawner for scripted mid-battle spawns.
+**Sequences played at battle start:** `initAnimationSequenceAtStartBattle` (run once per entity) queues **sequence 8** as the first sequence (the battle-entrance / scene-in animation). It also sets the idle fallback `basedAnimSeq` to **1** — or to the sequence queued by the entity's initial statuses (e.g. starting dead/asleep), or to an override byte passed by the spawner for scripted mid-battle spawns.
 
 **Base sequence ID (`basedAnimSeq`):** the sequence the entity returns to when nothing else is queued — its "idle". Defaults to 1 at battle start. It can be changed by opcode `A3` (adopts the current sequence as the new base) or via `E5 0x0B`, and read via `C3 0x0B`. When a sequence ends (`A2`) with nothing queued, **monsters** return to `basedAnimSeq`, while **characters** (com_id &lt; 0x10) instead pick a sequence from their [animation status]({{site.baseurl}}/technical-reference/list/battle-animation-state/#default-sequence-ids) (dead → 3, sleeping/weakened → 2, running → 16, preparing attack → 19, defending → 29, else 1).
 
@@ -89,7 +89,7 @@ Do opcode & FC:
 #### Case 3 param < 0x80:
 
 On each case a specific code is done, often it just read a value in memory that as a specific purpose.
-Full list (from `AnimSeq_ReadSpecialVar_C3` at `0x5044B0`):
+Full list (from `AnimSeq_ReadSpecialVar_C3`):
 
 | Param              | Value read                                                                                                                  |
 |--------------------|-------------------------------------------------------------------------------------------------------------------------------|
@@ -139,7 +139,7 @@ Param >= 0x80: Write to stack current_value at param
 
 #### Param < 0x80
 
-Full list (from `AnimSeq_WriteSpecialVar_E5` at `0x5048E0`):
+Full list (from `AnimSeq_WriteSpecialVar_E5`):
 
 | Param              | Effect                                                                                                                   |
 |--------------------|-----------------------------------------------------------------------------------------------------------------------------|
@@ -209,7 +209,7 @@ This queues the animation by the ID defined in [Model animation](../model-animat
 
 ## 0x80 <= Opcode < C0
 
-Full opcode list (decoded from `AnimSeq_DispatchActionOpcode` at `0x504BB0` in FF8_EN.exe). Opcodes not listed (87-8F, B3) are no-ops with no parameter.
+Full opcode list (decoded from `AnimSeq_DispatchActionOpcode` in FF8_EN.exe). Opcodes not listed (87-8F, B3) are no-ops with no parameter.
 
 | Opcode             | Params | Description                                                                                                                                                                                                                                                                                                                                          |
 |--------------------|--------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -335,3 +335,16 @@ Normal attack sequence of the Bite Bug, fully annotated:
 - `C3 7F` `C5 FF` `E5 7F` `E7 E1`: decrement and loop
 - `0C`: play animation 0C and wait (landing)
 - `A2`: end of sequence (jump to the next queued/idle sequence)
+
+## Function addresses
+
+FF8_EN.exe:
+
+| Function | Address | Description |
+|---|---|---|
+| `computeAnimationSequence` | 0x50DB40 | Byte-code VM interpreter shared by entity and camera sequences (verified IDA function) |
+| `AnimSeq_UpdateEntityPerFrame` | 0x504290 | Per-frame driver: runs the background sequence, resumes the main sequence (verified IDA function) |
+| `initAnimationSequenceAtStartBattle` | 0x5027D0 | Per-entity battle-start init; queues sequence 8 and sets `basedAnimSeq` (verified IDA function) |
+| `AnimSeq_ReadSpecialVar_C3` | 0x5044B0 | C3-family special variable reader (verified IDA function) |
+| `AnimSeq_WriteSpecialVar_E5` | 0x5048E0 | E5-family special variable writer (verified IDA function) |
+| `AnimSeq_DispatchActionOpcode` | 0x504BB0 | Opcode dispatcher for entity sequences (verified IDA function) |

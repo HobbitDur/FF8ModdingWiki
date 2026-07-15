@@ -59,9 +59,18 @@ permalink: /technical-reference/main/kernel/weapons/
 | 0x0003 | 1 byte  | Unused (padding) — no code references this byte (IDA: 0 xrefs)                                                                                                                                                                |
 | 0x0004 | 1 byte  | Character ID<br/><br/> 0x00 - Squall<br/> 0x01 - Zell<br/> 0x02 - Irvine<br/> 0x03 - Quistis<br/> 0x04 - Rinoa<br/> 0x05 - Selphie<br/> 0x06 - Seifer<br/> 0x07 - Edea<br/> 0x08 - Laguna<br/> 0x09 - Kiros<br/> 0x0A - Ward |
 | 0x0005 | 1 bytes | Attack Type                                                                                                                                                                                                                  |
-| 0x0006 | 1 byte  | Attack Power — the `power` term of the [physical damage formula]({{site.baseurl}}/technical-reference/list/formula/#physical-classic): `dmg = power × (265−VIT) × (STR₊ + STR₊²/16)/256/16 × rand/256` (`ComputeWithDamageSTRFormula`@0x492c40) |
-| 0x0007 | 1 byte  | Hit rate — the character's base Hit% while this weapon is equipped (`GetCharacterStat`/HIT reads it directly, capped at 255). The battle accuracy roll then applies `hit% = hitRate + LUCK/2 − targetEVA − targetLUCK`, landing if `255×hit%/100 ≥ rand(0..255)` (`computeAttackPhysical`@0x492e10). **255 = always hits**; Darkness quarters it. See the [Hit% formula]({{site.baseurl}}/technical-reference/list/formula/#hit-rate) |
-| 0x0008 | 1 byte  | STR Bonus — added directly into the wielder's **STR stat, and STR only** (`GetCharacterStat`@0x496440: `STR = CapTo255(weaponStrBonus + baseCurve + savedBonus + junction)`). That boosted STR is what feeds the physical damage formula above, so the bonus is accounted for through STR, not as a separate damage term |
+| 0x0006 | 1 byte  | Attack Power — the `power` term of the [physical damage formula]({{site.baseurl}}/technical-reference/list/formula/#physical-classic): `dmg = power × (265−VIT) × (STR₊ + STR₊²/16)/256/16 × rand/256` (`ComputeWithDamageSTRFormula`) |
+| 0x0007 | 1 byte  | Hit rate — the character's base Hit% while this weapon is equipped (`GetCharacterStat`/HIT reads it directly, capped at 255). The battle accuracy roll then applies `hit% = hitRate + LUCK/2 − targetEVA − targetLUCK`, landing if `255×hit%/100 ≥ rand(0..255)` (`computeAttackPhysical`). **255 = always hits**; Darkness quarters it. See the [Hit% formula]({{site.baseurl}}/technical-reference/list/formula/#hit-rate) |
+| 0x0008 | 1 byte  | STR Bonus — added directly into the wielder's **STR stat, and STR only** (`GetCharacterStat`: `STR = CapTo255(weaponStrBonus + baseCurve + savedBonus + junction)`). That boosted STR is what feeds the physical damage formula above, so the bonus is accounted for through STR, not as a separate damage term |
 | 0x0009 | 1 byte  | Weapon Tier                                                                                                                                                                                                                  |
-| 0x000A | 1 byte  | Crit Bonus — critical-hit chance: crit if `rand(0..255) ≤ CritBonus + LUCK`, i.e. `P(crit) = (CritBonus + LUCK)/256` (`Damage_RollCrit`@0x492b60). A crit **doubles** physical damage. See the [crit formula]({{site.baseurl}}/technical-reference/list/formula/#compute-crit) |
+| 0x000A | 1 byte  | Crit Bonus — critical-hit chance: crit if `rand(0..255) ≤ CritBonus + LUCK`, i.e. `P(crit) = (CritBonus + LUCK)/256` (`Damage_RollCrit`). A crit **doubles** physical damage. See the [crit formula]({{site.baseurl}}/technical-reference/list/formula/#compute-crit) |
 | 0x000B | 1 byte  | Melee weapon — bit 0 set marks the wielder a melee attacker (`initializeBattleSlotData` sets `BATTLE_FLAG_BYTE1_MELEE_CHARA` when `isMeleeWeapon & 1`)                                                                          |
+
+## Function addresses
+
+| Function | Address |
+|---|---|
+| `ComputeWithDamageSTRFormula` | 0x492c40 |
+| `computeAttackPhysical` | 0x492e10 |
+| `GetCharacterStat` | 0x496440 |
+| `Damage_RollCrit` | 0x492b60 |

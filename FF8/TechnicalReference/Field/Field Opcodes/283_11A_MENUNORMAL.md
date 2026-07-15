@@ -22,4 +22,10 @@ none
 
 Opens the main menu. Requests the menu module (`globalFieldNextModuleID = 5`) with menu id 0 (normal menu) and copies the field's "can save here" flag into the menu state. Takes no stack arguments. Returns 3 (yield).
 
-PC handler: `SCRIPT_MENUNORMAL` at 0x521D10.
+PC handler: `SCRIPT_MENUNORMAL`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_MENUNORMAL` | 0x521D10 | Field script opcode handler (verified IDA function) |

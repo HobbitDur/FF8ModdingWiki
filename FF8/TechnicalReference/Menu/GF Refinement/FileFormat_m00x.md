@@ -20,7 +20,7 @@ but only the one contains in the [mngrp.bin](https://github.com/HobbitDur/ShumiT
 
 The [mngrphd.bin](https://github.com/HobbitDur/ShumiTranslator/wiki/Mngrphd_bin) contains offset for mngrp and is different for every language.
 
-At runtime, the refine menu (Menu_Prog19_RefineMenu_Init at 0x4D7180 in FF8_EN.exe) loads the mngrp copies by raw
+At runtime, the refine menu (`Menu_Prog19_RefineMenu_Init`) loads the mngrp copies by raw
 mngrphd entry index: entries **188-192** for m000.bin-m004.bin (into the buffer at 0x1D8A864) and entries
 **196-200** for m000.msg-m004.msg (into 0x1D85864). The 8-byte entry stride is confirmed by the executable.
 
@@ -170,3 +170,9 @@ Each m00x file has a specific number of entries, which are listed here.
 
 Text offsets are in [bin](#BIN) files, and are
 classic [FF8 String]({{site.baseurl}}/FF8/TechnicalReference/Miscellaneous/FF8String)
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `Menu_Prog19_RefineMenu_Init` | 0x4D7180 | Refine menu program init; loads the m00x mngrp copies |

@@ -35,4 +35,10 @@ Pops five values (message channel, X, Y, Width, Height) and sets the window rect
 
 Only useful before calling MES, which has no built-in size parameters. WINSIZE is only used in the first hallway of the game, where Quistis is imitating Squall (and also in some debug areas). Probably, Square's eventers used this a few times, hated how tedious it was, and asked for the AMES family of opcodes to be added, but didn't change the ones they already did.
 
-PC handler: `SCRIPT_WINSIZE` at 0x529A20.
+PC handler: `SCRIPT_WINSIZE`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_WINSIZE` | 0x529A20 | Field script opcode handler (verified IDA function) |

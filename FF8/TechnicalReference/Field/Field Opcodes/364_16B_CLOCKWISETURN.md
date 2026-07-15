@@ -29,4 +29,10 @@ Turns this entity to face a target direction, always sweeping in the clockwise s
 
 The difference from [CLOCKWISETURN2](../16d-clockwiseturn2/) is a **single byte**: this opcode writes turn-mode **1** into entity+580, whereas CLOCKWISETURN2 writes **2** (which selects a different rotation-update path in the per-frame movement tick). The popped arguments, start/target setup and the ±256 direction forcing are otherwise byte-for-byte identical. The opcode yields until the turn finishes (the tick sets entity+580 to 3).
 
-PC handler: `SCRIPT_CLOCKWISETURN` at 0x526FD0.
+PC handler: `SCRIPT_CLOCKWISETURN`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_CLOCKWISETURN` | 0x526FD0 | Field script opcode handler (verified IDA function) |

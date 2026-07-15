@@ -29,4 +29,10 @@ Turns this entity to face a target direction, always sweeping in the counter-clo
 
 The difference from [COUNTERCLOCKWISETURN](../16c-counterclockwiseturn/) is a **single byte**: this opcode writes turn-mode **2** into entity+580, whereas COUNTERCLOCKWISETURN writes **1** (selecting a different rotation-update path in the per-frame movement tick). Everything else is byte-for-byte identical. Yields until the turn finishes (tick sets entity+580 to 3).
 
-PC handler: `SCRIPT_COUNTERCLOCKWISETURN2` at 0x5271B0.
+PC handler: `SCRIPT_COUNTERCLOCKWISETURN2`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_COUNTERCLOCKWISETURN2` | 0x5271B0 | Field script opcode handler (verified IDA function) |

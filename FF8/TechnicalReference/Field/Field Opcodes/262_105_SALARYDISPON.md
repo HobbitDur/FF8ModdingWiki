@@ -22,4 +22,10 @@ none
 
 Turns on the display of salary alerts.
 
-PC handler: `SCRIPT_SALARYDISPON` at 0x51DC10.
+PC handler: `SCRIPT_SALARYDISPON`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_SALARYDISPON` | 0x51DC10 | Field script opcode handler (verified IDA function) |

@@ -25,4 +25,10 @@ none
 
 Sets the countdown timer's remaining time. The handler pops one word and stores it into the global countdown value (`SG_COUNTDOWN`). This only sets the time; use [DISPTIMER](../09d-disptimer/) to show it and start counting down. Returns 2.
 
-PC handler: `SCRIPT_SETTIMER` at 0x5216E0.
+PC handler: `SCRIPT_SETTIMER`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_SETTIMER` | 0x5216E0 | Field script opcode handler (verified IDA function) |

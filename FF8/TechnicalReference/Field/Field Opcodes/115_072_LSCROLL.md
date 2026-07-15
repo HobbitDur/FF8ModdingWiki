@@ -31,4 +31,10 @@ Starts a background/camera scroll toward target offset (*X*, *Y*), taking *frame
 
 `LSCROLL` differs from [DSCROLL](../071-dscroll/) (mode 3) only in the mode index it writes: `DSCROLL` takes no duration (snaps directly), `LSCROLL` interpolates over *frame count*, and [CSCROLL](../073-cscroll/) (mode 5) uses the same three parameters with a different interpolation curve.
 
-PC handler: `SCRIPT_LSCROLL` at 0x520C90.
+PC handler: `SCRIPT_LSCROLL`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_LSCROLL` | 0x520C90 | Field script opcode handler (verified IDA function) |

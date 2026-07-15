@@ -39,4 +39,10 @@ Extended ladder-climb ("down" direction) that follows a three-waypoint path. Nin
 
 Identical to [LADDERUP2](../027-ladderup2/) except for the direction seed (1 for up, 0 for down).
 
-PC handler: `SCRIPT_LADDERDOWN2` at 0x525CA0.
+PC handler: `SCRIPT_LADDERDOWN2`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_LADDERDOWN2` | 0x525CA0 | Field script opcode handler (verified IDA function) |

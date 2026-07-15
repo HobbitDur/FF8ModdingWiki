@@ -31,4 +31,10 @@ Test data
 -   5 = Train
 -   10 = Lava cavern
 
-PC handler: `SCRIPT_EFFECTLOAD` at 0x51FDE0.
+PC handler: `SCRIPT_EFFECTLOAD`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_EFFECTLOAD` | 0x51FDE0 | Field script opcode handler (verified IDA function) |

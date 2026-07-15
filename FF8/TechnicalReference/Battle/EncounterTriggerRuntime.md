@@ -17,12 +17,12 @@ Both field and world-map random encounter systems ultimately select a battle sce
 | Source | Scene id storage | Module request | Main selector |
 |--------|------------------|----------------|---------------|
 | Field random battle | `MenuState_opcode_menu_id` (`0x1CE4762`) | `globalFieldNextModuleID = 3` | `Field_Encounter_RollAndSelectScene` (`0x47CA90`) |
-| Field scripted battle | `MenuState_opcode_menu_id` (`0x1CE4762`) | `globalFieldNextModuleID = 3` | `SCRIPT_BATTLE` (`0x523294`) |
-| World map random battle | `WM_PENDING_SCENE_LO/HI` (`0x2036B4E/0x2036B4F`) | `WM_PENDING_MODULE_ID = 3` | `WM_Encounter_RollAndSelectScene` (`0x541C80`) |
+| Field scripted battle | `MenuState_opcode_menu_id` (`0x1CE4762`) | `globalFieldNextModuleID = 3` | `SCRIPT_BATTLE` (`0x523270`) |
+| World map random battle | `WM_PENDING_SCENE_LO/HI` (`0x2036B4E/0x2036B4F`) | `WM_PENDING_MODULE_ID = 3` | `WM_Encounter_wm123456` (`0x541C80`, formerly documented as `WM_Encounter_RollAndSelectScene`) |
 
 ## Field random encounters
 
-`Field_Encounter_RollAndSelectScene` (`0x47CA90`) is called each frame from the field state machine (`Field_MainStateMachineTick`, `0x4789A0`).
+`Field_Encounter_RollAndSelectScene` is called each frame from the field state machine (`Field_Chara_UpdateEntitiesMotion`, previously documented on this page as `Field_MainStateMachineTick`). See [Function addresses](#function-addresses).
 
 ### Guard conditions
 
@@ -73,7 +73,7 @@ An encounter triggers when `threshold < FIELD_DANGER_RATING`.
 
 ### Formation selection
 
-When an encounter triggers, the field system selects from a 4-entry formation table at `FIELD_FORMATION_TABLE_PTR` (`0x1CF3D78`). The roll is based on `DANGER_LIMIT_TABLE[(TOTAL_ENCOUNTER + 1) & 0xFF]`.
+When an encounter triggers, the field system selects from a 4-entry formation table at `FIELD_FORMATION_TABLE_PTR`. The roll is based on `DANGER_LIMIT_TABLE[(TOTAL_ENCOUNTER + 1) & 0xFF]`.
 
 | Roll range | Slot | Nominal probability |
 |------------|------|---------------------|
@@ -86,7 +86,7 @@ If the selected formation matches `FIELD_LAST_FORMATION_ID`, selection falls thr
 
 ## Field scripted battles
 
-Field scripts can force battles through the `BATTLE` opcode. `SCRIPT_BATTLE` (`0x523294`) pops the battle flag byte and scene id from the script stack:
+Field scripts can force battles through the `BATTLE` opcode. `SCRIPT_BATTLE` pops the battle flag byte and scene id from the script stack:
 
 ```c
 ENCOUTER_BATTLE_FLAG = script_pop();
@@ -98,7 +98,7 @@ See [069_BATTLE](../../field/field-opcodes/069-battle/) for the field opcode pag
 
 ## World-map random encounters
 
-`WM_Encounter_RollAndSelectScene` (`0x541C80`) is called from `FFWorldDirector` (`0x53F4B0`) during the world-map frame tick.
+`WM_Encounter_wm123456` (renamed from `WM_Encounter_RollAndSelectScene`) is called from `FFWorldInit` (renamed from `FFWorldDirector`) during the world-map frame tick.
 
 ### Guard conditions
 
@@ -172,16 +172,18 @@ ReadSceneOutFileForSpecificEncounter(COMBAT_SCENE_ID, &CURRENT_ENCOUNTER_DATA_SC
 
 The loaded scene.out block contributes its own battle flags; scripted `ENCOUTER_BATTLE_FLAG` is merged during initialization.
 
-## Function address summary
+## Function addresses
 
-| Address | Name | Role |
-|---------|------|------|
-| `0x47CA90` | `Field_Encounter_RollAndSelectScene` | Field encounter tick: increment, check, select and trigger |
-| `0x541C80` | `WM_Encounter_RollAndSelectScene` | World-map encounter tick |
-| `0x54A7F0` | `World_Encounter_CheckAndTrigger` | World-map encounter orchestrator |
-| `0x523294` | `SCRIPT_BATTLE` | Field script forced battle opcode |
-| `0x48AFD0` | `Battle_InitPreemptiveBackAttackStatus` | Preemptive/back-attack resolution |
-| `0x48B260` | `Battle_CheckPartyAbilityForPreemptive` | Party ability modifier |
-| `0x52B3A0` | `Field_IsCutsceneActive` | Cutscene/event gate |
-| `0x53F4B0` | `FFWorldDirector` | World-map state machine |
-| `0x4706B0` | `FFModuleHandler_main_loop` | Module dispatcher and battle handoff |
+| Function | Address | Description |
+|---|---|---|
+| `Field_Encounter_RollAndSelectScene` | 0x47CA90 | Field encounter tick: increment, check, select and trigger (verified IDA function; not yet named in IDA, shown as `sub_47CA90`) |
+| `Field_Chara_UpdateEntitiesMotion` (previously documented on this page as `Field_MainStateMachineTick`) | 0x4789A0 | Field per-frame state machine that calls the encounter tick (verified IDA function) |
+| `FIELD_FORMATION_TABLE_PTR` | 0x1CF3D78 | Global variable/data, not a function |
+| `WM_Encounter_wm123456` (formerly documented as `WM_Encounter_RollAndSelectScene`) | 0x541C80 | World-map encounter tick (verified IDA function) |
+| `World_HandleVehicleBoardInput` (formerly documented as `World_Encounter_CheckAndTrigger`) | 0x54A7F0 | World-map encounter orchestrator (verified IDA function) |
+| `SCRIPT_BATTLE` | 0x523270 | Field script forced battle opcode; `0x523294` previously cited on this page is an interior offset of this same function (see [069_BATTLE](../../field/field-opcodes/069-battle/)) (verified IDA function) |
+| `computeBattleSurpriseAttack` (formerly documented as `Battle_InitPreemptiveBackAttackStatus`) | 0x48AFD0 | Preemptive/back-attack resolution (verified IDA function) |
+| `doesMonsterPartyReduceSurpriseRng` (formerly documented as `Battle_CheckPartyAbilityForPreemptive`) | 0x48B260 | Party ability modifier to the surprise RNG (verified IDA function) |
+| `Field_IsCutsceneActive` | 0x52B3A0 | Cutscene/event gate (verified IDA function; not yet named in IDA, shown as `sub_52B3A0`) |
+| `FFWorldInit` (formerly documented as `FFWorldDirector`) | 0x53F310 | World-map state machine; `0x53F4B0` previously cited on this page is an interior offset of this function (verified IDA function) |
+| `FFModuleHandler_main_loop` | 0x4706B0 | Module dispatcher and battle handoff (verified IDA function) |

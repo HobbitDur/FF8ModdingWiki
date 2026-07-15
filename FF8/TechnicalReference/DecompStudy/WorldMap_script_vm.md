@@ -100,9 +100,9 @@ The world map has 13 message-window slots (`world_msg_windows`, 16 bytes each: t
 
 The savemap script bits (2×32) and vars (2 bytes) live in the world-map save block (`SG_WORLDMAP_DATA` +116/+120 and +124) — they persist in save files.
 
-## Address table
+## Function addresses
 
-| Name | Address | Description |
+| Function | Address | Description |
 |------|---------|-------------|
 | `Wmset_warpConditionSystem` | 0x545F10 | Script interpreter (IF/THEN/ELSE walker) |
 | `wm_scriptCheckCondition` | 0x546100 | Condition opcode evaluator |

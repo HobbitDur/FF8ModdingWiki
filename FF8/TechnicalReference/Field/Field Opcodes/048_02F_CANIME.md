@@ -27,4 +27,10 @@ Model Animation ID
 
 Play a frame range of an animation, then return the model to its base animation. Two values are popped: the first frame (top of stack) and the last frame; internally they are scaled (frame*16 − 16) into the animation frame counters. Uses play-once mode (`execution_flags` bit 0x40, entity+352) and pauses the script until the range finishes.
 
-PC handler: `SCRIPT_CANIME` at 0x5266D0.
+PC handler: `SCRIPT_CANIME`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_CANIME` | 0x5266D0 | Field script opcode handler (verified IDA function) |

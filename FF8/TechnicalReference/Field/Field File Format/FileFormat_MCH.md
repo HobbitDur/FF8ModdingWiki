@@ -256,13 +256,16 @@ Function addresses for the 2000 PC version:
 |----------|-------------------------------------|------|
 | 0x531980 | Field_CharaCreateModelInstance      | Copies the bone records into the runtime array of (bone_count + 1) 64-byte records, creates the pre-root record 0 with angles (0, 1024, 0), builds the GPU primitive buffers from the faces |
 | 0x533CD0 | Field_CharaAnimateAndBuildSkeletons | Per frame: decodes packed poses into the bone records, writes the root offset (+ GETA height, field script opcode SETGETA) into the pre-root, walks the hierarchy building matrices/positions |
-| 0x533F90 | Field_CharaBuildBoneRotationMatrix  | Builds a rotation matrix from 3 angles using SIN_TABLE_4096 (0xB924BC) / COS_TABLE_4096 (0xB944C0), index & 0xFFF |
+| 0x533F90 | Field_CharaBuildBoneRotationMatrix  | Builds a rotation matrix from 3 angles using SIN_TABLE_4096 / COS_TABLE_4096, index & 0xFFF |
 | 0x531DA0 | Field_CharaModelCommand             | Command-style API for field scripts (command 32 = read a bone's decoded pose, used by the FACEDIR opcodes) |
 | 0x532930 | Field_CharaUpdateTextureAnim        | Eye-blink texture animation (random timer, VRAM rectangle copies) |
 | 0x532AE1 | Field_CharaOne                      | chara.one loader. Reads every TIM/model-data offset as `value & 0x0FFFFFFF` (high nibble = flags, list terminator = any negative DWORD, 0xA = shared-texture reference). For main characters it patches the MCH header's animation offset to point at the chara.one animation block |
 | 0x531310 | (model object constructor)          | Command 17 builds the per-model runtime object from the model data (applies the chara.one scale to vertices AND bone lengths: value * scale / 16); command 18 converts the animation section into the runtime layout (8-byte translation slot + 4 bytes per bone per frame) |
+| 0x1DCB340 | CHARA_MODEL_INSTANCE_TABLE | Model instance array base (global variable/data, not a function) |
+| 0xB924BC | SIN_TABLE_4096 | 4096-entry sine table (global variable/data, not a function) |
+| 0xB944C0 | COS_TABLE_4096 | 4096-entry cosine table (global variable/data, not a function) |
 
-Useful model instance fields (instances in `CHARA_MODEL_INSTANCE_TABLE`, 0x1DCB340): +4 runtime bone array, +8 animation data pointer, +82 frame counter (frame << 4, low bits = interpolation subframe), +98 GETA height offset, +112/113 blink texture ids, +114 flags (bit 2 = uncompressed 8-byte poses).
+Useful model instance fields (instances in `CHARA_MODEL_INSTANCE_TABLE`): +4 runtime bone array, +8 animation data pointer, +82 frame counter (frame << 4, low bits = interpolation subframe), +98 GETA height offset, +112/113 blink texture ids, +114 flags (bit 2 = uncompressed 8-byte poses).
 
 A working reference implementation of this whole page (parser + skeleton math) is available in [FF8UltimateEditor](https://github.com/HobbitDur/FF8UltimateEditor) (`FF8GameData/mch/mchanalyser.py`, used by the Seed field model viewer).
 

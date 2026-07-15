@@ -22,4 +22,10 @@ none
 
 Opens the PHS (switch) menu. Requests the menu module (`globalFieldNextModuleID = 5`) with menu id 1 (PHS) and marks the menu state as save-enabled (value 2). Takes no stack arguments. Returns 3 (yield).
 
-PC handler: `SCRIPT_MENUPHS` at 0x521D40.
+PC handler: `SCRIPT_MENUPHS`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_MENUPHS` | 0x521D40 | Field script opcode handler (verified IDA function) |

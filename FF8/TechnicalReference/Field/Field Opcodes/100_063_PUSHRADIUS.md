@@ -25,4 +25,10 @@ none
 
 Pops one value and stores it as this entity's push radius (+502): the distance at which the player triggers this entity's **push** script. Most events have a push radius of 48 when active and a push radius of 1 when inactive.
 
-PC handler: `SCRIPT_PUSHRADIUS` at 0x51EE00.
+PC handler: `SCRIPT_PUSHRADIUS`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_PUSHRADIUS` | 0x51EE00 | Field script opcode handler (verified IDA function) |

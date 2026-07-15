@@ -25,4 +25,10 @@ none
 
 End the current FACEDIR over the course of *frame count*, easing the head back to its neutral/model orientation. The handler pops one frame count, reads the head's current orientation from the model, and interpolates back over that many frames, clearing the head-lock flag. It yields until the interpolation completes.
 
-PC handler: `SCRIPT_FACEDIROFF` at 0x527E40.
+PC handler: `SCRIPT_FACEDIROFF`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_FACEDIROFF` | 0x527E40 | Field script opcode handler (verified IDA function) |

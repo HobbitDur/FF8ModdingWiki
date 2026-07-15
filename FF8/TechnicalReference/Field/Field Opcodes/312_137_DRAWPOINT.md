@@ -27,7 +27,7 @@ Runs the full Draw-Point interaction. It pops one value (`DrawPointID`), subtrac
 
 Sets drawable magic to the one from the hardcoded array at index: DrawPointID-1
 
-PC handler: `SCRIPT_DRAWPOINT` at 0x522770.
+PC handler: `SCRIPT_DRAWPOINT`.
 
 **array**:
 
@@ -59,3 +59,9 @@ PC handler: `SCRIPT_DRAWPOINT` at 0x522770.
 `.data:00B92500                 db 20h, 0Eh, 0Fh, 13h, 0F2h`
 
 By MaKiPL
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_DRAWPOINT` | 0x522770 | Field script opcode handler (verified IDA function) |

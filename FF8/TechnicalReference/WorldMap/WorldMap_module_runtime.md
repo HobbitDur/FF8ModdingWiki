@@ -26,7 +26,7 @@ The main loop is a render shell: clear/present, an optional overlay-menu sub-mod
 4. Two 2 KB blocks are streamed from an archive with `Archive_IO_LoadFile` using block indexes from the wmset variant data (`byte_2036B72` × 0x800).
 5. Music starts (`PlayMusic_SdMusicPlay` when a field handed over a track, otherwise the vehicle/area default via the music changer).
 6. `Field_To_World_section9` computes the spawn position (wmset section 9 entries when coming from a field, saved world coordinates when loading a save), then the camera is initialized.
-7. World character models load through the world chara.one loader, and the map-segment streaming loop runs until the blocks around the player are resident (`World_CountPendingMapSegments` / per-segment tick).
+7. World character models load through the world chara.one loader, and the map-segment streaming loop runs until the blocks around the player are resident (`Wmx_UpdateSegmentStreaming`, renamed from `World_CountPendingMapSegments` in the community IDB — per-segment tick).
 8. The player animation is selected: vehicle 49 (Ragnarok) uses animation 5, everything else animation 0.
 
 ## Per-frame director (FFWorldDirector)
@@ -64,7 +64,7 @@ Details worth knowing:
 * **Minimap** — `world_minimapMode`: 1 = corner planet minimap, 2 = corner zoomed map, 3 = fullscreen map.
 * **Streaming** — map segments stream in continuously around the player; the loader state pauses when a music change is in flight (`World_MusicChanger`).
 * **Fog toggle** — the registry flag `WORLDMAP_WITHOUT_FOG` (GraphicsGF bit) selects between the fogged and fogless terrain renderers each frame.
-* **Docking/arrival animations** — `world_docking_state` (0x2036B70) is a small struct: +0 is the context byte (0 = normal, 1/2 = docking sequence for block A/B running, 3/4 = variants, 12 = world rendering disabled), +2/+3 hold the two **docking animation block IDs** streamed as 2 KB chunks during `FFWorldInit` (0xFF = none), +4 the pending field entrance. `World_UpdateDockingAnimations` (0x545480) advances the keyframed objects of those blocks each frame (camera-distance gated) and returns a completion bitmask; a completed sequence triggers the matching field entrance — this drives sequences like Balamb Garden or Ragnarok landing at a dock/station.
+* **Docking/arrival animations** — `world_docking_state` is a small struct: +0 is the context byte (0 = normal, 1/2 = docking sequence for block A/B running, 3/4 = variants, 12 = world rendering disabled), +2/+3 hold the two **docking animation block IDs** streamed as 2 KB chunks during `FFWorldInit` (0xFF = none), +4 the pending field entrance. `World_UpdateDockingAnimations` advances the keyframed objects of those blocks each frame (camera-distance gated) and returns a completion bitmask; a completed sequence triggers the matching field entrance — this drives sequences like Balamb Garden or Ragnarok landing at a dock/station.
 
 ## Vehicle IDs observed in the director
 
@@ -79,12 +79,12 @@ Details worth knowing:
 | 64–66 | Boats (incl. White SeeD ship) |
 | 128 | On-foot variant (grouped with 0–9 everywhere) |
 
-The mapping was verified via `World_GetVehicleClearanceRadius` (0x54D9C0: Garden 700 / Ragnarok 528 / cars 256) and `World_GetBoardingMusicTrack` (0x5447A0: 49 → chocobo theme, 50 → Ragnarok theme).
+The mapping was verified via `World_GetVehicleClearanceRadius` (Garden 700 / Ragnarok 528 / cars 256) and `World_GetBoardingMusicTrack` (49 → chocobo theme, 50 → Ragnarok theme).
 
-## Address table
+## Function addresses
 
-| Name | Address | Description |
-|------|---------|-------------|
+| Function | Address | Description |
+|---|---|---|
 | `worldmap_init` | 0x53EFC0 | Module init (viewport + FFWorldInit) |
 | `FFWorldInit` | 0x53F310 | Archive loading, wmset parsing, spawn, streaming warm-up |
 | `FFWorldModule_worldmap_main_loop` | 0x53F0F0 | Module main loop (render shell) |
@@ -97,8 +97,12 @@ The mapping was verified via `World_GetVehicleClearanceRadius` (0x54D9C0: Garden
 | `WM_Encounter_wm123456` | 0x541C80 | Random encounter roll |
 | `World_JumboCactuarEncounter` | 0x54E730 | Jumbo Cactuar special encounter |
 | `World_MusicChanger` | 0x543340 | Area/vehicle music transitions |
-| `World_CountPendingMapSegments` | 0x5531F0 | Streaming: remaining segments around player |
+| `Wmx_UpdateSegmentStreaming` | 0x5531F0 | Streaming: remaining segments around player (renamed from `World_CountPendingMapSegments` in the community IDB) |
 | `Wmset_ParseSections` | 0x542DA0 | wmset section table parsing |
+| `World_UpdateDockingAnimations` | 0x545480 | Advances docking-sequence keyframed objects |
+| `World_GetVehicleClearanceRadius` | 0x54D9C0 | Vehicle clearance radius (Garden/Ragnarok/cars) |
+| `World_GetBoardingMusicTrack` | 0x5447A0 | Boarding music track per vehicle |
+| `world_docking_state` | 0x2036B70 | Docking context struct (global; see script VM page) |
 | `Field_To_World_section9` | 0x548080 | Spawn position from wmset section 9 / savemap |
 | `jumpFromFieldToWorldmap` | 0x522200 | Field-side hand-over before entering the module |
 | `TOWN_BATTLE_SCENE` | 0x203ED2C | Exit-transition flag (all destinations) |

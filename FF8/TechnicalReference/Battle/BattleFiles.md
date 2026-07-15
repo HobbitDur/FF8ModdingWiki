@@ -5,7 +5,7 @@ title: Battle Stages
 permalink: /technical-reference/battle/battle-files/
 ---
 
-Kernel32.dll LoadFile is started at 0x55d323 and 0x55d27b (FF8.EXE). Use below list to observe loaded files and manipulate it if needed. Throughout the code, only thing you'll find is index of below array, so... no names, nothing.
+Kernel32.dll LoadFile is called from two sites inside FF8.EXE; see [Function addresses](#function-addresses). Use below list to observe loaded files and manipulate it if needed. Throughout the code, only thing you'll find is index of below array, so... no names, nothing.
 
 | Index | File Name      |
 |-------|----------------|
@@ -1126,6 +1126,12 @@ Kernel32.dll LoadFile is started at 0x55d323 and 0x55d27b (FF8.EXE). Use below l
 | 1114  | MAG347.X       |
 | 1115  | MAG348.X       |
 | 1116  | MAG349.X       |
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `__write_lk` | 0x55D263 | Contains the two cited `LoadFile` call sites (0x55D323 and 0x55D27B are interior offsets of this function per IDA's current function boundaries; verified IDA function, but the name suggests a CRT write-lock routine rather than a file loader — flagged for further review) |
 
 
 

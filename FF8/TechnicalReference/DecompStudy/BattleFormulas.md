@@ -12,33 +12,33 @@ permalink: /technical-reference/battle/formulas/
 
 Exact integer arithmetic as compiled in the PC executable (function addresses given; image base 0x400000). Where the code differs from commonly circulated formulas, the difference is flagged. Notation: `rand255` = uniform 0..255, `randVar = rand%33 + 240` (the ±6% damage variance factor, applied as `dmg × randVar / 256`).
 
-## Character stats (`Stat_ComputeCharaStat` 0x496440)
+## Character stats (`Stat_ComputeCharaStat`)
 
 Kernel growth curve bytes A, B, C, D per stat; `J_val` = junctioned magic's junction value, `count` = magic quantity (0–100):
 
 * **STR/VIT/MAG/SPR**: `stat = weaponBonus(STR only) + (C + lvl·A/10 + lvl/B − (lvl²/D)/2)/4 + savedBonus + J_val·count/100`, capped 255
 * **SPD/LUCK**: `stat = bonus + lvl·A + lvl/B − lvl/D + savedBonus + J_val·count/100` (no /10, no level², no /4)
-* **Max HP** (0x496310): `HP = savedBonus + C + lvl·A − 10·lvl²/B + hpJ_val·count` — ⚠ the HP junction term has **no /100 divisor**
-* **HIT** (0x4967C0): `weapon.attackParameter + hitJ·count/100`; **EVA** (0x4968A0): `SPD/4 + evaJ·count/100`
+* **Max HP** (`Stat_ComputeCharaMaxHP`): `HP = savedBonus + C + lvl·A − 10·lvl²/B + hpJ_val·count` — ⚠ the HP junction term has **no /100 divisor**
+* **HIT** (`Stat_ComputeCharaHit`): `weapon.attackParameter + hitJ·count/100`; **EVA** (`Stat_ComputeCharaEva`): `SPD/4 + evaJ·count/100`
 * All stats are then scaled by the Stat+X% ability multiplier (`× mult/100`, base 100); HP caps at 9999.
 
-## Monster stats (0x48C1C0 / 0x48C3F0 / 0x48C500)
+## Monster stats (`Stat_ComputeMonsterStats` / `Stat_ComputeMonsterStatCurve` / `Stat_ComputeMonsterMaxHP`)
 
 From the .dat info_stat 4-byte curves: **STR/MAG** `= (C + lvl·A/10 + lvl/B − (lvl²/D)/2)/4`; **VIT/SPR/SPD/EVA** `= C + lvl·A + lvl/B − lvl/D`; each is then scaled by the AI-controllable stat variable (`× var/10`), capped 255. **HP** `= HP1·lvl²/20 + (HP1 + 100·HP3)·lvl + 10·HP2 + 1000·HP4`.
 
-## Physical damage (`Damage_ComputePhysicalCore` 0x492C40)
+## Physical damage (`Damage_ComputePhysicalCore`)
 
 ```
 dmg = [ P × ((265 − VIT) × (STR + STR²/16) / 256) / 16 ] × randVar / 256
 ```
 
-Vit 0 sets VIT = 0. Hit roll (0x492BA0): `255×(HIT + LUCK_atk/2 − EVA_tgt − LUCK_tgt)/100 ≥ rand255` (attacker Darkness quarters HIT); Sleep/Stop on target or accuracy 255 = auto-hit. Crit roll (0x492B30): `LUCK + critBonus ≥ rand255` → damage ×2. Modifiers (0x48F600): Protect ÷2, back attack ×2, zombie target ÷2; attack element: `dmg += dmg × elem% × (800 − elemDef)/10000`.
+Vit 0 sets VIT = 0. Hit roll (`Damage_RollPhysicalHit`): `255×(HIT + LUCK_atk/2 − EVA_tgt − LUCK_tgt)/100 ≥ rand255` (attacker Darkness quarters HIT); Sleep/Stop on target or accuracy 255 = auto-hit. Crit roll (`Damage_RollCrit`): `LUCK + critBonus ≥ rand255` → damage ×2. Modifiers (`Damage_ApplyPhysicalModifiers`): Protect ÷2, back attack ×2, zombie target ÷2; attack element: `dmg += dmg × elem% × (800 − elemDef)/10000`.
 
-⚠ **Defend fully nullifies physical damage** (returns 0, *not* a ÷2). Every physical attack type is gated before the formula: the dispatcher (0x4922B0, cases Attack / %-physical / Renzokuken finisher) and the built-in-roll variant (`Damage_ComputePhysicalWithHitCritRoll` 0x492E10, Everyone's Grudge / ignore-VIT) both bail out with `return 0` if the target has **Defend** (status_2 bit 19), **Invincible**, **Immune Physical attack** (status_2 bit 20), or **Petrify** (status_1). It is the same immunity gate for all four statuses — Defend behaves identically to Immune-Physical/Invincible here — and only the "ignore immunity" hit flag (`STATUS2_LINK_DRAIN_MAYBE_IGNORE_IMMUNITY`) bypasses it. Defend does **not** protect against magic/GF, where it only halves — see below.
+⚠ **Defend fully nullifies physical damage** (returns 0, *not* a ÷2). Every physical attack type is gated before the formula: the dispatcher (`Damage_DispatchByAttackType`, cases Attack / %-physical / Renzokuken finisher) and the built-in-roll variant (`Damage_ComputePhysicalWithHitCritRoll`, Everyone's Grudge / ignore-VIT) both bail out with `return 0` if the target has **Defend** (status_2 bit 19), **Invincible**, **Immune Physical attack** (status_2 bit 20), or **Petrify** (status_1). It is the same immunity gate for all four statuses — Defend behaves identically to Immune-Physical/Invincible here — and only the "ignore immunity" hit flag (`STATUS2_LINK_DRAIN_MAYBE_IGNORE_IMMUNITY`) bypasses it. Defend does **not** protect against magic/GF, where it only halves — see below.
 
-**Gunblade** (0x48F480): `dmg = [(CRIT_BONUS/20 + 2) × 4·P × ((265−VIT)×(STR + STR²/16)/256) / 128] × randVar/256`; the trigger gives a flat ×1.5-style boost via that leading term and **no crit roll happens**.
+**Gunblade** (`Damage_ComputeGunblade`): `dmg = [(CRIT_BONUS/20 + 2) × 4·P × ((265−VIT)×(STR + STR²/16)/256) / 128] × randVar/256`; the trigger gives a flat ×1.5-style boost via that leading term and **no crit roll happens**.
 
-## Magic damage (`Damage_ComputeMagicAndGF` 0x491AD0)
+## Magic damage (`Damage_ComputeMagicAndGF`)
 
 ```
 dmg = [ P × ((265 − SPR) × (P + MAG) / 4) / 256 ] × randVar / 256
@@ -56,9 +56,9 @@ dmg = [ (SumMag+100)/100 × Boost/100 × P × ((265−SPR) × (LvlMod·GFLvl/10 
 
 ## Healing
 
-Cure line (0x493280): `heal = P × randVar × ((P + MAG)/2) / 256`. Item in battle: `50 × P`. White Wind: caster's `maxHP − curHP`. Revive: target `maxHP/8` (from item Med data: `maxHP/4`). Angelo Recover: `P × maxHP/16`.
+Cure line (`Damage_ComputeCurativeMagic`): `heal = P × randVar × ((P + MAG)/2) / 256`. Item in battle: `50 × P`. White Wind: caster's `maxHP − curHP`. Revive: target `maxHP/8` (from item Med data: `maxHP/4`). Angelo Recover: `P × maxHP/16`.
 
-## Status attacks (`Battle_ApplyStatusWithResistRoll` 0x48F9F0)
+## Status attacks (`Battle_ApplyStatusWithResistRoll`)
 
 `chance = accuracy + atkStat/4 − tgtStat/4 − mentalResist` (must be > 0; resist ≥ 100 = immune). Accuracy < 250: succeed when `255·chance/100 ≥ rand255`; accuracy 250–254: automatic unless resist zeroes it; accuracy 255: **bypasses the resist check entirely** (rarely documented).
 
@@ -89,16 +89,16 @@ Cure line (0x493280): `heal = P × randVar × ((P + MAG)/2) / 256`. Item in batt
 5. Crit chance is exactly `(LUCK + bonus)/256` — the compiled `255·x/255` is a no-op.
 6. Status accuracy 250–254 vs 255 behave differently (auto-success vs full resist bypass).
 
-Key functions: `Damage_DispatchByAttackType` 0x4922B0 · `Damage_ComputePhysicalWithHitCritRoll` 0x492E10 · `Damage_ApplyPhysicalModifiers` 0x48F600 · `Battle_RollDropItem` 0x486650 · `Battle_RollMugItem` 0x4867C0 · `Battle_ComputeDrawQuantity` 0x48FD20 · `Battle_RollCardCommand` 0x48FBA0 · `Battle_ComputeExpDistribution` 0x494D40 · `Stat_RefreshCharaBattleStats` 0x495960.
+Key functions: `Damage_DispatchByAttackType` · `Damage_ComputePhysicalWithHitCritRoll` · `Damage_ApplyPhysicalModifiers` · `Battle_RollDropItem` · `Battle_RollMugItem` · `Battle_ComputeDrawQuantity` · `Battle_RollCardCommand` · `Battle_ComputeExpDistribution` · `Stat_RefreshCharaBattleStats`.
 
 ## Two ID spaces: command type vs attack type
 
 An action carries two independent IDs, easy to confuse:
 
-* **Command type** (`commandType`, byte +1 of each [`BattleTask68Data`]({{ site.baseurl }}/technical-reference/battle/tasks-effects/) action slot; the live copy is `CURRENT_COMMAND_TYPE_ID` at 0x1D27AD9). This is the *command* — Attack, Magic, GF, Item, Mug, Darkside, and the synthetic gunblade/Renzokuken variants. It selects animation, on-hit text and recoil behaviour, **not** the damage formula. (This field was mislabelled `commandTypeWIthGunblade` in an earlier pass — it holds the plain command type; the gunblade logic only *reads* it.)
-* **Attack type** (`p_attack_type`, from the kernel Attack Type field of the magic/ability). This is what `Damage_DispatchByAttackType` (0x4922B0) switches on to pick the damage formula.
+* **Command type** (`commandType`, byte +1 of each [`BattleTask68Data`]({{ site.baseurl }}/technical-reference/battle/tasks-effects/) action slot; the live copy is `CURRENT_COMMAND_TYPE_ID`). This is the *command* — Attack, Magic, GF, Item, Mug, Darkside, and the synthetic gunblade/Renzokuken variants. It selects animation, on-hit text and recoil behaviour, **not** the damage formula. (This field was mislabelled `commandTypeWIthGunblade` in an earlier pass — it holds the plain command type; the gunblade logic only *reads* it.)
+* **Attack type** (`p_attack_type`, from the kernel Attack Type field of the magic/ability). This is what `Damage_DispatchByAttackType` switches on to pick the damage formula.
 
-### Attack-type → formula dispatch (`Damage_DispatchByAttackType`, 0x4922B0)
+### Attack-type → formula dispatch (`Damage_DispatchByAttackType`)
 
 | Attack type | Damage function | Notes |
 |-------------|-----------------|-------|
@@ -132,7 +132,7 @@ Before the switch, sleep/confusion are cleared on the target (unless the attack 
 
 ### The command-type ID space (complete)
 
-`Battle_applyDamage` (0x48FE20) dispatches on `commandType` twice via two-level jump tables (`cmp id, 0xFE; ja default`): stage 1 (0x48FF2F, damage-formula fields) through `BATTLE_COMMAND_SWITCH_REMAP1` (0x491250), stage 2 (0x49043B, semantic handler) through `BATTLE_COMMAND_SWITCH_REMAP2` (0x4913B8). The IDs fall into two disjoint bands.
+`Battle_applyDamage` dispatches on `commandType` twice via two-level jump tables (`cmp id, 0xFE; ja default`): stage 1 (damage-formula fields) through `BATTLE_COMMAND_SWITCH_REMAP1`, stage 2 (semantic handler) through `BATTLE_COMMAND_SWITCH_REMAP2`. The IDs fall into two disjoint bands.
 
 **Real kernel battle commands (0x00–0x26)** — indices into the kernel battle-command ability list:
 
@@ -172,4 +172,38 @@ Before the switch, sleep/confusion are cleared on the target (unless the attack 
 | 0xFD | Gunblade on-hit (Attack + trigger) | Squall |
 | 0xFE | G-Force (GF summon) | GF |
 
-The gunblade variants (0xF3/0xF8/0xFD) and the Renzokuken launch pair (0x05/0xFA) collapse to shared handlers in stage 2; the gunblade forms are produced by `Battle_ApplyGunbladeTriggerHit` (0x485160) from the base command in `commandType`. `computeDamageEndOfAction` (0x484180) then queues Darkside's self-damage recoil after a Darkside hit (0x1C or its gunblade form 0xF3) via the internal command 0 — the same path as the poison end-of-turn tick.
+The gunblade variants (0xF3/0xF8/0xFD) and the Renzokuken launch pair (0x05/0xFA) collapse to shared handlers in stage 2; the gunblade forms are produced by `Battle_ApplyGunbladeTriggerHit` from the base command in `commandType`. `computeDamageEndOfAction` then queues Darkside's self-damage recoil after a Darkside hit (0x1C or its gunblade form 0xF3) via the internal command 0 — the same path as the poison end-of-turn tick.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `Stat_ComputeCharaStat` | 0x496440 | Character STR/VIT/MAG/SPR/SPD/LUCK stat formula |
+| `Stat_ComputeCharaMaxHP` | 0x496310 | Character max HP formula |
+| `Stat_ComputeCharaHit` | 0x4967C0 | Character HIT stat formula |
+| `Stat_ComputeCharaEva` | 0x4968A0 | Character EVA stat formula |
+| `Stat_ComputeMonsterStats` | 0x48C1C0 | Monster battle-stat curve dispatch/scaling |
+| `Stat_ComputeMonsterStatCurve` | 0x48C3F0 | Monster STR/MAG/VIT/SPR/SPD/EVA curve |
+| `Stat_ComputeMonsterMaxHP` | 0x48C500 | Monster max HP formula |
+| `Damage_ComputePhysicalCore` | 0x492C40 | Base physical damage formula |
+| `Damage_RollPhysicalHit` | 0x492BA0 | Physical hit-chance roll |
+| `Damage_RollCrit` | 0x492B30 | Critical-hit roll |
+| `Damage_ApplyPhysicalModifiers` | 0x48F600 | Protect/back-attack/zombie/element modifiers |
+| `Damage_DispatchByAttackType` | 0x4922B0 | Attack Type → damage formula dispatcher |
+| `Damage_ComputePhysicalWithHitCritRoll` | 0x492E10 | Physical damage variant with built-in hit/crit roll |
+| `Damage_ComputeGunblade` | 0x48F480 | Squall gunblade-trigger damage formula |
+| `Damage_ComputeMagicAndGF` | 0x491AD0 | Magic and GF damage formula |
+| `Damage_ComputeCurativeMagic` | 0x493280 | Curative magic (Cure line) healing formula |
+| `Battle_ApplyStatusWithResistRoll` | 0x48F9F0 | Status-attack accuracy/resist roll |
+| `Battle_RollDropItem` | 0x486650 | Item drop roll |
+| `Battle_RollMugItem` | 0x4867C0 | Mug item roll |
+| `Battle_ComputeDrawQuantity` | 0x48FD20 | Draw quantity formula |
+| `Battle_RollCardCommand` | 0x48FBA0 | Card command capture roll |
+| `Battle_ComputeExpDistribution` | 0x494D40 | EXP distribution formula |
+| `Stat_RefreshCharaBattleStats` | 0x495960 | Recomputes battle stats from base + junction |
+| `Battle_applyDamage` | 0x48FE20 | Command-type dispatcher (stage 1/2 jump tables) |
+| `BATTLE_COMMAND_SWITCH_REMAP1` | 0x491250 | Global variable/data, not a function — stage-1 jump table |
+| `BATTLE_COMMAND_SWITCH_REMAP2` | 0x4913B8 | Global variable/data, not a function — stage-2 jump table |
+| `Battle_ApplyGunbladeTriggerHit` | 0x485160 | Produces gunblade pseudo-command IDs |
+| `computeDamageEndOfAction` | 0x484180 | Queues Darkside recoil / end-of-action damage |
+| `CURRENT_COMMAND_TYPE_ID` | 0x1D27AD9 | Global variable/data, not a function — live command-type slot |

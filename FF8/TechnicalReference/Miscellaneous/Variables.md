@@ -11,12 +11,12 @@ Game variables can be accessed using the PSHM family of script functions, and ca
 on the size of the variable. The variables are all stored in save files, with the save block starting at address 0xD10 on uncompressed PC saves. The parameter
 to access a variable in the game scripts is basically the offset from this point in the variable block. For example, getting main story progress (word 256,
 which is word 0x100 in hex) just gets the two bytes starting at address 0xD10 + 0x100 = 0xE10. The varmap is continuous in memory while the game is running as
-well. In the en-US version of the original and SE releases (and likely most other versions), the varblock begins at 0x1cfe9b8. You can use
+well. In the en-US version of the original and SE releases (and likely most other versions), the varblock begins at the address given for `VARMAP_START` below. You can use
 this [Cheat Engine Table](https://www.mediafire.com/?ucolf65ewq1yoty) to track them as you play.
 
 Items in grey are unused by field scripts (some of them may be used in battle scripts).
 
-> **IDA verification (FF8_EN.exe).** The variable block is the global `VARMAP_START` at `0x1cfe9b8` (typed as the packed struct `SavemapVariables`). The
+> **IDA verification (FF8_EN.exe).** The variable block is the global `VARMAP_START` (typed as the packed struct `SavemapVariables`). The
 > `SCRIPT_PSHM_*` / `SCRIPT_POPM_*` opcode handlers read/write `*(&VARMAP_START + var_number)`, which confirms that **the "Var Number" in this table is exactly the
 > byte offset into the block** — variable N lives at offset N. Rows annotated with a function name / address below have been verified against engine code; most of
 > the remaining entries are used only by field or battle scripts and are not touched by the EXE, so they cannot be verified from the binary.
@@ -30,7 +30,7 @@ Items in grey are unused by field scripts (some of them may be used in battle sc
 | Long        | 4           | Steps (used to generate random encounters)                                                                                                                                                                                                                                                                                 |
 | Long        | 8           | Payslip                                                                                                                                                                                                                                                                                                                    |
 | Byte        | 12-15       | unused in fields                                                                                                                                                                                                                                                                                                           |
-| Signed Word | 16          | SeeD rank points. The SeeD rank shown in the menu = `clamp(points, 100, 3100) / 100` (rank 1–31), computed by `GetSeeDRankFromPoints` (0x4C3090).                                                                                                                                                                            |
+| Signed Word | 16          | SeeD rank points. The SeeD rank shown in the menu = `clamp(points, 100, 3100) / 100` (rank 1–31), computed by `GetSeeDRankFromPoints`.                                                                                                                                                                            |
 | Byte        | 18-19       | unused in fields                                                                                                                                                                                                                                                                                                           |
 | Long        | 20          | Battles won. (Fun fact: this affects the basketball shot in Trabia.)                                                                                                                                                                                                                                                       |
 | Byte        | 24-25       | unused in fields                                                                                                                                                                                                                                                                                                           |
@@ -62,22 +62,22 @@ Items in grey are unused by field scripts (some of them may be used in battle sc
 | Signed Byte | 88          | Built-in engine variable. Used exclusively on save points. Never written to with field scripts. Related to Siren's Move-Find ability.                                                                                                                                                                                      |
 | Byte        | 89-103      | unused in fields                                                                                                                                                                                                                                                                                                           |
 | Long        | 104         | Seems related to SALARYDISPON/SALARYON/MUSICLOAD/PHSPOWER opcodes                                                                                                                                                                                                                                                          |
-| Long        | 108         | Music related. Used for battle music retention: a value of `-1` means "no field BGM to carry over", which makes the engine stop music after the fight (checked by `Battle_KeepMusicAfterBattle`, 0x52CE30).                                                                                                                  |
+| Long        | 108         | Music related. Used for battle music retention: a value of `-1` means "no field BGM to carry over", which makes the engine stop music after the fight (checked by `Battle_KeepMusicAfterBattle`).                                                                                                                  |
 | Long        | 112         | unused in fields                                                                                                                                                                                                                                                                                                           |
 | Byte        | 116-147     | Draw points in field                                                                                                                                                                                                                                                                                                       |
 | Byte        | 148-179     | Draw points in worldmap                                                                                                                                                                                                                                                                                                    |
 | Byte        | 180-243     | Unused in fields. This region holds engine-only display/timer state rather than script variables: on-screen timer visibility (182) and X/Y position (205/206), a battle-disable flag (207), a "can save here" flag (209), and a battle-music A/B toggle (~201/203, toggled by `Battle_KeepMusicAfterBattle`).               |
 | Byte        | 244-255     | Not investigated. **Note:** the worldmap-variant descriptions historically listed here (as 244–247) actually belong to offsets **264–267** — see below. These 12 bytes are `unk5` in the struct and their purpose is unverified.                                                                                            |
-| Word        | 256         | Main Story quest progress. Both bytes are also copied into the worldmap state block (`+110`/`+111`) by `Wmset_SetupWorldmapVariant` (0x544860), so the worldmap appearance can depend on story progress.                                                                                                                     |
+| Word        | 256         | Main Story quest progress. Both bytes are also copied into the worldmap state block (`+110`/`+111`) by `World_BuildObjectInstanceList` (renamed from `Wmset_SetupWorldmapVariant` in the community IDB), so the worldmap appearance can depend on story progress.                                                                                                                     |
 | Byte        | 258         | not investigated                                                                                                                                                                                                                                                                                                           |
 | Byte        | 259-260     | unused in fields                                                                                                                                                                                                                                                                                                           |
 | Byte        | 261         | not investigated                                                                                                                                                                                                                                                                                                           |
 | Byte        | 262-263     | unused in fields                                                                                                                                                                                                                                                                                                           |
-| Byte        | 264         | **Worldmap variant extra flags.** Bit 3 (normal path) or bit 4 (Disc 4 path) OR-ins bit 6 (`0x40`) into the `word_2036BB6` worldmap variant bitmask. Likely the Balamb Garden mobile/stationary toggle. Read by `Wmset_SetupWorldmapVariant` (0x544860).                                                                     |
-| Byte        | 265         | **Worldmap variant state.** Copied into the worldmap state block (`+103`) by `Wmset_SetupWorldmapVariant`. Purpose not yet verified.                                                                                                                                                                                        |
-| Byte        | 266         | **Worldmap variant index** (previously guessed "World map version? 3=Esthar"). Bits 0-4 select the base tile-variant bitmask via a 5-case switch: `0→0x011D`, `1→0x010D`, `2→0x0101`, `3→0x0100`, `4→0x0180`. Each bit corresponds to one entry in the trigger-rect table at `.rdata:0xC763D2`/`0xC763EE` that overrides grid segments (0-767) with alternate segments (768-834). |
+| Byte        | 264         | **Worldmap variant extra flags.** Bit 3 (normal path) or bit 4 (Disc 4 path) OR-ins bit 6 (`0x40`) into the `word_2036BB6` worldmap variant bitmask. Likely the Balamb Garden mobile/stationary toggle. Read by `World_BuildObjectInstanceList`.                                                                     |
+| Byte        | 265         | **Worldmap variant state.** Copied into the worldmap state block (`+103`) by `World_BuildObjectInstanceList`. Purpose not yet verified.                                                                                                                                                                                        |
+| Byte        | 266         | **Worldmap variant index** (previously guessed "World map version? 3=Esthar"). Bits 0-4 select the base tile-variant bitmask via a 5-case switch: `0→0x011D`, `1→0x010D`, `2→0x0101`, `3→0x0100`, `4→0x0180`. Each bit corresponds to one entry in the trigger-rect table (see address table below) that overrides grid segments (0-767) with alternate segments (768-834). |
 | Byte        | 267         | **Disc 4 worldmap sub-variant.** Bits 0-1 select among three Disc 4 bitmasks (`0x003E`, `0x023E`, `0x003F`). Only used when the Disc 4 code path is active (`dword_203FD60 != 0`).                                                                                                                                          |
-| Byte        | 268-271     | Worldmap variant state bytes, copied into the worldmap state block (`+106`…`+109`) by `Wmset_SetupWorldmapVariant`. Not yet individually investigated.                                                                                                                                                                       |
+| Byte        | 268-271     | Worldmap variant state bytes, copied into the worldmap state block (`+106`…`+109`) by `World_BuildObjectInstanceList`. Not yet individually investigated.                                                                                                                                                                       |
 | Byte        | 272-299     | SO MANY F\*\*\*ING CARD GAME VARIABLES (292 = current card game rules, 293 = current card trade rule)                                                                                                                                                                                                                       |
 | Byte        | 300         | Card Queen re-cards.                                                                                                                                                                                                                                                                                                       |
 | Byte        | 301-303     | unused in fields                                                                                                                                                                                                                                                                                                           |
@@ -227,7 +227,7 @@ operand **is the byte offset** (= variable number):
 | 16 | `PSHSM_B` | read (s8) | 17 | `PSHSM_W` | read (s16) |
 | 18 | `PSHSM_L` | read (s32) |    |          |        |
 
-(Opcode numbers verified from the interpreter dispatch table `funcs_52A647` at `0xb8de94`; the JSM code array begins at file offset `u16@6`.) A variable that appears
+(Opcode numbers verified from the interpreter dispatch table `funcs_52A647` (see address table below); the JSM code array begins at file offset `u16@6`.) A variable that appears
 here is genuinely used by field scripts; one that is absent (e.g. everything in the 410–431, 461–473, 494–527, 540–591 "unused" gaps) is **not** touched by any field
 script, which is a strong independent confirmation of the "unused in fields" rows above.
 
@@ -248,11 +248,11 @@ A few results worth calling out:
 ### Who accesses the variable block
 
 The block is shared savemap state. Besides the field scripts (`*.jsm`) scanned above, it is read/written by several other EXE modules — there is **no separate
-scripting language** for it apart from the field JSM. The consumers found in the binary (via the `VAR_MAP_ADDRESS` pointer at `0xb8ee90`) are:
+scripting language** for it apart from the field JSM. The consumers found in the binary (via the `VAR_MAP_ADDRESS` pointer) are:
 
 - **Field script-command handlers** — the `SCRIPT_*` engine functions behind field opcodes (e.g. `SCRIPT_ADDGIL`, `SCRIPT_CARDGAME`, `SCRIPT_DRAWPOINT`, `SCRIPT_JOIN`/`SCRIPT_SPLIT`, `SCRIPT_JUNCTION`, `SCRIPT_SEALEDOFF`, `SCRIPT_ADDSEEDLEVEL`) read/write vars on a script's behalf.
 - **Field per-frame update** (`sub_529FF0`) and **world-map per-frame update** (`sub_6519D0`, via `FFWorldDirector`) — both tick Steps, SeeD pay, SeeD rank, walking HP-regen and Angelo points directly in the block.
-- **World-map module** — `FFWorldInit`, `jumpFromFieldToWorldmap` / `jumpFromWorldmapToField`, `Wmset_SetupWorldmapVariant`, `World_MusicChanger` (worldmap variant, field↔worldmap transitions, music).
+- **World-map module** — `FFWorldInit`, `jumpFromFieldToWorldmap` / `jumpFromWorldmapToField`, `World_BuildObjectInstanceList`, `World_MusicChanger` (worldmap variant, field↔worldmap transitions, music).
 - **Battle module** — reads a few entries (e.g. `Battle_KeepMusicAfterBattle` for music retention); battle *results* (kills, deaths, gil, battles-won) are written back to the block after combat.
 - **Menu / save-data code** and **new-game init** (`newgame_startgame`) — display values (gil, SeeD rank) and set the block's starting state.
 
@@ -532,7 +532,7 @@ values such as vars 350–357 / 380 / 443, which the special-battle setup reads 
 
 # Struct (IDA `SavemapVariables`)
 
-This is the layout applied to `VARMAP_START` (`0x1cfe9b8`) in the FF8_EN.exe database. It is a **packed** struct (no padding), so every field's offset equals its
+This is the layout applied to `VARMAP_START` in the FF8_EN.exe database. It is a **packed** struct (no padding), so every field's offset equals its
 variable number in the table above. `MapSeal`, `VarMiscFlag` and `SomeVarFlag` are the game's own enum types; `unused*`/`unk*`/`notInvestigated*` bytes are gaps.
 
 ```c
@@ -724,3 +724,15 @@ struct SavemapVariables
 };
 #pragma pack(pop)
 ```
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `VARMAP_START` | 0x1cfe9b8 | Global variable/data, not a function — base of the savemap variable block, typed `SavemapVariables` |
+| `GetSeeDRankFromPoints` | 0x4C3090 | Converts SeeD rank points to displayed rank |
+| `Battle_KeepMusicAfterBattle` | 0x52CE30 | Reads var 108 to decide whether to carry over field BGM after battle |
+| `World_BuildObjectInstanceList` | 0x544860 | Renamed from `Wmset_SetupWorldmapVariant` in the community IDB; copies worldmap-variant vars into the worldmap state block |
+| `funcs_52A647` | 0xb8de94 | Global variable/data, not a function — field script interpreter opcode dispatch table |
+| `VAR_MAP_ADDRESS` | 0xb8ee90 | Global variable/data, not a function — pointer to the savemap variable block, used by non-script EXE consumers |
+| Trigger-rect table | 0xC763D2 / 0xC763EE | Global variable/data, not a function — per-variant table overriding worldmap grid segments (0-767) with alternates (768-834) |

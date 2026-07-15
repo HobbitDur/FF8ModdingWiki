@@ -31,4 +31,10 @@ Reads this entity's current position and orientation into its temp variables (I 
 
 (I[3] is left untouched.) No stack use. Temp variables can be accessed with `PSHI_L`.
 
-PC handler: `SCRIPT_GETINFO` at 0x51EE30.
+PC handler: `SCRIPT_GETINFO`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_GETINFO` | 0x51EE30 | Field script opcode handler (verified IDA function) |

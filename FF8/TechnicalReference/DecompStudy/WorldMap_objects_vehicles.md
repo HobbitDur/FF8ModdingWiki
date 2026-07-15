@@ -14,7 +14,7 @@ Runtime companion to the [module runtime]({{ site.baseurl }}/technical-reference
 
 ## Object instance table
 
-Every visible world object is an entry in `world_object_instances` (0x20426C0, up to 64 entries of 40 bytes, count in `world_object_count`). The table is rebuilt on world load by `World_BuildObjectInstanceList` from the wmset spawn script (opcodes FF13/FF14) plus savemap state.
+Every visible world object is an entry in `world_object_instances` (up to 64 entries of 40 bytes, count in `world_object_count`). The table is rebuilt on world load by `World_BuildObjectInstanceList` from the wmset spawn script (opcodes FF13/FF14) plus savemap state.
 
 | Offset | Type | Meaning |
 |--------|------|---------|
@@ -30,7 +30,7 @@ Every visible world object is an entry in `world_object_instances` (0x20426C0, u
 | 0x1C | s16×3 | camera-relative render position |
 | 0x24 | u8 | visible (on-screen this frame; tested by script FF17) |
 
-A secondary 4-entry table (`world_extra_object_instances`, 0xC76588) uses the same layout. Reserved slot indexes (0xC76640–0xC7665C) track the player, two ships, Balamb Garden, the rental car, both Ragnarok instances, and a **Jumbo Cactuar object that only spawns while GF Cactuar is not owned**.
+A secondary 4-entry table (`world_extra_object_instances`) uses the same layout. Reserved slot indexes (0xC76640–0xC7665C) track the player, two ships, Balamb Garden, the rental car, both Ragnarok instances, and a **Jumbo Cactuar object that only spawns while GF Cactuar is not owned**.
 
 Per frame, `World_UpdateAndPlaceEntityModels` recomputes in-range flags and relative positions (with map wrap-around), applies anim-mode rotations, projects objects on the walkmesh, and draws (`World_DrawObjectShadow` adds the 2-quad projected shadow). `World_FindTouchedObject` scans for collision and facing (`world_touched_object_idx` / `world_facing_object_idx` — consumed by script conditions FF1A–FF1D).
 
@@ -50,21 +50,36 @@ Verified vehicle id mapping (see the module-runtime page table): 0–9/128 on fo
 
 `FFWorldInit` sets up double-buffered PSX-style draw/display environments and ordering tables (`World_InitRenderBuffers`), pre-built primitive pools for terrain polys, particles (64+64 slots), ground decals and the sky (gouraud gradient + sun/moon billboards on tpage 45). Per frame: `World_SelectSkyFogParams` (Ragnarok-airborne preset vs default), `World_DrawSkyAndHorizon` (camera-yaw-scrolled sky quads), `World_SpawnVehicleTerrainEffects` (dust/spray/wake/splash per ground type), `World_UpdateAndRenderGroundDecals` (48-byte trail entries projected on the walkmesh).
 
-## Address table
+## Function addresses
 
-| Function | Address | | Function | Address |
-|----------|---------|-|----------|---------|
-| `World_BuildObjectInstanceList` | 0x544860 | | `World_UpdateVehicleSteeringAndCamera` | 0x557A90 |
-| `World_SpawnObjectInstance` | 0x545280 | | `World_ComputeVehicleAltitude` | 0x53ECE0 |
-| `World_UpdateAndPlaceEntityModels` | 0x5472C0 | | `World_HandleVehicleBoardingInput` | 0x54A7F0 |
-| `World_FindTouchedObject` | 0x548CD0 | | `World_UpdateDockingTransitions` | 0x54B460 |
-| `World_DrawObjectShadow` | 0x54C6C0 | | `World_FindDismountPosition` | 0x53E7A0 |
-| `Wm_ModelIdToVehicleCode` | 0x546F90 | | `World_UpdateCarFuelConsumption` | 0x54FDA0 |
-| `Wm_VehicleCodeToModelId` | 0x546E10 | | `World_InitTrainLines` | 0x545330 |
-| `World_RestoreParkedVehiclePositions` | 0x54D6A0 | | `World_MoveTrainCarAlongTrack` | 0x545B20 |
-| `World_SaveWorldStateToSavemap` | 0x549E80 | | `World_UpdateTrainStationBoarding` | 0x5484B0 |
-| `World_PlacePlayerAtWarpPoint` | 0x548AF0 | | `World_ChocoboPathfindStateMachine` | 0x54DCF0 |
-| `World_GetVehicleClearanceRadius` | 0x54D9C0 | | `World_UpdateFollowerTrail` | 0x54DAD0 |
-| `World_GetBoardingMusicTrack` | 0x5447A0 | | `World_SpawnVehicleTerrainEffects` | 0x550070 |
-| `Wm_MsgWindow_Show/ShowAsk/Close` | 0x543790/0x5438D0/0x543A40 | | `World_UpdateFullMapScreen` | 0x543CB0 |
-| `world_object_instances` | 0x20426C0 | | `world_msg_windows[13]` | 0xC761A0 |
+| Function | Address | Description |
+|---|---|---|
+| `World_BuildObjectInstanceList` | 0x544860 | Rebuilds the object instance table on world load |
+| `World_SpawnObjectInstance` | 0x545280 | Adds one entry to the object instance table |
+| `World_UpdateAndPlaceEntityModels` | 0x5472C0 | Per-frame in-range/position/anim update and draw |
+| `World_FindTouchedObject` | 0x548CD0 | Collision/facing scan for touch and script conditions |
+| `World_DrawObjectShadow` | 0x54C6C0 | Draws the 2-quad projected object shadow |
+| `Wm_ModelIdToVehicleCode` | 0x546F90 | wmset model id to vehicle code |
+| `Wm_VehicleCodeToModelId` | 0x546E10 | Vehicle code to wmset model id |
+| `World_RestoreParkedVehiclePositions` | 0x54D6A0 | Restores parked vehicle positions on load |
+| `World_SaveWorldStateToSavemap` | 0x549E80 | Saves world object/vehicle state to the savemap |
+| `World_PlacePlayerAtWarpPoint` | 0x548AF0 | Places the player at a warp point |
+| `World_GetVehicleClearanceRadius` | 0x54D9C0 | Vehicle clearance radius (Garden/Ragnarok/cars) |
+| `World_GetBoardingMusicTrack` | 0x5447A0 | Boarding music track per vehicle |
+| `Wm_MsgWindow_Show/ShowAsk/Close` | 0x543790/0x5438D0/0x543A40 | World message-window open/ask/close |
+| `world_object_instances` | 0x20426C0 | Object instance table (global) |
+| `World_UpdateVehicleSteeringAndCamera` | 0x557A90 | Per-frame heading/velocity/chase-camera update |
+| `World_ComputeVehicleAltitude` | 0x53ECE0 | Ground/hover/flight altitude per vehicle class |
+| `World_HandleVehicleBoardingInput` | 0x54A7F0 | Board/disembark input handling |
+| `World_UpdateDockingTransitions` | 0x54B460 | Docking state machine |
+| `World_FindDismountPosition` | 0x53E7A0 | Probes for a walkable dismount spot |
+| `World_UpdateCarFuelConsumption` | 0x54FDA0 | Car fuel decrement and display |
+| `World_InitTrainLines` | 0x545330 | Builds train line structs from track blocks |
+| `World_MoveTrainCarAlongTrack` | 0x545B20 | Moves a train car along its track |
+| `World_UpdateTrainStationBoarding` | 0x5484B0 | Train station boarding sequence |
+| `World_ChocoboPathfindStateMachine` | 0x54DCF0 | Chocobo auto-run pathfinding |
+| `World_UpdateFollowerTrail` | 0x54DAD0 | Chicobo follower trail replay |
+| `World_SpawnVehicleTerrainEffects` | 0x550070 | Dust/spray/wake/splash per ground type |
+| `World_UpdateFullMapScreen` | 0x543CB0 | Fullscreen map rendering |
+| `world_extra_object_instances` | 0xC76588 | Secondary 4-entry object table (global) |
+| `world_msg_windows[13]` | 0xC761A0 | World message-window slot array (global) |

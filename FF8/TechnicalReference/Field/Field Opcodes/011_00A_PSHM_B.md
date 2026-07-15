@@ -22,4 +22,10 @@ Byte offset into the savemap field-variable block (`VARMAP_START`), i.e. a savem
 
 Push the unsigned byte stored at variable offset **Argument** onto the stack. Returns 2.
 
-PC handler: `SCRIPT_PSHM_B` at 0x51CAF0.
+PC handler: `SCRIPT_PSHM_B`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_PSHM_B` | 0x51CAF0 | Field script opcode handler (verified IDA function) |

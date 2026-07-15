@@ -92,7 +92,7 @@ Starts at \~0x5d4 (see How the engine handles this file?). \[.text:00509820\]
 
 #### Camera Setting
 
-This 24-byte block is not a fixed structure: it is **byte-code** executed every frame by the shared battle animation-sequence VM (`computeAnimationSequence`, `0x50DB40` — the same interpreter used by [monster animation sequences](../model-sections/animation-sequences/) and [camera sequences](../model-sections/camera-sequence/)). `BS_UpdateCameraSequence` (`0x509610`) runs it with the camera opcode handlers (opcodes `< 0xC0` are camera actions dispatched by `a2ParamAnimSeqForCamera` at `0x509810`; `0xC0`+ are the generic VM control/arithmetic opcodes).
+This 24-byte block is not a fixed structure: it is **byte-code** executed every frame by the shared battle animation-sequence VM (`computeAnimationSequence` — the same interpreter used by [monster animation sequences](../model-sections/animation-sequences/) and [camera sequences](../model-sections/camera-sequence/)). `BS_UpdateCameraSequence` runs it with the camera opcode handlers (opcodes `< 0xC0` are camera actions dispatched by `CameraSeq_DispatchActionOpcode` (renamed from `a2ParamAnimSeqForCamera`); `0xC0`+ are the generic VM control/arithmetic opcodes). See [Function addresses](#function-addresses).
 
 This script drives the battle-intro camera. Stage scripts typically start with camera opcode `05 00` = "play the camera animation whose ID is read from camera variable 0" — and variable 0 is filled at battle load with the encounter's [camera data byte from scene.out](../battle-structure-sceneout/#camera-data). This is how each encounter picks its intro camera animation out of the stage's collection below.
 
@@ -109,7 +109,7 @@ Example — `a0stg000.x` camera setting bytes: `05 00 C3 10 E5 7F C1 00 CB 7F EA
 
 ##### CameraAnimationSet
 
-Each set holds exactly **8** animation pointers: the engine masks the requested animation index with `& 7` (`BS_GetCameraAnimationPointer`, `0x503520`). The same function bounds-checks the requested set index against `NumOfSets` and silently ignores the request if it is out of range (no animation plays).
+Each set holds exactly **8** animation pointers: the engine masks the requested animation index with `& 7` (`BS_GetCameraAnimationPointer`). The same function bounds-checks the requested set index against `NumOfSets` and silently ignores the request if it is out of range (no animation plays).
 
 | Offset      | Length                           | Description     |
 |-------------|----------------------------------|-----------------|
@@ -337,7 +337,7 @@ Complete list (without replacing bit order - as is in HEX editor/memory):
 
 ## Texture animation
 
-Optional block pointed to by geometry header offset `20` (present when that value differs from the texture offset). It animates parts of the stage texture by copying rectangles inside VRAM every few frames — waterfalls, scrolling conveyors, blinking lights. The engine runs it each frame in `BS_UpdateTextureAnimation` (`0x50CB20`); the pointer to the block is kept in `dword_1D98A50`.
+Optional block pointed to by geometry header offset `20` (present when that value differs from the texture offset). It animates parts of the stage texture by copying rectangles inside VRAM every few frames — waterfalls, scrolling conveyors, blinking lights. The engine runs it each frame in `BS_UpdateTextureAnimation`; the pointer to the block is kept in `dword_1D98A50`. See [Function addresses](#function-addresses).
 
 The block starts with an array of `uint16` entry offsets (in **words**, relative to the block start; a `0` entry is an unused slot), each pointing to one animated region:
 
@@ -429,3 +429,13 @@ Each time you half the number of bits you double the amount of data you can stor
 ` f 1/1 6/3 7/4`  
 ` where:`  
 ` A=1 B=2 C=6 D=7`
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `computeAnimationSequence` | 0x50DB40 | Shared animation-sequence VM (verified IDA function) |
+| `BS_UpdateCameraSequence` | 0x509610 | Runs the camera byte-code with camera opcode handlers (verified IDA function) |
+| `CameraSeq_DispatchActionOpcode` (formerly documented as `a2ParamAnimSeqForCamera`) | 0x509810 | Dispatches camera opcodes below `0xC0` (verified IDA function) |
+| `BS_GetCameraAnimationPointer` | 0x503520 | Masks/bounds-checks the animation index and resolves its pointer (verified IDA function) |
+| `BS_UpdateTextureAnimation` | 0x50CB20 | Per-frame stage texture animation (VRAM blit) (verified IDA function) |

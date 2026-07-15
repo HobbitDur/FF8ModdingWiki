@@ -20,6 +20,13 @@ none
 
 #### Description
 
-Writes the outcome byte of the most recent battle (`battle_result_byte` at 0x1CFF6E7) into temp variable I[0] (+320). Read it with `PSHI_L 0`. No stack use.
+Writes the outcome byte of the most recent battle (`battle_result_byte`) into temp variable I[0] (+320). Read it with `PSHI_L 0`. No stack use.
 
-PC handler: `SCRIPT_BATTLERESULT` at 0x5232E0.
+PC handler: `SCRIPT_BATTLERESULT`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_BATTLERESULT` | 0x5232E0 | Field script opcode handler (verified IDA function) |
+| `battle_result_byte` | 0x1CFF6E7 | Global byte, not a function |

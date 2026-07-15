@@ -22,4 +22,10 @@ none
 
 Locks a walkmesh triangle so nothing can walk over it. The handler sets the corresponding bit in the walkmesh blocked-triangle bitmap (`FIELD_WALKMESH_BLOCKED_BITS[id/8] |= 1 << (id%8)`). Takes no stack values. Returns 2.
 
-PC handler: `SCRIPT_IDLOCK` at 0x51D7F0.
+PC handler: `SCRIPT_IDLOCK`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_IDLOCK` | 0x51D7F0 | Field script opcode handler (verified IDA function) |

@@ -37,4 +37,10 @@ Sound channel 0 appears to be able to play sounds while it's already playing sou
 
 The handler pops all four values (volume first, then pan, then channel, then the sound id) and calls `PlayWorldSound(soundId, channel, pan, volume)`. Returns 2.
 
-PC handler: `SCRIPT_EFFECTPLAY` at 0x51FEA0.
+PC handler: `SCRIPT_EFFECTPLAY`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_EFFECTPLAY` | 0x51FEA0 | Field script opcode handler (verified IDA function) |

@@ -23,4 +23,10 @@ none
 
 Zeroes the entire 0x400-byte (1024-byte) field-script variable block (`memset` of the savemap variable area starting at `MainStoryProgress`). This wipes every script/story variable to 0; it does not touch party, inventory or stats. Takes no arguments and pops nothing. Only used when starting a new game (and in debug rooms).
 
-PC handler: `SCRIPT_CLEAR` at 0x51D8B0.
+PC handler: `SCRIPT_CLEAR`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_CLEAR` | 0x51D8B0 | Field script opcode handler (verified IDA function) |

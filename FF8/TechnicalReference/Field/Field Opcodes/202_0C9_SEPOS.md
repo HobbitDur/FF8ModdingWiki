@@ -27,4 +27,10 @@ none
 
 Sets the pan of the sound playing in *sound channel*. 0=left, 255=right. Pops two values (channel mask, then pan) and calls the SFX pan routine (`Sfx_SetPan_Mask`); *sound channel* is the channel bit-mask used when the effect was started.
 
-PC handler: `SCRIPT_SEPOS` at 0x520110.
+PC handler: `SCRIPT_SEPOS`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_SEPOS` | 0x520110 | Field script opcode handler (verified IDA function) |

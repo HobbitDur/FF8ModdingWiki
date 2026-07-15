@@ -27,4 +27,10 @@ Removes a PC from the available roster (and therefore from the active party). Th
 
 See [SETPARTY](../08a-setparty/) for the character id list.
 
-PC handler: `SCRIPT_SUBMEMBER` at 0x51E710.
+PC handler: `SCRIPT_SUBMEMBER`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_SUBMEMBER` | 0x51E710 | Field script opcode handler (verified IDA function) |

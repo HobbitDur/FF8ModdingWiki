@@ -27,4 +27,10 @@ Add the given amount of points to the player's SeeD level. Pops one value (the a
 
 100 points per rank - minimum 100 (rank 1), maximum 3100 (rank A)
 
-PC handler: `SCRIPT_ADDSEEDLEVEL` at 0x522480.
+PC handler: `SCRIPT_ADDSEEDLEVEL`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_ADDSEEDLEVEL` | 0x522480 | Field script opcode handler (verified IDA function) |

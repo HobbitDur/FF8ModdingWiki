@@ -29,4 +29,10 @@ Fades the volume of all sound-effect channels to a target level over a duration.
 
 Note the push order: the final volume is pushed **first**, then the frame count (the reverse of most `*TRANS` opcodes).
 
-PC handler: `SCRIPT_ALLSEVOLTRANS` at 0x51FFD0.
+PC handler: `SCRIPT_ALLSEVOLTRANS`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_ALLSEVOLTRANS` | 0x51FFD0 | Field script opcode handler (verified IDA function) |

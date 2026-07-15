@@ -31,4 +31,10 @@ Plays a sound effect through the given sound channel. The channel is important b
 
 Note: It seems each area can have a maximum of 32 sounds predefined (meaning sound ID 31 is the highest you can play with this). You have to use [EFFECTPLAY](../0bc-effectplay/) to use more than 32 sounds.
 
-PC handler: `SCRIPT_EFFECTPLAY2` at 0x51FF00.
+PC handler: `SCRIPT_EFFECTPLAY2`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_EFFECTPLAY2` | 0x51FF00 | Field script opcode handler (verified IDA function) |

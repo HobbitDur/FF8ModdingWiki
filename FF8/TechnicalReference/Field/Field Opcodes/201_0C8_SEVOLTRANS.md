@@ -29,4 +29,10 @@ none
 
 Fades the volume of one sound-effect channel to a target level over a duration. The handler pops the final volume first (top of stack), the frame count second, and the channel third, then calls `Sfx_SetVolumeTrans_Mask` with the frame count doubled as the transition step count. Returns 2.
 
-PC handler: `SCRIPT_SEVOLTRANS` at 0x5200C0.
+PC handler: `SCRIPT_SEVOLTRANS`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_SEVOLTRANS` | 0x5200C0 | Field script opcode handler (verified IDA function) |

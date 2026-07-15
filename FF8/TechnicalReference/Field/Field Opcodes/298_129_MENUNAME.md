@@ -49,4 +49,10 @@ Name a character or GF. If it's a GF, this also marks that GF as obtained in the
 | 19     | Boko       |
 | 20+    | Griever    |
 
-PC handler: `SCRIPT_MENUNAME` at 0x521DA0.
+PC handler: `SCRIPT_MENUNAME`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_MENUNAME` | 0x521DA0 | Field script opcode handler (verified IDA function) |

@@ -27,4 +27,10 @@ Assigns this draw point an ID. Draw points with identical IDs share Full/Drained
 
 The handler pops one value and stores `id - 1` into the field var-map (`unk3`), so the pushed ID is 1-based while the stored index is 0-based.
 
-PC handler: `SCRIPT_SETDRAWPOINTID` at 0x5230A0.
+PC handler: `SCRIPT_SETDRAWPOINTID`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_SETDRAWPOINTID` | 0x5230A0 | Field script opcode handler (verified IDA function) |

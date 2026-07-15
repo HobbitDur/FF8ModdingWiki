@@ -27,4 +27,10 @@ Adds a PC to the active party. The handler pops one word (the character id). If 
 
 See [SETPARTY](../08a-setparty/) for the character id list.
 
-PC handler: `SCRIPT_ADDPARTY` at 0x51E160.
+PC handler: `SCRIPT_ADDPARTY`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_ADDPARTY` | 0x51E160 | Field script opcode handler (verified IDA function) |

@@ -21,17 +21,6 @@ Every file access goes through a **virtual file layer** (`FILE_HANDLE_TABLE`): `
 * A static configuration table (800-byte stride, kind ids in `ARCHIVE_KIND_TABLE`) maps path substrings to archives. Kind 0 (FIELD) is special: field sub-archives are **nested** — the requested sub-archive's `.fi/.fl/.fs` are extracted from `field.fs` into `<CurrentDir>\temp.fi/.fl/.fs` (cached per subfolder) and then opened as a normal archive. Other kinds open their archive directly.
 * Path table: `CopyDataPathsStrings` builds 260-byte-stride entries — app root, `Data\`, then per-folder paths (Sound, Music, Menu, Battle, Field, world Data root `PATH_DATA_DIR`). World paths pass through `getWorldFsPath`, which implements the 2-character `;x` elision used to strip language tags from stored paths.
 
-| Function | Address |
-|----------|---------|
-| `Archive_OpenVirtualFile` / `Archive_SeekVirtualFile` / `Archive_ReadVirtualFile` / `Archive_CloseVirtualFile` | 0x51B4E0 / 0x51BDC0 / 0x51BE40 / 0x51BF50 |
-| `Archive_OpenFsArchive` | 0x40EFAA |
-| `Archive_FindFileEntry` (FL match → FI record) | 0x40F06B |
-| `Archive_ReadFileData` (raw or LZSS) | 0x40F52C |
-| `Archive_LZSSDecompress` | 0x40F852 |
-| `Archive_LoadFlPathList` / `Archive_FL_GetPathByIndex` | 0x428B6E / 0x428C1A |
-| `IO_OpenFile` (disk-or-archive resolution) | 0x40E33A |
-| `File_WriteBufferToDisk` (temp.* extraction) | 0x40EB71 |
-
 ## Frame timing
 
 The engine has two timer backends selected by `USE_TIME_RDTSC`: the raw CPU **RDTSC** counter, or `timeGetTime` (1 kHz). RDTSC is only enabled when `CPU_DetectProcessor` (full CPUID identification at startup) reports an Intel P5/P6 or AMD K6/K7 class CPU; its frequency is calibrated against QueryPerformanceCounter during a 100 ms busy-wait at realtime priority (`CPU_MeasureTscFrequency`) and stored in `game_obj->countspersecond`.
@@ -44,7 +33,7 @@ Frame pacing:
 
 ## Input
 
-`Input_ProcessInput` (pumped every frame from `IsWindowNOTActive`) polls DirectInput keyboard (256 DIK bytes), mouse, and up to two joysticks, then builds a 32-bit state per pad through the remap table at 0x1CD0208 (112 bytes per pad = 3 alternative binding banks × 32 codes; code < 0xDE = DIK scancode, 0x6A–0x6C = mouse buttons, 0xE0+n = joystick button, 0xFC–0xFF = stick Y−/Y+/X−/X+). Rising edges are computed as `cur & ~(prev & cur)`, with a keyboard-style auto-repeat layer on top.
+`Input_ProcessInput` (pumped every frame from `IsWindowNOTActive`) polls DirectInput keyboard (256 DIK bytes), mouse, and up to two joysticks, then builds a 32-bit state per pad through the pad remap table (112 bytes per pad = 3 alternative binding banks × 32 codes; code < 0xDE = DIK scancode, 0x6A–0x6C = mouse buttons, 0xE0+n = joystick button, 0xFC–0xFF = stick Y−/Y+/X−/X+). Rising edges are computed as `cur & ~(prev & cur)`, with a keyboard-style auto-repeat layer on top.
 
 The resulting 16-bit game pad mask **is the PSX digital pad layout** (verified by `Input_WritePsxPadButtons`, which converts it active-low into an emulated PSX pad buffer):
 
@@ -61,15 +50,35 @@ The resulting 16-bit game pad mask **is the PSX digital pad layout** (verified b
 
 `remap_pad_input` further remaps bits 0–11 through the player's button config in the savemap settings; the D-pad nibble 0xF000 passes through unchanged. The world map keeps its own double-buffered copy (`world_input_states[2]` + `world_input_frame_parity`) with hold-to-repeat after 30 time units.
 
-Debug key combos (raw DIK state, held 5 frames): **Ctrl+R** = soft reset, **Ctrl+Q** = quit. The bounds-check of that code still contains the developer string "William please check this".
+Debug key combos (raw DIK state, held 5 frames), handled by `InputKeyboardResetCombination`: **Ctrl+R** = soft reset, **Ctrl+Q** = quit. The bounds-check of that code still contains the developer string "William please check this".
 
-| Function | Address |
-|----------|---------|
-| `Input_ProcessInput` | 0x467D10 |
-| `Input_PollKeyboard` / `Input_PollMouse` / `Input_PollJoysticks` | 0x468D80 / 0x468B60 / 0x4692B0 |
-| `Input_GetPadState` / `Input_UpdateAutoRepeat` | 0x468500 / 0x468540 |
-| `Input_WritePsxPadButtons` | 0x56D990 |
-| `World_PollInputBeginFrame` | 0x559240 |
-| `InputKeyboardResetCombination` (Ctrl+R / Ctrl+Q) | 0x4A2E50 |
-| `Time_SetTargetFrameRate` / `Time_WaitNextFrame` | 0x4020C0 / 0x4020F0 |
-| `CPU_DetectProcessor` / `CPU_MeasureTscFrequency` | 0x569E70 / 0x56AD8E |
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `Archive_OpenVirtualFile` | 0x51B4E0 | Resolves a path to a loose file or archive entry |
+| `Archive_SeekVirtualFile` | 0x51BDC0 | Seeks a virtual file handle |
+| `Archive_ReadVirtualFile` | 0x51BE40 | Reads from a virtual file handle |
+| `Archive_CloseVirtualFile` | 0x51BF50 | Closes a virtual file handle |
+| `Archive_OpenFsArchive` | 0x40EFAA | Opens an FS archive (.fl/.fs/.fi) |
+| `Archive_FindFileEntry` | 0x40F06B | FL match → FI record lookup |
+| `Archive_ReadFileData` | 0x40F52C | Reads raw or LZSS-compressed archive data |
+| `Archive_LZSSDecompress` | 0x40F852 | LZSS decompressor |
+| `Archive_LoadFlPathList` | 0x428B6E | Loads an .fl path list |
+| `Archive_FL_GetPathByIndex` | 0x428C1A | Resolves an FL token index to its path |
+| `IO_OpenFile` | 0x40E33A | Disk-or-archive path resolution |
+| `File_WriteBufferToDisk` | 0x40EB71 | Writes a buffer to disk (temp.* extraction) |
+| `Input_ProcessInput` | 0x467D10 | Polls keyboard/mouse/joysticks and builds pad state |
+| `Input_PollKeyboard` | 0x468D80 | Polls the DirectInput keyboard |
+| `Input_PollMouse` | 0x468B60 | Polls the mouse |
+| `Input_PollJoysticks` | 0x4692B0 | Polls up to two joysticks |
+| `Input_GetPadState` | 0x468500 | Reads the current pad state |
+| `Input_UpdateAutoRepeat` | 0x468540 | Keyboard-style auto-repeat layer |
+| `Input_WritePsxPadButtons` | 0x56D990 | Converts pad mask to emulated PSX pad buffer |
+| `World_PollInputBeginFrame` | 0x559240 | World-map double-buffered input poll |
+| `InputKeyboardResetCombination` | 0x4A2E50 | Ctrl+R / Ctrl+Q debug key combo handler |
+| `Time_SetTargetFrameRate` | 0x4020C0 | Sets a module's target frame rate |
+| `Time_WaitNextFrame` | 0x4020F0 | Frame-pacing limiter |
+| `CPU_DetectProcessor` | 0x569E70 | Full CPUID processor detection |
+| `CPU_MeasureTscFrequency` | 0x56AD8E | Calibrates the RDTSC frequency |
+| Pad remap table | 0x1CD0208 | Global variable/data, not a function — per-pad button binding banks |

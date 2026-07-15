@@ -22,4 +22,10 @@ No change.
 
 Disable this entity's scripts, hides its model, and makes it throughable. Call [USE](../0e5-use/) to re-enable.
 
-PC handler: `SCRIPT_UNUSE` at 0x51DD80 (unused / no-op opcode).
+PC handler: `SCRIPT_UNUSE` (unused / no-op opcode).
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_UNUSE` | 0x51DD80 | Field script opcode handler (verified IDA function) |

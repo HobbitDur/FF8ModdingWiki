@@ -34,6 +34,13 @@ none
 
 #### Description
 
-Pops one value (a key mask) and writes 1 to temporary variable I[0] (access with `PSHI_L 0`) if any of those keys are currently **held** in the field's live button state (0x1CE48B0), 0 otherwise. The script does not pause while doing this, so you have to run it in a touch or push script, or inside a looping subroutine.
+Pops one value (a key mask) and writes 1 to temporary variable I[0] (access with `PSHI_L 0`) if any of those keys are currently **held** in the field's live button state, 0 otherwise. The script does not pause while doing this, so you have to run it in a touch or push script, or inside a looping subroutine.
 
-PC handler: `SCRIPT_KEYSCAN` at 0x51DA50.
+PC handler: `SCRIPT_KEYSCAN`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_KEYSCAN` | 0x51DA50 | Field script opcode handler (verified IDA function) |
+| field button-state (held) register | 0x1CE48B0 | Global dword, not a function |

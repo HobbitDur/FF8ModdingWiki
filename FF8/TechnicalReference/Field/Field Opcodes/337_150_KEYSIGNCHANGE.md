@@ -25,4 +25,10 @@ none
 
 Dummied out, does nothing.
 
-PC handler: `SCRIPT_KEYSIGNCHANGE` at 0x51FBA0.
+PC handler: `SCRIPT_KEYSIGNCHANGE`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_KEYSIGNCHANGE` | 0x51FBA0 | Field script opcode handler (verified IDA function) |

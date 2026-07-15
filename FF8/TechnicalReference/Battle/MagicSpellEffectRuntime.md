@@ -8,7 +8,9 @@ permalink: /technical-reference/battle/magic-spell-effect-runtime/
 How a **regular magic spell** (Fire, Thunder, Thundara, …) resolves to its on-screen effect,
 which mag file it uses, and why the effect is largely **procedural code** rather than
 keyframe data — the key constraint for 60 fps work. Complements
-[GF Summon Runtime](../gf-summon-runtime/) (GF cinematics).
+[GF Summon Runtime](../gf-summon-runtime/) (GF cinematics) and
+[Magic Effect Anatomy & Authoring](../magic-effect-anatomy/) (full per-spell code pattern —
+task queues, director timeline, particle rendering — and how to modify/create effects).
 
 1. TOC
 {:toc}
@@ -53,7 +55,7 @@ tiers do **not** share a file.
 Dumping the +0x06 byte for every spell family gives only two values — `5` for **all**
 offensive spells, `0` for **all** curatives. It is a coarse category flag, not a per-spell
 id. Its exact runtime role is unconfirmed; it routes to a shared/secondary effect
-(`effect_id 5`, handler `0x8D4450`, loads `mag004_034.tim`, previously mis-guessed
+(`effect_id 5`, handler `MagicEffect05_Init`, loads `mag004_034.tim`, previously mis-guessed
 `MAG_005_PHOENIX_DOWN`), which is **not** the per-spell animation. Renamed in the IDB to a
 neutral `MagicEffect05_*` scheme:
 
@@ -65,15 +67,15 @@ neutral `MagicEffect05_*` scheme:
 
 ## The real Thundara effect (effect_id 102)
 
-`MAG_102_THUNDARA` (0x6DC2D0) → body `MAG_102_THUNDARA_Init` (0x6DC2E0):
+`MAG_102_THUNDARA` → body `MAG_102_THUNDARA_Init`:
 
 - Loads **mag101.tim**, allocates particle task-queues (pools 3 / 60 / 32).
 - Fires a **keyframe camera animation** `Battle_PlayCameraAnimation(&unk_1321588)` — the
   strike swoop.
-- Tick `MAG_102_THUNDARA_Tick` (0x6DC390):
+- Tick `MAG_102_THUNDARA_Tick`:
   - Iterates the attack's **target list** (from the action ctx: +17 = target count,
     +8+20·i = per-target slot) and spawns a **bolt task per target**
-    (`MAG_102_THUNDARA_BoltTask`, 0x6DC510).
+    (`MAG_102_THUNDARA_BoltTask`).
   - **Flickers** by toggling the texture VRAM page each frame (`dword_2544360` vs
     `+0x8000`) — the lightning strobe.
   - Timed by a **frame-cycle counter** (`a1[1].flags_and_priority`, wraps at 15) and a
@@ -102,9 +104,10 @@ under a 60 fps render loop. The camera tracks can be interpolated as data.
 ## The single per-frame driver — one gate fixes every effect
 
 Every active magic/GF effect is a task tree whose **root queue** is stored in the global
-`C3_28_GF_data_pointer` (0x1D96AAC), set by the effect's Init (e.g. `MAG_105_THUNDAGA_Init`
+`C3_28_GF_data_pointer`, set by the effect's Init (e.g. `MAG_105_THUNDAGA_Init`
 returns `&stru_2543DD0.data`). The whole tree is ticked **once per battle frame** from a
-single line in the battle frame-update `BdLink_GF_battle_input_and_texture_upload` (0x500900):
+single line in the battle frame-update `BdLink_GF_battle_input_and_texture_upload_called_in_loop`
+(renamed from `BdLink_GF_battle_input_and_texture_upload`):
 
 ```c
 // @0x50093A — ticks the ENTIRE active spell/GF effect once per frame
@@ -117,7 +120,7 @@ spell/GF effect plays 4× too fast.
 
 **The naive gate flickers.** Simply skipping the tick on 3 of 4 frames gives correct *speed*
 but **flickers**: the effect **draws inside its update tick** —
-`InitEffectSequenceFromData` (0x571C80) rebuilds the effect's geometry into the battle render
+`InitEffectSequenceFromData` rebuilds the effect's geometry into the battle render
 list every frame; there is no separate render pass — so a skipped tick drops the effect's
 geometry that frame.
 
@@ -131,7 +134,7 @@ The effect advances at 15 fps yet is drawn every frame → correct speed, **no f
 **Only hold genuine magic casts.** The tick is shared. Draw/Stock rides the same effect tick,
 but its handler writes external state the window-restore can't undo → a **delayed crash**.
 Discriminate on the battle command type `BattleTask68Data.commandTypeWIthGunblade`
-(byte +1 of `*BATTLE_TASK_68_DATA_ADDR` @0x1D99A50), verified in-game:
+(byte +1 of `*BATTLE_TASK_68_DATA_ADDR` — see [Function addresses](#idb-names-applied)), verified in-game:
 
 | commandTypeWIthGunblade | Action | Frame-hold? |
 |---|---|---|
@@ -141,7 +144,7 @@ Discriminate on the battle command type `BattleTask68Data.commandTypeWIthGunblad
 | 0x00 | Physical attack | No |
 
 Capture the holdable effect-queue pointer only when the magic-cast handlers
-(`BattleActionSequence_Tick_MagicCast` 0x50A9A0 / `_MagicEffect` 0x50B190) register it under
+(`BattleActionSequence_Tick_MagicCast` / `BattleActionSequence_Tick_MagicEffect`) register it under
 cmd 0x02; hold the tick only when `effect_ctx` equals that captured pointer.
 
 **Side effects re-fire on held frames** (the tick re-runs), so suppress them while holding via
@@ -149,8 +152,8 @@ a flag:
 
 | Side effect | Function | Held-frame action |
 |---|---|---|
-| Effect SFX | `PlayWorldSound` (0x46B2A0) | no-op → plays once |
-| Damage/heal number | `BattleFx_DamageNumbers_Spawn` (0x5068B0) | no-op → shows once |
+| Effect SFX | `PlayWorldSound` | no-op → plays once |
+| Damage/heal number | `BattleFx_DamageNumbers_Spawn` | no-op → shows once |
 
 Damage itself is applied once (externally guarded), so only the *display* duplicated.
 
@@ -182,6 +185,10 @@ Globals: `C3_28_GF_data_pointer` (0x1D96AAC, effect-tick root), `BATTLE_TASK_68_
 (0x1D99A50, ptr to `BattleTask68Data`), `MagicList_Logic` (0xC81774) /
 `MagicList_TextureLoad` (0xC81DB8, fn-ptr arrays indexed by effect_id−1),
 `MAGIC_EFFECT_LOGIC_CALLBACK` (0x21DFEC4), `MAGIC_EFFECT_LOGIC_CALLBACK_2` (0x21DFEC0).
+
+Also: `BdLink_GF_battle_input_and_texture_upload_called_in_loop` (0x500900, renamed from
+`BdLink_GF_battle_input_and_texture_upload`, the per-frame effect-tick driver),
+`InitEffectSequenceFromData` (0x571C80), and `PlayWorldSound` (0x46B2A0).
 
 ### Open
 

@@ -27,4 +27,10 @@ Pops one value (a field character ID), maps it through `getPointerCharaData`, an
 
 This is only used twice in the game - both at Esthar's "front gate" before the last dream sequence.
 
-PC handler: `SCRIPT_WHOAMI` at 0x51EF70.
+PC handler: `SCRIPT_WHOAMI`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_WHOAMI` | 0x51EF70 | Field script opcode handler (verified IDA function) |

@@ -41,4 +41,10 @@ none
 
 Disables the party-member conga line and sends each of the three followers to a specific spot. The handler pops nine values as three X/Y/Z triples; each coordinate is shifted left 12 bits (converted to world fixed-point) before use. It looks up the three current party entities from the savemap party map and walks each one to its target position, setting each entity's "moving" flag. The opcode yields (return 1) every frame until all three followers have arrived, then clears their moving flags and returns.
 
-PC handler: `SCRIPT_SPLIT` at 0x525090.
+PC handler: `SCRIPT_SPLIT`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_SPLIT` | 0x525090 | Field script opcode handler (verified IDA function) |

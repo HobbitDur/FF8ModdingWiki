@@ -12,7 +12,7 @@ Reference for the per-entity animation state used by the [animation sequences]({
 
 # Entity animation status flags (anim_status)
 
-32-bit flag field on each battle entity, readable from a sequence via `C3 0x1F`. Most bits are refreshed from the entity's [statuses]({{site.baseurl}}/technical-reference/list/status-flags/) through a lookup table (`getAnimMaskFromStatus` at `0x509BA0` in FF8_EN.exe); the engine-controlled bits (marked *engine*) survive that refresh.
+32-bit flag field on each battle entity, readable from a sequence via `C3 0x1F`. Most bits are refreshed from the entity's [statuses]({{site.baseurl}}/technical-reference/list/status-flags/) through a lookup table (`getAnimMaskFromStatus`); the engine-controlled bits (marked *engine*) survive that refresh.
 
 | bit | Flag       | Meaning                              | Source                 |
 |-----|------------|--------------------------------------|------------------------|
@@ -64,7 +64,7 @@ Other bits (e.g. 0x080, written by some vanilla sequences through `E5 08`) have 
 
 At battle start every entity plays **sequence 8** (battle entrance) and the idle fallback (`basedAnimSeq`) defaults to **1**.
 
-When a sequence ends (`A2`) with nothing queued, **monsters** return to `basedAnimSeq`; **characters** (com_id &lt; 0x10) pick by animation status (`analyse_animation_status` at `0x509C10`), in this priority order:
+When a sequence ends (`A2`) with nothing queued, **monsters** return to `basedAnimSeq`; **characters** (com_id &lt; 0x10) pick by animation status (`analyse_animation_status`), in this priority order:
 
 | Sequence | Played when |
 |----------|-------------|
@@ -73,4 +73,11 @@ When a sequence ends (`A2`) with nothing queued, **monsters** return to `basedAn
 | 16 (0x10)| Running / moving |
 | 19 (0x13)| Preparing attack |
 | 29 (0x1D)| Defending |
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `getAnimMaskFromStatus` | 0x509BA0 | Refreshes anim_status bits from entity statuses |
+| `analyse_animation_status` | 0x509C10 | Picks the fallback sequence for a character entity |
 | 1        | Normal standing (default) |

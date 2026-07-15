@@ -12,7 +12,7 @@ For each _Ground ID_, 8 different encounter slots are available, and are ordered
 These 8 slots each contain an [EncounterID](../../battle/encounter-codes/), these IDs are used to load the correct encounter from [scene.out](../../battle/battle-structure-sceneout/).  
 The following is a list of all the possible encounters in FF8's World Map.
 
-World-map random encounters are selected by `WM_Encounter_RollAndSelectScene` (`0x541C80`), called from `FFWorldDirector` (`0x53F4B0`). Encounters are blocked by Enc-None, most vehicle states, lack of movement, and some terrain ids (27 and 28). While moving, `WM_ENC_METER` (`0x2040A5C`) increases by 16 each frame, or 4 with Enc-Half. When it exceeds 256, the world map uses `Encounter_RandomRollArray` (`0xC75D20`) with the current step/cycle bonus and terrain encounter rate to decide whether an encounter triggers. The selected scene id is handed to the battle module through `WM_PENDING_MODULE_ID = 3` and `WM_PENDING_SCENE_LO/HI`. See [Encounter Trigger Runtime](../../battle/encounter-trigger-runtime/) for the full runtime flow.
+World-map random encounters are selected by `WM_Encounter_wm123456` (renamed from `WM_Encounter_RollAndSelectScene` in the community IDB), called from `FFWorldDirector`. Encounters are blocked by Enc-None, most vehicle states, lack of movement, and some terrain ids (27 and 28). While moving, `WM_ENC_METER` increases by 16 each frame, or 4 with Enc-Half. When it exceeds 256, the world map uses `Encounter_RandomRollArray` with the current step/cycle bonus and terrain encounter rate to decide whether an encounter triggers. The selected scene id is handed to the battle module through `WM_PENDING_MODULE_ID = 3` and `WM_PENDING_SCENE_LO/HI`. See [Encounter Trigger Runtime](../../battle/encounter-trigger-runtime/) for the full runtime flow.
 
 1. TOC
 {:toc}
@@ -854,3 +854,12 @@ Shared with _Region ID 11_.
 
 ### Railways
 {: .no_toc }
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `WM_Encounter_wm123456` | 0x541C80 | Encounter roll/selection (renamed from `WM_Encounter_RollAndSelectScene` in the community IDB) |
+| `FFWorldDirector` | 0x53FAC0 | Per-frame world logic; the wiki previously cited 0x53F4B0 here, which resolves mid-function inside `FFWorldInit` (0x53F310) — corrected to the verified `FFWorldDirector` start address |
+| `WM_ENC_METER` | 0x2040A5C | Global variable/data, not a function |
+| `Encounter_RandomRollArray` | 0xC75D20 | Global variable/data, not a function |

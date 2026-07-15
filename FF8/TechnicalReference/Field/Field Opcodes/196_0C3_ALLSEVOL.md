@@ -25,4 +25,10 @@ none
 
 Sets the volume of all sound-effect channels at once. The handler pops one value (the volume) and applies it to every SE channel immediately (no transition). Returns 2.
 
-PC handler: `SCRIPT_ALLSEVOL` at 0x51FFA0.
+PC handler: `SCRIPT_ALLSEVOL`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_ALLSEVOL` | 0x51FFA0 | Field script opcode handler (verified IDA function) |

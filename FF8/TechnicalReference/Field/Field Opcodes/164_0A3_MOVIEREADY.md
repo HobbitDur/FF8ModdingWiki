@@ -66,4 +66,10 @@ The movie that plays depends on which disc is currently active.
 | 32       |                          | Escape Hatch                      |                               |                            |
 | 33       |                          | Paratrooper fight                 |                               |                            |
 
-PC handler: `SCRIPT_MOVIEREADY` at 0x51F2C0.
+PC handler: `SCRIPT_MOVIEREADY`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_MOVIEREADY` | 0x51F2C0 | Field script opcode handler (verified IDA function) |

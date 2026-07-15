@@ -40,7 +40,7 @@ Three 13-px rows in the (122,165,190,51) region, backed by `BATTLE_CHARA_UI` (0x
 
 ## Command window (slot 4)
 
-`BattleMenu_CommandWindow_Update` (0x4BB9E0) is a 25-state machine: init (reads the character's 4 junctioned command entries from `F_CHAR_DATA[].commandData`, names resolved from kernel.bin) → scale-in animation (+409/frame to 4096) → input states → optional inline Double/Triple sub-list → flush selection to the [command queue]({{ site.baseurl }}/technical-reference/battle/module-runtime/) → executed/character-switch states. Cursor position is remembered per character when the config "cursor memory" flag is set.
+`BattleMenu_CommandWindow_Update` is a 25-state machine: init (reads the character's 4 junctioned command entries from `F_CHAR_DATA[].commandData`, names resolved from kernel.bin) → scale-in animation (+409/frame to 4096) → input states → optional inline Double/Triple sub-list → flush selection to the [command queue]({{ site.baseurl }}/technical-reference/battle/module-runtime/) → executed/character-switch states. Cursor position is remembered per character when the config "cursor memory" flag is set.
 
 **Limit display**: pressing LEFT on a command whose kernel flag allows it slides in the limit command with an eased crossfade; a blinking arrow icon marks crisis; Renzokuken's R1 caption and timing gauges are drawn by the caption window (slot 8) from the combo message pointer.
 
@@ -48,7 +48,7 @@ Three 13-px rows in the (122,165,190,51) region, backed by `BATTLE_CHARA_UI` (0x
 
 Magic list (with Draw-stock counts), GF list, two-column item list, the Draw window (draw/cast choice), and four special list types share a generic scrolling-list engine (`BattleMenu_ListWindow_*`, 0x4FDD90). Zell's Duel input replaces slot 6. Target selection (`BattleMenu_OpenTargetSelection`, 8 states) polls a target bitmask, supports the ALL toggle for spells flagged multi-target, and confirms into the pending-selection buffer.
 
-`BattleMenu_ExecuteSelectedCommand` (0x4BC770) is what opens each of these sub-windows; the full bit layout and id-to-function table lives in [Menu flags]({{site.baseurl}}/technical-reference/list/battle/#menu-flags).
+`BattleMenu_ExecuteSelectedCommand` is what opens each of these sub-windows; the full bit layout and id-to-function table lives in [Menu flags]({{site.baseurl}}/technical-reference/list/battle/#menu-flags).
 
 ## Text and graphics sources
 
@@ -68,24 +68,41 @@ The port compensates for the *logic* but not for the *input*:
 
 Consequences, straight from the code:
 
-* **Zell's Duel** (`BattleMenu_ZellDuel_Update`, 0x4AF840): the countdown decrements once per tick through a 4-tick budget refilled on each fresh-input event — so the timer runs at the correct 60/s. The inputs, however, are edge words pushed into an 8-entry ring only when a *new* snapshot shows them: at most one new input event per 66.7 ms, presses shorter than a frame are lost, and two quick presses merge into one snapshot. Same duel time, **a quarter of the input opportunities** → far fewer commands per Duel than on PSX.
-* **GF Boost** (`computeGFBoost`, 0x56DD70): the gauge (+1 per Square press edge in the "safe" phase, reset to 75 in the "danger" phase, start 75, cap 250, untouched = 100) suffers twice. Press edges are capped by the 15 Hz sampling (~7–8 effective mashes/s instead of ~30). And the safe/danger **phase timers only decrement on fresh-input frames** (15/s) while their durations (`15 × (rand(1..3) + rand(1..3))` units) were tuned for 60/s — so on PC each phase lasts 2–6 seconds instead of 0.5–1.5 s. The Duel timer got the 4-tick real-time fix; the Boost phase pacing did not.
+* **Zell's Duel** (`BattleMenu_ZellDuel_Update`): the countdown decrements once per tick through a 4-tick budget refilled on each fresh-input event — so the timer runs at the correct 60/s. The inputs, however, are edge words pushed into an 8-entry ring only when a *new* snapshot shows them: at most one new input event per 66.7 ms, presses shorter than a frame are lost, and two quick presses merge into one snapshot. Same duel time, **a quarter of the input opportunities** → far fewer commands per Duel than on PSX.
+* **GF Boost** (`computeGFBoost`): the gauge (+1 per Square press edge in the "safe" phase, reset to 75 in the "danger" phase, start 75, cap 250, untouched = 100) suffers twice. Press edges are capped by the 15 Hz sampling (~7–8 effective mashes/s instead of ~30). And the safe/danger **phase timers only decrement on fresh-input frames** (15/s) while their durations (`15 × (rand(1..3) + rand(1..3))` units) were tuned for 60/s — so on PC each phase lasts 2–6 seconds instead of 0.5–1.5 s. The Duel timer got the 4-tick real-time fix; the Boost phase pacing did not.
 
 In short: the menu isn't "running at 15 fps" logically — it ticks at 60 Hz — but it can only *see the controller* at 15 Hz, and Boost's phase pacing was left on the per-frame clock. Fixing Duel/Boost responsiveness would mean polling input per tick (or per 16.7 ms) and feeding `BattleUI_NewInputFrameFlag`/ctx+33 accordingly, plus restoring Boost's phase decrement to per-tick.
 
-## Address table
+## Function addresses
 
-| Function | Address | | Function | Address |
-|----------|---------|-|----------|---------|
-| `BattleUI_RegisterWindow` | 0x4B9AD0 | | `BattleMenu_CommandWindow_Update` | 0x4BB9E0 |
-| `BattleUI_UpdateAllWindows` / `DrawAllWindows` | 0x4B9C80 / 0x4B9DB0 | | `BattleMenu_CommandWindow_Init` / `Draw` | 0x4BCBE0 / 0x4BCE10 |
-| `BattleUI_InvalidateWindowsUpTo` | 0x4B9C40 | | `BattleMenu_ExecuteSelectedCommand` | 0x4BC770 |
-| `BattleUI_DrawWindowGradientStrips` | 0x4B6530 | | `BattleMenu_OpenMagicWindow` / `GF` / `Item` | 0x4C8840 / 0x4C8280 / 0x4C87A0 |
-| `BattleHUD_Init` | 0x4B1B00 | | `BattleMenu_OpenDrawWindow` | 0x4ADD10 |
-| `BattleHUD_RefreshCharaRow` | 0x4B1BB0 | | `BattleMenu_OpenTargetSelection` | 0x4C7030 |
-| `BattleHUD_DrawPartyRows` / `DrawCharaRow` | 0x4B1740 / 0x4B0F10 | | `BattleMenu_ListWindow_Update` | 0x4FDD90 |
-| `BattleHUD_DrawGFSummonOverlay` | 0x4B08F0 | | `BattleMsg_ComboCaption_Draw` | 0x4C8DC0 |
-| `BattleHUD_GetATBGaugeColor` | 0x4B14C0 | | `BattleUI_WindowTable` (9×20 B) | 0x1D76628 |
-| `BATTLE_CHARA_UI` (3×108 B) | 0x1D76928 | | ATB color tables | 0xB8790C–0xB8793C |
+| Function | Address | Description |
+|---|---|---|
+| `BattleUI_RegisterWindow` | 0x4B9AD0 | Registers a window's update/draw/overlay callbacks in the 9-slot table |
+| `BattleUI_UpdateAllWindows` | 0x4B9C80 | Per-frame update pass over all windows |
+| `BattleUI_DrawAllWindows` | 0x4B9DB0 | Per-frame draw pass over all windows |
+| `BattleUI_InvalidateWindowsUpTo` | 0x4B9C40 | Forces redraw of cached windows |
+| `BattleUI_DrawWindowGradientStrips` | 0x4B6530 | Draws the tinted blue window gradient |
+| `BattleHUD_Init` | 0x4B1B00 | Initializes the party HUD |
+| `BattleHUD_RefreshCharaRow` | 0x4B1BB0 | Updates a party HUD row's rolling HP/gauge state |
+| `BattleHUD_DrawPartyRows` | 0x4B1740 | Draws all party HUD rows |
+| `BattleHUD_DrawCharaRow` | 0x4B0F10 | Draws a single party HUD row |
+| `BattleHUD_DrawGFSummonOverlay` | 0x4B08F0 | Draws the GF summon overlay on the HUD |
+| `BattleHUD_GetATBGaugeColor` | 0x4B14C0 | Picks ATB gauge gradient colors |
+| `BattleMenu_CommandWindow_Update` | 0x4BB9E0 | Command window state machine |
+| `BattleMenu_CommandWindow_Init` | 0x4BCBE0 | Command window init state |
+| `BattleMenu_CommandWindow_Draw` | 0x4BCE10 | Command window draw |
+| `BattleMenu_ExecuteSelectedCommand` | 0x4BC770 | Opens the sub-window for the selected command |
+| `BattleMenu_OpenMagicWindow` | 0x4C8840 | Opens the magic list sub-window |
+| `BattleMenu_OpenGFWindow` | 0x4C8280 | Opens the GF list sub-window |
+| `BattleMenu_OpenItemWindow` | 0x4C87A0 | Opens the item list sub-window |
+| `BattleMenu_OpenDrawWindow` | 0x4ADD10 | Opens the Draw sub-window |
+| `BattleMenu_OpenTargetSelection` | 0x4C7030 | Opens target selection |
+| `BattleMenu_ListWindow_Update` | 0x4FDD90 | Generic scrolling-list engine shared by sub-windows |
+| `BattleMsg_ComboCaption_Draw` | 0x4C8DC0 | Draws the Renzokuken combo caption/timing gauges |
+| `BattleMenu_ZellDuel_Update` | 0x4AF840 | Zell's Duel input window state machine |
+| `computeGFBoost` | 0x56DD70 | GF Boost mini-game gauge/phase logic |
+| `BattleUI_WindowTable` | 0x1D76628 | Global variable/data, not a function — 9-slot window table (20 B/slot) |
+| `BATTLE_CHARA_UI` | 0x1D76928 | Global variable/data, not a function — party HUD state (3×108 B) |
+| ATB color tables | 0xB8790C–0xB8793C | Global variable/data, not a function — ATB gauge gradient color pairs |
 
 Addresses are for FF8_EN.exe (2000 PC release) as mapped in IDA (image base 0x400000).

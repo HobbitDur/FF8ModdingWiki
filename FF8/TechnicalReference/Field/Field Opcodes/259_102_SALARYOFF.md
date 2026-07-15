@@ -22,4 +22,10 @@ none
 
 Disables the payment of salaries.
 
-PC handler: `SCRIPT_SALARYOFF` at 0x51DB90.
+PC handler: `SCRIPT_SALARYOFF`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_SALARYOFF` | 0x51DB90 | Field script opcode handler (verified IDA function) |

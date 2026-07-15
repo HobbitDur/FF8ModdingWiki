@@ -22,4 +22,10 @@ none
 
 Pauses execution of this script until the current FMV movie is finished playing (returns 1 while the movie is still running, then cleans up and returns 2). No stack use.
 
-PC handler: `SCRIPT_MOVIESYNC` at 0x51F4F0.
+PC handler: `SCRIPT_MOVIESYNC`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_MOVIESYNC` | 0x51F4F0 | Field script opcode handler (verified IDA function) |

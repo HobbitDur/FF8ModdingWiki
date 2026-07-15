@@ -44,7 +44,7 @@ Each entity runs up to **8 concurrent script threads by priority** (0 = highest)
 | 0x17C | u8[8] | `stack_base_per_priority` | stack base pointer per priority (on entry SP = base + 8) |
 | 0x184 | u8 | `stack_current_position` | current stack pointer |
 
-Standard opcode prologue: an opcode only runs when `(1 << ready_bit_index) & opcode_ready_mask` is set; `RET`/`RETTO` (`SCRIPT_RET`, 0x51C5C0) writes 0xFFFF into `script_ip_per_priority[prio]` and restores the highest still-active priority into `instructions_current_position`.
+Standard opcode prologue: an opcode only runs when `(1 << ready_bit_index) & opcode_ready_mask` is set; `RET`/`RETTO` (`SCRIPT_RET`) writes 0xFFFF into `script_ip_per_priority[prio]` and restores the highest still-active priority into `instructions_current_position`.
 
 ## Character entity extras (`FieldCharacterEntity612`, 0x190–0x243)
 
@@ -90,3 +90,9 @@ Mapping this struct corrected several offsets that had been guessed from partial
 `FieldEntityHeader` offsets **0x148–0x15F** (6 dwords) remain unidentified — they are not referenced by the VM dispatcher, `SCRIPT_RET`, or the movement/model functions inspected. They are likely written during field/script initialization; chasing their writers is the remaining work on this struct.
 
 Addresses are for FF8_EN.exe (2000 PC release) as mapped in IDA (image base 0x400000).
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_RET` | 0x51C5C0 | RET/RETTO opcode handler |

@@ -25,4 +25,10 @@ none
 
 Waits for a non-blocking message window to finish. A window opened by [MES](../047-mes/) or [AMES](../065-ames/) stays up while the script continues; MESSYNC pauses the script until that window's channel is closed/dismissed. It pops one value, the message channel number, and each frame checks the channel's window state: it returns 1 (wait) while the message is still active and 2 (done + continue) once the channel has been cleared.
 
-PC handler: `SCRIPT_MESSYNC` at 0x529900.
+PC handler: `SCRIPT_MESSYNC`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_MESSYNC` | 0x529900 | Field script opcode handler (verified IDA function) |

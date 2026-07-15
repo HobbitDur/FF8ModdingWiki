@@ -22,4 +22,10 @@ none
 
 Starts playing the music track preloaded by [MUSICLOAD](../0b5-musicload/), replacing the current field music. Takes no arguments and pops nothing. If nothing has been loaded (the load flag `unk_1D9CDE0` is 0) it does nothing and returns 2. Otherwise it clears the load flag, plays the loaded track, applies the saved music volume and returns 3 (yield).
 
-PC handler: `SCRIPT_MUSICCHANGE` at 0x51F7F0.
+PC handler: `SCRIPT_MUSICCHANGE`.
+
+## Function addresses
+
+| Function | Address | Description |
+|---|---|---|
+| `SCRIPT_MUSICCHANGE` | 0x51F7F0 | Field script opcode handler (verified IDA function) |
