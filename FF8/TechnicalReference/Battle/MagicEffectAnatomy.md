@@ -91,7 +91,9 @@ effect is finished.
 ## Anatomy of one spell — Firaga (effect_id 143, `mag142.tim`)
 
 All of the following is per-spell code/static data; every other spell follows the same
-pattern with different constants.
+pattern with different constants. For the full frame-by-frame walkthrough of this spell —
+every task, every particle, the data block, and concrete edit recipes — see the dedicated
+[Case study: Firaga animation](../firaga-case-study/).
 
 ### 1. Texture loader — `MAG_143_FIRAGA_FL` @0x61BFC0
 
@@ -260,7 +262,7 @@ director function (start from the table, not from names).
 
 ## Read-only pseudocode for the tool
 
-The repo script `MagicResearch/dump_magic_effects.py` (FF8UltimateEditor) runs inside IDA
+The repo script `Fujin/ResearchScript/dump_magic_effects.py` (FF8UltimateEditor) runs inside IDA
 on the FF8_EN.exe database and exports `magic_effects.json`: for every effect_id, the
 handler addresses, the files its `_FL` loads, and the **Hex-Rays pseudocode of the init +
 its spell-local sub-functions** (director, particle ticks, two call levels deep). That JSON
@@ -330,4 +332,4 @@ Globals: `MAGIC_EFFECT_ACTIVE_FLAG` (0x1D99A64), `MAGIC_EFFECT_INDEX` (0x1D99A68
 - Identification of effect_ids 226–345 (`MAG_2xx/3xx_UNKNOWN`): which monster attack or
   story cinematic each one is.
 - Remaining shifted main-function names in the 34–98 range (fix by walking the table, or
-  extend `MagicResearch/dump_magic_effects.py` to auto-rename from the `_FL` names).
+  extend `Fujin/ResearchScript/dump_magic_effects.py` to auto-rename from the `_FL` names).
