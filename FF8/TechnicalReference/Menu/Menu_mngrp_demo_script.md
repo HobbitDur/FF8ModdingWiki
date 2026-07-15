@@ -74,6 +74,31 @@ Each frame, the interpreter replaces the pad read: the word built by HOLD_BUTTON
 engine's pad state, so the hosted menu program navigates as if the player pressed those buttons. Ops 0x1 and
 0x4-0x7 execute immediately (several per frame); the wait ops yield until their condition is met.
 
+### HOLD_BUTTON bit indices
+
+The HOLD_BUTTON operand (low byte) is the bit index ORed into the engine pad word (`PAD_PRESSED`/`PAD_REPEAT`).
+Bits 0-11 are the physical button slots consumed through the button-config remap (`sub_4A2D60`, identity with
+the default config); bits 12-15 are the D-pad, passed through the remap unchanged:
+
+| Bit | Button   | Menu action              |
+|-----|----------|--------------------------|
+| 0   | L2       | Flee combo half          |
+| 1   | R2       | Flee combo half          |
+| 2   | L1       | Previous character/page  |
+| 3   | R1       | Next character/page      |
+| 4   | Triangle | Cancel/Back              |
+| 5   | Circle   | Open menu                |
+| 6   | Cross    | Confirm                  |
+| 7   | Square   | Examine                  |
+| 8   | Select   |                          |
+| 11  | Start    |                          |
+| 12  | D-pad    | Left                     |
+| 13  | D-pad    | Down                     |
+| 14  | D-pad    | Right                    |
+| 15  | D-pad    | Up                       |
+
+The vanilla scripts only use bits 4, 6, 7 and 12-15.
+
 ### Example (start of the Junction demo script, raw section 168)
 
 ```

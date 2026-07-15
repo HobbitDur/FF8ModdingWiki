@@ -165,6 +165,41 @@ cardanm.sp2...) have **no copy inside mngrp.bin** — they are loaded by name fr
 | 116 | 204         | 0x227800 | 0x800   | [Mngrp_string_section44](../mngrp-string-section/)  | Character switch tutorial                                                               | Yes                             |
 | 117 | 205         | 0x228000 | 0x800   |                                                          | [Tutorial demo script](../mngrp-demo-script/): Character switch demo                                             | No                              |
 
+## The SeeD test sections (Pos 42-73)
+
+Raw file 95 holds the shared exam UI strings, raw files 96-125 the 30 tests (10 questions each, string N =
+question N+1; raw 126 is an unused duplicate "test 31" — the engine caps the test number at 30).
+
+These are normal [string sections](../mngrp-string-section/) with one twist: **every string starts with one
+extra byte before the FF8 text — the expected answer**, as a 0-based cursor index (questions: 0 = YES,
+1 = NO). The question text then contains **0x0B n cursor stop codes** (n = 0x20 + choice index) marking each
+selectable position; the engine counts the stops dynamically, so a question can offer **more than two
+choices** simply by adding more cursor stops — the answer byte just has to match the index of the correct
+one. On confirm the selected index is compared to the answer byte; a perfect 10/10 raises the SeeD test level
+and the rank.
+
+In the retail files each string (answer byte, FF8 text, 0x00 terminator) is zero-padded to a multiple of
+4 bytes, so the string offsets keep a constant alignment inside the section.
+
+### How the choices are drawn
+
+The choice labels are **not** laid out by the engine — they are simply part of the question text. A
+`0x0B n` code emits nothing visible: as `Menu_SeedTest_ParseCursorStops` renders the string, each stop
+records the *current pen position* (x, y) and the choice index into `Menu_SeedTest_CursorStops` (8-byte
+entries {x, y, ...}), returning the count in `Menu_SeedTest_ChoiceCount`. The selection cursor sprite is
+then drawn at `CursorStops[selected]`, and navigation wraps within `[0, ChoiceCount)`. So the on-screen
+position of each choice is decided by where its `0x0B` stop sits in the text (the surrounding spaces and
+`\n` line breaks); to add a 3rd choice you write its label into the text with its own cursor stop before
+it. `Menu_SeedTest_CursorStops` (0x1D7EB40) runs up to `Menu_SeedTest_ExpectedAnswer` (0x1D7EC40), i.e. a
+fixed 32-entry buffer, the practical ceiling on choices per question.
+
+| Address   | Name                           | Description                                   |
+|-----------|--------------------------------|-----------------------------------------------|
+| 0x4D4D30  | Menu_SeedTest_Update           | Exam state machine (program 23)               |
+| 0x4D4A80  | Menu_SeedTest_ParseCursorStops | Collects the 0x0B stops of a string           |
+| 0x1D7EC40 | Menu_SeedTest_ExpectedAnswer   | Answer byte of the displayed string           |
+| 0x1D7EAB8 | Menu_SeedTest_ChoiceCount      | Number of cursor stops found                  |
+
 ## The SP2 quad-list sprite format (Pos 4)
 
 Pos 4 uses the same sprite format as the standalone .sp2 files (cardanm.sp2, face.sp2 — see

@@ -474,6 +474,44 @@ List of possible values:
 
 Correspond to 2 or 3 hexa values that activate a certain code from the game, so that does a specific action.
 
+### Control opcode overview
+
+Every byte in the range `0x00`-`0x1F` is a control opcode rather than a printable glyph. The
+game's text engine reads a byte, and if it is below `0x20` it is treated as a command; most
+commands consume one following parameter byte (noted "size 2" below). Bytes `0x20` and above are
+normal glyphs (see [TextChar](#textchar)).
+
+The table below is the full opcode map as interpreted by the shared battle/menu text engine
+(`ProcessBattleTextExpansion` and `Text_FetchNextToken` in the game executable, see the
+[Reference addresses](#reference-addresses) table). The field/world text uses the same opcode
+numbering.
+
+| Opcode | Size | Name             | Description                                                                                     |
+|--------|------|------------------|-------------------------------------------------------------------------------------------------|
+| 0x00   | 1    | EndOfString      | Terminates the string.                                                                          |
+| 0x01   | 1    | NewPage          | Ends the current page: waits for input, clears the window, then shows the next page.            |
+| 0x02   | 1    | NewLine (`\n`)   | Line break. Some windows ignore it.                                                             |
+| 0x03   | 2    | CharaName        | Inserts a character name. Param selects which name (see [Characters](#characters)).             |
+| 0x04   | 2    | Var              | Inserts a numeric variable read from the active text layer. Param selects slot & format (`{Var0}`,`{Var00}`,`{Varb0}`). |
+| 0x05   | 2    | Icon             | Draws a symbol from `icon.tex` (controller button, status icon…). See [Icons](#icons).           |
+| 0x06   | 2    | Color            | Changes the text color / blink for the rest of the line. See [Colors](#colors).                 |
+| 0x07   | 1    | NewPage (variant)| Handled identically to `0x01` by the engine: a page break / page terminator.                    |
+| 0x08   | 2    | *(unused)*       | Consumes a parameter byte but produces no visible output in the known engines.                  |
+| 0x09   | 2    | Wait             | Pause. Param = number of frames to wait (`{Wait000}`).                                          |
+| 0x0A   | 2    | Value (context)  | Inserts a context-specific value (number or string) filled in by the active screen. See [Context value](#context-value-0x0a). |
+| 0x0B   | 2-3  | CursorLocation   | Marks a cursor stop / choice position. See [Cursor location ID](#cursor-location-id).           |
+| 0x0C   | 2    | GuardianForce    | Inserts a GF name. See [Guardian force](#guardian-force).                                        |
+| 0x0D   | 2    | *(unused)*       | Consumes a parameter byte but produces no visible output in the known engines.                  |
+| 0x0E   | 2    | Location/Word    | Inserts a location or generic word (language-dependent). See [Location and generic text](#location-and-generic-text-changing-depending-of-languages). |
+| 0x0F   | 2    | *(unused)*       | Consumes a parameter byte but produces no visible output in the known engines.                  |
+| 0x19-0x1B | 2 | JP glyph page    | Two-byte Japanese glyph; the lead byte selects font table 1/2/3.                                 |
+| 0x1C   | 2    | AddJp            | Japanese text variant (`{Jp000}`).                                                              |
+| 0x1D-0x1F | 2 | Extended glyph   | Two-byte extended/Japanese glyph pages (mostly unused on the western build).                     |
+
+> Note on the "unused" opcodes `0x08`, `0x0D`, `0x0F`: the battle and menu text engines still read
+> and skip their parameter byte, but no glyph is emitted. They are not referenced by known text and
+> should be treated as reserved. If you meet them in real data, keep them untouched.
+
 ### End of string, New page
 
 The new page is a special one on himself, I don't know for sure what it does exactly, but should create a "new page"
@@ -499,23 +537,38 @@ it is used for example for Yes/No question in the test seed for example. For see
 |-----------|-------------------------------|--------|
 | 0x0b      | {cursor_location_id:0x..(..)} | 2 or 3 |
 
-### Generic var
+### Context value (0x0a)
 
-The hex value for a generic var is 0x0a. It can be of size 2 or 3, we didn't reference all values yet.
-Those value are specific to an environment, so the meaning change depending of when they are used.
+The hex value for a context value is 0x0a, followed by one parameter byte (size 2).
 
-| Hex value | Char         | Size   |
-|-----------|--------------|--------|
-| 0x0a      | {0x0a..(..)} | 2 or 3 |
+It works like the `0x04` Var opcode, but instead of a fixed variable it inserts a value that the
+**active screen fills in just before drawing the text**. The parameter byte is a slot number; the
+engine converts the slot's value into digit glyphs (for a number) or copies it as a string. Because
+each screen loads its own values into these slots, **the same `0x0a` code means different things in
+different places** - the meanings below are per-context, not global.
 
-List of known value:
+| Hex value | Char         | Size |
+|-----------|--------------|------|
+| 0x0a      | {0x0a..}     | 2    |
 
-| Hex value | Char/Signification                  | Size |
-|-----------|-------------------------------------|------|
-| 0x0a20    | {CurrentSeedTestLevel-1/APReceived} | 2    |
-| 0x0a22    | {NextSeedTestLevel-1}               | 2    |
-| 0x0a23    | {CardReceived}                      | 2    |
-| 0x0a26    | {SeedRank}                          | 2    |
+Known values in the **SeeD written test** screen (menu program 23). These are the slots read by
+`Menu_SeedTest_ParseCursorStops` and filled by `Menu_SeedTest_Update`:
+
+| Hex value | Char/Signification                  | Filled global (EXE)                    | Size |
+|-----------|-------------------------------------|----------------------------------------|------|
+| 0x0a20    | {CurrentSeedTestLevel}              | `SeedTest_TextValue_0A20_CurLevelOrAP` | 2    |
+| 0x0a21    | {0x0a21}                            | `SeedTest_TextValue_0A21`              | 2    |
+| 0x0a22    | {NextSeedTestLevel}                 | `SeedTest_TextValue_0A22_NextLevel`    | 2    |
+| 0x0a26    | {SeedRank}                          | `SeedTest_TextValue_0A26_RankStr` (string) | 2 |
+
+For slot `0x0a20` the SeeD test reuses the same slot for two purposes depending on the page: the
+current test level/number, or the AP awarded on success (`10 x number of correct answers`).
+
+Known values in **other** screens (the code number is the same, the meaning is not):
+
+| Hex value | Char/Signification | Context                 | Size |
+|-----------|--------------------|-------------------------|------|
+| 0x0a23    | {CardReceived}     | Card-received popup     | 2    |
 
 ### Special characters
 
@@ -549,6 +602,24 @@ Some words are divided in several characters, but need to be used together to co
 | 0xd9 0xda | {Fente} | 2 |
 | 0xdb 0xdc 0xdd 0xde | {Ingresso} | 4 |
 | 0xdf 0xe0 0xe1 | {Ranura} | 3 |
+
+# Reference addresses
+
+The control-opcode behaviour above was recovered from the 2013 Steam release (`FF8_EN.exe`,
+base `0x400000`). Addresses are given for reference only.
+
+| Name                             | Address     | Role                                                                            |
+|----------------------------------|-------------|---------------------------------------------------------------------------------|
+| `ProcessBattleTextExpansion`     | 0x4B8B30    | Expands a raw string: resolves names/vars/items/GF/location into displayable text. |
+| `Text_FetchNextToken`            | 0x4B9170    | Tokenizer: returns the next glyph or `(opcode<<8)\|param` control token.          |
+| `Text_RenderGlyphs`              | 0x4A1570    | Main glyph layout/rendering from the tokenized line.                             |
+| `someStringWork_4B8E40`          | 0x4B8E40    | Resolves the `0x04` Var opcode (numeric variable slots, decimal/hex formats).    |
+| `Menu_SeedTest_ParseCursorStops` | 0x4D4A80    | Parses `0x0B` cursor stops and expands the `0x0A` context values for the SeeD test. |
+| `Menu_SeedTest_Update`           | 0x4D4D30    | SeeD written test state machine; fills the `0x0A` value slots below.             |
+| `SeedTest_TextValue_0A20_CurLevelOrAP` | 0x1D7DAA8 | Value inserted by `{0x0a20}` (current test level, or AP on success).            |
+| `SeedTest_TextValue_0A21`        | 0x1D7DAB0   | Value inserted by `{0x0a21}`.                                                    |
+| `SeedTest_TextValue_0A22_NextLevel` | 0x1D7DAAC | Value inserted by `{0x0a22}` (next test level).                                 |
+| `SeedTest_TextValue_0A26_RankStr`| 0x1D7EABC   | String inserted by `{0x0a26}` (SeeD rank).                                       |
 
 
 
