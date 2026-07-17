@@ -35,7 +35,7 @@ author: HobbitDur
 | Varies | numColoredTriangles \* 20 bytes | Colored triangles                                  |
 | Varies | numColoredQuads \* 24 bytes     | Colored quads                                      |
 
-The renderer processes **four** primitive lists per object, not two. What was previously documented as "8 bytes always empty" is really two more list counts plus an unused u32: every vanilla monster has 0 colored primitives, which is why those bytes are always zero in monster files. The colored lists are fully supported by the engine (the same object format is used by the [battle stages](../../battle-stages/) and the magic-effect 3D models, which do use them).
+The renderer processes **four** primitive lists per object, not two. What was previously documented as "8 bytes always empty" is really two more list counts plus an unused u32: every vanilla monster has 0 colored primitives, which is why those bytes are always zero in monster files. The colored lists are fully supported by the engine (the same object format is used by the [battle stages](../../battle-stage-x/) and the magic-effect 3D models, which do use them).
 
 #### Vertice Data
 

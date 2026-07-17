@@ -8,7 +8,7 @@ author: hobbitdur
 
 mmag.bin (a standalone file of the menu archive, loaded at menu startup) drives the in-menu magazine viewer:
 each entry describes one magazine page view — the text window, the page picture, up to 4 picture overlays and
-up to 4 text overlays. The picture overlays reference [mngrp.bin](../mngrp/) Pos 4, the text overlays reference
+up to 4 text overlays. The picture overlays reference [mngrp.bin](../mngrpbin-file-format/) Pos 4, the text overlays reference
 the book-text string sections (raw files 87+).
 
 The file is an array of 68-byte entries (69 entries in the English PC release), with no header.
@@ -84,7 +84,7 @@ Both slot arrays use the same 4-byte layout; a slot with id 0xFF is unused:
 | 0x03   | 1    | Id                                                                  |
 
 * **Picture overlays** (0x24): the id selects a sprite in the [SP2 quad-list
-  table](../mngrp/#the-sp2-quad-list-sprite-format-pos-4) at Pos 4 of mngrp.bin (raw file 7), drawn
+  table](../mngrpbin-file-format/#the-sp2-quad-list-sprite-format-pos-4) at Pos 4 of mngrp.bin (raw file 7), drawn
   over the page. **These carry the page art.** Their quads sample the page picture directly: every
   magazine quad has texpage `0x00AE` = VRAM (896, 0) in 8bpp — exactly where the page picture TIM
   declares itself — and CLUT `0x36A0` = VRAM (512, 218), the TIM's own (single) CLUT row. A quad is
@@ -112,7 +112,7 @@ any file an entry references.
 
 ## Page texture categories
 
-The page texture loader maps the category to a base raw file index inside [mngrp.bin](../mngrp/); the loaded
+The page texture loader maps the category to a base raw file index inside [mngrp.bin](../mngrpbin-file-format/); the loaded
 file is base + page number:
 
 | Category | Base raw file | Content                          |
@@ -166,15 +166,15 @@ the page is up — that is the whole unlock mechanism — and two of the three a
   **right-aligned** on `weapon_list_x + weapon_quantity_column_x` (`menu_draw_number_rightaligned`).
   Rows step down by `weapon_line_spacing` (0x19). The item name comes from the kernel
   (`getTextBattleItem`), and the type icon is `byte_B88024[mitem.bin row's item type] + 223`, i.e.
-  one of [icon.sp1](../icon-sp1/) ids 223-229. `byte_B88024` is a 24-byte table indexed by the
+  one of [icon.sp1](../sp1-sp2/#sp1-format-iconsp1) ids 223-229. `byte_B88024` is a 24-byte table indexed by the
   item type: `0,0,0,1,1,1,2,3,4,5,6,1,3,3,3,3,6,1,1,6,6,0,0,0`.
 * **Duel move (0x1A)** — ORs `1 << id` into `SG_LIMIT_BREAK_ZELL`, then draws the move's button
-  combo from the kernel's [Duel section](../../kernel/#duel): up to 5 `u16` codes at offset 16 of the
+  combo from the kernel's [Duel section](../../main/kernel/duel-zell-limit-break/): up to 5 `u16` codes at offset 16 of the
   32-byte entry, terminated by 0xFFFF. Buttons start at (`duel_combo_x`, `duel_combo_y`) and step
   40 px right, with separator icon 55 drawn 16 px left of every button after the first.
 
   A button code is a pad bitmask, and its icon is
-  `128 + (index of the lowest set bit of code & 0xF0FF)` — an [icon.sp1](../icon-sp1/) id. The mask
+  `128 + (index of the lowest set bit of code & 0xF0FF)` — an [icon.sp1](../sp1-sp2/#sp1-format-iconsp1) id. The mask
   drops bits 8-11, which is why the icon ids the combos actually reach are 128-135 and 140-143:
 
   | Bit | 0  | 1  | 2  | 3  | 4 | 5 | 6 | 7 | 8-11 (masked out) | 12-15 |

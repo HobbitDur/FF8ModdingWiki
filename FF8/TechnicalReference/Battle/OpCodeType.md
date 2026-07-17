@@ -67,7 +67,7 @@ An ability line correspond to a list of 3 abilities, with the first being at low
 
 A monster can have theoretically up to 255 ability line, even tho in practise 10 is already a lot.
 
-So the value is the ID of the ability line, starting from 0. The line contains 3 [monster ability]({{site.baseurl}}/FF8/TechnicalReference/Lists/Ability_list#monster-ability)
+So the value is the ID of the ability line, starting from 0. The line contains 3 [monster ability]({{site.baseurl}}/technical-reference/list/ability-list/#monster-ability)
 
 # Local var
 

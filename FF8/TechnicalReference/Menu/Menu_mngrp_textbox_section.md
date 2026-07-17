@@ -22,7 +22,7 @@ They can be composed of:
 These pages power the **Information menu** (main menu → Information): a hypertext browser (menu program 21)
 with links, a parent page per entry and a 127-deep navigation history.
 
-There are 6 sections with string info in it (raw files 128-133 of [mngrp.bin](../mngrp/)), and before those a
+There are 6 sections with string info in it (raw files 128-133 of [mngrp.bin](../mngrpbin-file-format/)), and before those a
 "Seek map" section (raw file 127) which indicates the position of every String Entry.
 
 ## Seek Map

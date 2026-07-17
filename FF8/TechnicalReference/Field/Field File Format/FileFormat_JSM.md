@@ -52,4 +52,4 @@ The position is relative to *offsetScriptData*. The meaning of the flag is unkno
 
 Each opcode is 4 bytes.
 
-[Opcode List](../Field%20Opcodes/Opcodes)
+[Opcode List](../../field-opcodes/)

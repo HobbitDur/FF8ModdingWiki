@@ -82,7 +82,7 @@ permalink: /technical-reference/main/kernel/magic/
 | 0x0002 | 2 bytes | Offset to spell description                                                                     |
 | 0x0004 | 2 bytes | Attack animation (a.k.a. "Magic ID") — **the effect / animation id** dispatched at runtime (the engine "special action": Fire=2, Thunder=3, Thundara=102 → `MAG_<id>_<name>`, file `mag<id-1>`). See [Magic Spell Effect Runtime](../../../battle/magic-spell-effect-runtime/) |
 | 0x0006 | 1 byte  | Target hit/reaction animation ID (`HIT_TYPE_TARGET_ANIMATION_TO_PLAY`) — 5 for offensive spells, 0 for curatives; sets the target's reaction animation when the spell lands |
-| 0x0007 | 1 byte  | [Attack type]({site.baseurl}}/technical-reference/list/kernel#attack-type)                      |
+| 0x0007 | 1 byte  | [Attack type]({{site.baseurl}}/technical-reference/list/kernel#attack-type)                      |
 | 0x0008 | 1 byte  | Spell power (used in damage formula)                                                            |
 | 0x0009 | 1 byte  | [Status window flags]({{site.baseurl}}/technical-reference/list/battle/#status-window-flags) — bit 0x80 clear = show the ally status panel while targeting (heals use 0x00, Esuna & co. use 0x40 for the ailment view) |
 | 0x000A | 1 byte  | [TargetInfo]({{site.baseurl}}/technical-reference/list/kernel#target-info)                      |
