@@ -22,13 +22,13 @@ The file is an array of 68-byte entries (69 entries in the English PC release), 
 | 0x02   | 2    | Window Y (8)                                                                                   |
 | 0x04   | 2    | Window width (336)                                                                             |
 | 0x06   | 2    | Window height (184)                                                                            |
-| 0x08   | 2    | Page picture X                                                                                 |
-| 0x0A   | 2    | Page picture Y                                                                                 |
-| 0x0C   | 2    | Page picture width (0 = no picture)                                                            |
-| 0x0E   | 2    | Page picture height                                                                            |
-| 0x10   | 1    | Picture X scale (multiplied by the zoom factor, /128)                                          |
-| 0x11   | 1    | Picture Y scale                                                                                |
-| 0x12   | 1    | Picture Z scale                                                                                |
+| 0x08   | 2    | Paper mat X (relative to the window, see [the paper mat](#the-paper-mat-0x08-0x12))            |
+| 0x0A   | 2    | Paper mat Y                                                                                    |
+| 0x0C   | 2    | Paper mat width (0 = not drawn)                                                                |
+| 0x0E   | 2    | Paper mat height (0 = not drawn)                                                               |
+| 0x10   | 1    | Paper mat red (multiplied by the zoom colour byte, /128)                                       |
+| 0x11   | 1    | Paper mat green                                                                                |
+| 0x12   | 1    | Paper mat blue                                                                                 |
 | 0x13   | 1    | Paper background parameter A (PS1 GPU E1 texture page bits)                                    |
 | 0x14   | 1    | Paper background parameter B (PS1 GPU E2 texture window bits)                                  |
 | 0x15   | 1    | Text file index: the string section loaded is raw file 87 + this value                         |
@@ -43,9 +43,35 @@ The file is an array of 68-byte entries (69 entries in the English PC release), 
 | 0x1F   | 1    | Weapon quantity column X offset                                                                |
 | 0x20   | 2    | Duel combo X                                                                                   |
 | 0x22   | 1    | Duel combo Y                                                                                   |
-| 0x23   | 1    | Footer flag: 1 = draw the "To be continued"-style footer line (menu string 1/13/28)            |
+| 0x23   | 1    | Footer flag: 1 = draw the footer line, menu string 1/13/28 ("{CrossLeft} {CrossRight} to scroll {Circle} to go to Tutorial"), centred at x = (336 - text width) / 2 + 24, y = 200. Only the multi-page books set it |
 | 0x24   | 16   | 4 picture overlay slots, 4 bytes each (see below)                                              |
 | 0x34   | 16   | 4 text overlay slots, 4 bytes each (see below)                                                 |
+
+### The paper mat (0x08-0x12)
+
+These seven bytes do **not** describe the page picture, and 0x10-0x12 are a colour rather than a
+scale. `Menu_Magazine_DrawPageImage` (0x4C95A0) builds a single `GP0(0x62)` primitive — a
+monochrome, semi-transparent rectangle with **no texture coordinates at all** — whose R/G/B are the
+three bytes at 0x10-0x12, each multiplied by the matching byte of the zoom colour and divided by
+128 (so 128 = unchanged):
+
+```
+prim.r = zoom.b0 * entry[0x10] / 128
+prim.g = zoom.b1 * entry[0x11] / 128
+prim.b = zoom.b2 * entry[0x12] / 128
+prim.code = 0x62                      // monochrome rect, variable size, semi-transparent
+prim.xy   = window.xy + entry[0x08..0x0B]
+prim.wh   = entry[0x0C..0x0F]
+```
+
+It is the tinted mat drawn *behind* the page art: the art itself is a
+[picture overlay](#overlay-slots). Entry 0's (115, 35, 0) is the sepia backing of the Lion Heart
+photo, and the Pet Pals pages use it as the reddish frame around the dog. Combat King has no
+picture overlay at all and uses the mat alone, as the banner behind its Duel move name.
+
+Both the width and the height must be non-zero for it to be drawn. The entries that want no mat do
+not use zeroes: they store (255, 255, 255, 255) with a (0, 0, 0) tint, which lands a black rectangle
+at (279, 263) — off screen.
 
 ### Overlay slots
 
@@ -58,9 +84,31 @@ Both slot arrays use the same 4-byte layout; a slot with id 0xFF is unused:
 | 0x03   | 1    | Id                                                                  |
 
 * **Picture overlays** (0x24): the id selects a sprite in the [SP2 quad-list
-  table](../mngrp/#the-sp2-quad-list-sprite-format-pos-4) at Pos 4 of mngrp.bin, drawn over the page.
+  table](../mngrp/#the-sp2-quad-list-sprite-format-pos-4) at Pos 4 of mngrp.bin (raw file 7), drawn
+  over the page. **These carry the page art.** Their quads sample the page picture directly: every
+  magazine quad has texpage `0x00AE` = VRAM (896, 0) in 8bpp — exactly where the page picture TIM
+  declares itself — and CLUT `0x36A0` = VRAM (512, 218), the TIM's own (single) CLUT row. A quad is
+  therefore a plain crop of the decoded TIM, at the slot's position plus the quad's own draw offset.
 * **Text overlays** (0x34): the id selects a string in the book-text
   [string section](../mngrp-string-section/) (raw file 87 + entry byte 0x15), drawn with the menu text engine.
+
+## Draw order
+
+`Menu_Magazine_Draw` (0x4C9330) fills a PSX ordering table, so the primitives it adds last are the
+ones drawn first. Back to front, a page is:
+
+1. the paper background (`Menu_Magazine_DrawPaperBackground`, 0x4C96F0)
+2. the menu window gradient (`BattleUI_DrawWindowBackground`)
+3. the [paper mat](#the-paper-mat-0x08-0x12)
+4. the picture overlays
+5. the text overlays, then the footer line when byte 0x23 is set
+
+The paper background is drawn as 64px-wide vertical strips across the window width, textured from
+the E1/E2 bits at 0x13/0x14. In every retail entry these are E1 = 0x00 and E2 = 0xC0, which give
+texpage VRAM (896, 0) and a texture window of mask (28, 28) offset (0, 24): the U/V are wrapped to
+0-31 and 192-223, i.e. a single 32x32 tile at VRAM (896, 192)-(927, 223). That tile sits *below* the
+256x192 page picture TIM loaded at the same texpage, so it is uploaded separately and is not part of
+any file an entry references.
 
 ## Page texture categories
 
@@ -70,13 +118,20 @@ file is base + page number:
 | Category | Base raw file | Content                          |
 |----------|---------------|--------------------------------------|
 | 0        | 28            | Weapons Monthly issue pictures       |
-| 1        | 20            | Combat King pictures                 |
+| 1        | 20            | Loaded by the Combat King pages, but never drawn (see below) |
 | 2        | 24            | Pet Pals pictures                    |
 | 3        | 44            | Occult Fan pictures                  |
 | 4        | 48            | Card textures (unused by mmag.bin)   |
 | 5        | 71            | Card rules / battle tutorial pictures |
 | 6        | 180           | Card icon explanation pictures       |
 | other    | -             | The page number is used directly as the raw file index |
+
+A page texture is only ever sampled through the [picture overlays](#overlay-slots) — nothing else
+draws it. The five Combat King entries (28-32) have no picture overlay at all, so their texture is
+loaded into VRAM and then never read. Category 1 is theirs alone, and raw file 20 is in fact a
+byte-identical copy of raw file 28, the Weapons Monthly weapons: the reference is vestigial, and
+those pages have no picture. What fills their banner is the
+[Duel combo](#the-unlock-block-0x18-0x22).
 
 ## Magazine map (English PC release)
 
@@ -99,6 +154,41 @@ reading the page is what unlocks weapons, Duel moves and Angelo moves, every fra
 The tutorial-book viewer ignores those fields (entries 43-67 have them at 0xFF). Entries 43-67 are the three
 tutorial-menu books, whose first/last entry indices come from [mtmag.bin](../mtmag/).
 
+## The unlock block (0x18-0x22)
+
+`Menu_ItemMagazine_DrawPage` both applies and draws it. Each field sets its savemap bit every frame
+the page is up — that is the whole unlock mechanism — and two of the three also draw:
+
+* **Weapon index (0x18)** — ORs `1 << index` into `SG_PARTY_BATTLE.unlocked_weapons`, then draws the
+  weapon's remodel line from [mwepon.bin](../mwepon/) (`mweaponbuffer + 12 * index + 4`, four
+  {item id, quantity} pairs, empty ids skipped). Per row: the item's type icon at
+  (`weapon_list_x`, `weapon_list_y` - 2), its name at `weapon_list_x + 14`, and the quantity
+  **right-aligned** on `weapon_list_x + weapon_quantity_column_x` (`menu_draw_number_rightaligned`).
+  Rows step down by `weapon_line_spacing` (0x19). The item name comes from the kernel
+  (`getTextBattleItem`), and the type icon is `byte_B88024[mitem.bin row's item type] + 223`, i.e.
+  one of [icon.sp1](../icon-sp1/) ids 223-229. `byte_B88024` is a 24-byte table indexed by the
+  item type: `0,0,0,1,1,1,2,3,4,5,6,1,3,3,3,3,6,1,1,6,6,0,0,0`.
+* **Duel move (0x1A)** — ORs `1 << id` into `SG_LIMIT_BREAK_ZELL`, then draws the move's button
+  combo from the kernel's [Duel section](../../kernel/#duel): up to 5 `u16` codes at offset 16 of the
+  32-byte entry, terminated by 0xFFFF. Buttons start at (`duel_combo_x`, `duel_combo_y`) and step
+  40 px right, with separator icon 55 drawn 16 px left of every button after the first.
+
+  A button code is a pad bitmask, and its icon is
+  `128 + (index of the lowest set bit of code & 0xF0FF)` — an [icon.sp1](../icon-sp1/) id. The mask
+  drops bits 8-11, which is why the icon ids the combos actually reach are 128-135 and 140-143:
+
+  | Bit | 0  | 1  | 2  | 3  | 4 | 5 | 6 | 7 | 8-11 (masked out) | 12-15 |
+  |-----|----|----|----|----|---|---|---|---|-------------------|-------|
+  | Icon | 128 | 129 | 130 | 131 | 132 | 133 | 134 | 135 | 136-139 | 140-143 |
+  | Button | L2 | R2 | L1 | R1 | Triangle | Circle | Cross | Square | Select, L3, R3, Start | the four d-pad directions |
+
+  So Dolphin Blow (`04 08 04 08`) is L1 R1 L1 R1, and My Final Heaven
+  (`1100 2000 4000 8000 0010`) is a full d-pad rotation followed by Triangle. Note the engine
+  remaps ids 128-139 through the player's **key config** at runtime, so the glyph a player sees
+  depends on their bindings; icon.sp1 ships the PlayStation pad set.
+* **Angelo move (0x1B)** — ORs `1 << id` into `SG_ANGELO_KNOWN`, and draws nothing. The Pet Pals
+  pages show their dog through an ordinary picture overlay like any other page.
+
 ## Function addresses
 
 | Function | Address   | Description                                                  |
@@ -106,7 +196,11 @@ tutorial-menu books, whose first/last entry indices come from [mtmag.bin](../mtm
 | `Menu_Magazine_Update` | 0x4C9060  | Viewer state machine (page turning, zoom)                    |
 | `Menu_Magazine_Draw` | 0x4C9330  | Draws window, page picture, text overlays, footer            |
 | `Menu_Magazine_DrawPictureOverlays` | 0x4C9670  | Draws the 4 picture overlay slots                            |
-| `Menu_Magazine_DrawPageImage` | 0x4C95A0  | Draws the scaled page picture quad                           |
+| `Menu_Magazine_DrawPageImage` | 0x4C95A0  | Draws the paper mat rectangle                                |
+| `Menu_ItemMagazine_DrawPageImage` | 0x4FDA50 | The item reader's copy of it, same logic                  |
+| `menu_draw_text` | 0x4BDE30  | Glyph blitter: cell = code - 0x20, atlas of 21 columns of 12x12, +13 y per line break |
+| `menu_draw_number_rightaligned` | 0x4A3400 | Draws a number ending on the given x (via `menu_draw_number_colorsel`, 0x4A3530) |
+| `getTextBattleItem` | 0x47EA30  | Item name, from the kernel's item name text sections        |
 | `Menu_Magazine_LoadPageTexture` | 0x4C9920  | Loads the page picture TIM from category/page                |
 | `Menu_Magazine_DrawPaperBackground` | 0x4C96F0  | Draws the paper background in 64-pixel strips                |
 | `Menu_Magazine_FirstEntry` | 0x1D7D3A5 | First mmag entry of the currently open book                  |

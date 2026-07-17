@@ -88,6 +88,168 @@ positions, velocities, scale, per-target index. Task functions return `0` to sta
 `2` to self-destruct. When *every* node of the spell's root queue has self-destructed, the
 effect is finished.
 
+## The cast context — the one argument every init receives
+
+Every one of the 343 effect inits has the **same signature**, and it is not a guess: they are all
+called through one function-pointer table, so the type is fixed by construction.
+
+```c
+TaskQueueExample *__cdecl MAG_nnn_Init(MagicCastContext *cast_context);
+```
+
+The argument is **`&g_MagicCastContext` (0x1D99A78)** — a single **global**, not an allocation.
+There is only ever one cast in flight, so the engine reuses one struct:
+
+```c
+C3_28_GF_data_pointer = MAGIC_EFFECT_LOGIC_CALLBACK(&g_MagicCastContext);
+```
+
+It is filled in by **`BattleActionSequence_BuildMagicCastContext` (0x50AFC0)**, called by every cast
+path immediately before the init — `_MagicEffect` (0x50B190) case 3, `_MagicCast_Simple` (0x50B0C0),
+`_GF_Cinematic` (0x50B2A0), `sub_50BDC0`, `sub_50BEE0`.
+
+| Offset | Field | Type | Meaning |
+|---|---|---|---|
+| +0 | `attacker_slot` | `u8` | `BATTLE_TASK_68_DATA->slotIdAttacker`. Effects use it as `&BattleEntitySlotData[attacker_slot]` (stride 156) |
+| +1 | `flags` | `MagicCastFlags` | bit0 = **suppress camera track + TIM upload** (below) |
+| +2 | `target_slot_mask` | `u16` | `LINKED_TARGET_SLOT_ID_0` — a **bitmask** over slots, tested as `(1 << i) & mask` |
+| +4 | `action_data` | `BattleActionTaskData *` | `= BATTLE_TASK_68_DATA_ADDR`. **The payload** — targets, counts, damage |
+| +8 | `sequence_mode` | `u8` | **IN:** sub-command for re-entrant effects (Shot, Duel). Derived from `action_data->word_1D280C8` (`+2`, or 8 for the 0xFFFC/0xFFFA cases) |
+| +9 | `done_flag` | `u8` | **OUT:** zeroed before the init; **the effect writes 1** to say it has finished, and the action sequence ends |
+| +10 | `sequence_submode` | `u8` | `0`, or `unk6 − 5` |
+| +11 | `unknown_11` | `u8` | written 0, never read |
+
+**The context is a bidirectional mailbox, not just an input.** For ordinary spells it is
+write-once-then-read: the engine fills it, the init reads `+0/+1/+4`, done. But the two re-entrant
+effects use it as a channel in both directions — `sequence_mode` in, `done_flag` out (§
+[Duel](#duel--the-same-trick-as-an-input-channel)).
+
+**Most effects read only `+0`, `+1` and `+4`** — who cast it, whether to play the cinematics, and a
+pointer to the action data. But `+8` (`sequence_mode`) is **not** merely bookkeeping: the
+[Shot family](#the-shot-family--a-re-entrant-init) branches its entire setup on it.
+
+> **A trap when checking this.** Asking IDA for cross-references to `g_MagicCastContext.sequence_mode`
+> returns only battle-sequence functions, which makes it *look* like no effect reads it. That is an
+> artifact: effects typically **stash the context pointer into a private global** in the init and
+> dereference it later (`*(ptr + 8)`), which no xref on the global will ever catch. Field usage must
+> be judged from the effects' own stashed pointers, not from xrefs to the global.
+
+### `flags` bit 0 — what a "simple" cast is
+
+Every init ends with the same gate:
+
+```c
+if ( (cast_context->flags & MAGICCAST_FLAG_NO_CAMERA_OR_TIM) == 0 ) {
+    Battle_PlayCameraAnimation(&MAGnnn_cameraAnim);
+    Battle_QueueTIMUpload_GetEOF(MAGnnn_timBuffer);
+}
+```
+
+Who sets it settles the meaning: **`BattleActionSequence_Tick_MagicCast_Simple` sets it**
+(`byte_1D99A79 |= 1` @0x50B155) right after building the context, whereas the full `_MagicEffect`
+path leaves it clear. So bit 0 is what makes a "simple" cast bare — the effect plays its particles
+but skips its camera track and does not re-upload its texture. This is the single most useful bit in
+the struct for modding: it is the engine's own switch for *"this spell, minus the cinematics."*
+
+### Reaching the targets
+
+Everything an effect needs about *what it is hitting* is behind `action_data`. Note the two count
+fields are **different quantities** and both are live — see the
+[Thundara case study](../thundara-case-study/#3-the-director-iterates-actions-not-targets):
+
+| Path | Meaning |
+|---|---|
+| `action_data[0].target_count` (+16) | number of targets of an action; iterate `targetData[0..n-1]`, **stride 24** |
+| `action_data[0].actionCountMinus1` (+17) | number of actions (hits); iterate `action_data[0..n]`, **stride 20** |
+
+Both idioms occur in the wild: Fire and the GF summons loop targets; Thundara loops actions and
+takes each action's first target only.
+
+### The Shot family — a re-entrant init
+
+There are exactly **eight 40-byte inits** in the dispatch table — the smallest by a wide margin —
+and they are precisely Irvine's **Shot** limit break (ids **188, 192–198**). Nothing else in the
+table is that small, and the reason is a dispatch shape unique to this family.
+
+Their init does almost nothing: it **stashes the context into globals and delegates**.
+
+```c
+TaskQueueExample *__cdecl MAG_188_SHOT_NORMAL_SHOT_Init(MagicCastContext *cast_context) {
+    MAG_188_texBuffer   = Magic_TextureOFF_ToEAX1();
+    MAG_188_castCtx     = cast_context;              // stash the pointer
+    MAG_188_attackerSlot = cast_context->attacker_slot;
+    MAG_188_SHOT_Setup_BySequenceMode();             // no args — reads the globals
+    return &MAG_188_queueRootAndShots;
+}
+```
+
+Note there is **no camera/TIM gate** here, unlike every other init. That is the tell: the real setup
+(`MAG_188_SHOT_Setup_BySequenceMode`, 0x5BE370) branches on **`castCtx->sequence_mode` (+8)**:
+
+| `sequence_mode` | Action |
+|---|---|
+| 0 | **full init** — pools (`0x10×4` root, `0x24×100` twice), root task, effect task, zero the two 900-entry tables, `resetSomeCameraData()`, `Battle_QueueTIMUpload_GetEOF` |
+| 1 | add task `MAG_188_sub_5BF100` |
+| 2 | **fire one shot** — spawn `MAG_188_sub_5BE4D0`, `seq_id = shotCounter % 100`, target from `castCtx->action_data->targetData->TargetSlotId`, cycle `0..2` |
+| else | `mode − 2` |
+
+So **the Shot effect entry is invoked many times per limit break** — once to build, then once per
+shot — whereas every other effect's init runs exactly once per cast. The 40-byte wrapper exists
+because it has to be cheap and re-entrant; all the state lives in globals between invocations.
+
+`sequence_mode` is *not* set by `BattleActionSequence_BuildMagicCastContext`. Its writers are
+`BattleActionSequence_Tick_MagicCast` (0x50AA4D) and `BattleActionSequence_Tick_Duel` (0x50BDC0).
+Shot has its own re-entry handler, **`BattleActionSequence_Tick_Shot` (0x50BEE0)**, dispatched for
+command types **`0xED` "Shot on hit"** and **`0xEE` "Shot time expire"**.
+
+### Duel — the same trick, as an input channel
+
+Zell's **Duel** (effect **274**, command type **`0xF1`**) is the most interactive effect in the game,
+and it reuses the Shot mechanism for something rather different: **live player input**.
+
+The player enters a button combo; the battle code raises a `0xF1` action;
+`BattleActionSequence_Tick_Duel` (0x50BDC0) sets `sequence_mode` and re-invokes the init — which
+builds **nothing**. It just latches the move and bails:
+
+```c
+TaskQueueExample *__cdecl MAG_274_DUEL_Init(MagicCastContext *cast_context) {
+    if ( cast_context->sequence_mode ) {                       // re-entry: a move was entered
+        MAG274_DUEL_pendingMoveId = cast_context->sequence_mode;
+        MAG274_DUEL_moveChanged   = 1;
+        return 0;                                              // no queue!
+    }
+    ... /* first call: build pools, root task, stash ctx */
+}
+```
+
+Returning **0** would normally be fatal — the `_MagicEffect` path assigns the return straight to
+`C3_28_GF_data_pointer`, so a NULL would end the effect. It is safe here only because
+`_Tick_Duel` **discards the return value**. That is the structural signature of a re-entry path.
+
+`MAG_274_DUEL_MoveTask` (0x689AC0) then latches `pendingMoveId` and switches on it — one handler per
+move, with the finisher inline:
+
+| `sequence_mode` | Handler |
+|---|---|
+| 0 | no move pending → `castCtx->done_flag = 1` |
+| 2–6 | `MAG_274_DUEL_Move2_Tick` … `Move6_Tick` (0x68A050, 0x68B2F0, 0x68B700, 0x68B950, 0x68C7B0) |
+| 7 | `MAG_274_sub_68CA60` |
+| 8 | **finisher (inline)** — `ApplyActionResultToTarget`, restore the attacker's saved position/rotation, return 2 |
+
+Mode = `action_data->word_1D280C8 + 2` for combo ids 0–5 → moves 2–7; and the sentinels
+**`0xFFFC` / `0xFFFA` map to mode 8**, i.e. those two values *are* the "finish the Duel" signal
+(time expired / final blow). Per-move duration comes from the table `MAG274_DUEL_moveDurations`
+(0x110E3E0); per-move camera from `BS_GetCameraAnimationPointer(..., comData[145] + 16*(move−2))`.
+
+The return path completes the picture: the move task writes `castCtx->done_flag = 1`, and
+`_Tick_Duel` polls `byte_1D99A81 == 1` and ends the action. **That is the whole Duel loop — input in
+via `sequence_mode`, completion out via `done_flag`, both through the shared cast context.**
+
+> A by-product: the odd `commandType == 0xF0` branch at the top of
+> `BattleActionSequence_BuildMagicCastContext` — which scans `BattleEntitySlotData` for
+> `COM_ID_RINOA` — explains itself once you have the command list. `0xF0` is **Angelo Automove**,
+> whose attacker is Rinoa, so her slot has to be found rather than read from the action.
+
 ## Anatomy of one spell — Firaga (effect_id 143, `mag142.tim`)
 
 All of the following is per-spell code/static data; every other spell follows the same
@@ -317,6 +479,22 @@ Functions: `BdLink_InitTaskQueuePool` (0x508300, ex-`BS_Memset`), `Effect_AddTas
 `MAG_143_FIRAGA_RootTask_RunEffectQueue` / `_Director_Tick` / `_SparkParticle_Tick` /
 `_TargetFireball_Tick` / `_FlameSwirl_Tick` / `_Burst_Tick` / `_AreaFlame_Tick`
 (0x61CDA0 / 0x61C0A0 / 0x61CBB0 / 0x61CB10 / 0x61C9C0 / 0x61C870 / 0x61C6B0).
+
+Re-entrant effects (2026-07-16): `BattleActionSequence_Tick_Duel` (0x50BDC0, ex-`sub_50BDC0`, cmd
+`0xF1`), `BattleActionSequence_Tick_Shot` (0x50BEE0, ex-`sub_50BEE0`, cmd `0xED`/`0xEE`);
+`MAG_188_SHOT_Setup_BySequenceMode` (0x5BE370) + `MAG_188_*` globals; the Duel tree
+`MAG_274_DUEL` / `_Init` / `_RootTask` / `_MoveTask` / `_Move2..6_Tick`
+(0x6897E0 / 0x6898B0 / 0x689990 / 0x689AC0 / 0x68A050, 0x68B2F0, 0x68B700, 0x68B950, 0x68C7B0) and
+`MAG274_DUEL_*` globals (`pendingMoveId`, `moveChanged`, `castCtx`, `attackerEntity`, `modelBuffer`,
+`moveDurations` 0x110E3E0).
+
+Cast-context pass (2026-07-16): `BattleActionSequence_BuildMagicCastContext` (0x50AFC0,
+ex-`sub_50AFC0`), the struct `MagicCastContext` (12 B) + enum `MagicCastFlags`, and the global
+`g_MagicCastContext` (0x1D99A78, ex-`RELATED_SLOT_ID_ATTACKER`). Typing that one global absorbed
+seven loose globals that were really its fields — `byte_1D99A79`, `word_1D99A7A`,
+`RELATED_BATTLE_TASK_68_DATA_ADDR`, `byte_1D99A80`…`byte_1D99A83`. The uniform prototype
+`TaskQueueExample *__cdecl f(MagicCastContext *cast_context)` is applied to **all 343 dispatch
+entries and all 111 thunk targets**, so every effect init now reads its context symbolically.
 
 Globals: `MAGIC_EFFECT_ACTIVE_FLAG` (0x1D99A64), `MAGIC_EFFECT_INDEX` (0x1D99A68),
 `MAGIC_TEXTURE_BUFFER_PTR` (0x1D99A88), `MAGIC_TEXTURE_BUFFER_BASE` (0x20DFAB8),

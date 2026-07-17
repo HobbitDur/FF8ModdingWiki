@@ -62,6 +62,56 @@ Cure line (`Damage_ComputeCurativeMagic`): `heal = P × randVar × ((P + MAG)/2)
 
 `chance = accuracy + atkStat/4 − tgtStat/4 − mentalResist` (must be > 0; resist ≥ 100 = immune). Accuracy < 250: succeed when `255·chance/100 ≥ rand255`; accuracy 250–254: automatic unless resist zeroes it; accuracy 255: **bypasses the resist check entirely** (rarely documented).
 
+## Hit result flags & the damage popup
+
+How a computed result becomes what the player *sees*. The formula functions do not write to the
+targets directly — they fill a **staging `FF8BattleTargetData` at `0x1D27ADD − 2 = 0x1D27ADB`**
+(the loose globals `BATTLE_ACTION_STATE_RESULT`, `HIT_TYPE_2` @0x1D27ADE, `DAMAGE_DEAL`… are its
+fields), which `computeTargetData` copies into the per-target `TARGET_DATA` ring. Later,
+`ApplyActionResultToTarget` (0x506690) consumes one ring entry: applies statuses to the entity,
+queues the hit reaction, fires the crit screen flash, spawns the eject/death FX, and calls
+`BattleFx_DamageNumbers_Spawn`.
+
+### `HitType2` (staging +3) — how the number is displayed
+
+| Bit | Name | Set by (verified) | Display effect |
+|---|---|---|---|
+| 0x01 | `HIT_TYPE_RESTORATIVE` | curative magic, resurrection, **negative final damage** (elemental absorb); *cleared* when a Zombie flips a heal into damage | green number, steady-rise animation |
+| 0x02 | `HIT_TYPE_CRIT` | the crit rolls | white screen flash in `ApplyActionResultToTarget`; damage already ×2 |
+| 0x04 | `HIT_TYPE_MISS` | evade roll, gravity-immune, dead/invincible targets, earth-vs-Float, reflected-away, zero-power attacks whose statuses all failed | single glyph 16 (the "Miss" icon) instead of digits |
+| 0x08 | `HIT_TYPE_REACTION_NEEDED` | (consumer not yet traced) | — |
+| 0x10 | `HIT_TYPE_CERBERUS_POPUP` | **one site in the whole exe** (0x491E62): the Cerberus ability, when it didn't miss | stacked glyph pair 69+70, and **overrides** the no-number suppression — Cerberus deals no damage, so without this bit its popup would never show |
+
+### `BattleActionResultFlag` (staging +2) — side effects on the target
+
+| Bit | Name | Meaning |
+|---|---|---|
+| 0x01 | `NO_DAMAGE_NUMBER` | action resolved without a visible HP change (status landed with 0 power, or spell reflected) → popup suppressed (unless 0x10 above) |
+| 0x04 | `REVIVAL_SUCCESSFUL` | Life landed |
+| 0x10 | `PROTECT_TRIGGERED` | Protect halved the damage → shimmer effect **39** |
+| 0x20 | `SHELL_TRIGGERED` | Shell halved the damage *or healing* → shimmer effect **40** |
+| 0x30 | both = **Reflect** | reflection sets `0x31` → flash effect **38** on the original target |
+| 0x40 | `NORMAL_MONSTER_DIED` | monster death vanish animation + the two death SFX |
+
+The 39/40/38 effect dispatch is the `switch (flags & 0x30)` in `ApplyActionResultToTarget` —
+this is where the Protect / Shell / Reflect shimmers actually come from.
+
+### The popup itself (`BattleFx_DamageNumbers_Spawn` / `_TaskTick`)
+
+A 32-byte task (`TaskNodeDamageNumber`) living 10 frames. Digits are glyphs `56+d`; the text is
+built most-significant-first with a computed half-width for centering. Frame 0 resolves the
+target's head anchor (bone 0xF0, +0x1000 up), projects it through the GTE and clamps to
+x∈[32,288], y∈[32,152]; each frame `y` moves by `BattleFx_DamageNumbers_AnimTable[frame +
+10×isHeal]` — damage numbers *bounce*, heals *rise steadily* — and the last two frames fade via a
+palette scale + semi-transparent blend. Colours are plain RGB dwords: white `0x808080` (neutral
+modulate) for damage, green `0x408040` for heals. A drain attack spawns a **second** popup on the
+attacker from the drain-back half of the same ring entry.
+
+> ⚠ Both colour constants are valid `.text` addresses, so IDA renders them as bogus function
+> offsets (`0x808080` collected hundreds of false xrefs). They are numbers.
+
+
+
 ## Specials
 
 | Formula | Code |
@@ -198,6 +248,12 @@ The gunblade variants (0xF3/0xF8/0xFD) and the Renzokuken launch pair (0x05/0xFA
 | `Battle_RollDropItem` | 0x486650 | Item drop roll |
 | `Battle_RollMugItem` | 0x4867C0 | Mug item roll |
 | `Battle_ComputeDrawQuantity` | 0x48FD20 | Draw quantity formula |
+| `computeTargetData` | 0x48EF80 | copies the staging result struct into the `TARGET_DATA` ring |
+| `ApplyActionResultToTarget` | 0x506690 | applies a ring entry: statuses, reaction anim, crit flash, Protect/Shell/Reflect shimmer, popup |
+| `BattleFx_DamageNumbers_Spawn` | 0x5068B0 | builds the damage/heal popup task (`TaskNodeDamageNumber`) |
+| `BattleFx_DamageNumbers_TaskTick` | 0x5069B0 | popup per-frame tick: project, bounce/rise, fade |
+| `Damage_ComputeReviveHP` | 0x491940 | Life / Full-Life revive HP (zombie target → unmissable magic damage) |
+| `computeResurrection` | 0x4935A0 | resurrection entry: sets restorative display, handles the resurrection map-seal |
 | `Battle_RollCardCommand` | 0x48FBA0 | Card command capture roll |
 | `Battle_ComputeExpDistribution` | 0x494D40 | EXP distribution formula |
 | `Stat_RefreshCharaBattleStats` | 0x495960 | Recomputes battle stats from base + junction |

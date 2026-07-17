@@ -200,7 +200,12 @@ Each GF draws an animated **creature model** loaded from the magic-effect files.
 (`.00` = `[0, 0xFC, 0x8C, 0x281C, 0x1D48, 0x30, 0xE8, 0xFC, 0, 0x2540, 0]`). This is a **custom
 magic-effect format**, not the monster/character skeletal `.dat`.
 
-### The creature animation is a byte-code VM, not keyframes
+### The creature animation is a byte-code VM, not keyframes — *in the cinematic family*
+
+> **Scope.** Everything in this subsection was decoded from **Ifrit**, and holds for the
+> **shared-cinematic family** (the 10 slots at `0xAE`–`0xB5` that drive ctx `*0x27973EC`). It is
+> **not** how every GF animates — see [Quezacotl](#quezacotl-a-timeline-family-gf-animates-like-an-ordinary-battle-model)
+> below, which uses the standard battle-model system instead. Do not generalise the VM to all GFs.
 
 Decoded from the Ifrit render tree: there is **no `pose[frame][bone]` table to interpolate**.
 The animation is a **data-driven per-bone/per-axis opcode VM** (the AnimSeq VM, shared in form
@@ -252,6 +257,42 @@ Because this VM shape is shared with battle `.dat` model animation, output-pose 
 is a candidate **unified** fix for GF creatures *and* characters/enemies. (`mag184` **Shiva**
 is documented as having a frame-count header, so some chains may store data differently —
 verify per GF.)
+
+### Quezacotl: a timeline-family GF animates like an ordinary battle model
+
+Quezacotl (effect **116**) was read specifically to test whether the Ifrit VM generalises. **It does
+not.** Quezacotl is a *timeline* GF reached through a 14-byte thunk (`MAG_116_QUEZACOTL` 0x6C3550
+→ `GF_116Quezacotl_SetupSummon` 0x6C3640, offset +0xF0), and **nothing in the summon ever touches
+`*0x27973EC`**. Its creature animates through the **standard battle-model path**:
+
+```c
+au_re_Battle_ReadAnimation_6(&node[3].next, 0..2)     // 0x6574D0
+  -> pre_Battle_ReadAnimation (0x509440)
+    -> Battle_ReadAnimation (0x508F90)                // the same leaf the model gate hooks
+BS_ComputeBonesWorldMatrices((BattleAnimHeader *)(modelBuffer + 136), ...);
+ProcessFieldEntitiesTransformation((BattleAnimHeader *)(modelBuffer + 136));
+```
+
+So there is no opcode VM and no velocity integrator here — it is a `BattleAnimHeader` skeleton, the
+same machinery characters and monsters use. Five other GFs sit behind thunks in the same timeline
+region (Griever, Phoenix, Carbuncle, Pandemona, Diablos), so **FF8's GFs are split across two
+unrelated animation implementations** — see the [census](../../list/magic-effect-census/).
+
+**Why a ctx-windowed frame-hold cannot work on it.** `GF116_QUEZACOTL_modelBuffer` is
+`Magic_TextureOFF_ToEAX1()` — the **magic texture buffer** (~`0x20DFAB8`), filled in `SetupSummon`
+by `qmemcpy`ing `0x109FC` + `0x4D9C` bytes out of `.data`. The creature's skeleton and animation
+state therefore live at `modelBuffer + 136`, roughly **4.4 MB away** from the effect's own globals
+(`0x25216D8`…`0x25217B0`) and from the root queue it returns (`0x2521748`). A snapshot/restore hold
+windowed on the returned context (e.g. `ctx − 0x2000`, size `0x8000`) simply **does not contain the
+state it is trying to freeze**. That is a concrete, address-level reason the generic frame-hold left
+Quezacotl at 4× — separate from the `*0x27973EC` cine-path question.
+
+The summon's own timeline is `++task_node[1].flags_and_priority` in
+**`GF_116Quezacotl_SequenceTask` (0x6C3760)**, once per tick — that single task also flips the
+double-buffered packet arena, spawns the creature at counter `== 2`
+(`GF_116Quezacotl_CreatureTask`, a 0x8D0-byte node), and drives every particle queue. It is
+therefore the natural 1-in-4 gate point for this GF. **Untested in-game** — this is a code-reading
+conclusion, not a confirmed fix.
 
 ## Runtime evidence summary
 
