@@ -73,7 +73,7 @@ There is exactly one hardcoded exception: **encounter ID 33** (2× G-Soldier, Do
 
 1. `FFBattleDirector_battleLoop` loads the 128-byte encounter record into `CURRENT_ENCOUNTER_DATA_SCENE_OUT` via `ReadSceneOutFileForSpecificEncounter`.
 2. During stage init, the per-stage handler (`BS_StageXXX`) receives the *load camera* command and calls `BS_CameraInit`, which picks main/secondary as described above and stores the byte into **camera-VM variable 0** (`CURRENT_CAMERA_ANIMATION`). It then resolves the stage .x camera section pointers (camera settings + animation collection) via `BS_GetCameraHeaderPointers` (renamed from `BS_GetCameraAnimPointers`).
-3. Every frame, `updateBattleCamera` → `BS_UpdateCameraSequence` executes the stage's *camera settings* byte-code with the shared animation-sequence VM (`computeAnimationSequence` — the same VM used by [monster animation sequences](../monster-files-c0mxxxdat/) and [camera sequences](../model-sections/camera-sequence/)). Stage camera scripts start with camera opcode `05 00` = "play the camera animation whose ID is read from camera variable 0" — i.e. the scene.out byte.
+3. Every frame, `updateBattleCamera` → `BS_UpdateCameraSequence` executes the stage's *camera settings* byte-code with the shared animation-sequence VM (`computeAnimationSequence` — the same VM used by [monster animation sequences](../monster-file/) and [camera sequences](../model-sections/camera-sequence/)). Stage camera scripts start with camera opcode `05 00` = "play the camera animation whose ID is read from camera variable 0" — i.e. the scene.out byte.
 4. `BS_GetCameraAnimationPointer` decodes the byte: `set = (id >> 4) & 0xF` (bounds-checked against `NumOfSets`), `anim = id & 7`, resolves the animation's relative pointer inside the stage file and spawns the `ProcessCameraAnimation` task that plays it.
 
 After the intro animation ends, this byte has no further effect: mid-battle cameras are chosen per action by `cameraWhenDoingAction`, which overwrites camera variable 0 with its own animation choices.  
@@ -114,7 +114,7 @@ Enemy flags are one byte each, and each bit determines whether a specific monste
 ## Enemy IDs
 
 Encounters hold 8 monster IDs.  
-IDs are the last 3 digits of the monster's [c0mxxx.dat file](../monster-files-c0mxxxdat/)) + 0x10.  
+IDs are the last 3 digits of the monster's [c0mxxx.dat file](../monster-file/)) + 0x10.  
 
 | Offset     | Size | Monster      |
 |------------|------|--------------|

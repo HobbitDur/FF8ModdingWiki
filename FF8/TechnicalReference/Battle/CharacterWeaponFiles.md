@@ -14,7 +14,7 @@ author: HobbitDur
 
 Playable characters and their weapons are battle models stored in the same
 `battle.fs` archive as the monsters, using the **same container format and the
-same section building blocks** as [monster files (c0mxxx.dat)](../monster-files-c0mxxxdat/).
+same section building blocks** as [monster files (c0mxxx.dat)](../monster-file/).
 They differ only in *which* sections they carry and in how those sections are
 split at load time.
 
@@ -69,7 +69,7 @@ model table before loading.
 
 ## Container header
 
-Identical to the [monster header](../monster-files-c0mxxxdat/#header): a section
+Identical to the [monster header](../monster-file/#header): a section
 count, a table of per-section byte offsets, and a trailing end offset equal to
 the file size. `len(section i) = position[i+1] − position[i]`.
 

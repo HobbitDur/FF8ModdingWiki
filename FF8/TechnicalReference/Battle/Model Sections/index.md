@@ -22,7 +22,7 @@ These pages document each building block once, independently of the file it
 appears in. The file-type pages then list which blocks they use and in what
 order:
 
-- [Monster files (c0mxxx.dat)](../monster-files-c0mxxxdat/) — all 11 blocks.
+- [Monster files (c0mxxx.dat)](../monster-file/) — all 11 blocks.
 - [Character & weapon files (dXcYYY.dat / dXwYYY.dat)](../character-weapon-files/) — a subset each.
 
 Because the section *number* depends on the file type (the camera block is

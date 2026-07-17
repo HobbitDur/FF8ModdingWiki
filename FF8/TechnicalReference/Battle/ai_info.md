@@ -294,7 +294,7 @@ OR
 
 | Position | Size | Name            | Type                                                      | Short description     |
 |----------|------|-----------------|-----------------------------------------------------------|-----------------------|
-| 1        | 1    | **Monster ID**  | [c0mxxx.dat files ID](../monster-files-c0mxxxdat/) + 0x10 | Monster ID            |
+| 1        | 1    | **Monster ID**  | [c0mxxx.dat files ID](../monster-file/) + 0x10 | Monster ID            |
 
 ---
 

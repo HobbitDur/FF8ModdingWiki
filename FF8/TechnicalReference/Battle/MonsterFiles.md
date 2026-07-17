@@ -3,16 +3,16 @@ title: Monster files (c0mxxx.dat)
 layout: default
 parent: Battle
 author: Mirex, JWP, random_npc, myst6re, HobbitDur
-permalink: /technical-reference/battle/monster-files-c0mxxxdat/
+permalink: /technical-reference/battle/monster-file/
 nav_order: 2
 ---
 
 1. TOC
 {:toc}
 
-A monster file carries all 11 [model building-block sections](model-sections/). The
+A monster file carries all 11 [model building-block sections](../model-sections/). The
 same blocks (with a different numbering) make up the playable [character & weapon
-files](character-weapon-files/) — see [Model file sections](model-sections/)
+files](../character-weapon-files/) — see [Model file sections](../model-sections/)
 for the shared formats.
 
 ## Header
@@ -29,18 +29,18 @@ Section Positions and the trailing End offset are byte offsets from the start of
 
 ## Sections
 
-| # | Section ([format](model-sections/))                    |
+| # | Section ([format](../model-sections/))                    |
 |---|-----------------------------------------------------------|
-| 1 | [Skeleton](model-sections/skeleton/)                   |
-| 2 | [Model geometry](model-sections/model-geometry/)      |
-| 3 | [Model animation](model-sections/model-animation/)    |
-| 4 | [Dynamic texture data](model-sections/dynamic-texture-data/) |
-| 5 | [Animation sequences](model-sections/animation-sequences/) |
-| 6 | [Camera sequence](model-sections/camera-sequence/)    |
-| 7 | [Information & stats](model-sections/information-stats/) |
-| 8 | [Battle scripts / AI](model-sections/battle-scripts-ai/) |
-| 9 | [Sounds](model-sections/sounds/)                       |
-| 10 | [Sound sample bank](model-sections/sound-sample-bank/) |
-| 11 | [Textures](model-sections/textures/)                  |
+| 1 | [Skeleton](../model-sections/skeleton/)                   |
+| 2 | [Model geometry](../model-sections/model-geometry/)      |
+| 3 | [Model animation](../model-sections/model-animation/)    |
+| 4 | [Dynamic texture data](../model-sections/dynamic-texture-data/) |
+| 5 | [Animation sequences](../model-sections/animation-sequences/) |
+| 6 | [Camera sequence](../model-sections/camera-sequence/)    |
+| 7 | [Information & stats](../model-sections/information-stats/) |
+| 8 | [Battle scripts / AI](../model-sections/battle-scripts-ai/) |
+| 9 | [Sounds](../model-sections/sounds/)                       |
+| 10 | [Sound sample bank](../model-sections/sound-sample-bank/) |
+| 11 | [Textures](../model-sections/textures/)                  |
 
 (`c0m127.dat` is the exception: it holds only sections 7 and 8.)
