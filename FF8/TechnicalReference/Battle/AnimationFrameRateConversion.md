@@ -69,9 +69,22 @@ This is why the limit is per animation:
 ## Splitting an animation that does not fit
 
 An animation that goes over its limit once converted is cut into parts played one after
-the other. The parts **share their boundary frame** (part 1 ends on the frame part 2 starts
-with), so each part interpolates the motion across the cut and the parts chain seamlessly:
-playing them in a row shows the original motion, plus one repeated frame.
+the other. **Interpolate first, cut after**: the animation is converted whole, then the
+resulting frame stream is cut in contiguous slices of at most the limit. The parts are
+then slices of the very stream an unsplit conversion would produce — no frame is repeated
+at the cut, no interpolated frame is missing, and the parts chained play exactly the
+unsplit animation. Elvoret's animation 27 at 30 fps: 140 frames → 279 converted →
+`140 + 139`, and 140 + 139 = 279.
+
+(Cutting the 15 fps frames *before* interpolating would instead force each part to end on
+the frame the next one starts with — one repeated frame per cut, and one tick too many.)
+
+The chaining is seamless because of how the engine counts ticks: an animation of N frames
+occupies exactly N ticks, and the tick where it completes **draws nothing** —
+`Battle_ReadAnimation` returns COMPLETE before rebuilding the geometry, the sequence VM
+runs in that same tick, reaches the op code of the next part, and
+`pre_Battle_ReadAnimation` displays *its* frame 0. Part 1's last frame and part 2's first
+frame are therefore consecutive ticks, exactly as they would be inside a single animation.
 
 The original animation keeps the first part and the other parts are appended at the end of
 the section, so existing animation ids stay valid. A bare op code names the animation
@@ -195,7 +208,7 @@ Monsters absent from the table convert as-is at both frame rates.
 | `c0m111` | Propagator | — | — | 0 (37f→2) | — |
 | `c0m112` | Adel | — | — | 18 (100f→2) | 0 (36f, A0), 10 (35f, A0) |
 | `c0m113` | {Rinoa} | — | — | 18 (100f→2) | 0 (36f, A0), 10 (35f, A0) |
-| `c0m114` | Omega Weapon | — | — | 26 (107f→2), 32 (128f→3) | — |
+| `c0m114` | Omega Weapon | — | — | 26 (107f→2), 32 (128f→2) | — |
 | `c0m115` | “Sorceress” | — | — | — | 0 (35f, A0), 9 (64f, A0) |
 | `c0m116` | “Sorceress” | — | — | — | 0 (38f, A0) |
 | `c0m117` | “Sorceress” | — | — | 13 (110f→2) | 0 (35f, A0), 10 (81f, A0) |
