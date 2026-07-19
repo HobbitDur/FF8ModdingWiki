@@ -10,7 +10,7 @@ permalink: /technical-reference/worldmap/script-vm/
 
 # WorldMap script VM
 
-The world map has its own small event-script bytecode, stored in the [wmset]({{ site.baseurl }}/technical-reference/worldmap/worldmap-wmset/) file and evaluated every frame by the [module director]({{ site.baseurl }}/technical-reference/worldmap/module-runtime/). It drives everything scripted on the world map: conditional field warps (docks, stations, Garden/Ragnarok boarding), forced battles, docking sequences, savemap flag updates, even item rewards.
+The world map has its own small event-script bytecode, stored in the [wmset]({{ site.baseurl }}/technical-reference/worldmap/worldmap-wmset-file-format/) file and evaluated every frame by the [module director]({{ site.baseurl }}/technical-reference/worldmap/module-runtime/). It drives everything scripted on the world map: conditional field warps (docks, stations, Garden/Ragnarok boarding), forced battles, docking sequences, savemap flag updates, even item rewards.
 
 Two wmset sections contain scripts:
 

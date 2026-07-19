@@ -47,6 +47,6 @@ permalink: /technical-reference/main/kernel/blue-magic/
 | 0x000A | 1 byte  | Attack Flags                |
 | 0x000B | 1 byte  | Hit Count                   |
 | 0x000C | 1 byte  | Element                     |
-| 0x000D | 1 byte  | Status attack accuracy — chance to inflict the attached statuses (0 = never; the status flags themselves are in [Quistis limit-break parameters](../quistis-limit-break-parameters/), per crisis level) |
+| 0x000D | 1 byte  | Status attack accuracy — chance to inflict the attached statuses (0 = never; the status flags themselves are in [Quistis limit-break parameters](../blue-magic-parameters/), per crisis level) |
 | 0x000E | 1 byte  | Crit Bonus                  |
 | 0x000F | 1 byte  | Padding (unused; IDA: 0 xrefs) |

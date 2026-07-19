@@ -95,7 +95,7 @@ Consequently shop.bin only needs records **0–20** (the 21 item shops); IDs in 
 
 ## Items
 
-[Item list](({{site.baseurl}}/technical-reference/list/item))
+[Item list]({{site.baseurl}}/technical-reference/list/item/)
 
 ## Shop name
 

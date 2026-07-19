@@ -438,7 +438,7 @@ Sets global variable (accessible by all monsters)
 
 | Position | Size | Name      | Type                                 | Short description             |
 |----------|------|-----------|--------------------------------------|-------------------------------|
-| 1        | 1    | **Var**   | [LocalVar](../opcode-type-list#global-var) | The var to store the data     |
+| 1        | 1    | **Var**   | [LocalVar](../opcode-type-list#local-var) | The var to store the data     |
 | 2        | 1    | **Value** | [int](../opcode-type-list#int)             | The value var is set to       |
 
 ---
@@ -497,7 +497,7 @@ Adds value to battle var (accessible by all monsters).
 
 | Position | Size | Name      | Type                                  | Short description           |
 |----------|------|-----------|---------------------------------------|-----------------------------|
-| 1        | 1    | **Var**   | [GlobalVar](../opcode-type-list#global-var) | The var to store the data   |
+| 1        | 1    | **Var**   | [GlobalVar](../opcode-type-list#global-map) | The var to store the data   |
 | 2        | 1    | **Value** | [int](../opcode-type-list#int)              | The value to add to the var |
 
 ---
@@ -552,7 +552,7 @@ Allows/Disallows escaping in the current battle.
 
 | Position | Size | Name                | Type                       | Short description                          |
 |----------|------|---------------------|----------------------------|--------------------------------------------|
-| 1        | 1    | **EscapeActivated** | [Bool](../opcode-type-list#bool) | Previously documented as "True to allow escape, False to disallow it" — likely backwards, see correction above. **TO BE TESTED.** |
+| 1        | 1    | **EscapeActivated** | [Bool](../opcode-type-list#int) | Previously documented as "True to allow escape, False to disallow it" — likely backwards, see correction above. **TO BE TESTED.** |
 
 ---
 

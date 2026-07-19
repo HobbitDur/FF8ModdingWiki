@@ -69,7 +69,7 @@ permalink: /technical-reference/main/kernel/battle-commands/
 
 ### Ability data ID (0x04)
 
-Index into [Command ability in battle](../command-ability-in-battle/) (kernel section 11) supplying this command's fixed built-in effect (magic/effect id,
+Index into [Command ability in battle](../command-abilities-in-battle/) (kernel section 11) supplying this command's fixed built-in effect (magic/effect id,
 attack type, power, hit count, element, status, animation), via `computeCommandAction`.
 
 `0xFF` = no fixed effect: the action is chosen at runtime from the player's selection (Attack, Magic, Draw, GF, Item all use `0xFF`). Fixed-effect commands (

@@ -10,7 +10,7 @@ permalink: /technical-reference/worldmap/terrain-streaming/
 
 # WorldMap terrain rendering and streaming
 
-How the engine streams `wmx.obj` around the player and turns it into triangles each frame. Complements the [wmx format]({{ site.baseurl }}/technical-reference/worldmap/worldmap-wmx/) and [texl]({{ site.baseurl }}/technical-reference/worldmap/worldmap-texl/) pages with the runtime view. Addresses for FF8_EN.exe, image base 0x400000.
+How the engine streams `wmx.obj` around the player and turns it into triangles each frame. Complements the [wmx format]({{ site.baseurl }}/technical-reference/worldmap/worldmap-wmx-file-format/) and [texl]({{ site.baseurl }}/technical-reference/worldmap/worldmap-texl-file-format/) pages with the runtime view. Addresses for FF8_EN.exe, image base 0x400000.
 
 ## Map layout recap
 

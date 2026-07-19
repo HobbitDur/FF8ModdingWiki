@@ -84,4 +84,4 @@ FF8_EN.exe:
 | `updateBattleCamera` | 0x504060 | Per-frame battle camera update; calls `BS_UpdateCameraSequence` (verified IDA function) |
 | Camera pose capture routine (`sub_503300` in IDA, unnamed) | 0x503300 | Copies the live camera position/look-at into the default-pose registers, used by opcode `03` (verified IDA function) |
 | Default-pose registers | 0xB8B800 | Global data holding the idle/rest camera pose (Global variable/data, not a function) |
-| `CameraSeq_ReadSpecialVar_C3` | 0x509640 | Camera C3-family special-variable reader (verified IDA function; also referenced as `a3ParamAnimSeqForCamera` — an older name — on the [Information & stats](../information-stats/#function-address-reference) page) |
+| `CameraSeq_ReadSpecialVar_C3` | 0x509640 | Camera C3-family special-variable reader (verified IDA function; also referenced as `a3ParamAnimSeqForCamera` — an older name — on the [Information & stats](../information-stats/#functionaddress-reference) page) |

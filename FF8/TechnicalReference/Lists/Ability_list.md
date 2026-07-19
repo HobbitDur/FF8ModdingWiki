@@ -18,7 +18,7 @@ This ID define which list should be check. Seifer is a special case for seifer b
 |-----|----------------------------------------------------------------------------------|
 | 0   | Not defined                                                                      |
 | 2   | [Magic]({{site.baseurl}}/technical-reference/list/magic-list)                    |
-| 4   | [Item]({{site.baseurl}}/technical-reference/list/item_list)                      |
+| 4   | [Item]({{site.baseurl}}/technical-reference/list/item/)                      |
 | 8   | [Custom]({{site.baseurl}}/technical-reference/list/ability-list#monster-ability) |
 | 179 | Ultimecia_weird_file_127                                                         |
 | 236 | [Seifer]({{site.baseurl}}/technical-reference/list/ability-list#monster-ability) |

@@ -59,7 +59,7 @@ Each sprite record is a UInt32 quad count followed by 12 bytes per quad:
 | icon.sp1      | 329     | UI icons (element/status symbols, cursors, button icons...)   |
 | face.sp2      | 64      | Character and GF portraits (32×48)                            |
 | cardanm.sp2   | 12      | Triple Triad card flip animation frames (64×64)               |
-| [mngrp.bin](../mngrp/) Pos 4 | 79 (39 used) | Magazine and Chocobo World screen pictures    |
+| [mngrp.bin](../mngrpbin-file-format/) Pos 4 | 79 (39 used) | Magazine and Chocobo World screen pictures    |
 
 ## Addresses (FF8 PC 2000 EN)
 

@@ -16,7 +16,7 @@ Differences from the magazine viewer in how the fields are used:
   raw file 90 (Chocobo World text: story slides = strings 0-4, Solo RPG manual = strings 5-14), loaded to a
   different buffer than the magazines' book text. The text file index at 0x15 is not used.
 * **Picture overlays** (offset 0x24): sprite ids 58-76 of the
-  [SP2 quad-list table](../mngrp/#the-sp2-quad-list-sprite-format-pos-4) at Pos 4 of mngrp.bin — the high
+  [SP2 quad-list table](../mngrpbin-file-format/#the-sp2-quad-list-sprite-format-pos-4) at Pos 4 of mngrp.bin — the high
   sprite ids of that table belong to this screen.
 * **Page textures**: all entries use category 6 (base raw file 180): page 0 = raw 180 (story pictures),
   page 1 = raw 181 (manual pictures).

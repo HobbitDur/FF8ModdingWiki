@@ -130,7 +130,7 @@ being harmful.
 These drive **Zell's "Duel"** and **Irvine's "Shot"** limit breaks, which both scale with the
 character's crisis level (0–3, higher = lower HP / stronger limit).
 
-- **Duel Start Sequence (CL1–4)** — the starting index into the [Duel move table](../zell-limit-break-parameters/)
+- **Duel Start Sequence (CL1–4)** — the starting index into the [Duel move table](../duel-parameters/)
   (section 24, *Duel Params*). When a Duel begins, `linkedToZellDuel` reads the byte for the current
   crisis level (`K_MISC[0x2E + 2·crisis_level]`) and uses it to seed the "current sequence" pointer.
   The per-tick Duel driver (`sub_4852B0`) then performs `duelMoves[seq].StartMove`, and the player's
