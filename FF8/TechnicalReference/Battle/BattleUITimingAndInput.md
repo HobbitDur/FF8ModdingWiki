@@ -103,6 +103,37 @@ The 16-bit PSX button mask layout (also used by `K_DUEL` sequences): hi byte `Se
 
 Since press edges materialize at most once per rendered frame, the player can land **one input per 64.5 ms** at best, and quick taps between two polls are dropped. The duel duration in seconds is unchanged, so the input-per-second ceiling is ~4× lower than the code's own tick pacing allows.
 
+## GF Boost internals (full decode)
+
+`pre_computeGFBoost_` is invoked from the GF cinematic action sequence (state 3, only
+for `commandType 0xFE` = boostable summon). **The timing data is kernel data**:
+`K_GF_JUNCTIONABLE[gf].gfBoostParams` (2 bytes) — low byte ×15 = initial delay units,
+high byte ×15 = the total Boost window (`word_209CEF4`). The gauge registers as battle
+UI window 6 and updates every UI tick; all *pacing* units decrement only on
+fresh-input latch ticks (`ctx+33`):
+
+- **State 2**: initial delay counts down, then a safe-phase length is rolled:
+  `15 × (rand(1..3) + rand(1..3))` = 30–90 units.
+- **State 4** (the minigame): Square press *edge* during a safe phase → boost +1
+  (starts 75, caps 250); press during a danger phase → reset to 75. Phase expiry
+  re-rolls: safe→danger `15×rand(1..3)`, danger→safe `15×(rand(1..3)+rand(1..3))`.
+  The total window and current phase tick down together; window exhausted → apply
+  `damage × boost/100`. Untouched gauge → 100.
+- A 4-tick freshness budget (`byte_209CEFD`, set to 4 on fresh ticks, −1 per UI tick)
+  gates input processing; at the vanilla 15 Hz latch it hits 0 on the 4th tick, so
+  vanilla PC silently ignores input on 1 of every 4 UI ticks — at a 30/60 Hz latch it
+  never starves.
+- The displayed number eases toward the real value at 3/UI-tick (cosmetic).
+
+Wall-clock consequences (window and phase lengths = units ÷ latch rate):
+
+| Build | latch | Boost window / phases vs PSX | mash ceiling |
+|---|---|---|---|
+| PSX | 60/s | 1× (phases 0.5–1.5 s) | ~30 presses/s |
+| PC vanilla | 15/s | 4× slower | ~7.5/s |
+| 30fps mod (n=2) | 30/s | 2× slower | ~15/s |
+| 60fps mod (n=4) | 60/s | PSX-exact | ~30/s |
+
 ## Effect on GF Boost
 
 `computeGFBoost_` also runs per UI tick, but its phase timers (`word_209CEF6`, safe/danger phase lengths of `15 × rand(2..6)` units) only decrement on **fresh-input ticks** (ctx+33), i.e. at 15/s instead of the intended 60/s:

@@ -1,7 +1,7 @@
 ---
 layout: default
 parent: Field File Format
-title: Field Dialogs
+title: Field Dialogs (.msd)
 permalink: /technical-reference/field/field-file-format/field-dialogs/
 ---
 

@@ -294,6 +294,17 @@ double-buffered packet arena, spawns the creature at counter `== 2`
 therefore the natural 1-in-4 gate point for this GF. **Untested in-game** — this is a code-reading
 conclusion, not a confirmed fix.
 
+### Creature model storage (timeline family)
+
+Every timeline-family creature — GF summons (Quezacotl, Shiva, Siren, Pandemona, Doomtrain,
+Diablos, Carbuncle, Odin, Gilgamesh, Phoenix, Cactuar, Tonberry) and effect companions
+(Angelo, Boko, Mog/MiniMog, Moomba, the Death reaper, the Absorbed-Into-Time cherub) — is a
+**standard 4-section battle-model container** (same layout as `c0mXXX.dat` sections 1–3), either
+shipped as a file of its mag group or embedded in `FF8_EN.exe` `.data` and resolved by
+`Effect_BindModelContainerSections` (0x6EC060) / `Effect_BindModelContainerSetAnim` (0x8DD0F0)
+before entering `Battle_ReadAnimation`. The complete census of model and texture locations,
+with all addresses, is on [Summon Creature Models](../summon-creature-models/).
+
 ## Runtime evidence summary
 
 | GF | Test id | Key confirmations |

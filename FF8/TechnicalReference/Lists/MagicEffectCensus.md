@@ -269,7 +269,7 @@ That is **57 free effect ids**, each needing a logic fn + a loader fn wired into
 | 66 | Griever + Ultimecia Death | `0x622610` `MAG_066_GRIEVER__ULTIMECIA_DEATH` | timeline (Fire/Blizzard archetype) |
 | 67 | Remedy/Remedy+ | `0x7dea20` `MAG_067_REMEDY_REMEDY_Init` | heal/status framework (Cure archetype) |
 | 68 | Unknown | `0x7dc1a0` `MAG_068_SCAN` | heal/status framework (Cure archetype) |
-| 69 | Griever Summon | `0x6fe040` `MAG_069_GRIEVER_SUMMON` → `GF_069Griever_SetupSummon` | **timeline** (via thunk +0x10) |
+| 69 | Griever Summon (loads no model; renders the boss instances in `stru_1D9898C[1]`/`[2]` — Griever's model is `c0m122.dat`) | `0x6fe040` `MAG_069_GRIEVER_SUMMON` → `GF_069Griever_SetupSummon` | **timeline** (via thunk +0x10) |
 | 70 | Shockwave Pulsar | `0x6dd8d0` `MAG_070_SHOCKWAVE_PULSAR` → `MAG_070_sub_6DD900` | **timeline** (via thunk +0x30) |
 | 71 | Laser Eye (Quistis) | `0x7d6150` `MAG_071_LASER_EYE_QUISTIS` | heal/status framework (Cure archetype) |
 | 72 | Aqua Breath (Quistis) | `0x7d1e80` `MAG_072_AQUA_BREATH_QUISTIS` | timeline (Fire/Blizzard archetype) |
@@ -289,14 +289,14 @@ That is **57 free effect ids**, each needing a logic fn + a loader fn wired into
 | 86 | Angelo Cannon | `0x77f250` `MAG_086_ANGELO_CANNON_Init` | timeline (Fire/Blizzard archetype) |
 | 87 | Angelo Strike | `0x773870` `MAG_087_ANGELO_STRIKE` | timeline (Fire/Blizzard archetype) |
 | 88 | Invincible Moon | `0x7684f0` `MAG_088_INVINCIBLE_MOON` | timeline (Fire/Blizzard archetype) |
-| 89 | Wishing Star | `0x6f9cf0` `MAG_089_WISHING_STAR` → `MAG_089_sub_6F9D00` | **timeline** (via thunk +0x10) |
+| 89 | Wishing Star (Rinoa/Angelo limit — creature model = Angelo) | `0x6f9cf0` `MAG_089_WISHING_STAR` → `MAG_089_sub_6F9D00` | **timeline** (via thunk +0x10) |
 | 90 | Tonberry Summon (Chef's Knife) | `0x762360` `MAG_090_TONBERRY_SUMMON_CHEFS_KNIFE` | timeline (Fire/Blizzard archetype) |
 | 91 | Angelo Rush | `0x759370` `MAG_091_ANGELO_RUSH_Init` | timeline (Fire/Blizzard archetype) |
 | 92 | Angelo Search | `0x755130` `MAG_092_ANGELO_SEARCH_Init` | timeline (Fire/Blizzard archetype) |
 | 93 | Angelo Recover | `0x74e390` `MAG_093_ANGELO_RECOVER_Init` | timeline (Fire/Blizzard archetype) |
 | 94 | Angelo Reverse | `0x7475f0` `MAG_094_ANGELO_REVERSE_Init` | timeline (Fire/Blizzard archetype) |
 | 95 | Siren Summon (Silent Voice) | `0x739da0` `MAG_095_SIREN_SUMMON_SILENT_VOICE` | timeline (Fire/Blizzard archetype) |
-| 96 | Moogle Dance | `0x731de0` `MAG_096_MOOGLE_DANCE_Init` | timeline (Fire/Blizzard archetype) |
+| 96 | Moogle Dance (the MiniMog command effect — creature model = Mog, embedded in the exe) | `0x731de0` `MAG_096_MOOGLE_DANCE_Init` | timeline (Fire/Blizzard archetype) |
 | 97 | ChocoFire | `0x729a60` `MAG_097_CHOCOFIRE` | timeline (Fire/Blizzard archetype) |
 | 98 | ChocoFlare | `0x721860` `MAG_098_CHOCOFLARE` | timeline (Fire/Blizzard archetype) |
 | 99 | ChocoMeteor | `0x717d30` `MAG_099_CHOCOMETEOR` | timeline (Fire/Blizzard archetype) |
@@ -418,7 +418,7 @@ That is **57 free effect ids**, each needing a logic fn + a loader fn wired into
 | 215 | My Final Heaven (Zell's Finisher) | `0x69ab60` `MAG_215_UNK9` → `MAG_215_sub_69AB90` | **timeline** (via thunk +0x30) |
 | 216 | Different Beat (Zell's Finisher) | `0x6959e0` `MAG_216_UNK10` → `MAG_216_sub_695A10` | **timeline** (via thunk +0x30) |
 | 217 | Energy Bomber | `0x694e60` `MAG_217_ENERGY_BOMBER` → `MAG_217_sub_694E90` | **timeline** (via thunk +0x30) |
-| 218 | Unknown | `0x6326d0` `MAG_218_UNK11` | timeline (Fire/Blizzard archetype) |
+| 218 | Unknown (owns the mag217 group — `mag217_b.dat` is a second 69-bone Gilgamesh model, same mesh as `mag326_g.dat` with 6 animations) | `0x6326d0` `MAG_218_UNK11` | timeline (Fire/Blizzard archetype) |
 | 219 | Terra Break | `0xabd420` `MAG_219_TERRA_BREAK` | timeline (Fire/Blizzard archetype) |
 | 220 | Light Pillar | `0xab3320` `MAG_220_LIGHT_PILLAR` | timeline (Fire/Blizzard archetype) |
 | 221 | Apocalypse | `0xaa5560` `MAG_221_APOCALYPSE` | timeline (Fire/Blizzard archetype) |

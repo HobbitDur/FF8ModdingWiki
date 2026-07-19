@@ -206,29 +206,35 @@ subject to the body's part-hiding.
 
 ### Placing the weapon
 
-The weapon is **positioned relative to the entity root, not parented to a hand
-bone.** In step 4 the base fed to the weapon is the *body's world base* (camera ×
-scale) composed with `attach_transform` (`weaponAnimHeader[3]`, at +36 of the
-weapon slot). `BS_ComputeBonesWorldMatrices` for the body does **not** modify that
-base (it writes each product into the bone's own storage), so the weapon does not
-inherit any single body bone.
+In step 4 the base fed to the weapon is the *body's world base* (camera × scale)
+composed with `attach_transform` (`weaponAnimHeader[3]`, at +36 of the weapon
+slot). `attach_transform` is **rebuilt every frame** in
+`pre_pre_linkedToAnimationSequence`: `ComposeZYXRotationMatrix` turns the three
+`attach_rot` angles (+20) into the 3×3 part, and the three `attach_trans_src`
+int16 (+28) are sign-extended into the translation part. `initAnimationSequence­
+AtStartBattle` **zeroes** all six fields, and no vanilla code writes them for a
+normal attack, so `attach_transform` is **identity** — the weapon is posed under
+the *plain* entity base.
 
-`attach_transform` is **rebuilt every frame**, in the per-entity task
-`pre_pre_linkedToAnimationSequence` just before the pass that renders the entity:
-`ComposeZYXRotationMatrix` turns the three `attach_rot` angles (+20) into the 3×3
-part, and the three `attach_trans_src` int16 (+28) are sign-extended into the
-translation part. In vanilla both sets are left at their spawn-zeroed values, so
-`attach_transform` is effectively **identity** — the weapon mesh is authored in
-the character's own coordinate space. The fields exist so an effect can rotate or
-offset the held weapon (e.g. throwing it) without touching the weapon's skeletal
-animation.
+> **⚠️ Correction (verified against d0c000/d0w000).** An earlier version of this
+> page claimed the weapon's own animation clip keys the mesh into the hand under
+> that shared base. **That is wrong.** Parsing the files shows the opposite: a
+> weapon has a tiny skeleton (Squall's `d0w000` = **2 bones, all geometry bound to
+> bone 1**), the animated weapon vertices are centred on the **entity origin** (not
+> the hand), and the weapon's per-frame root position ≈ the body's (both ~the
+> entity height, no hand offset). With `attach_transform` identity and the weapon
+> bones at the origin, the weapon is drawn **at the character's root**, and the
+> "held" placement must come from **somewhere still not accounted for here** — most
+> likely a per-frame hand-bone transform copied into `attach_trans`/`attach_rot` by
+> a path not yet located (the write site is via `weaponAnimHeader[N]` pointer
+> arithmetic, so it doesn't show up as a struct-field xref). Until that is found,
+> **a viewer cannot reproduce the placement from the weapon clip alone** — it must
+> attach the weapon to the body's hand bone explicitly (translate the posed weapon
+> to a chosen body bone each frame; the correct bone index is per-character and not
+> encoded in the file). See [Reproducing it in a viewer](#reproducing-it-in-a-viewer).
 
-The "held in the hand" look is therefore produced entirely by the **weapon's own
-animation**: for each matched index, the weapon clip is keyed so that — under the
-shared entity base — the weapon sits at the hand throughout the body clip. Move
-the body root (run-up, knockback) and both models move together because they
-share the base; swing the arm and only the matching weapon clip keeps the weapon
-aligned.
+The `attach_rot`/`attach_trans` fields also exist so an effect can rotate or offset
+the held weapon (e.g. throwing it) without touching the weapon's skeletal animation.
 
 ## Reproducing it in a viewer
 
@@ -237,13 +243,15 @@ For a tool that wants to show a character animating with its weapon (Ifrit3D):
 1. **Load both files.** A `dXcYYY` body on its own can only be posed with an empty
    hand; the weapon geometry/animation is in the paired `dXwYYY`.
 2. **Play the same animation index on both** skeletons, stepping them together —
-   body frame *k* with weapon frame *k*. Do **not** try to attach the weapon to a
-   body bone; use each model's own skeletal pose.
-3. **Apply one shared world transform** (your camera/entity matrix) to the body
-   bones, and the same transform composed with the weapon's base/attach transform
-   to the weapon bones. In practice, applying the *same* entity-root transform to
-   both models reproduces the in-game placement, because the weapon clip already
-   encodes the hand offset.
+   body frame *k* with weapon frame *k*.
+3. **Attach the weapon to the body's hand bone.** Contrary to the earlier claim
+   above, the weapon clip does **not** self-place into the hand — posed on its own
+   it sits at the entity root (blade extending past the head). You must transform
+   the posed weapon by a chosen body bone's world matrix each frame (translation to
+   the bone is usually enough; the weapon's own clip supplies the blade
+   orientation). The correct bone is the weapon-holding hand and is **per-character**
+   — it is not stored in the file, so a tool should let the user pick it (or ship a
+   per-character lookup once each is confirmed visually).
 4. The body's animation pool and the weapon's animation pool have the **same
    count and ordering** of actions; index them in parallel. (The choreography that
    picks indices in-game lives in the weapon's sequence section and is not needed

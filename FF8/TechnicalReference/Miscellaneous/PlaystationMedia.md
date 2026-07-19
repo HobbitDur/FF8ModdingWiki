@@ -103,7 +103,7 @@ There are three LZSed files for each field: EXAMPLE.MIM, EXAMPLE.DAT and EXAMPLE
 | 20     | 4        | Location of section 6 in PSX RAM       | [Battle rate \[RAT](../Field/Field%20File%20Format/FileFormat_RAT_MRT)\]       |
 | 24     | 4        | Location of section 7 in PSX RAM       | [Battle formations \[MRT](../Field/Field%20File%20Format/FileFormat_RAT_MRT)\] |
 | 28     | 4        | Location of section 8 in PSX RAM       | Sounds/AKAOs                                                   |
-| 32     | 4        | Location of section 9 in PSX RAM       | [Texts \[MSD](../Field/Field%20File%20Format/FileFormat_MSD)\]                 |
+| 32     | 4        | Location of section 9 in PSX RAM       | [Texts \[MSD]({{site.baseurl}}/technical-reference/field/field-file-format/field-dialogs/)\]                 |
 | 36     | 4        | Location of section 10 in PSX RAM      | Particle Infos \[PMD\] (was a link, target page no longer exists)        |
 | 40     | 4        | Location of section 11 in PSX RAM      | [Scripts \[JSM](../Field/Field%20File%20Format/FileFormat_JSM)\]               |
 | 44     | 4        | Location of the end of file in PSX RAM |                                                                |

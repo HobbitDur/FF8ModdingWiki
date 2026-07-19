@@ -41,6 +41,11 @@ the exe.
 
 For runtime dispatch of GF summon effects, `MagicList_Logic`, `effect_id`, Odin/Gilgamesh/Phoenix/Angelo auto-actions and GF callback addresses, see [GF Summon Runtime](../gf-summon-runtime/).
 
+Timeline-family summon creatures (Shiva, Quezacotl, Siren, Carbuncle, …) are ordinary
+4-section battle-model containers, some shipped in the mag groups and some embedded in
+`FF8_EN.exe` — the full census of models and textures is on
+[Summon Creature Models](../summon-creature-models/).
+
 ## Environment objects
 
 **I'm aware it's chaotic**, like no tables and etc. but it's **up-to-date** information First, recognize file:
