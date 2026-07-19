@@ -88,6 +88,7 @@ Items in grey are unused by field scripts (some of them may be used in battle sc
 | Byte        | 334         | Ultimecia Castle seals. See [SEALEDOFF](../../field/field-opcodes/159-sealedoff/) for details.                                                                                                                                                                                                                               |
 | Byte        | 335         | Card related                                                                                                                                                                                                                                                                                                               |
 | Byte        | 336         | Deling City bus related                                                                                                                                                                                                                                                                                                    |
+| Byte        | 337         | Galbadia Garden water/fountain flags (`glfurin1`, `glprein1`, `glwater3/4`).                                                                                                                                                                                                                                                |
 | Byte        | 338-340     | Deling Sewer gates opened                                                                                                                                                                                                                                                                                                  |
 | Byte        | 341         | Does lots of things.<sub>5</sub>                                                                                                                                                                                                                                                                                           |
 | Byte        | 342         | Deling City bus system                                                                                                                                                                                                                                                                                                     |
@@ -134,7 +135,7 @@ Items in grey are unused by field scripts (some of them may be used in battle sc
 | Byte        | 442         | Rinoa Garden tour flags                                                                                                                                                                                                                                                                                                    |
 | Word        | 443         | Zell Health in Prison (Hacktuar)                                                                                                                                                                                                                                                                                           |
 | Byte        | 445-447     | Propagator defeated flags                                                                                                                                                                                                                                                                                                  |
-| Word        | 448         | Unknown                                                                                                                                                                                                                                                                                                                    |
+| Word        | 448         | Balamb Garden 2F classroom study-panel state (read+written only by `bg2f_22`).                                                                                                                                                                                                                                              |
 | Byte        | 450-451     | Various magazine/talk flags                                                                                                                                                                                                                                                                                                |
 | Byte        | 452         | Lunatic Pandora areas visited?                                                                                                                                                                                                                                                                                             |
 | Byte        | 453-455     | Moomba teleport variables                                                                                                                                                                                                                                                                                                  |
@@ -176,17 +177,17 @@ Items in grey are unused by field scripts (some of them may be used in battle sc
 | Byte        | 722         | Selphie's costume (0=normal, 1=student, 2=SeeD)                                                                                                                                                                                                                                                                            |
 | Byte        | 723         | Quistis' Costume (0=normal, 1=SeeD)                                                                                                                                                                                                                                                                                        |
 | Word        | 724         | Dollet mission time                                                                                                                                                                                                                                                                                                        |
-| Word        | 726         | not investigated                                                                                                                                                                                                                                                                                                           |
+| Word        | 726         | Town SeeD-rank/conduct input (written in Dollet/Timber fields, read by `bgrank1`).                                                                                                                                                                                                                                          |
 | Byte        | 728         | Does lots of things.<sub>3</sub>                                                                                                                                                                                                                                                                                           |
-| Byte        | 729         | not investigated                                                                                                                                                                                                                                                                                                           |
+| Byte        | 729         | Town SeeD-rank/conduct input (written in Dollet/Timber/Deling fields, read by `bgrank1`).                                                                                                                                                                                                                                   |
 | Byte        | 730         | Flags (+1 Joined Garden Festival Committee, +4 Gave Selphie tour of BG, +16 Kadowaki asks for Cid, +32 and +64 Tomb of Unknown Kind hints?, +128 Beat all card people?)                                                                                                                                                    |
 | Byte        | 731         | unused in fields                                                                                                                                                                                                                                                                                                           |
-| Word        | 732         | not investigated                                                                                                                                                                                                                                                                                                           |
+| Word        | 732         | Fire Cavern (Ifrit) test result — written **only** by `bdifrit1`, read by `bgrank1`; feeds the SeeD rank.                                                                                                                                                                                                                   |
 | Byte        | 734         | Split Party Flags (+1 Zell, +2 Irvine, +4 Rinoa, +8 Quistis, +16 Selphie).<sub>2</sub>                                                                                                                                                                                                                                     |
-| Byte        | 735         | not investigated                                                                                                                                                                                                                                                                                                           |
+| Byte        | 735         | Balamb Garden interior NPC/state flags (`bgbook_3`, `bgeat_1`, `bghoke_1`, `bgkote_1`, `bghall*`).                                                                                                                                                                                                                          |
 | Byte        | 736-751     | unused in fields                                                                                                                                                                                                                                                                                                           |
-| Byte        | 752         | not investigated                                                                                                                                                                                                                                                                                                           |
-| Byte        | 753-1023    | unused in fields                                                                                                                                                                                                                                                                                                           |
+| Byte        | 752         | Ragnarok interior state (`rgcock*`, `rgexit2`, `rgroad*`).                                                                                                                                                                                                                                                                  |
+| Byte        | 753-1023    | **Verified free** (271 bytes) — see note <sub>6</sub>. Unused by every field script, by the EXE, and zero in all real saves; a safe home for mod-added persistent data.                                                                                                                                                     |
 | Byte        | 1024        | Escalating deck level for balamb card player (bgmon_4, training center for Joker) -> Linked to CC group quest                                                                                                                                                                                                              |
 | Byte        | 1024        | Escalating deck level for balamb card player (rgroad11, ragnarok for Joker) -> Linked to CC group quest                                                                                                                                                                                                                    |
 | Byte        | 1040        | Escalating deck level for balamb card player (bghall1b with seed) -> Linked to CC group quest                                                                                                                                                                                                                              |
@@ -212,6 +213,7 @@ Items in grey are unused by field scripts (some of them may be used in battle sc
     2. Selphie's current action when escaping from Deling's mansion (changes the dialogue)
     3. FH Concert Crappiness
     4. Something in B-Garden classroom during the paratrooper attack.
+6. **Vars 753–1023 — verified unused, usable as free persistent storage for mods.** Confirmed on three independent axes: (a) referenced by **no field script** (all 882 `*.jsm` re-scanned for every PSHM/POPM/PSHSM opcode), (b) referenced by **no EXE code** (full binary scan for any instruction embedding an address in that range), and (c) **zero in every real save** (28 Steam `.ff8` saves decoded). The region's save-image offset is `464 + 3344 + var = 3808 + var`, so vars 753–1023 occupy image bytes **4561–4831**, which lie **inside** the save CRC span (bytes 80–5023); the game recomputes that CRC on every save, so values written here at runtime persist through a normal save/load with no extra hooking. Unlike the temporary variables at ≥1024, these bytes are never cleared on field entry. Runtime address of a given var = `0x1CFE9B8 + var` (e.g. var 753 = `0x1CFECA9`).
 
 # Field-script usage (JSM bytecode scan)
 
@@ -243,7 +245,9 @@ A few results worth calling out:
 - **var 261** — heavily used (82 fields, all over the world map): a real, active general-purpose flag, previously "not investigated".
 - **vars 264–270** (worldmap-variant cluster) are written by field scripts too, confirming they are ordinary savemap variables and not engine scratch.
 - The location-coded blocks confirm many guesses: **387/400/404** are all Winhill (`gf`), **436/437** are the D-District Prison (`gp`), **358/359** Centra Ruins + space, **484/487/492/493** the Missile Base (`gm`), **485/486/491** the Tomb of the Unknown King (`gn`), **320–334/369–377** Ultimecia Castle (`fe`/`ff`), and **752** is Ragnarok (`rg`).
+- The scan also resolved several bytes previously marked "not investigated"/"Unknown": **337** = Galbadia Garden water (`gl`), **448** = a BG 2F classroom panel (`bg2f_22` only), **533–539 / 595–624 / 626–691** = large per-town/city local-flag clusters (Dollet/Timber/Esthar, FH/D-District, Balamb-city/BG-library/Esthar-city — the Esthar walkway gates **672/673** are the single busiest bytes in the whole block), and **726/729/732** are all read by `bgrank1` (the SeeD-rank field), i.e. town-conduct inputs — **732** is written *only* by the Fire Cavern field `bdifrit1`.
 - Temporary/scratch variables (offsets **1024–1074** observed) are used everywhere, as expected.
+- **Vars 753–1023 (271 bytes) are verified free for modding** — see note <sub>6</sub>.
 
 ### Who accesses the variable block
 
@@ -621,7 +625,7 @@ struct SavemapVariables
     MapSeal UltimeciaSeals;         // 0x14E var 334 (SEALEDOFF)
     __int8  CardRelated;            // 0x14F
     __int8  DelingBus;              // 0x150
-    __int8  unused337;              // 0x151
+    __int8  GGardenWaterFlags337;   // 0x151 var 337 (Galbadia Garden water/fountain, gl*)
     __int8  DelingSewerGates[3];    // 0x152
     __int8  MultiPurposeVar1;       // 0x155 var 341 (multi-use, note 5)
     __int8  DelingBusSystem;        // 0x156
@@ -667,7 +671,7 @@ struct SavemapVariables
     __int8  RinoaTourFlags;         // 0x1BA
     __int16 ZellPrisonHealth;       // 0x1BB var 443
     __int8  PropagatorFlags[3];     // 0x1BD
-    __int16 Unknown9;               // 0x1C0 var 448
+    __int16 BG2FClassroomVar448;    // 0x1C0 var 448 (Balamb Garden 2F classroom study panel, bg2f_22)
     __int8  MagazineFlags[2];       // 0x1C2
     __int8  LunaticPandora;         // 0x1C4
     __int8  MoombaTeleport[3];      // 0x1C5
@@ -696,30 +700,30 @@ struct SavemapVariables
     __int8  XATMDefeated;           // 0x212
     __int8  UnusedVar1_Dollet;      // 0x213
     __int8  DolletFootsteps;        // 0x214
-    __int8  Unknown10[7];           // 0x215
+    __int8  TownLocalVars533[7];    // 0x215 vars 533-539 (Dollet/Timber/Esthar road+field flags)
     __int8  unused540[52];          // 0x21C
     __int8  AngleCharacterFacingControl[2]; // 0x250
     __int8  unused594;              // 0x252
-    __int8  Unknown11[30];          // 0x253
+    __int8  TownLocalVars595[30];   // 0x253 vars 595-624 (FH / D-District / Timber-Moomba; 614-615 hottest)
     __int8  BalambVisitedFlags;     // 0x271 var 625
-    __int8  notInvestigated626[66]; // 0x272
+    __int8  CityLocalVars626[66];   // 0x272 vars 626-691 (Balamb city / BG library / Winhill / Esthar city; 672-673 hottest)
     __int8  unused692[28];          // 0x2B4
     __int8  SquallCostume;          // 0x2D0 var 720
     __int8  ZellCostume;            // 0x2D1
     __int8  SelphieCostume;         // 0x2D2
     __int8  QuistisCostume;         // 0x2D3
     __int16 DolletMissionTime;      // 0x2D4
-    __int16 Unknown14;              // 0x2D6
+    __int16 TownVar726_SeedRankInput; // 0x2D6 var 726 (town conduct, read by bgrank1 SeeD-rank field)
     __int8  MultiPurposeVar2;       // 0x2D8 var 728 (multi-use, note 3)
-    __int8  Unknown15;              // 0x2D9
+    __int8  TownVar729_SeedRankInput; // 0x2D9 var 729 (town conduct, read by bgrank1)
     __int8  Flags1;                 // 0x2DA var 730
     __int8  unused731;              // 0x2DB
-    __int16 Unknown16;              // 0x2DC
+    __int16 FireCavernVar732_SeedRankInput; // 0x2DC var 732 (Fire Cavern time, written only by bdifrit1, read by bgrank1)
     __int8  SplitPartyFlags;        // 0x2DE var 734 (note 2)
-    __int8  Unknown17;              // 0x2DF
+    __int8  BGardenNPCVar735;       // 0x2DF var 735 (Balamb Garden interior NPC/state)
     __int8  unused736[16];          // 0x2E0
-    __int8  Unknown18;              // 0x2F0 var 752
-    __int8  unused753[271];         // 0x2F1  (vars 753-1023, unused in fields)
+    __int8  RagnarokVar752;         // 0x2F0 var 752 (Ragnarok interior state, rg*)
+    __int8  unused753[271];         // 0x2F1  (vars 753-1023, VERIFIED FREE - see note 6)
     __int8  tempVars[256];          // 0x400  (vars >=1024, temporary/scratch)
 };
 #pragma pack(pop)

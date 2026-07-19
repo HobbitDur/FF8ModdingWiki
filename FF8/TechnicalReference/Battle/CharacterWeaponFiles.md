@@ -49,7 +49,7 @@ The 11 character ids follow the standard FF8 party order:
 | 4      | Rinoa     | `d4c009`              |                                                   |
 | 5      | Selphie   | `d5c011`, `d5c012`    |                                                   |
 | 6      | Seifer    | `d6c014`              |                                                   |
-| 7      | Edea      | `d7c016`              | dedicated loader (`linked_edea_sub_5079B0`)       |
+| 7      | Edea      | `d7c016`              | dedicated loader (`linked_edea_sub_5079B0`); **10-section self-contained body, no weapon file** |
 | 8      | Laguna    | `d8c017`, `d8c018`    |                                                   |
 | 9      | Kiros     | `d9c019`, `d9c020`    | reduced weapon file (`BS_LoadWeaponry_2`)          |
 | 10 (a) | Ward      | `dac021`, `dac022`    |                                                   |
@@ -108,6 +108,10 @@ record and bound into **both** the body's and the weapon's animation headers wit
 `setComFileData`. The result is that the body and the held weapon behave as one
 model driven by a single animation clock.
 
+For how that single clock actually drives the two models at runtime — the
+lockstep same-index playback, the render order and how the weapon is positioned —
+see [Composite character + weapon animation (runtime)](../composite-character-weapon-animation/).
+
 ## Weapon sections (dXwYYY.dat)
 
 Each character has one weapon file per equippable weapon (`dXwYYY`, where `YYY`
@@ -146,6 +150,37 @@ VM, sounds and (minimal) textures:
 | 3 | Sounds                  | [Sounds](../model-sections/sounds/)            |
 | 4 | Sound sample bank       | [Sound sample bank](../model-sections/sound-sample-bank/)   |
 | 5 | Textures                | [Textures](../model-sections/textures/)         |
+
+Because these reduced files carry **no skeleton, geometry animation, or renderable
+weapon model**, Zell and Kiros draw **no second model** in battle
+(`weaponAnimHeader = NULL`); the file exists only to supply the sequence VM and the
+attack sounds. See [Composite character + weapon animation](../composite-character-weapon-animation/).
+
+## Edea — self-contained 10-section body
+
+Edea is the exception to the two-file rule: `initWeaponAnim` loads **no weapon
+file** for her, and her body `d7c016.dat` instead carries **10 sections** — a
+normal 7-section character body with the weapon's three "service" sections
+(sequence VM + sounds + bank) spliced in ahead of the textures. Verified against
+the extracted file:
+
+| # | Edea section              | Shared building block                                          | Comes from |
+|---|---------------------------|----------------------------------------------------------------|------------|
+| 1 | Skeleton                  | [Skeleton](../model-sections/skeleton/)                        | body |
+| 2 | Model geometry            | [Model geometry](../model-sections/model-geometry/)            | body |
+| 3 | Model animation (30)      | [Model animation](../model-sections/model-animation/)          | body |
+| 4 | Dynamic texture (eye-blink)| [Dynamic texture data](../model-sections/dynamic-texture-data/)| body |
+| 5 | Camera sequence           | [Camera sequence](../model-sections/camera-sequence/)          | body |
+| 6 | **Animation sequences**   | [Animation sequences](../model-sections/animation-sequences/)  | *weapon's role* |
+| 7 | **Sounds**                | [Sounds](../model-sections/sounds/)                            | *weapon's role* |
+| 8 | **Sound sample bank**     | [Sound sample bank](../model-sections/sound-sample-bank/)      | *weapon's role* |
+| 9 | Textures                  | [Textures](../model-sections/textures/)                        | body |
+| 10| Extra animation block     | [Model animation](../model-sections/model-animation/)          | body |
+
+Section 6 is byte-for-byte the same sequence-VM header format as a standard
+weapon's section 4, and sections 7–8 are the same `AKAO` sounds/bank as a weapon's
+sections 5–6 — Edea simply *is* a character and her "weapon" fused into one file,
+so she needs no separate weapon and renders a single model.
 
 ## Summary: who carries what
 

@@ -106,9 +106,18 @@ ones drawn first. Back to front, a page is:
 The paper background is drawn as 64px-wide vertical strips across the window width, textured from
 the E1/E2 bits at 0x13/0x14. In every retail entry these are E1 = 0x00 and E2 = 0xC0, which give
 texpage VRAM (896, 0) and a texture window of mask (28, 28) offset (0, 24): the U/V are wrapped to
-0-31 and 192-223, i.e. a single 32x32 tile at VRAM (896, 192)-(927, 223). That tile sits *below* the
-256x192 page picture TIM loaded at the same texpage, so it is uploaded separately and is not part of
-any file an entry references.
+0-31 and 192-223, i.e. a single 32x32 tile at VRAM (896, 192)-(927, 223), just below the 256x192
+page picture TIM loaded at the same texpage.
+
+That parchment tile is **[mngrp.bin](../mngrp/) raw file 12**: a standalone 2048-byte file holding
+one 32x32 8bpp TIM whose header places its image at VRAM (896, 192) and its CLUT at (512, 219) — a
+row below the page pictures' shared CLUT at (512, 218). It is the only TIM in the game data
+declaring that placement, and it stays resident while the page TIMs swap in above it. It is
+uploaded when a book opens: `Menu_Tutorial_Update` case 14 calls
+`Menu_LoadMngrpTextureAsync(12, staging)` right after loading the SP2 table (raw 7), and the
+texture loader sends the TIM to the emulated VRAM at its header-declared placement. The menu
+window fill (`BattleUI_DrawWindowBackground`, coloured by the player's Config window colour) is
+blended over the paper, which is why the pages read as darkened parchment in game.
 
 ## Page texture categories
 
@@ -203,6 +212,9 @@ the page is up — that is the whole unlock mechanism — and two of the three a
 | `getTextBattleItem` | 0x47EA30  | Item name, from the kernel's item name text sections        |
 | `Menu_Magazine_LoadPageTexture` | 0x4C9920  | Loads the page picture TIM from category/page                |
 | `Menu_Magazine_DrawPaperBackground` | 0x4C96F0  | Draws the paper background in 64-pixel strips                |
+| `Menu_ItemMagazine_DrawPaperBackground` | 0x4FD5B0 | The item reader's copy of it, same logic                |
+| `Menu_LoadMngrpTextureAsync` | 0x4AC400  | Loads a mngrp raw file and uploads its TIM to the emulated VRAM at the header-declared placement (page pictures, parchment raw 12) |
+| `Menu_Tutorial_Update` | 0x4C9CB0  | Tutorial menu state machine; case 14 uploads raw 7 (sprites) + raw 12 (parchment) on book open |
 | `Menu_Magazine_FirstEntry` | 0x1D7D3A5 | First mmag entry of the currently open book                  |
 | `Menu_Magazine_LastEntry` | 0x1D7D3A6 | Last mmag entry of the currently open book                   |
 | `Menu_DrawSp2Sprite` | 0x4FDCA0  | Generic SP2 quad-list sprite renderer (also cardanm.sp2)     |

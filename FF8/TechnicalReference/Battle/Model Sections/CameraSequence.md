@@ -12,6 +12,17 @@ author: HobbitDur
 The camera sequences reuse the **same byte-code VM** as [animation sequences](../animation-sequences/) (arithmetic `C0`-`E5` and jumps `E6`-`F3` behave identically), with camera-specific
 callbacks (`CameraSeq_DispatchActionOpcode`, driver `BS_UpdateCameraSequence`).
 
+### Two container forms (important)
+
+Camera data ships in **two container shapes**, and they are easy to confuse because both open with a `u16 count + u16 pointer table`:
+
+- **Full camera blob with a byte-code setting** — battle-stage `.X` files, R0WIN section 2, and spell/effect camera globals (`MAG_*`). An 8-byte header (`pointerCount`, relative offset to the **camera setting** = the byte-code VM sequence, relative offset to the **camera animation collection**, size), then the camera-setting byte-code (e.g. `a0stg000.x`: `05 00 C3 10 E5 7F C1 00 CB 7F EA 06 …`), then the collection. This is the [`BattleStageCameraData`](../../file-format-x/#camera-data) layout, and **this is the only form that contains a byte-code camera sequence.** Started via `Battle_PlayCameraAnimation`.
+- **Bare camera animation collection** — **per-entity cameras: monster files section 6, and character files (`dXc`) section 5**. There is **no 8-byte header and no camera-setting byte-code**: the section *is* a [camera animation collection](../../file-format-x/#camera-animations-collection) and starts directly at `NumOfSets`, ending with an EOF word equal to the section's byte length. The engine plays these through `cameraWhenDoingAction`, which passes the *acting entity's own* collection pointer (`command_queue->camera_animation_collection`, at offset 0x2C of the command-queue struct, set at load time to the entity's section-6/section-5 destination — see `Battle_isLoadSquallEtc` @0x5078CA) to `BS_GetCameraAnimationPointer`. Verified:
+  - **Monsters** — over all `c0m*.dat`: 133 files are a valid bare collection (`NumOfSets` usually **1** → 8 slots), 66 empty, 0 malformed.
+  - **Characters** — all 17 `dXc` section-5 blocks parse with the *same* parser: `NumOfSets = 2` (16 slots, 8 per set), `EOF == section length`, every pointer resolves. What looks like an 8-byte blob header (`02 00 08 00 08 04 b8 06`) is really the collection header itself: `NumOfSets = 2`, `setPtr[0] = 0x08`, `setPtr[1] = 0x408`, `EOF = 0x6B8` (= 1720 = length). **Characters carry no camera byte-code** — like monsters, their "which shot / how" logic lives outside the file (in `cameraWhenDoingAction`).
+
+In other words: the opcodes and the C3/E5 tables below describe the **byte-code half**, which only the stage/R0WIN/spell blobs carry. A per-entity camera section (monster §6 or character §5) is purely the key-framed collection (positions, look-at, FOV, roll) that the `00`/`05` opcodes would play. The [FF8UltimateEditor](https://github.com/HobbitDur/FF8UltimateEditor) *Camera* tab edits these collections directly; the same collection parser handles both the monster (1-set) and character (2-set) cases.
+
 ### Who starts a camera sequence
 
 A camera data blob starts with a small header containing two relative offsets: one to the **camera sequence** (the VM byte-code interpreted here) and one to the **camera animation collection** (the actual key-framed camera motions that opcodes `00`/`05` play).

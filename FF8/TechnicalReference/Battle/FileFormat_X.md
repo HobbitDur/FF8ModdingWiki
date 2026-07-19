@@ -111,10 +111,12 @@ Example — `a0stg000.x` camera setting bytes: `05 00 C3 10 E5 7F C1 00 CB 7F EA
 
 Each set holds exactly **8** animation pointers: the engine masks the requested animation index with `& 7` (`BS_GetCameraAnimationPointer`). The same function bounds-checks the requested set index against `NumOfSets` and silently ignores the request if it is out of range (no animation plays).
 
-| Offset      | Length                           | Description     |
-|-------------|----------------------------------|-----------------|
-| 0           | ushort                           | AnimPointer\*2  |
-| AnimPointer | Varies 144-146-148 bytes usually | CameraAnimation |
+The 8 pointers are **signed** int16, each **relative to the set start** and **multiplied by 2** to get the byte offset. A slot is empty when its target word is `0xFFFF` (idle monsters reuse one `0xFFFF` for several slots, so consecutive empty pointers increase by 1).
+
+| Offset          | Length                    | Description                                    |
+|-----------------|---------------------------|------------------------------------------------|
+| 0               | int16 (signed) \[8 of\]   | AnimPointer (x2 = byte offset from set start)  |
+| 2\*AnimPointer  | Chain of control-word blocks | [CameraAnimation](#camera-animation-wip)    |
 
 ## Camera Animation (WIP)
 
@@ -128,7 +130,13 @@ Each set holds exactly **8** animation pointers: the engine masks the requested 
 
 #### FOV
 
-`Control Word & 0b0000'0000'1100'0000U`
+`FOV mode = (Control Word >> 6) & 0b11`. Modes 2/3 read one/two words respectively; there is **no padding word** (earlier revisions of this page listed one - the "Same" case is a single word, "Different" is two consecutive words).
+
+##### 0 Keep
+
+| Offset | Length | Description                              |
+|--------|--------|------------------------------------------|
+| None   | None   | FOV unchanged (keeps the previous value) |
 
 ##### 1 Default
 
@@ -142,24 +150,24 @@ Each set holds exactly **8** animation pointers: the engine masks the requested 
 | Offset | Length    | Description |
 |--------|-----------|-------------|
 | 0      | uint16\_t | Start       |
-| 2      | uint16\_t | Padding     |
 | None   | None      | End = Start |
 
-##### 2 Different
+##### 3 Different
 
 | Offset | Length    | Description |
 |--------|-----------|-------------|
 | 0      | uint16\_t | Start       |
-| 2      | uint16\_t | Padding     |
-| 4      | uint16\_t | End         |
+| 2      | uint16\_t | End         |
 
 #### ROLL
 
-`Control Word & 0b0000'0011'0000'0000U`
+`ROLL mode = (Control Word >> 8) & 0b11`.
 
-##### 0 Unknown
+##### 0 Copy current
 
-`TODO`
+| Offset | Length | Description                                   |
+|--------|--------|-----------------------------------------------|
+| None   | None   | Start = End = the camera's current roll value |
 
 ##### 1 Default
 
@@ -175,7 +183,7 @@ Each set holds exactly **8** animation pointers: the engine masks the requested 
 | 0      | uint16\_t | Start       |
 | None   | None      | End = Start |
 
-##### 2 Different
+##### 3 Different
 
 | Offset | Length    | Description |
 |--------|-----------|-------------|
@@ -186,31 +194,40 @@ Each set holds exactly **8** animation pointers: the engine masks the requested 
 
 `Control Word & 0b0000'0000'0000'0001U`
 
+`LAYOUT = Control Word & 1`. Both layout paths produce the same 18-byte on-disk frames (the difference is only whether coordinates are resolved through the camera translation at parse time vs. play time; LAYOUT=1 forces interpolation mode 0xFB). You loop reading 18-byte [Animation Frames](#animation-frame) until the next word has bit 15 set (int16 < 0, i.e. 0xFFFF), which terminates the list and is consumed.
+
 ##### 0 Default
 
-`You'll loop through the data till the first value is less than 0. pushing back to a variable length container.`
-
-| Offset | Length   | Description                                         |
-|--------|----------|-----------------------------------------------------|
-| 0      | int16\_t | if &lt; 0 break; could be related to time of frame. |
-| 2      | 16 bytes | Animation Frame                                     |
+| Offset | Length   | Description                                                    |
+|--------|----------|---------------------------------------------------------------|
+| 0      | uint16   | Frame duration; if bit 15 is set (int16 < 0) the list ends    |
+| ...    | 18 bytes | [Animation Frame](#animation-frame) (the duration is its first field) |
 
 ##### 1 Other
 
-`TODO`
+Same 18-byte frame layout as mode 0; coordinates are pre-resolved through the camera translation and interpolation mode is forced to 0xFB.
 
 ### Time
 
-`Time is calculated from number of frames. You basically set starting position World+lookat and ending position, then mark number of frames to interpolate between them. Every frame is one draw call and it costs 16. Starting time needs to be equal or higher for next animation frame to be read; If next frame==0xFFFF then it's all done.`
+`Time is calculated from number of frames. You set a starting camera position + look-at and an ending one, then the frame's duration = how many frames to interpolate between them. The engine accumulates duration*16 as the running timing value. The frame list ends when the next word has bit 15 set (an int16 < 0, in practice 0xFFFF); that terminator word is consumed.`
 
 ### Animation Frame
 
-| Offset | Length                    | Description             |
-|--------|---------------------------|-------------------------|
-| 0      | uint16\_t                 | is frame durations shot |
-| 2      | Vertice<uint16_t> (x,y,z) | World                   |
-| 8      | uint16\_t                 | is frame ending shot    |
-| 10     | Vertice<uint16_t> (x,y,z) | Look At                 |
+Each frame is **18 bytes** (verified against `BS_Camera_ReadAnimation` @0x503C70 and every vanilla monster camera section). The two interpolation-mode bytes were previously missing (the frame was documented as 16 bytes), and the coordinates are **signed int16** in **Z, X, Y** order - not unsigned x,y,z.
+
+| Offset | Length   | Description                                   |
+|--------|----------|-----------------------------------------------|
+| 0      | uint16   | Frame duration (ticks to interpolate over)    |
+| 2      | uint8    | Position interpolation mode                   |
+| 3      | uint8    | Padding (skipped; always 0 in vanilla data)   |
+| 4      | int16    | Camera position **Z**                         |
+| 6      | int16    | Camera position **X**                         |
+| 8      | int16    | Camera position **Y**                         |
+| 10     | uint8    | Look-at interpolation mode                    |
+| 11     | uint8    | Padding (skipped)                             |
+| 12     | int16    | Look-at **Z**                                 |
+| 14     | int16    | Look-at **X**                                 |
+| 16     | int16    | Look-at **Y**                                 |
 
 ##### Dependency
 
