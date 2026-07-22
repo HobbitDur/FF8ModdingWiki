@@ -345,6 +345,11 @@ why the 60 fps frame-skip gate flickers; see
 | `Magic_LoadTexture_IO_GetsFile` | 0x571900 | read any file from `\FF8\Data\Magic\` |
 | `Magic_ClearMemoryForTex` | 0x571870 | free all `MAGIC_ALLOC_PTRS` allocations |
 | `InitEffectSequenceFromData` | 0x571C80 | data-driven sub-effect sequences (AnimSeq 99/B0/B1/B4/A5 path) |
+| `Effect_DecodeModelPrimLayout` | 0x7016B0 | decodes a prim-model's section-flags word → per-primitive command strides (the format in "Tier-2" below); pre-sizes the render-command buffer |
+| `MAG_011_sub_701970` | 0x701970 | model-render **iterator**: walks a model's elements, calls a per-spell draw callback per element (used by the status-effect arena tier, e.g. Haste) |
+| `MAG_025_CURA_DrawSprite` | 0x88A0F0 | the **generic heal-family sprite draw** — reads everything from node fields (see taxonomy below) |
+| `CURE_Emitter_UpdatePos` | 0x8DC610 | shared emitter **bone-follow anchor** (midpoint of target bones 0xF0/0xF1); used by ~17 heal/support spells |
+| `GfCinematic_CommitBoneAngles` | 0xAA17D0 | cinematic-tier (Water/Meteor + GF summons): commit `accumRot*`→`outAngle*` after the per-frame bone-stream decode |
 
 ## Where everything lives
 
@@ -357,6 +362,61 @@ why the 60 fps frame-skip gate flickers; see
 | Sound def | `.data` (e.g. 0xDDD8F0) | Hex-editable |
 | Dispatch | `MagicList_Logic` / `MagicList_TextureLoad` tables in `.data` | **Yes — patch a pointer** |
 | Which effect a spell uses | kernel.bin magic entry +0x04 | **Yes** — kernel edit |
+
+## Editing any spell — the draw primitives + per-part data
+
+Every castable spell's on-screen parts are drawn by a **small fixed set of shared primitives**; a
+spell is not a bespoke renderer but a set of parts, each passing its own data pointers/flags into one
+of these. To edit a part's *appearance* you edit the data it points at (all hex-editable) — not code.
+
+| Draw primitive | Used by | The edit surface (what to change) |
+|---|---|---|
+| `Effect_RenderPrimModel` (prim model) | fire trail/burst, thunder glow/column, Holy pillar, Reflect hexagon, Ultima energy, Aura, most status glyphs | 88-byte header: **+0 model-data ptr** (geometry, format below), +8/9/10 RGB, +12 alpha/param, +28 tpage flag (**243** = the standard additive-blend page for magic glows) + the `magNNN.tim` atlas |
+| **Status keyframe-model** (`MAG_119_STOP_RenderKeyframedModelElement` + iterator `MAG_011_sub_701970`) | the true glyph templates (Haste/Slow/Stop/Silence/Blind/Float) — byte-identical | a per-element **descriptor** (flags: scale/billboard/rotation-mode/blend/pose-morph); can **blend two keyframe poses** (`MAG_017_sub_701390`). Edit = the descriptor + model element data |
+| `InitEffectSequenceFromData` (sprite) | Fire flame + ground-glow, Firaga area-flames, Regen leaves, **Thunder/Blizzara bolts** (8 stacked sprite layers staggered by frame) | render header: **+0 sprite-sequence ptr** (UV/frame table), frame_index (flipbook), flags (blend), RGB + atlas |
+| **Generic heal-sprite draw** (`MAG_025_CURA_DrawSprite`) | the whole CURE-emitter family (~17: Cure/Cura/Curaga/Life/Regen/Esuna/Protect/Shell/Double/Triple/Reflect/Pain/Drain/Bio/Confuse…) | reads from **node fields**: `+76` = sprite-sequence ptr, `+80` = frame_index, `+28` = pos, `+84` = spin. Edit = the seq-ptr the spawner writes into `+76` |
+
+| **GTE vertex-morph** | Bio main visual, Ultima core sphere | two vertex-pose arrays lerped by `alpha/4096` → edit the two pose arrays |
+| **Cinematic bone-stream** (`Water_CinematicBoneStreamDecoder` 0xAA1810, driven by `MAG_222_WATER_CinematicRootTick`) | Water, Meteor (+ GF summons) | a `seqCounter`-driven, pingPong-double-buffered engine (no frame-number director; `paused` = `battle_flags&1` is the 60fps gate); a compressed per-frame delta stream drives bone matrices (`accumRot*`→`outAngle*`). Edit the stream/bone data, not simple constants |
+| **Animated model container** (`Effect_BindModelContainerSetAnim`) | Death (the reaper), other creature-summoning effects | a full skeletal model + animation set (same system as monster/GF models); edit = the model-container data (mesh/skeleton/anims), like a monster `.dat` |
+| **Fullscreen 2D overlay** (direct `SSIGPU_InsertPrimAutoDepth`) | Confuse (the screen swirl) | a mini command-script (`0xFF`=end/`0xFE`=wait-frame) drives a fullscreen textured quad via the 2D GPU path, bypassing the effect render list; edit = the overlay texture + palette + script |
+
+The heal/support family also shares a common **task structure**: a director task (an N-state machine,
+state at node+0x29) driving 4 pools — director / a small helper pool / the **emitter** pool / the
+**glint** pool — over 3 packet arenas, and several spells **reuse the same camera track**
+(`MAG_Cure_cameraAnimation` — editing it changes Cure *and* Esuna *and* others). The emitter's config is a
+**relocatable descriptor** (16 sprite slots + per-particle keyframe arrays, pointer-fixed at first run by
+`Effect_ParticleEmitter_RelocateDescriptor`) at **node+48**; `Effect_ParticleEmitter_RunAndCheckDone` +
+a per-spell `SetupWorkspace` (e.g. `MAG_024_ESUNA_Emitter_SetupWorkspace`) reads it, builds an
+`EffectParticleEmitterState` workspace at node+52, and a type field at `workspace+0x22` selects the
+processor (Curaga's "main visual" is the same engine). So editing any heal/support particle's appearance,
+timing and spawn behaviour = editing that **descriptor blob at node+48**.
+
+A few spells fall **outside** these primitives and generate geometry procedurally at runtime: **Quake** builds
+and deforms a ground-fissure mesh in a ~46 KB runtime vertex buffer (`dword_2792E1C`, zeroed by
+`MAG_038_QUAKE_InitGroundMeshBuffers`, displaced across an 11-phase sequence), and **Tornado**
+(`MAG_146_TORNADO_BuildFunnelMesh`) builds its funnel as an 8×16 grid of quads in `unk_249524C` /
+`unk_2497A4C` each cast. **Holy**'s gathering-light plane is built the same way (`MAG_175_HOLY_BuildGatherLightGrid`: a 15×21
+perturbed vertex grid → GPU quads), alongside its prim-model pillar. These have no static model pointer to
+swap; editing them means changing the generation/deformation code/parameters, like the cinematic tier.
+(**Meltdown** is a middle case: it reuses the prim-model renderer but computes a per-target beam
+orientation via axis-angle at runtime.)
+
+**Target re-render:** a few effects don't draw a separate model — they **re-render the target entity's own
+model** (`BS_ComputeBonesWorldMatrices` + `RenderGeometry` on the target) with an overlay/distortion texture,
+e.g. **Meltdown** (`MAG_148_MELTDOWN_RenderMeltedTarget`, tex-16 melt overlay) and **Sleep**. Editing that
+look means editing the overlay texture/distortion, not a spell-owned model.
+
+**Shared sprites:** some common particles don't use the spell's own atlas — they call
+`EffectSprite_GetSharedSequence(N)` for a **shared, indexed sprite sequence** (e.g. Fira's spark = #5),
+CLUT-recoloured per use. Editing a shared sequence changes that particle in *every* effect that requests
+it, so distinguish shared-sequence particles from per-spell `unkXXXX` atlas sprites before editing.
+
+The **model-render library** is the `MAG_011_*` routines (`Effect_DecodeModelPrimLayout` decodes the
+section-flags format; `MAG_011_sub_701970` iterates elements). The **anchor/motion** layer is shared
+too (`CURE_Emitter_UpdatePos` bone-follow; particle ticks are `pos += vel` with velocity decayed
+*after* the draw). So "edit any spell" = pick the part, identify which primitive above it uses, edit
+that part's data pointer/flags. See also the 30fps interpolation study for the motion-field offsets.
 
 ## Tier-2 data formats
 
@@ -381,9 +441,10 @@ then 2 pad bytes. The seven remaining section types are parsed by 0x572500, 0x57
 decompile the one you need; same count-prefixed layout, different entry sizes).
 
 The 88-byte render header passed to `Effect_RenderPrimModel` (built per draw with
-`Field_Alloc(88)`): +0 model ptr, +4 (auto) vertex ptr, +8/9/10 RGB tint, +12 colour/alpha
-parameter, +28 flags (observed 48 and 240; bit 0x40 enables the +12 parameter path),
-+32 (auto) section cursor, +36 depth, +44 OT index.
+`Field_Alloc(88)`; typed as `struct EffectPrimModelHeader` in the IDB): +0 `model_data` ptr, +4 (auto)
+`vertex_ptr`, +8/9/10 `rgb_r/g/b` tint, +12 `color_param` (colour/alpha, frame-driven),
++28 `tpage_flags` (observed 48/240 for fire, **243** for the additive glow tier; bit 0x40 enables the
++12 path; bits |0xC/0xC3 switch blend), +32 (auto) `section_cursor`, +36 `depth`, +44 `ot_index`.
 
 ### Camera track
 

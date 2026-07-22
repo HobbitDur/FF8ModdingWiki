@@ -71,22 +71,40 @@ Because the body and weapon each keep their **own** `comFileData` (own skeleton 
 own animation pool), advancing "the animation" means advancing *two* separate
 delta-stream decodes.
 
-### When there is no weapon model
+### When there is no weapon model — Zell and Kiros's spliced weapons
 
 `initWeaponAnim` sets `weaponAnimHeader = NULL` — i.e. **no second model is drawn**
 — for monsters and for **Zell, Edea and Kiros**:
 
-- **Zell** and **Kiros** fight with fists/attached blades: their body already
-  contains the "weapon". They still load a **reduced** weapon file
-  (`BS_LoadWeaponry_2`) — but only to supply the choreography VM and sounds, not a
-  rendered model.
+- **Zell** and **Kiros** still show tier-specific weapons (gloves, twin katals) —
+  but as **part of the body model**, not a second model. The mechanism
+  (`BS_LoadWeaponry_2`, `0x507E20`):
+  - The **body file ships a stub** as [model geometry](../model-sections/model-geometry/)
+    **object 1**: Zell `d1c003` = 6 vertices bound to hand bones 21/22 (bare
+    fists), Kiros `d9c019` = 10 vertices on his hand bones 25/29. Object 0 is the
+    whole rest of the body.
+  - The **reduced weapon file** (6-section `dXw`, no skeleton/animation sections)
+    carries the real weapon mesh in its geometry section, **skinned directly to
+    the body's bones**: Zell `d1w008`–`d1w011` = 62 vertices on body bones 21/22
+    (one glove per hand), Kiros `d9w037` = 98 vertices on body bones 25/29 (one
+    katal per arm).
+  - At load, `BS_LoadWeaponry_2` copies the weapon mesh and **patches the body
+    geometry's object-table entry 1** (a self-relative offset at section +8) to
+    point at it — the glove/katal replaces the stub and renders as a body part,
+    posed by the body's own skeleton and animations. That is why these weapons
+    have **no independent movement**: they are two meshes riding the body's two
+    hand bones. The reduced file also supplies the choreography VM and sounds,
+    like a full weapon file does.
 - **Edea** casts: `initWeaponAnim` skips her weapon load entirely
   (`com_id != COM_ID_EDEA`), and her dedicated body loader carries what she needs.
 - Every other character loads a normal weapon file **and** gets a
   `BattleWeaponAnimSlot`, so a second model is drawn.
 
-For a viewer this means: Zell/Kiros/Edea are complete from the body file alone;
-all other characters need the paired weapon file to look right.
+For a viewer this means: Edea is complete from the body file alone; Zell/Kiros
+need the reduced weapon mesh posed **with the body's bone matrices** (its
+vertices' bone ids already reference the body skeleton — no root delta, no
+lockstep clip); all other characters need the paired weapon file played in
+lockstep as described below.
 
 ## Lockstep: one index, one clock
 
@@ -216,25 +234,39 @@ AtStartBattle` **zeroes** all six fields, and no vanilla code writes them for a
 normal attack, so `attach_transform` is **identity** — the weapon is posed under
 the *plain* entity base.
 
-> **⚠️ Correction (verified against d0c000/d0w000).** An earlier version of this
-> page claimed the weapon's own animation clip keys the mesh into the hand under
-> that shared base. **That is wrong.** Parsing the files shows the opposite: a
-> weapon has a tiny skeleton (Squall's `d0w000` = **2 bones, all geometry bound to
-> bone 1**), the animated weapon vertices are centred on the **entity origin** (not
-> the hand), and the weapon's per-frame root position ≈ the body's (both ~the
-> entity height, no hand offset). With `attach_transform` identity and the weapon
-> bones at the origin, the weapon is drawn **at the character's root**, and the
-> "held" placement must come from **somewhere still not accounted for here** — most
-> likely a per-frame hand-bone transform copied into `attach_trans`/`attach_rot` by
-> a path not yet located (the write site is via `weaponAnimHeader[N]` pointer
-> arithmetic, so it doesn't show up as a struct-field xref). Until that is found,
-> **a viewer cannot reproduce the placement from the weapon clip alone** — it must
-> attach the weapon to the body's hand bone explicitly (translate the posed weapon
-> to a chosen body bone each frame; the correct bone index is per-character and not
-> encoded in the file). See [Reproducing it in a viewer](#reproducing-it-in-a-viewer).
+**The in-hand placement comes from the weapon's own per-frame root position.**
+`ProcessFieldEntitiesTransformation` (`0x508C90`, the per-model matrix rebuild run
+at the end of every `Battle_ReadAnimation`) sets the **root bone's world
+translation** of the model it is processing to
 
-The `attach_rot`/`attach_trans` fields also exist so an effect can rotate or offset
-the held weapon (e.g. throwing it) without touching the weapon's skeletal animation.
+```
+root_world = model_scale × root_pos >> 8        (each axis)
+```
+
+where `root_pos` (skeleton header +8/+10/+12) is that model's **own** accumulated
+per-frame root position — the deltas its own animation stream carries. Body and
+weapon each get their own call with their own skeleton, so each is placed by its
+own root track. The weapon's clip carries a **different** root track than the
+body's: measured on `d0c000`/`d0w000` across all 42 matched animations, the
+per-frame difference `weapon_root − body_root` is a constant ≈ `(−0.6, −0.2, 1.6)`
+world units during holds (the gunblade resting in Squall's grip) and **arcs 2–5
+units through the attack swings** — the weapon root literally traces the hand.
+The weapon's skeleton itself contributes no offset (2 bones, geometry on the leaf
+bone, positioned only by the root): the root track plus the bone rotations are the
+entire placement.
+
+> **History.** An earlier version of this page first claimed the weapon clip keys
+> the mesh into the hand (right conclusion, unverified), then "corrected" itself to
+> claim a hand-bone attach must exist because the weapon bones sit at the origin —
+> wrong: that analysis compared roots at one idle frame, saw similar values, and
+> missed that the *difference* is exactly the hand offset. The per-model root
+> application in `ProcessFieldEntitiesTransformation` settles it.
+
+The `attach_rot`/`attach_trans` fields of the weapon slot stay zero for normal
+attacks; the AnimSeq VM can write them (`E5 0x14/0x15/0x16` = weapon X/Y/Z, read
+back via `C3 0x14–0x16`) so a choreography can rotate or offset the held weapon —
+e.g. throwing it — without touching the weapon's skeletal animation. Squall's
+`d0w000` sequences never use them.
 
 ## Reproducing it in a viewer
 
@@ -244,18 +276,30 @@ For a tool that wants to show a character animating with its weapon (Ifrit3D):
    hand; the weapon geometry/animation is in the paired `dXwYYY`.
 2. **Play the same animation index on both** skeletons, stepping them together —
    body frame *k* with weapon frame *k*.
-3. **Attach the weapon to the body's hand bone.** Contrary to the earlier claim
-   above, the weapon clip does **not** self-place into the hand — posed on its own
-   it sits at the entity root (blade extending past the head). You must transform
-   the posed weapon by a chosen body bone's world matrix each frame (translation to
-   the bone is usually enough; the weapon's own clip supplies the blade
-   orientation). The correct bone is the weapon-holding hand and is **per-character**
-   — it is not stored in the file, so a tool should let the user pick it (or ship a
-   per-character lookup once each is confirmed visually).
+3. **Apply each model's own per-frame root position.** Do *not* attach the weapon
+   to a body bone — no such link exists in the files. If your viewer applies root
+   translations per model (as the game does), the weapon lands in the hand
+   automatically. If it normalizes the body to its root (common for orbit-camera
+   viewers), translate the posed weapon by `weapon_root − body_root` for the
+   current frame of each clip — that difference is the entire in-hand offset, and
+   it tracks the hand through every swing. **Mind your units and axes**: the root
+   values and your posed vertices may not share a scale or handedness (Ifrit3D
+   stored them as `raw/204.8` vs `raw/128` with Z mirrored). The reliable way to
+   calibrate is a wide attack swing: only the correct conversion keeps some weapon
+   grip vertex at a *constant distance* from the body's hand bone across every
+   frame (measured std ≈ 0.005 world units over a 5-unit arc on Squall, Seifer and
+   Irvine once calibrated; any wrong axis/scale degrades this by 1–2 orders of
+   magnitude).
 4. The body's animation pool and the weapon's animation pool have the **same
    count and ordering** of actions; index them in parallel. (The choreography that
    picks indices in-game lives in the weapon's sequence section and is not needed
    just to *play* a given animation.)
+5. **Reduced weapons (Zell/Kiros)** are simpler: pose the weapon file's geometry
+   with the **body's** bone matrices at the body's current frame — its vertex
+   bone ids already reference the body skeleton. No second clip, no root delta.
+   (Strictly, the game *replaces* the body's stub object 1 rather than adding the
+   mesh on top; drawing both is visually identical since the stub sits inside the
+   weapon mesh.)
 
 Note the body's own [dynamic-texture section](../model-sections/dynamic-texture-data/)
 drives eye-blink, and the body's [camera section](../model-sections/camera-sequence/)
@@ -274,8 +318,9 @@ holds the per-action camera — neither affects the weapon.
 | `0x509440` | `pre_Battle_ReadAnimation`             | Resets one model's `anim_cmd`/skeleton for a new index, reads frame 0|
 | `0x5094F0` | `AdvanceAnimationBy1AndCheckCompletion`| Per-tick advance of **weapon then body** decode                      |
 | `0x508F90` | `Battle_ReadAnimation`                 | Decodes one frame's delta rot/pos into a skeleton, rebuilds geometry |
-| `0x508C90` | `ProcessFieldEntitiesTransformation`   | Rebuilds a model's bone world matrices from the posed skeleton       |
+| `0x508C90` | `ProcessFieldEntitiesTransformation`   | Rebuilds a model's bone world matrices; sets the root bone's world translation to `model_scale × root_pos >> 8` — the weapon-placement mechanism |
 | `0x507BF0` | `Battle_LoadWeaponry`                  | Loads the weapon file; sets `weaponAnimHeader->comFileData`          |
+| `0x507E20` | `BS_LoadWeaponry_2`                    | Reduced-weapon loader (Zell/Kiros): splices the weapon mesh into the body geometry's object slot 1 |
 
 The weapon slot layout is captured as `struct BattleWeaponAnimSlot` (68 bytes) in
 the IDB, with the attach mechanism and lockstep documented as comments on
