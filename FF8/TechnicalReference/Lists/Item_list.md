@@ -24,7 +24,7 @@ permalink: /technical-reference/list/item/
 | 0x0E   |         14 | Echo Screen       |
 | 0x0F   |         15 | Holy Water        |
 | 0x10   |         16 | Remedy            |
-| 0x11   |         17 | Remedy&           |
+| 0x11   |         17 | Remedy+           |
 | 0x12   |         18 | Hero-trial        |
 | 0x13   |         19 | Hero              |
 | 0x14   |         20 | Holy War-trial    |
