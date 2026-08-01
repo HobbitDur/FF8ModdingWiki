@@ -77,6 +77,400 @@ World-map random encounters are selected by `WM_Encounter_wm123456` (renamed fro
 | 519          | 2 Glacial Eye | Rare   |
 | 519          | 2 Glacial Eye | Rare   |
 
+# Centra
+
+## Centra (Region ID 7)
+
+### Forest (Ground ID 3)
+{: .no_toc }
+
+| Encounter ID | Description              | Rarity |
+|--------------|--------------------------|--------|
+| 640          | Blitz                    | Common |
+| 641          | Grand Mantis             | Common |
+| 639          | Death Claw               | Common |
+| 644          | Blitz + Geezard          | Common |
+| 643          | Grand Mantis + 2 Geezard | Medium |
+| 643          | Grand Mantis + 2 Geezard | Medium |
+| 642          | Ruby Dragon              | Rare   |
+| 640          | Blitz                    | Rare   |
+
+### Dirt (Ground ID 7)
+{: .no_toc }
+
+| Encounter ID | Description             | Rarity |
+|--------------|-------------------------|--------|
+| 636          | Jelleye                 | Common |
+| 636          | Jelleye                 | Common |
+| 636          | Jelleye                 | Common |
+| 637          | 2 Jelleye               | Common |
+| 637          | 2 Jelleye               | Medium |
+| 637          | 2 Jelleye               | Medium |
+| 638          | Jelleye + 2 Geezard     | Rare   |
+| 638          | Jelleye + 2 Geezard     | Rare   |
+
+### Beach (Ground ID 10)
+{: .no_toc }
+
+| Encounter ID | Description             | Rarity |
+|--------------|-------------------------|--------|
+| 645          | 3 Fastitocalon          | Common |
+| 645          | 3 Fastitocalon          | Common |
+| 645          | 3 Fastitocalon          | Common |
+| 646          | 3 Fastitocalon          | Common |
+| 646          | 3 Fastitocalon          | Medium |
+| 646          | 3 Fastitocalon          | Medium |
+| 647          | 3 Fastitocalon          | Rare   |
+| 647          | 3 Fastitocalon          | Rare   |
+
+### Next to Mountains (Ground ID 16)
+{: .no_toc }
+
+| Encounter ID | Description             | Rarity |
+|--------------|-------------------------|--------|
+| 649          | Jelleye                 | Common |
+| 649          | Jelleye                 | Common |
+| 649          | Jelleye                 | Common |
+| 649          | Jelleye                 | Common |
+| 648          | Jelleye, Blitz          | Medium |
+| 648          | Jelleye, Blitz          | Medium |
+| 648          | Jelleye, Blitz          | Rare   |
+| 648          | Jelleye, Blitz          | Rare   |
+
+# Esthar
+
+## Esthar (Region ID 10)
+
+### Top of Plateau (Ground ID 14)
+{: .no_toc }
+
+| Encounter ID | Description | Rarity |
+|--------------|-------------|--------|
+| 713          | Forbidden | Common |
+| 713          | Forbidden | Common |
+| 713          | Forbidden | Common |
+| 714          | Cockatrice + Forbidden + Cockatrice | Common |
+| 714          | Cockatrice + Forbidden + Cockatrice | Medium |
+| 715          | Ruby Dragon + Cockatrice | Medium |
+| 715          | Ruby Dragon + Cockatrice | Rare |
+| 715          | Ruby Dragon + Cockatrice | Rare |
+
+### Badlands (Ground ID 7)
+{: .no_toc }
+
+| Encounter ID | Description | Rarity |
+|--------------|-------------|--------|
+| 732          | Behemoth | Common |
+| 727          | Imp | Common |
+| 728          | Torama | Common |
+| 728          | Torama | Common |
+| 729          | Imp + Torama | Medium |
+| 730          | 3 Imp | Medium |
+| 731          | Iron Giant | Rare |
+| 727          | Imp | Rare |
+
+### Esthar Streets (Ground ID 12)
+{: .no_toc }
+
+| Encounter ID | Description | Rarity |
+|--------------|-------------|--------|
+| 733          | Turtapod | Common |
+| 734          | Imp + Turtapod | Common |
+| 734          | Imp + Turtapod | Common |
+| 735          | 2 Imp | Common |
+| 736          | 2 Torama | Medium |
+| 737          | Iron Giant | Medium |
+| 738          | Elnoyle | Rare |
+| 733          | Turtapod | Rare |
+
+### Next to Mountains (Ground ID 16)
+{: .no_toc }
+
+| Encounter ID | Description | Rarity |
+|--------------|-------------|--------|
+| 739          | 2 Turtapod | Common |
+| 739          | 2 Turtapod | Common |
+| 739          | 2 Turtapod | Common |
+| 739          | 2 Turtapod | Common |
+| 741          | 2 Turtapod + Torama | Medium |
+| 741          | 2 Turtapod + Torama | Medium |
+| 740          | Behemoth | Rare |
+| 740          | Behemoth | Rare |
+
+### Dirt (red sky) (Ground ID 25)
+{: .no_toc }
+
+Shared with Ground ID 7 above, identical `group_id` 81).
+
+| Encounter ID | Description | Rarity |
+|--------------|-------------|--------|
+| 732          | Behemoth | Common |
+| 727          | Imp | Common |
+| 728          | Torama | Common |
+| 728          | Torama | Common |
+| 729          | Imp + Torama | Medium |
+| 730          | 3 Imp | Medium |
+| 731          | Iron Giant | Rare |
+| 727          | Imp | Rare |
+
+## North Esthar (Region ID 11)
+
+### Beach (Ground ID 10)
+{: .no_toc }
+
+| Encounter ID | Description | Rarity |
+|--------------|-------------|--------|
+| 586          | Fastitocalon-F | Common |
+| 586          | Fastitocalon-F | Common |
+| 744          | 2 Fastitocalon-F | Common |
+| 744          | 2 Fastitocalon-F | Common |
+| 646          | 3 Fastitocalon | Medium |
+| 646          | 3 Fastitocalon | Medium |
+| 647          | 3 Fastitocalon | Rare |
+| 647          | 3 Fastitocalon | Rare |
+
+### Badlands (Ground ID 7)
+{: .no_toc }
+
+| Encounter ID | Description | Rarity |
+|--------------|-------------|--------|
+| 653          | Gayla | Common |
+| 658          | Glacial Eye + Bite Bug | Common |
+| 654          | Bite Bug | Common |
+| 654          | Bite Bug | Common |
+| 655          | Glacial Eye | Medium |
+| 656          | 2 Bite Bug + Gayla | Medium |
+| 657          | Gayla + Glacial Eye | Rare |
+| 653          | Gayla | Rare |
+
+### Next to Mountains (Ground ID 16)
+{: .no_toc }
+
+| Encounter ID | Description | Rarity |
+|--------------|-------------|--------|
+| 627          | Gayla | Common |
+| 665          | Glacial Eye + Bite Bug | Common |
+| 665          | Glacial Eye + Bite Bug | Common |
+| 665          | Glacial Eye + Bite Bug | Common |
+| 627          | Gayla | Medium |
+| 664          | Gayla + Glacial Eye | Medium |
+| 664          | Gayla + Glacial Eye | Rare |
+| 664          | Gayla + Glacial Eye | Rare |
+
+### Tundra (Ground ID 18)
+{: .no_toc }
+
+Shared with _Region ID 8_ (identical `group_id` 52 to Trabia Region's Frozen Grasslands table).
+
+| Encounter ID | Description | Rarity |
+|--------------|-------------|--------|
+| 622          | Mesmerize | Common |
+| 622          | Mesmerize | Common |
+| 622          | Mesmerize | Common |
+| 623          | 2 Mesmerize | Common |
+| 623          | 2 Mesmerize | Medium |
+| 623          | 2 Mesmerize | Medium |
+| 624          | Bite Bug + Gayla + Mesmerize | Rare |
+| 624          | Bite Bug + Gayla + Mesmerize | Rare |
+
+### Tundra Next to Mountains (Ground ID 23)
+{: .no_toc }
+
+Shared with _Region ID 8_ (identical `group_id` 53 to Trabia Region's "Next to Frozen Mountains on Frozen Grasslands" table).
+
+| Encounter ID | Description | Rarity |
+|--------------|-------------|--------|
+| 625          | Gayla | Common |
+| 625          | Gayla | Common |
+| 625          | Gayla | Common |
+| 625          | Gayla | Common |
+| 626          | 2 Gayla | Medium |
+| 626          | 2 Gayla | Medium |
+| 626          | 2 Gayla | Rare |
+| 626          | 2 Gayla | Rare |
+
+### Top of Plateau (Ground ID 14)
+{: .no_toc }
+
+Shared with _Region ID 18_.
+
+| Encounter ID | Description | Rarity |
+|--------------|-------------|--------|
+| 666          | Cockatrice | Common |
+| 666          | Cockatrice | Common |
+| 666          | Cockatrice | Common |
+| 667          | 2 Cockatrice | Common |
+| 667          | 2 Cockatrice | Medium |
+| 667          | 2 Cockatrice | Medium |
+| 668          | Hexadragon | Rare |
+| 668          | Hexadragon | Rare |
+
+### Grandidi Forest (Ground ID 2)
+{: .no_toc }
+
+Shared with _Region ID 18_ (Ground ID 0 there, identical `group_id` 62).
+
+| Encounter ID | Description | Rarity |
+|--------------|-------------|--------|
+| 659          | 3 Mesmerize | Common |
+| 660          | Mesmerize + Caterchipillar | Common |
+| 660          | Mesmerize + Caterchipillar | Common |
+| 661          | Cockatrice + Forbidden | Common |
+| 661          | Cockatrice + Forbidden | Medium |
+| 662          | Malboro | Medium |
+| 663          | Hexadragon | Rare |
+| 659          | 3 Mesmerize | Rare |
+
+## Esthar Southern Island (Region ID 12)
+
+### Beach (Ground ID 10)
+{: .no_toc }
+
+| Encounter ID | Description | Rarity |
+|--------------|-------------|--------|
+| 543          | 3 Fastitocalon-F | Common |
+| 543          | 3 Fastitocalon-F | Common |
+| 586          | Fastitocalon-F | Common |
+| 586          | Fastitocalon-F | Common |
+| 650          | Adamantoise | Medium |
+| 651          | 2 Fastitocalon-F + Adamantoise | Medium |
+| 548          | 2 Adamantoise | Rare |
+| 647          | 3 Fastitocalon | Rare |
+
+### Desert (Ground ID 8)
+{: .no_toc }
+
+| Encounter ID | Description | Rarity |
+|--------------|-------------|--------|
+| 677          | Cactuar | Common |
+| 677          | Cactuar | Common |
+| 678          | 2 Cactuar | Common |
+| 678          | 2 Cactuar | Common |
+| 679          | Abyss Worm | Medium |
+| 680          | 2 Cactuar + Abyss Worm | Medium |
+| 681          | Chimera | Rare |
+| 680          | 2 Cactuar + Abyss Worm | Rare |
+
+### Badlands (Ground ID 7)
+{: .no_toc }
+
+| Encounter ID | Description | Rarity |
+|--------------|-------------|--------|
+| 636          | Jelleye | Common |
+| 674          | Blitz | Common |
+| 674          | Blitz | Common |
+| 636          | Jelleye | Common |
+| 676          | Grand Mantis | Medium |
+| 676          | Grand Mantis | Medium |
+| 675          | Blitz + Grand Mantis | Rare |
+| 675          | Blitz + Grand Mantis | Rare |
+
+### Forest (Ground ID 3)
+{: .no_toc }
+
+| Encounter ID | Description | Rarity |
+|--------------|-------------|--------|
+| 684          | Bomb | Common |
+| 684          | Bomb | Common |
+| 685          | 2 Bomb | Common |
+| 682          | 2 Grand Mantis | Common |
+| 683          | 2 Jelleye + Blitz | Medium |
+| 682          | 2 Grand Mantis | Medium |
+| 686          | 2 Bomb + Grand Mantis | Rare |
+| 687          | Ruby Dragon + Blitz | Rare |
+
+### Next to Mountains (Ground ID 16)
+{: .no_toc }
+
+| Encounter ID | Description | Rarity |
+|--------------|-------------|--------|
+| 688          | Grand Mantis | Common |
+| 688          | Grand Mantis | Common |
+| 688          | Grand Mantis | Common |
+| 688          | Grand Mantis | Common |
+| 689          | Blitz + Grand Mantis | Medium |
+| 689          | Blitz + Grand Mantis | Medium |
+| 689          | Blitz + Grand Mantis | Rare |
+| 689          | Blitz + Grand Mantis | Rare |
+
+## South Esthar (Region ID 13)
+
+### Badlands (Ground ID 7)
+{: .no_toc }
+
+| Encounter ID | Description | Rarity |
+|--------------|-------------|--------|
+| 669          | Jelleye | Common |
+| 669          | Jelleye | Common |
+| 670          | Bomb | Common |
+| 670          | Bomb | Common |
+| 671          | 2 Bomb | Medium |
+| 672          | 2 Jelleye | Medium |
+| 673          | 2 Jelleye + Bomb | Rare |
+| 669          | Jelleye | Rare |
+
+## Cactaur Island (Region ID 14)
+
+### Badlands (Ground ID 7)
+{: .no_toc }
+
+| Encounter ID | Description | Rarity |
+|--------------|-------------|--------|
+| 706          | Cactuar | Common |
+| 706          | Cactuar | Common |
+| 706          | Cactuar | Common |
+| 707          | 2 Cactuar | Common |
+| 707          | 2 Cactuar | Medium |
+| 707          | 2 Cactuar | Medium |
+| 708          | 3 Cactuar | Rare |
+| 708          | 3 Cactuar | Rare |
+
+### Desert (Ground ID 8)
+{: .no_toc }
+
+| Encounter ID | Description | Rarity |
+|--------------|-------------|--------|
+| 709          | 2 Cactuar | Common |
+| 709          | 2 Cactuar | Common |
+| 709          | 2 Cactuar | Common |
+| 710          | 3 Cactuar | Common |
+| 710          | 3 Cactuar | Medium |
+| 710          | 3 Cactuar | Medium |
+| 711          | 4 Cactuar | Rare |
+| 711          | 4 Cactuar | Rare |
+
+## Island Closest to Heaven (Region ID 18)
+
+### Badlands (Ground ID 7)
+{: .no_toc }
+
+| Encounter ID | Description | Rarity |
+|--------------|-------------|--------|
+| 690          | Malboro | Common |
+| 690          | Malboro | Common |
+| 691          | Ochu | Common |
+| 691          | Ochu | Common |
+| 692          | Chimera | Medium |
+| 692          | Chimera | Medium |
+| 693          | Tri-Face | Rare |
+| 693          | Tri-Face | Rare |
+
+### Top of Plateau (Ground ID 14)
+{: .no_toc }
+
+Shared with _Region ID 11_.
+
+| Encounter ID | Description | Rarity |
+|--------------|-------------|--------|
+| 666          | Cockatrice | Common |
+| 666          | Cockatrice | Common |
+| 666          | Cockatrice | Common |
+| 667          | 2 Cockatrice | Common |
+| 667          | 2 Cockatrice | Medium |
+| 667          | 2 Cockatrice | Medium |
+| 668          | Hexadragon | Rare |
+| 668          | Hexadragon | Rare |
+
 # Galbadia
 
 ## Dollet Region (Region ID 1)
@@ -438,7 +832,7 @@ Unused in _Region ID 3_.
 | 577          | 2 Thrustaevis         | Rare   |
 | 577          | 2 Thrustaevis         | Rare   |
 
-## Winhil Region (Region ID 6)
+## Winhillll Region (Region ID 6)
 
 ### Grasslands (Ground ID 6)
 {: .no_toc }
@@ -523,6 +917,52 @@ Unused in _Region ID 3_.
 | 592          | Vysage + Lefty + Righty | Medium |
 | 592          | Vysage + Lefty + Righty | Rare   |
 | 592          | Vysage + Lefty + Righty | Rare   |
+
+## Island Closest to Hell (Region ID 15)
+
+### Grasslands (Ground ID 6)
+{: .no_toc }
+
+| Encounter ID | Description | Rarity |
+|--------------|-------------|--------|
+| 699          | Malboro | Common |
+| 700          | Grendel | Common |
+| 701          | 2 Grendel | Common |
+| 702          | Blue Dragon | Common |
+| 703          | T-Rexaur | Medium |
+| 704          | Hexadragon | Medium |
+| 705          | Ruby Dragon | Rare |
+| 700          | Grendel | Rare |
+
+### Next to Plateau on Grass (Ground ID 15)
+{: .no_toc }
+
+| Encounter ID | Description | Rarity |
+|--------------|-------------|--------|
+| 700          | Grendel | Common |
+| 700          | Grendel | Common |
+| 700          | Grendel | Common |
+| 701          | 2 Grendel | Common |
+| 701          | 2 Grendel | Medium |
+| 699          | Malboro | Medium |
+| 699          | Malboro | Rare |
+| 701          | 2 Grendel | Rare |
+
+### Top of Plateau (Ground ID 14)
+{: .no_toc }
+
+Identical formation set to Ground ID 15 above (same `group_id` 74 in the source data).
+
+| Encounter ID | Description | Rarity |
+|--------------|-------------|--------|
+| 700          | Grendel | Common |
+| 700          | Grendel | Common |
+| 700          | Grendel | Common |
+| 701          | 2 Grendel | Common |
+| 701          | 2 Grendel | Medium |
+| 699          | Malboro | Medium |
+| 699          | Malboro | Rare |
+| 701          | 2 Grendel | Rare |
 
 ## Central and North-West Galbadia (Region ID 19)
 
@@ -849,11 +1289,17 @@ Shared with _Region ID 11_.
 
 # Inaccessible Encounters
 
+### Fisherman's Horizon Region (Region ID 5)
+{: .no_toc }
+
 ### Roads
 {: .no_toc }
 
 ### Railways
 {: .no_toc }
+
+## Visual region map
+![](./assets/images/worldmap_region_grid_labeled.png)
 
 ## Function addresses
 
