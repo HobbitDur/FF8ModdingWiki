@@ -19,7 +19,8 @@ Two signed 16-bit integers, X and Y relative to center (0, 0)
 Another 16-bit value, probably a fixed-point representation of the Z coordinate (divide by 4096 to get a floating point value)  
 4 bits, which 128x256 texture to use, if you consider the MIM to be one big image, just multiply this value by 128 and add it to the source X coordinate  
 1 unknown bit, always 1 (except in ending.map)  
-3 bits, related to image deph. If &lt; 4 there is two color indexes per byte (4-bit indexed), else there is one color index per byte (8-bit indexed)  
+1 bit, image depth. 0 - there is two color indexes per byte (4-bit indexed), 1 there is one color index per byte (8-bit indexed)
+2 unknown bits, seem to be always equal to (blend mode % 4), except in some test fields
 1 Unknown byte, always 0 (except in ending.map)  
 6 unknown bits, always 0  
 4 bits specifying which palette to use, add 8 to this number to get the right palette from the MIM  
