@@ -117,7 +117,7 @@ switches on `target_info & 0x30` (`getTargetMaskFromInfo`, `getMagicTargetMask`,
 |----------|-------------|-----------------|
 | `0x00` | Every unit of the side `0x40` names — `getTargetMaskAllChara` / `getTargetMaskAllEnemy` | 74 |
 | `0x10` | **One** unit of that side (random on the auto-resolve path) | 135 |
-| `0x20` | `getMaskEveryone()` | 0 |
+| `0x20` | `getMaskEveryone()` — but **broken in practice**, see below | 0 |
 | `0x30` | Matches no branch; the raw `0x30` is returned | 0 |
 
 The name "Everyone on one side" was wrong. `getMaskEveryone` returns **all eight slots** — the
@@ -135,6 +135,52 @@ TargetMask getMaskEveryone()
 So `0x20` means *both* sides at once, and it is the one value that ignores `0x40` entirely.
 Note also that "whole side" is `0x00`, not `0x20` — clearing both bits is what targets a full
 side. Nothing in vanilla ships with `0x20` or `0x30`.
+
+#### Scope 0x20 works for enemy attacks, not for player commands
+
+Set scope `0x20` on something the player uses and the cursor highlights every unit, then the
+damage lands on the monsters only. The slot bits are discarded before damage is applied.
+
+`getMaskEveryone` returns all slot bits **plus `TARGET_MASK_TARGET_SEVERAL` (0x8000)**, and the
+player cursor builds the same shape (`sub_4AA1D0`: `BYTE1(v4) |= 0x80` then `v48 = v4 | v47`).
+At damage time `processMultiHitAttackExecution` (`0x48E830`) branches on that flag:
+
+```c
+if ( special & TARGET_MASK_SPECIAL_BYTE_TARGET_SEVERAL )   // 0x8000 was set
+    validated = expandTargetMaskToValidSide(current_hit_mask, revive);   // slot bits DISCARDED
+else
+    validated = getClosestTargetMaskValid(current_hit_mask, revive);     // exact bits kept
+```
+
+and `expandTargetMaskToValidSide` (`0x48EE50`) re-derives a single side:
+
+| slot bits | result |
+|-----------|--------|
+| `== 0xFF` | every valid slot — both sides |
+| `<= 0x07` | the party (slots 0-2) |
+| anything else | **the monsters (slots 3-6)** |
+
+**Bit 7 is a phantom slot.** There are only **7** battle slots, not 8:
+`getMaskTargetTargetValid` (`0x485FB0`) and `getMaskTargetTargetValidAndAlive` (`0x485F60`) both
+loop `i = 1248; i > -208; i -= 208` over `BATTLE_SLOT_DATA` (stride `0xD0`), giving indices 6..0 —
+a **7-bit** mask whose maximum value is `0x7F`. Slots 0-2 are the party (the `i < 624` test) and
+3-6 the monsters, so **four monsters maximum**. `TARGET_MASK_SLOT_7_MONSTER` (`0x80`) is declared
+in the enum but no live-slot builder ever sets it, and the cursor code agrees — `sub_4AA190`
+validates with `& 0x7F`, `sub_4AA920` uses `& 7` and `& 0x78`.
+
+That splits the two paths:
+
+- **Enemy / auto-resolved actions work.** `getMaskEveryone` returns the hardcoded constant
+  `0x00FF | 0x8000` — phantom bit 7 included — so it matches `== 0xFF` exactly and every valid
+  slot is hit.
+- **Player commands cannot.** `sub_4AA1D0` builds the mask from the live slot set, which can
+  never reach `0xFF`, so it always falls into the last branch. The menu highlights from the
+  unexpanded mask, which is why the selection looks correct while the damage is one-sided.
+
+So there is no data-only way to give a *player* action a both-sides hit — not even on a maximally
+full battlefield, because the deciding bit is unreachable. It needs a patch at `0x48EE50` (test
+"has bits on both sides" rather than `== 0xFF`). Scope `0x00` is immune throughout: its mask is
+ANDed with the current side, so it always lands in one of the first two branches correctly.
 
 ### 0x0040 — which side, and relative to whom
 
@@ -157,7 +203,9 @@ over. The two decoders read it with opposite polarity:
 | `getTargetMaskFromInfo` (`0x483880`) | `queuePlayerBattleCommand`, others | `getTargetMaskAllEnemy` — the **monsters** |
 
 The helpers themselves are absolute — `getTargetMaskAllChara` returns party slots 0-2,
-`getTargetMaskAllEnemy` returns monster slots 3-7 — so the mirroring is deliberate: the kernel bit
+`getTargetMaskAllEnemy` returns monster slots 3-7 (bit 7 being the phantom slot; only 3-6 ever
+exist, see [scope 0x20](#scope-0x20-works-for-enemy-attacks-not-for-player-commands)) — so the
+mirroring is deliberate: the kernel bit
 means "the opposing side", and each decoder bakes in whose turn it is. The same `target_info`
 byte therefore points at different concrete slots depending on whether a character or a monster
 is acting.

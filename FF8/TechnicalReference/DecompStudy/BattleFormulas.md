@@ -60,7 +60,24 @@ Cure line (`Damage_ComputeCurativeMagic`): `heal = P × randVar × ((P + MAG)/2)
 
 ## Status attacks (`Battle_ApplyStatusWithResistRoll`)
 
-`chance = accuracy + atkStat/4 − tgtStat/4 − mentalResist` (must be > 0; resist ≥ 100 = immune). Accuracy < 250: succeed when `255·chance/100 ≥ rand255`; accuracy 250–254: automatic unless resist zeroes it; accuracy 255: **bypasses the resist check entirely** (rarely documented).
+`chance = accuracy + atkStat/4 − tgtStat/4 − mentalResist` (must be > 0; resist **≥ 200** = immune — `cmp cl, 0C8h`, not 100). Accuracy < 250: succeed when `255·chance/100 ≥ rand255`; accuracy 250–254: automatic unless resist zeroes it; accuracy 255: **bypasses the resist check entirely** (rarely documented).
+
+The success test is `chance != 0 && chance >= (GetRandomInt() & 0xFF)` with `chance = 255·hitChance/100` kept at full width (no byte truncation), so `P = (min(chance,255)+1)/256`.
+
+**`mentalResist`'s neutral baseline is 100, not 0.** `setBattleSlotData` (`0x48B310`) fills all 40
+`mental_res` bytes with 100 — `mov eax, 64646464h / mov ecx, 0Ah / rep stosd` at `0x48B41D` —
+*before* overwriting individual statuses from the character's ST-Def junctions;
+`setMonsterInfoFromDatInfoSection` (`0x48BBD0`) does the monster side from the `.dat`. A resist of
+0 never occurs in a real battle, which makes raw accuracy values look far stronger than they are:
+
+| Enemy attack | accuracy | vs resist 0 | vs baseline 100 | vs 130 |
+|--------------|----------|-------------|-----------------|--------|
+| Petrify Stare (#19) | 140 | 100% | **~40%** | ~10% |
+| Petrify Stare (#29) | 180 | 100% | **~80%** | ~50% |
+| Stare (#84) | 130 | 100% | **~30%** | 0% |
+
+So any status accuracy ≤ 100 cannot land at all on an unjunctioned target, and accuracy is best
+read as "points above 100".
 
 ## Hit result flags & the damage popup
 
