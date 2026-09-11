@@ -65,17 +65,30 @@ mask plus the D-pad nibble — and compares it against `stored & 0xF0FF`. `Build
 (0x4B0280) picks the on-screen glyph from the *index of the lowest set bit* of the same masked value
 (icon id = bit index + 0x80).
 
-| Value    | Button   | Value    | Button |
-|----------|----------|----------|--------|
-| `0x0001` | L2       | `0x1000` | Up     |
-| `0x0002` | R2       | `0x2000` | Right  |
-| `0x0004` | L1       | `0x4000` | Down   |
-| `0x0008` | R1       | `0x8000` | Left   |
-| `0x0010` | Triangle |          |        |
-| `0x0020` | Circle   |          |        |
-| `0x0040` | Cross    |          |        |
-| `0x0080` | Square   |          |        |
-| `0xFFFF` | unused slot |       |        |
+Each bit is a remappable **slot**, not a fixed key: the value stored in the kernel never changes,
+but which key or pad button performs it depends on the player's controls. The table gives the slot's
+default gamepad button and the `ff8input.cfg` line that rebinds it — `Create_ff8input_cfg`
+(0x498CB0) writes the fourteen commands in order and `sub_498550` maps each one to its pad bit.
+
+| Value    | Default pad button | `ff8input.cfg` command |
+|----------|--------------------|------------------------|
+| `0x0001` | L2                 | 7. `RotLt`             |
+| `0x0002` | R2                 | 8. `RotRt`             |
+| `0x0004` | L1                 | 5. `Toggle`            |
+| `0x0008` | R1                 | 6. `Trigger`           |
+| `0x0010` | Triangle           | 4. `Menu`              |
+| `0x0020` | Circle             | 1. `Select`            |
+| `0x0040` | Cross              | 2. `Exit`              |
+| `0x0080` | Square             | 3. `Misc`              |
+| `0x1000` | Up                 | 11. `Up`               |
+| `0x2000` | Right              | 14. `Right`            |
+| `0x4000` | Down               | 12. `Down`             |
+| `0x8000` | Left               | 13. `Left`             |
+| `0xFFFF` | *unused slot*      |                        |
+
+Two more commands exist but cannot appear in a Duel input: `9. Start` (`0x0800`) and
+`10. Select` (`0x0100`) are above the low byte the matcher reads — which is exactly why `0x0100`
+was free to be reused as the finisher flag below.
 
 > **This corrects an earlier version of this page**, which listed the raw PSX hardware button word
 > (directions at `0x0010`-`0x0080`, face buttons at `0x1000`-`0x8000`, finisher at `0x0001`). The
@@ -85,15 +98,14 @@ mask plus the D-pad nibble — and compares it against `stored & 0xF0FF`. `Build
 > R3 or Start (`sub_498550` emits `0x0001`-`0x0100`, `0x0800` and `0x1000`-`0x8000`, never `0x0200`
 > or `0x0400`). No vanilla entry sets `0x0001` at all.
 
-The bit-to-button names are the PSX pad slots, taken from the engine pad mask documented for the
-button-remap table (bits 0-11 = L2, R2, L1, R1, Triangle, Circle, Cross, Square, Select, L3, R3,
-Start). On PC the glyph is resolved through the player's Controls config, so which physical key
-produces a given bit depends on their mapping — the names above are the slots, not fixed keys. The
-direction bit order is inferred from the input layer's command order and corroborated by My Final
-Heaven, which reads as a full clockwise circle.
+The pad-button names match the engine pad mask documented for the button-remap table (bits 0-11 =
+L2, R2, L1, R1, Triangle, Circle, Cross, Square, Select, L3, R3, Start). The direction bits are
+confirmed the same way, through `Create_ff8input_cfg`'s command order, and corroborated by My Final
+Heaven reading as a full clockwise circle.
 
-Bits `0x0200`/`0x0400`/`0x0800`, and bits 8-11 of buttons 2-5, are masked off everywhere and read by
-nothing.
+Bits `0x0200` and `0x0400` (L3/R3) are masked off and unreachable anyway — `sub_498550` never emits
+them, which is why the Controls menu greys those rows out without an analog pad. Bits 8-11 of
+buttons 2-5 are likewise masked off and read by nothing.
 
 `0xFFFF` marks an unused slot. The matcher counts a move's inputs by walking **back** from button 5
 while the slot reads `0xFFFF`, so the used slots must be packed from button 1 with no gap in the
