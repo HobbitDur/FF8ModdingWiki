@@ -107,7 +107,7 @@ Full list (from `AnimSeq_ReadSpecialVar_C3`):
 | 0x12               | Stored sine (set via E5 0x12)                                                                                               |
 | 0x13               | Stored cosine (set via E5 0x13)                                                                                             |
 | 0x14-0x16          | Weapon anim data words at +28/+30/+32 (writable via E5 0x14-0x16), 0 if no weapon                                           |
-| 0x17               | Y rotation & 0xFFF                                                                                                           |
+| 0x17               | [Y rotation](#y-rotation-e5-0x17--c3-0x17) & 0xFFF (the left/right facing)                                                    |
 | 0x18               | Slot id of the current target                                                                                               |
 | 0x19               | Hit flag 2 of the current target (`hitType2 & 2`)                                                                           |
 | 0x1A               | Angle between the target and the attacker & 0xFFF                                                                           |
@@ -152,7 +152,7 @@ Full list (from `AnimSeq_WriteSpecialVar_E5`):
 | 0x12               | Compute and store sin(current_value) (readable via C3 0x12)                                                              |
 | 0x13               | Compute and store cos(current_value) (readable via C3 0x13)                                                              |
 | 0x14-0x16          | Write weapon anim data words at +28/+30/+32 (no-op if no weapon)                                                         |
-| 0x17               | Rotate the entity (Y rotation, 0-4096)                                                                                   |
+| 0x17               | Set the entity's [Y rotation](#y-rotation-e5-0x17--c3-0x17) — absolute facing, 4096 = a full turn                        |
 | 0x1D               | Move hit particle position (written into skeleton header)                                                                |
 | 0x1E               | Move selection cursor position (written into skeleton header)                                                            |
 | 0x20               | Hide/show a model part: value > 0 hides geometry object (value-1), value < 0 shows object (-1-value). See opcodes 81/A6 |
@@ -169,6 +169,60 @@ Full list (from `AnimSeq_WriteSpecialVar_E5`):
 | 0x32               | Set target's rotation (lean to a side) (gets reset when target comes back from an attack)                                |
 | 0x34               | Set target's Y position                                                                                                  |
 | > 0x77             | `*(E5_7F_save + 2 * (127 - param)) = current_value` (so 0x7F writes E5_7F_save[0])                                       |
+
+### Y rotation: E5 0x17 / C3 0x17
+
+`E5 0x17` is the entity's facing, and it behaves differently from most sequence writes — three things
+catch people out.
+
+**It is absolute, and it is not masked.** The handler is a single 16-bit store into
+`based_rotation_y` (entity `+0x0E`), so there is no "rotate by" opcode: compute the new angle and
+store it again. The raw `int16` goes in as-is — only the `C3 0x17` *read* masks with `& 0xFFF`.
+4096 is a full turn, and the neutral facing is **0 for party slots, 2048 (180°) for monsters**
+(`resetBasedRotation` @0x502070). `E5 0x31` is the same write aimed at the current target instead.
+
+**It is level-triggered, not an event.** The renderer never reads the field on the normal path.
+`pre_pre_linkedToAnimationSequence` @0x502AB0 rebuilds the entity's live matrix *every tick* with
+`ComposeZYXRotationMatrix(&based_rotation_z, &current_z_scale)`, and `BS_RenderBattleEntity`
+@0x502D40 only composes camera × that matrix. So the write lands on the very next frame and then
+simply holds, for as long as the field keeps the value. Nothing decays it.
+
+**Several things silently undo it.** All of these call `resetBasedRotation`, putting the facing back
+to neutral:
+
+| What | Where |
+|------|-------|
+| Opcode `A2` — end of sequence / chain to the next one | 0x504C70 |
+| Opcode `AC` — restore base model | 0x504F1F |
+| Opcode `92` — setup targeting context | `AnimSeq92_SetupTargetingContext` @0x50D300 |
+| Magic cast / magic effect ticks | 0x50B15B, 0x50B216 |
+| Battle start | `initAnimationSequenceAtStartBattle` @0x50283B |
+
+Opcode `92` is the trap. With a **single target that is not self** it does not reset but *overwrites*
+the facing with `CalculateAngleBetweenXZ(attacker_pos, target_pos)` — it snaps the entity to face its
+target. Self-target or multi-target take the plain reset. Either way, an `E5 0x17` written *before* a
+`92` is thrown away: write it after.
+
+Two more cases where the value is stored but you do not see it:
+
+- **Combat flag `TURN_BACK`** (set by opcode `9C`): `BS_RenderBattleEntity` applies
+  `ApplyYRotation(angleToCamera - based_rotation_y - 1024)` on top, so the field becomes a *negative
+  offset* into a billboard-to-camera angle rather than the facing itself.
+- **Multi-part linking** (opcode `90`): at the end of 0x502AB0 the chain head's whole matrix block is
+  copied over this entity's, so a linked part's own Y rotation is discarded.
+
+#### Axis note
+
+`ComposeZYXRotationMatrix` takes a pointer to three consecutive `int16` and applies
+`ApplyXRotation(angles[0])`, `ApplyYRotation(angles[1])`, `ApplyZRotation(angles[2])`. The pointer is
+taken at `based_rotation_z` (`+0x0C`), so slot 1 is `+0x0E` — this field — and it is a genuine Y-axis
+yaw (`ApplyYRotation` @0x56D020 builds `[cos,0,sin / 0,1,0 / -sin,0,cos]`). It is applied **last**,
+i.e. outermost in the product, so it is a world-space yaw on top of the other two.
+
+Beware the exe's own field names for the other two: `+0x0C` is called `based_rotation_z` but feeds
+`ApplyXRotation` (pitch), and `+0x10` is called `based_rotation_x` but feeds `ApplyZRotation` (roll).
+The target-side names used in the tables above (`0x30`/`0x21` forwards-backwards, `0x31` left-right,
+`0x32` lean-to-side) are the accurate ones.
 
 ### 0xE4: set to zero (BUGGED)
 

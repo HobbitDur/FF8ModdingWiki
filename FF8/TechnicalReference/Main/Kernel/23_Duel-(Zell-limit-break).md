@@ -44,7 +44,7 @@ permalink: /technical-reference/main/kernel/duel-zell-limit-break/
 | 0x000D | 1 byte  | Element Attack              |
 | 0x000E | 1 byte  | Element Attack %            |
 | 0x000F | 1 byte  | Status attack accuracy       |
-| 0x0010 | 2 bytes | Sequence Button 1           |
+| 0x0010 | 2 bytes | [Sequence Button 1](#sequence-buttons) — also carries the [finisher flag](#the-finisher-flag-bit-0x0100-of-button-1) in bit 0x0100 |
 | 0x0012 | 2 bytes | Sequence Button 2           |
 | 0x0014 | 2 bytes | Sequence Button 3           |
 | 0x0016 | 2 bytes | Sequence Button 4           |
@@ -52,18 +52,79 @@ permalink: /technical-reference/main/kernel/duel-zell-limit-break/
 | 0x001A | 2 bytes | [Status 1]({{site.baseurl}}/technical-reference/list/status-flags#status-1) (statuses 0-15)    |
 | 0x001C | 4 bytes | [Status 2]({{site.baseurl}}/technical-reference/list/status-flags#status-2) (statuses 16-47)   |
 
-Buttons
-is finisher = 0x0001
-up = 0x0010
--> = 0x0020
-do = 0x0040
-<- = 0x0080
-L2 = 0x0100
-R2 = 0x0200
-L1 = 0x0400
-R1 = 0x0800
-/\ = 0x1000
-O = 0x2000
-X = 0x4000
-|_|= 0x8000
-None = 0xFFFF
+## Sequence buttons
+
+Each of the five slots is a `u16`, but it is **never used raw** — the engine masks it with `0xF0FF`
+everywhere, and bit `0x0100` of *button 1 only* is not a button at all but a finisher flag.
+
+### The button bits
+
+`BattleMenu_ZellDuel_Update` (0x4AF840) builds the recorded input as
+`(unsigned __int8)read_pad_pressed_raw(...) | (ctx+20 & 0xF000)` — the low byte from the engine pad
+mask plus the D-pad nibble — and compares it against `stored & 0xF0FF`. `BuildZellDuelMenu`
+(0x4B0280) picks the on-screen glyph from the *index of the lowest set bit* of the same masked value
+(icon id = bit index + 0x80).
+
+| Value    | Button   | Value    | Button |
+|----------|----------|----------|--------|
+| `0x0001` | L2       | `0x1000` | Up     |
+| `0x0002` | R2       | `0x2000` | Right  |
+| `0x0004` | L1       | `0x4000` | Down   |
+| `0x0008` | R1       | `0x8000` | Left   |
+| `0x0010` | Triangle |          |        |
+| `0x0020` | Circle   |          |        |
+| `0x0040` | Cross    |          |        |
+| `0x0080` | Square   |          |        |
+| `0xFFFF` | unused slot |       |        |
+
+> **This corrects an earlier version of this page**, which listed the raw PSX hardware button word
+> (directions at `0x0010`-`0x0080`, face buttons at `0x1000`-`0x8000`, finisher at `0x0001`). The
+> kernel stores the *engine* pad mask instead, whose two halves are swapped relative to the hardware
+> word. The give-away is Dolphin Blow, whose four inputs are `0x0004 0x0008 0x0004 0x0008`: those are
+> L1/R1 in the engine mask, but R3/Start in the hardware word — and the PC input layer can never emit
+> R3 or Start (`sub_498550` emits `0x0001`-`0x0100`, `0x0800` and `0x1000`-`0x8000`, never `0x0200`
+> or `0x0400`). No vanilla entry sets `0x0001` at all.
+
+The bit-to-button names are the PSX pad slots, taken from the engine pad mask documented for the
+button-remap table (bits 0-11 = L2, R2, L1, R1, Triangle, Circle, Cross, Square, Select, L3, R3,
+Start). On PC the glyph is resolved through the player's Controls config, so which physical key
+produces a given bit depends on their mapping — the names above are the slots, not fixed keys. The
+direction bit order is inferred from the input layer's command order and corroborated by My Final
+Heaven, which reads as a full clockwise circle.
+
+Bits `0x0200`/`0x0400`/`0x0800`, and bits 8-11 of buttons 2-5, are masked off everywhere and read by
+nothing.
+
+`0xFFFF` marks an unused slot. The matcher counts a move's inputs by walking **back** from button 5
+while the slot reads `0xFFFF`, so the used slots must be packed from button 1 with no gap in the
+middle.
+
+### The finisher flag (bit `0x0100` of button 1)
+
+`BuildZellDuelMenu` reads it from button 1 alone (`v8 = *SequenceButton1 & 0x100`) and turns it into
+bit `0x40` of the menu row byte; `BattleMenu_ZellDuel_Update` then selects the state that **closes the
+Duel window** (`BattleUI_CloseWindow(6)`) instead of returning to the input loop. In other words, a
+move with this bit set **ends the limit break**. Both the matched-input path and the auto-limit path
+use it.
+
+Vanilla sets it on exactly the four five-input moves.
+
+### Vanilla sequences
+
+Decoded from `kernel.bin` with the mask applied:
+
+| Move            | Inputs                      | Ends Duel |
+|-----------------|-----------------------------|-----------|
+| Punch Rush      | ○ ✕                         |           |
+| Booya           | → ←                         |           |
+| Heel Drop       | ↑ ↓                         |           |
+| Mach Kick       | ← ← ○                       |           |
+| Dolphin Blow    | L1 R1 L1 R1                 |           |
+| Meteor Strike   | ↓ ○ ↑ ○                     |           |
+| Burning Rave    | ↓ ↓ ↓ ↓ ○                   | yes       |
+| Meteor Barret   | ↑ ✕ ↓ △ ○                   | yes       |
+| Different Beat  | △ □ ✕ ○ ↑                   | yes       |
+| My Final Heaven | ↑ → ↓ ← △                   | yes       |
+
+The four raw words carrying the finisher bit are Burning Rave `0x4100`, Meteor Barret `0x1100`,
+Different Beat `0x0110` and My Final Heaven `0x1100` — always in button 1.
