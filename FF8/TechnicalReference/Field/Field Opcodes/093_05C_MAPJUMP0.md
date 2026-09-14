@@ -25,7 +25,7 @@ none
 
 #### Description
 
-Jump the player to the field with the given ID and starting on the given walkmesh triangle. The walkmesh is almost always 0 because MAPJUMP0 is intended to be used for teleporting the player into a cutscene, and the cutscenes place the characters where they need to be on initialization, so it doesn't matter where they're initially teleported.
+Jump the player to the field with the given ID and starting on the given walkmesh triangle. The handler pops the triangle (top of stack, `wm2field_FieldZ`) then the field ID (`MenuState_opcode_menu_id`), sets the facing (`wm2field_FieldTarget`) to 0 and both `wm2field_FieldX` and `wm2field_FieldY` to 0x7FFF, which places the party at the centre of that triangle (`Field_Walkmesh_PlaceEntitiesOnLoad`). The walkmesh is almost always 0 because MAPJUMP0 is intended to be used for teleporting the player into a cutscene, and the cutscenes place the characters where they need to be on initialization, so it doesn't matter where they're initially teleported.
 
 PC handler: `SCRIPT_MAPJUMP0`.
 

@@ -20,9 +20,12 @@ Every jump, whatever triggered it, fills the same handful of globals and lets th
 |--------|---------|---------|
 | `globalFieldNextModuleID` | see table below | Destination module: **1** = field, **6** = disc change (cdcheck), **7** = world map, **4** = intro/credits |
 | `MenuState_opcode_menu_id` | — | Multi-purpose "next module parameter"; for a field jump = **destination field ID** |
-| `wm2field_FieldX` / `FieldY` | see table below | Spawn X/Y on the destination field (0x7FFF = keep current position) |
-| `wm2field_FieldZ` | — | Destination walkmesh triangle / Z |
-| `wm2field_FieldTarget` | — | Facing direction on arrival |
+| `wm2field_FieldX` / `FieldY` | 0x1CE4764 / 0x1CE4766 | Spawn X/Y on the destination field (X = 0x7FFF: spawn at the centre of the destination triangle) |
+| `wm2field_FieldZ` | 0x1CE476C | Destination walkmesh triangle ID, not a height (0x7FFF: triangle 0 with default player animations, speed and radius) |
+| `wm2field_FieldTarget` | 0x1CE476E | Facing direction on arrival |
+| `wm2field_UnusedJumpParam` | 0x1CE4768 | Extra value written by MAPJUMP3 and DISCJUMP; never read on PC |
+
+The meaning of these globals is confirmed by `FFNewGame_or_load`, which fills them from the saved game: `SG_COORD_X/Y_PARTY_1` → X/Y, `SG_TRIANGLE_PARTY_1` → `wm2field_FieldZ`, `SG_DIRECTION_PARTY_1` → `wm2field_FieldTarget`, `SG_CURRENT_FIELD` → field ID.
 
 ## Triggers
 
@@ -33,14 +36,14 @@ Field scripts pop their arguments off the entity script stack and set the global
 | Opcode | Function | Behaviour |
 |--------|----------|-----------|
 | `MAPJUMP` | 0x521A20 | Jump to field ID with spawn X, Y, triangle (arg) and facing |
-| `MAPJUMP0` | 0x521C30 | Jump keeping the party's current position (X=Y=0x7FFF), target 0 |
-| `MAPJUMP3` | 0x521AC0 | Like MAPJUMP with an extra parameter word |
+| `MAPJUMP0` | 0x521C30 | Jump to field ID on a triangle: X=Y=0x7FFF (centre of the triangle), facing 0 |
+| `MAPJUMP3` | 0x521AC0 | Like MAPJUMP with an extra parameter word (`wm2field_UnusedJumpParam`, unused on PC) |
 | `WORLDMAPJUMP` | 0x521820 | Sets `globalFieldNextModuleID`=7 → world map (toggles the savemap save-enable flag) |
 | `DISCJUMP` | 0x521B70 | Sets `globalFieldNextModuleID`=6 → disc-change screen, disables the menu |
 
 ### Gateways (walked field exits)
 
-`Field_Collision_CheckGatewayCrossing` tests the 12 gateway records in the `.inf` file (`.inf`+100, 32 bytes each). A gateway fires when the player is within touch radius of its line **and** the cross-product sign against the line flips between the previous and current position. On firing it sets the same globals from the record: destination field ID (`< 0x48` routes to the world map = module 7, otherwise a field = module 1), spawn X/Y, triangle and facing. See the gateway record layout on the rendering/collision page.
+`Field_Collision_CheckGatewayCrossing` tests the 12 gateway records in the `.inf` file (`.inf`+100, 32 bytes each). A gateway fires when the player is within touch radius of its line **and** the cross-product sign against the line flips between the previous and current position. On firing it sets the same globals from the record: destination field ID (`< 0x48` routes to the world map = module 7, otherwise a field = module 1), spawn X/Y, triangle and facing. See the gateway record layout on the [Field Gateways]({{ site.baseurl }}/technical-reference/field/field-file-format/field-gateways/) page.
 
 ### World map → field
 
@@ -89,7 +92,7 @@ flowchart TD
     C -->|6 disc| X[cdcheck screen]
     D --> E[Field_LoadResources: maplist line = field ID -> field name]
     E --> F[Load NAME.fs sections .inf/.ca/.id/.map/.mim/...]
-    F --> G[Field_Walkmesh_PlaceEntitiesOnLoad:<br>spawn party at wm2field_FieldX/Y/triangle/facing<br>0x7FFF X/Y = keep position]
+    F --> G[Field_Walkmesh_PlaceEntitiesOnLoad:<br>spawn party at wm2field_FieldX/Y/triangle/facing<br>X = 0x7FFF: centre of the triangle]
     G --> H[Field running]
 ```
 
