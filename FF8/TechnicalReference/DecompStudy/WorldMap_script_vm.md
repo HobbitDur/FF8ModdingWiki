@@ -19,11 +19,11 @@ Two wmset sections contain scripts:
 
 ## Instruction format
 
-Every instruction is 4 bytes: a signed 16-bit opcode (always `0xFFxx`, i.e. negative) followed by one 16-bit argument, or two 8-bit arguments (noted b2 = byte at +2, b3 = byte at +3). Anything that is not a known opcode terminates an action list.
+Every instruction is 4 bytes: a signed 16-bit opcode (always `0xFFxx`, i.e. negative) followed by one 16-bit argument, or two 8-bit arguments (noted b2 = byte at +2, b3 = byte at +3). An opcode the action runner does not know is skipped, not a terminator: only `FF05` ends an action list.
 
 ## Script structure
 
-`Wmset_warpConditionSystem` (the interpreter) walks the instructions as an IF/THEN/ELSE machine and returns a pointer to the first **action** of a branch whose conditions all passed — the caller executes the actions:
+`Wmset_warpConditionSystem` (the interpreter) is handed the whole section, offset table included, and walks the instructions as an IF/THEN/ELSE machine and returns a pointer to the first **action** of a branch whose conditions all passed — the caller executes the actions:
 
 ```
 FF0A IF
@@ -35,7 +35,7 @@ FF05 END-ACTIONS      ; also acts as ELSE boundary
 FF0C ELSE-IF          ; re-evaluate after a failed IF
 FF0D ELSE             ; actions if previous conditions failed
 FF04 THEN-ALWAYS      ; unconditional action block
-FF0E JMP offset       ; jump within the script blob
+FF0E JMP offset       ; offset counted from the start of the SECTION, not of the script
 FF16 END-SCRIPT       ; next script (section 37) / stop (section 8)
 ```
 
@@ -53,8 +53,8 @@ Returns 1 (true), −1 (false), or 0 (not a condition → treated as an action b
 | FF0F / FF10 | X / Y position **within segment** (& 0x1FFF) < arg |
 | FF11 / FF12 | X / Y position within segment > arg |
 | FF17 | a visible instance of world object model `arg` is close to the camera |
-| FF18 | docking sequence **completed** for vehicle arg (state 6 = Ragnarok/50, state 9 = Garden/48) |
-| FF19 | docking sequence **in progress** for vehicle arg (state 5 = Ragnarok landing, 8 = Garden descent) |
+| FF18 | vehicle arg is **approaching** (state 6 = Ragnarok/50, state 9 = Garden/48) |
+| FF19 | vehicle arg is boarded and **active** (state 5 = Ragnarok/50, state 8 = Garden/48) |
 | FF1A | touched object's model == arg |
 | FF1B | touched object's model == arg and it is not one of the 8 reserved vehicle slots |
 | FF1C | nearest-object model == arg, player facing it (angle diff ≤ 512) |
@@ -70,11 +70,11 @@ Returns 1 (true), −1 (false), or 0 (not a condition → treated as an action b
 | FF2C | (message window slot b2 still open) == b3 |
 | FF2D / FF30 / FF31 | savemap script **var** [b2] == / > / < b3 |
 | FF2F | random 16-bit (2 × `Wm_Random8` draws) < arg (probability roll) |
-| FF13/FF14 | spawn world object (b2 = model class, b3 = wmset position record) — evaluated at map load |
+| FF13/FF14 | spawn world object (b2 = model class, b3 = index into the wmset section 10 position records, 0xFF = places itself) — evaluated at map load. Model classes are a different numbering from the FF09 vehicle codes; `Wm_ModelIdToVehicleCode` (0x546F90) converts. |
 | FF32 | location entry flag bit 8 (inverted) == arg |
 | FF33 | location entry byte +13 == b2 |
 | FF34 | last battle scene ID (`COMBAT_SCENE_ID`) == arg |
-| FF35 | (battle result == escaped) == arg |
+| FF35 | (battle result == escaped) == arg. The argument IS read, contrary to older notes. |
 | FF38 | (player currently moving) == arg |
 | FF39 | `SG_UNKNOWN_BATTLE_VAR` == arg |
 

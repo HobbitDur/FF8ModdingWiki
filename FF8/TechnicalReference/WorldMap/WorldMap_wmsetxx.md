@@ -632,7 +632,9 @@ Sections 7, 9, 11 and 36 share a "generic script" container.
 | 0 + N × 4        | 4 bytes | Relative offset to a script (sentinel: `0x00000000`) |
 | (after sentinel) | varies  | Script bytecode for each entry           |
 
-Each script's bytecode runs from its offset up to the next script's offset (or end of section). Scripts always terminate with `RETURN` (`0xFF16`, code id `−234`).
+A script runs from its offset up to its own `RETURN` (`0xFF16`, code id `−234`) — not up to the next entry in the table. The interpreter walks instructions until it meets `RETURN`, then takes the next table offset, so nothing forces the scripts to be stored in table order. In `wmsetus.obj` section 36 two scripts (entries 45 and 53) sit *earlier* in the section than the entry listed before them, and reading "up to the next offset" gives them a negative length.
+
+Section 9 is the exception: its spawn lists end on `END` (`0xFF05`), never on `RETURN`, because they are run as a plain action list rather than through the interpreter. There each script does run up to the next offset.
 
 ### Opcode
 
@@ -650,14 +652,14 @@ A 16-bit parameter is recovered as `param1 + param2 × 256`.
 
 | ID   | Hex     | Name                | Notes |
 |------|---------|---------------------|-------|
-| −255 | `0xFF01` | `IF`                | Begin condition block (interpreter state v6 = 1). |
-| −252 | `0xFF04` | `EXEC`              | Begin action block; runs when previous condition passed (v6 = 2, v4 = 3). |
+| −255 | `0xFF01` | `IF`                | Begin the script's own condition list (interpreter state v6 = 1). **It has no ELSE**: the moment one of its conditions fails, `Wmset_warpConditionSystem` abandons the whole script and moves to the next offset-table entry — unlike `IFBLOCK`, where a failure only hands over to the `NESTEDIF` / `NESTEDELSE` chain. |
+| −252 | `0xFF04` | `EXEC`              | Close the `IF` list and begin the action block (v6 = 2, v4 = 3). Reaching it means every condition of the list passed, so the script is committed — it is not an "always run" marker: in all 154 scripts of `wmsetus.obj` it follows an `IF` list, never stands alone. |
 | −251 | `0xFF05` | `ENDIF`             | End of IF/EXEC/ELSE; in exec mode this terminates the script (`sub_54D7E0` returns 0). |
 | −246 | `0xFF0A` | `IFBLOCK`           | Explicitly begin an IF structure (v4 = 1). |
 | −245 | `0xFF0B` | `ELSE`              | ELSE clause; from IF-true (v4 = 1) → exec-true (v4 = 2); from nested-true (v4 = 4) → nested exec (v4 = 3). |
 | −244 | `0xFF0C` | `NESTEDIF`          | Nested IF inside an ELSE (valid from v4 = 2 or v4 = 5; sets v4 = 4). |
 | −243 | `0xFF0D` | `NESTEDELSE`        | Nested ELSE inside an ELSE (valid from v4 = 2 or v4 = 5; sets v4 = 6). |
-| −242 | `0xFF0E` | `GOTO`              | Unconditional jump to absolute byte offset = `param1 + param2 × 256` from the start of the current script. |
+| −242 | `0xFF0E` | `GOTO`              | Unconditional jump to byte offset `param1 + param2 × 256` counted **from the start of the section** — the same origin the offset table uses, not the start of the current script. `Wmset_warpConditionSystem` computes the target as `section_base + arg`. A jump may therefore leave the script it is written in. |
 | −234 | `0xFF16` | `RETURN`            | End the script entry-point. |
 | −235 | `0xFF15` | `SET_RETURN_VALUE`  | Set output value without stopping; `3` triggers a special return path (used in Section 11). |
 | −248 | `0xFF08` | `RETURN_WITH_VALUE` | Terminate the script and return code `1` with `param` as output. |
@@ -673,14 +675,14 @@ All return `1` (pass) or `−1` (fail). On fail the interpreter skips to the mat
 | −253 | `0xFF03` | `GREATER_THAN`                | `param > word_2036BDE`. |
 | −250 | `0xFF06` | `CHECK_REGION_NUMBER`         | `param == wm_GetRegionNumber(WORLD_MAP_COORD_X, Y)` (or tile-grid region in tile mode). |
 | −249 | `0xFF07` | `CHECK_TILE_POSITION`         | `param == tile_x + 128 × tile_y` (wrapping). |
-| −247 | `0xFF09` | `CHECK_VEHICLE_TYPE`          | Current vehicle equals `param`. Known values: 33 = bike, 48 = Balamb Garden, 49 = Shumi train, 50 = Ragnarok, 128 = on foot, 129 = any vehicle, 130 = Galbadia aircraft, 131 = mobile Garden, 132 = special. Fails if `dword_2040A2C` (override) is set. |
+| −247 | `0xFF09` | `CHECK_VEHICLE_TYPE`          | Current vehicle equals `param`. Known values: 33 = bike, 49 = the two big ships, 128 = on foot, 129 = the walking party, 130 = Galbadia aircraft, 131 = trains, 132/133 = cars. **48 and 50 are the Ragnarok and the mobile Balamb Garden, but which is which is unsettled**: these notes have long said 48 = Garden / 50 = Ragnarok, while `Wm_ModelIdToVehicleCode` maps world model 1 → 50 and models 64/65 → 48, and `World_BuildObjectInstanceList` calls model 1 the Garden. Nothing checked so far decides it — treat both labels as unverified until someone tests it in game. Fails if `dword_2040A2C` (override) is set. |
 | −241 | `0xFF0F` | `X_GREATER_THAN`              | `param > (WORLD_MAP_COORD_X & 0x1FFF)`; tile mode uses `(dword_2040A24 % 4) << 11`. |
 | −240 | `0xFF10` | `Y_GREATER_THAN`              | `param > (WORLD_MAP_COORD_Y & 0x1FFF)`; tile mode similar. |
 | −239 | `0xFF11` | `X_LESS_THAN`                 | `param < (WORLD_MAP_COORD_X & 0x1FFF)`. |
 | −238 | `0xFF12` | `Y_LESS_THAN`                 | `param < (WORLD_MAP_COORD_Y & 0x1FFF)`. |
 | −233 | `0xFF17` | `CHECK_ENTITY_PROXIMITY`      | Nearest entity matching `param` is within camera-space sight range. |
-| −232 | `0xFF18` | `CHECK_VEHICLE_ENTERING`      | Vehicle `param` in approaching/boarding state. Ragnarok: `byte_2036B70 == 6`. Balamb Garden: `byte_2036B70 == 9`. |
-| −231 | `0xFF19` | `CHECK_VEHICLE_BOARDED`       | Vehicle `param` fully boarded. Ragnarok: 5. Balamb Garden: 8. |
+| −232 | `0xFF18` | `CHECK_VEHICLE_ENTERING`      | Vehicle `param` in approaching/boarding state. Ragnarok (`param` 50): `byte_2036B70 == 6`. Balamb Garden (`param` 48): `byte_2036B70 == 9`. Every other `param` fails. |
+| −231 | `0xFF19` | `CHECK_VEHICLE_BOARDED`       | Vehicle `param` fully boarded and active. Ragnarok (50): `byte_2036B70 == 5`. Balamb Garden (48): `== 8`. Every other `param` fails. |
 | −230 | `0xFF1A` | `CHECK_CHARACTER_LOCATION`    | Nearest NPC has location code `param` (entity table `byte_20426D0`). |
 | −229 | `0xFF1B` | `CHECK_CHARACTER_LOCATION_EX` | As above but excludes the 7 party/vehicle entity slots. |
 | −228 | `0xFF1C` | `CHECK_CHARACTER_LOCATION_2`  | Secondary tracked entity `dword_C75D10` has location code `param`. |
@@ -701,7 +703,7 @@ All return `1` (pass) or `−1` (fail). On fail the interpreter skips to the mat
 | −206 | `0xFF32` | `CHECK_LOCATION_FLAG`         | Inverted bit-3 check on location-block flags byte (offset +14). |
 | −205 | `0xFF33` | `COMPARE_LOCATION_BYTE`       | Per-location byte at offset +13 equals `param1`. |
 | −204 | `0xFF34` | `CHECK_COMBAT_SCENE_ID`       | `param == COMBAT_SCENE_ID`. |
-| −203 | `0xFF35` | `CHECK_BATTLE_RESULT`         | `byte_1CFF6E7 == 4`. No parameter is read. |
+| −203 | `0xFF35` | `CHECK_BATTLE_RESULT`         | `param == (byte_1CFF6E7 == 4)`, i.e. whether the last battle was escaped equals `param`. **The parameter is read**, contrary to earlier notes: `wm_scriptCheckCondition` falls through to the same compare every other condition uses. One script in `wmsetus.obj` section 36 passes `1`, so a tool that drops the parameter corrupts it. |
 | −200 | `0xFF38` | `CHECK_MOVEMENT`              | `(isStateOfMovement != 0) == param` (1 = moving, 0 = standing still). |
 | −199 | `0xFF39` | `CHECK_BATTLEVAR`             | `param == SG_UNKNOWN_BATTLE_VAR`. |
 
@@ -709,7 +711,7 @@ All return `1` (pass) or `−1` (fail). On fail the interpreter skips to the mat
 
 | ID   | Hex     | Name                       | Notes |
 |------|---------|----------------------------|-------|
-| −237 | `0xFF13` | `ADD_ENTITY`               | Register entity. `param1` = entity type (0 = Squall, 1 = Seifer, 3 = Chocobo, 33 = bike, 48 = Balamb Garden, 50 = Ragnarok, 64..66 = Galbadia vehicles, 80 = SeeD ship, 94 = Lunatic Pandora …). `param2` = slot override or `0xFF` for default. Used only in Section 9. |
+| −237 | `0xFF13` | `ADD_ENTITY`               | Register entity. `param1` = **world model class**, `param2` = **index into the Section 10 position records** (`World_BuildObjectInstanceList` at 0x544860 reads `spawn_positions + 16 × param2`); `0xFF` means the object places itself. Model classes are their own numbering, *not* the vehicle codes `CHECK_VEHICLE_TYPE` uses — `Wm_ModelIdToVehicleCode` (0x546F90) converts between them. Known: 0 = Squall, 2/3 = the two big ships, 70 = a train, 73–87 = cars and chocobos, 94 = the Jumbo Cactuar (spawned only while GF 13, Cactuar, is not owned). Classes 1 and 64/65 are the Ragnarok and the mobile Balamb Garden and ignore `param2`, reading their saved position instead. Used only in Section 9. |
 | −236 | `0xFF14` | `ADD_ENTITY_ALT`           | Same layout as `ADD_ENTITY`; identical handling in `sub_544860`. |
 | −225 | `0xFF1F` | `SHOW_TEXT_BOX`            | Open text dialog (no choices) in slot `param1`. `param2` = string ID in Section 13. |
 | −221 | `0xFF23` | `SHOW_CHOICE_BOX`          | Open choice dialog. `param1` = slot, `param2` = string ID. Choice-option IDs are hard-coded per call site. |
