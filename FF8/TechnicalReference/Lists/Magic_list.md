@@ -7,17 +7,25 @@ permalink: /technical-reference/list/magic-list/
 
 # Element
 
-| ID   | Description   |
-|------|---------------|
-| 0x00 | Non Elemental |
-| 0x01 | Fire          |
-| 0x02 | Ice           |
-| 0x04 | Thunder       |
-| 0x08 | Earth         |
-| 0x10 | Poison        |
-| 0x20 | Wind          |
-| 0x40 | Water         |
-| 0x80 | Holy          |
+The element field is a **bitfield**, and all eight bits are assigned — there is no spare bit.
+The *index* column is what the battle runtime actually uses: the bitfield is converted to a list
+of set-bit indices and every resistance lookup is indexed, not masked. Note that only the
+**lowest set bit** is ever read, so combining bits does not produce a multi-element attack.
+
+| ID   | Index | Description   |
+|------|-------|---------------|
+| 0x00 | -     | Non Elemental |
+| 0x01 | 0     | Fire          |
+| 0x02 | 1     | Ice           |
+| 0x04 | 2     | Thunder       |
+| 0x08 | 3     | Earth         |
+| 0x10 | 4     | Poison        |
+| 0x20 | 5     | Wind          |
+| 0x40 | 6     | Water         |
+| 0x80 | 7     | Holy          |
+
+See [Element System]({{site.baseurl}}/technical-reference/battle/element-system/) for the full
+data/runtime/AI/UI chain.
 
 # Magic
 

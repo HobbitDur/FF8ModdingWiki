@@ -44,7 +44,7 @@ Example: slot 3 is `0x1D27B10 + 3 * 0xD0 = 0x1D27D80`.
 | `+0x14` | 4 | `cur_atb` | Updated by `0x4842B0` |
 | `+0x18` | 4 | `current_hp` | Written by `Battle_ApplyDamageOrHeal` (`0x494410`) |
 | `+0x1C` | 4 | `max_hp` | Initialized by party/enemy setup |
-| `+0x44` | 16 | `elem_def[8]` | `int16[8]`; party from junctions, enemy from `.dat` info |
+| `+0x44` | 16 | `elem_def[8]` | `uint16[8]`; 800 = neutral, 900 = immune, >900 = absorb. Party from junctions, enemy from `.dat` info. See [Element System](../element-system/) |
 | `+0x54` | 32 | `timer[16]` | Status timers |
 | `+0x7C` | 2 | `flag_data` | Active/ready state bitfield |
 | `+0x7E` | 2 | `immunity_flag_data` | Gravity immunity and related flags |
