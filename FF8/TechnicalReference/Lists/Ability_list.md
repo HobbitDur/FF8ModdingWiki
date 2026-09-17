@@ -12,16 +12,19 @@ permalink: /technical-reference/list/ability-list/
 
 ## Abilities Type
 
-This ID define which list should be check. Seifer is a special case for seifer but point to same list than custom.
+The type of a monster ability slot is a **command type**: `computeCommandAction` (0x48D200) switches on it to decide which
+list the id belongs to. Only these values occur in the 142 vanilla `c0m*.dat`:
 
-| ID  | Name                                                                             |
-|-----|----------------------------------------------------------------------------------|
-| 0   | Not defined                                                                      |
-| 2   | [Magic]({{site.baseurl}}/technical-reference/list/magic-list)                    |
-| 4   | [Item]({{site.baseurl}}/technical-reference/list/item/)                      |
-| 8   | [Custom]({{site.baseurl}}/technical-reference/list/ability-list#monster-ability) |
-| 179 | Ultimecia_weird_file_127                                                         |
-| 236 | [Seifer]({{site.baseurl}}/technical-reference/list/ability-list#monster-ability) |
+| ID  | Name                                                                             | What the id means                                                    |
+|-----|----------------------------------------------------------------------------------|----------------------------------------------------------------------|
+| 0   | Nothing (empty slot)                                                             | Nothing. `COMMAND_KAMIKAZE_PHOENIX_PINION_OR_FAIL`, the command every failure path falls back to |
+| 2   | [Magic]({{site.baseurl}}/technical-reference/list/magic-list)                    | `COMMAND_MAGIC` - an index into the kernel magic table               |
+| 4   | [Item]({{site.baseurl}}/technical-reference/list/item/)                      | `COMMAND_ITEM` - an index into the kernel item table                  |
+| 8   | [Monster attack]({{site.baseurl}}/technical-reference/list/ability-list#monster-ability) | `COMMAND_MONSTER_ATTACK` - an index into the kernel enemy-attack table |
+| 236 | [Monster attack (Seifer)]({{site.baseurl}}/technical-reference/list/ability-list#monster-ability) | Shares the `COMMAND_MONSTER_ATTACK` case, so the same enemy-attack table. Used only by c0m128 Seifer, ids 329 and 330 |
+
+The value `179` used to be listed here as "Ultimecia_weird_file_127". It is not a command type: the dispatcher has no case for it,
+no code in the battle module compares a command type with it, and no ability slot of any `c0m*.dat` holds it.
 
 ## Passif abilities
 
