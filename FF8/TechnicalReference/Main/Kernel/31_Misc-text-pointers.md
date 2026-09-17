@@ -14,6 +14,11 @@ permalink: /technical-reference/main/kernel/misc-text-pointers/
 
 ## Sections
 
+> Entries 37-41 and 101-108 were identified from the scan-screen code path
+> (`manageScanText` @ 0xB67EF0) and by decoding `main/kernel.bin` directly.
+> The eight element names are **not** words: each is a 2-byte text special code
+> (0x055D-0x0564) rendered as an icon glyph. See [Element System]({{site.baseurl}}/technical-reference/battle/element-system/).
+
 | Offset | Ability   |
 |--------|-----------|
 | 0x4D08 | Some text |
@@ -53,11 +58,11 @@ permalink: /technical-reference/main/kernel/misc-text-pointers/
 | 0x4D4C | Some text |
 | 0x4D4E | Some text |
 | 0x4D50 | Some text |
-| 0x4D52 | Some text |
-| 0x4D54 | Some text |
-| 0x4D56 | Some text |
-| 0x4D58 | Some text |
-| 0x4D5A | Some text |
+| 0x4D52 | Scan affinity label: "very weak against" |
+| 0x4D54 | Scan affinity label: "weak against" |
+| 0x4D56 | Scan affinity label: "strong against" |
+| 0x4D58 | Scan affinity label: "has no effect" |
+| 0x4D5A | Scan affinity label: "absorbs" |
 | 0x4D5C | Some text |
 | 0x4D5E | Some text |
 | 0x4D60 | Some text |
@@ -117,14 +122,14 @@ permalink: /technical-reference/main/kernel/misc-text-pointers/
 | 0x4DCC | Some text |
 | 0x4DCE | Some text |
 | 0x4DD0 | Some text |
-| 0x4DD2 | Some text |
-| 0x4DD4 | Some text |
-| 0x4DD6 | Some text |
-| 0x4DD8 | Some text |
-| 0x4DDA | Some text |
-| 0x4DDC | Some text |
-| 0x4DDE | Some text |
-| 0x4DE0 | Some text |
+| 0x4DD2 | Element name: **Fire** — 2 bytes `05 5D` (text special code 0x055D, icon glyph) |
+| 0x4DD4 | Element name: **Ice** — 2 bytes `05 5E` |
+| 0x4DD6 | Element name: **Thunder** — 2 bytes `05 5F` |
+| 0x4DD8 | Element name: **Earth** — 2 bytes `05 60` |
+| 0x4DDA | Element name: **Poison** — 2 bytes `05 61` |
+| 0x4DDC | Element name: **Wind** — 2 bytes `05 62` |
+| 0x4DDE | Element name: **Water** — 2 bytes `05 63` |
+| 0x4DE0 | Element name: **Holy** — 2 bytes `05 64` |
 | 0x4DE2 | Some text |
 | 0x4DE4 | Some text |
 | 0x4DE6 | Some text |
