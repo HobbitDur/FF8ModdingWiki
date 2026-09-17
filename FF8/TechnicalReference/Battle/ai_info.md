@@ -99,6 +99,11 @@ Then there is a jump param to define the jump size if the condition is not met
 | 5        | 1    | **Padding**            | [Unused](../opcode-type-list#unused)         | Always 0x00 (changing it has no impact)              |
 | 6        | 2    | **Jump**               | [int](../opcode-type-list#int)               | The number of byte to jump if the condition is false |
 
+Note: when the subject makes no use of the left part (_Param left type_ **Unused**, e.g. ENCOUNTER ID or ALIVE), the
+byte is still present in the file and vanilla stores `0xC8` (the SELF value) in it, but the game never reads it —
+verified on the interpreter (`MonsterAI`, FF8_EN.exe: subject 3 at 0x488B27 and subject 9 at 0x4891B8 use only the
+comparator and the right part). Writing `0x00` there instead, as FF8UltimateEditor's AI compiler does, changes nothing.
+
 ### SubjectID
 
 #### General info

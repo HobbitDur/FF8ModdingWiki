@@ -23,18 +23,11 @@ permalink: /technical-reference/list/battle/
 # Monster info byte flag
 
 
-## Byte 0
+## Byte 0 (byte 246) — not a bitfield
 
-| Bit Position | Flag (Hex) | Description |
-|--------------|------------|-------------|
-| 0 (LSB)      | 0x01       | UNKNOWN0    |
-| 1            | 0x02       | UNKNOWN1    |
-| 2            | 0x04       | UNKNOWN2    |
-| 3            | 0x08       | UNKNOWN3    |
-| 4            | 0x10       | UNKNOWN4    |
-| 5            | 0x20       | UNKNOWN5    |
-| 6            | 0x40       | UNKNOWN6    |
-| 7 (MSB)      | 0x80       | UNKNOWN7    |
+Byte 246 is the **camera category**, a small number (0-4 in vanilla), not eight flags. `getMonsterCameraCategory` (0x48B9F0) reads it and
+`initAnimationSequenceAtStartBattle` (0x5027D0) turns it into the entity's `cameraDataRelated`. See
+[Informations & stats]({{site.baseurl}}/technical-reference/battle/model-sections/information-stats/#byte-246-camera-category) for the value table.
 
 
 ## Byte 1
@@ -43,7 +36,7 @@ permalink: /technical-reference/list/battle/
 |--------------|------------|-----------------------|
 | 0 (LSB)      | 0x01       | Zombie                |
 | 1            | 0x02       | Fly                   |
-| 2            | 0x04       | zz1                   |
+| 2            | 0x04       | unused — no effect    |
 | 3            | 0x08       | LvUp-Down Immunity    |
 | 4            | 0x10       | HP Hidden             |
 | 5            | 0x20       | Auto-Reflect          |
@@ -57,11 +50,22 @@ permalink: /technical-reference/list/battle/
 | 0 (LSB)      | 0x01       | Increase SurpriseRNG    |
 | 1            | 0x02       | Decrease SurpriseRNG    |
 | 2            | 0x04       | SurpriseAttack Immunity |
-| 3            | 0x08       | unused                  |
-| 4            | 0x10       | unused                  |
-| 5            | 0x20       | unused                  |
+| 3            | 0x08       | Increase chance to escape |
+| 4            | 0x10       | Decrease chance to escape |
+| 5            | 0x20       | unused — no effect      |
 | 6            | 0x40       | Gravity Immunity        |
 | 7 (MSB)      | 0x80       | Always obtains card     |
+
+Every bit above was checked against the code. Bit `0x04` of byte 1 and bit `0x20` of byte 2 have **no reader at all**: `setMonsterInfoFromDatInfoSection`
+(0x48BBD0) is the only function that reads byte 247, and it never tests `0x04`; byte 254's readers are `computeBattleSurpriseAttack` /
+`doesMonsterPartyReduceSurpriseRng` / `doesMonsterPartyImmuneToSurpriseAttack` (`0x01`/`0x02`/`0x04`), `computeEscape` (`0x08`/`0x10`),
+`setMonsterInfoFromDatInfoSection` (`0x40`, sets `BATTLE_FLAG_GRAVITY_IMMUNITY` - this is what makes Demi miss) and `computeCardDrop` (`0x80`, which
+raises the card roll from 8/256 to 255/256). Setting either unused bit in a .dat changes nothing.
+
+## Byte 3 (byte 255) — not a bitfield
+
+Byte 255 is the **devour category**, a number 0-8, not eight flags. See
+[Informations & stats]({{site.baseurl}}/technical-reference/battle/model-sections/information-stats/#byte-255-devour-category).
 
 ## Menu flags
 
