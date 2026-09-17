@@ -34,7 +34,7 @@ permalink: /technical-reference/main/kernel/renzokuken-finishers/
 | 0x0009 | 1 byte  | Target hit/reaction animation ID (`HIT_TYPE_TARGET_ANIMATION_TO_PLAY`) played on the target when the ability lands |
 | 0x000A | 1 byte  | Target info                 |
 | 0x000B | 1 byte  | Attack Flags                |
-| 0x000C | 1 byte  | Hit count                   |
+| 0x000C | 1 byte  | [Hit count]({{site.baseurl}}/technical-reference/list/kernel#hit-count) |
 | 0x000D | 1 byte  | Element Attack              |
 | 0x000E | 1 byte  | Element Attack %            |
 | 0x000F | 1 byte  | Status attack accuracy       |

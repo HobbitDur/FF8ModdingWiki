@@ -16,7 +16,7 @@ permalink: /technical-reference/main/kernel/magic/
 
 | Offset | Magic          |
 |--------|----------------|
-| 0x021C | Unknown/Dummy? |
+| 0x021C | Dummy (blank)  |
 | 0x0258 | Fire           |
 | 0x0294 | Fira           |
 | 0x02D0 | Firaga         |
@@ -74,6 +74,11 @@ permalink: /technical-reference/main/kernel/magic/
 | 0x0F00 | Catastrophe    |
 | 0x0F3C | The End        |
 
+Entry 0 is the **blank slot**, not an unknown: name and description offsets are both `0xFFFF`
+(the "no text" sentinel), Attack animation 0, Attack type 0 (None) and
+[Hit count]({{site.baseurl}}/technical-reference/list/kernel#hit-count) 0 — so even if it were
+dispatched it would run no hits at all. The GF compatibility bytes are the neutral `0x64`.
+
 ## Section Structure
 
 | Offset | Length  | Description                                                                                     |
@@ -88,7 +93,7 @@ permalink: /technical-reference/main/kernel/magic/
 | 0x000A | 1 byte  | [TargetInfo]({{site.baseurl}}/technical-reference/list/kernel#target-info)                      |
 | 0x000B | 1 byte  | Attack Flags                                                                                    |
 | 0x000C | 1 byte  | Draw resist (how hard is the magic to draw)                                                     |
-| 0x000D | 1 byte  | Hit count (works with meteor animation, not sure about others)                                  |
+| 0x000D | 1 byte  | [Hit count]({{site.baseurl}}/technical-reference/list/kernel#hit-count) — how many times the attack runs. Meteor's 10 *random* targets come from Target info `0x02`, not from this byte |
 | 0x000E | 1 byte  | [Element]({{site.baseurl}}/technical-reference/list/magic-list#element)                         |
 | 0x000F | 1 byte  | Unused (padding) — no code references this byte (IDA: 0 xrefs)                                  |
 | 0x0010 | 4 bytes | [Status 2]({{site.baseurl}}/technical-reference/list/status-flags#status-2)                     |

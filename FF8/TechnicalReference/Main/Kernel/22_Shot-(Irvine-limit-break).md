@@ -38,7 +38,7 @@ permalink: /technical-reference/main/kernel/shot-irvine-limit-breaks/
 | 0x0009 | 1 byte  | [Status window flags]({{site.baseurl}}/technical-reference/list/battle/#status-window-flags) — all 8 Shot entries use `0x80` (ally status panel hidden while targeting); read by `BuildLimitCommandMenu` for the Seifer/Edea-style limit list path |
 | 0x000A | 1 byte  | Target Info                 |
 | 0x000B | 1 byte  | Attack Flags                |
-| 0x000C | 1 byte  | Hit Count                   |
+| 0x000C | 1 byte  | [Hit count]({{site.baseurl}}/technical-reference/list/kernel#hit-count) |
 | 0x000D | 1 byte  | Element Attack              |
 | 0x000E | 1 byte  | Element Attack %            |
 | 0x000F | 1 byte  | Status attack accuracy       |

@@ -181,16 +181,17 @@ individually decompiled — nothing here is inferred from the byte's *name* alon
 | Attack Types | Function | Behaviour |
 |---|---|---|
 | Physical Attack, % Physical Damage, Renzokuken Finisher, Squall Gunblade Attack, Kamikaze, Everyone's Grudge, Physical Attack (Ignore Target VIT) | `Battle_ApplyStatusWithResistRoll` via the STR/VIT physical core | `chance = accuracy + STR/4 − VIT/4 − resistance`, rolled |
-| Magic Attack, % Magic Damage, GF, GF (Ignore Target SPR), % GF Damage, Magic Attack (Ignore Target SPR), LV? Attack, Unknown 4 | same roll, via `Damage_ComputeMagicAndGF`'s MAG/SPR path | `chance = accuracy + MAG/4 − SPR/4 − resistance`, rolled |
+| Magic Attack, % Magic Damage, GF, GF (Ignore Target SPR), % GF Damage, Magic Attack (Ignore Target SPR), LV? Attack, Magic damage from step count (`0x21`) | same roll, via `Damage_ComputeMagicAndGF`'s MAG/SPR path | `chance = accuracy + MAG/4 − SPR/4 − resistance`, rolled |
 | Curative Item, White Wind, Give Percentage HP (Angelo Recover) | `Damage_ComputeCurativeItemSpecial` | `cures if accuracy > rand(1..100)` — flat %, no stat terms. **Cures** the listed statuses, doesn't inflict them |
-| Curative Magic, Unknown 1 (Demi-type) | `Damage_ComputeCurativeMagic` | `checkDoubleStatusApply` runs **unconditionally** — `HIT_ATTACK_ACCURACY` is never read. **Byte is dead** |
+| Curative Magic, Curative Magic % of target's Max HP (`0x15`) | `Damage_ComputeCurativeMagic` | `checkDoubleStatusApply` runs **unconditionally** — `HIT_ATTACK_ACCURACY` is never read. **Byte is dead** |
 | Revive, Revive At Full HP | `GetReviveHP` | Clears Death unconditionally if present and not sealed — accuracy never read. **Byte is dead**, except reviving a Zombie-status target instead deals unmissable magic damage via the Magic-dispatch path |
 | LV Down, LV Up | `computeLvlUpDown` | `succeeds if accuracy > rand(0..255)` — gates the WHOLE level-change action (not a status roll at all); also fails outright if the target is level-change-immune |
 | Fixed Damage, Target Current HP - 1, Fixed Magic Damage Based on GF Level, 1 HP Damage | `Damage_ComputeFixedSpecial` | No reference to `HIT_ATTACK_ACCURACY` anywhere in the function. **Byte is dead** |
 | Card | `Battle_RollCardCommand` | Capture depends on the **target's HP ratio**, not this byte: `chance = (256 − 255×curHP/maxHP)/256` (~0.4% at full HP → 100% near 0 HP); a second `rand < 16` (6.25%) gives the rare card. **Byte is dead** |
 | Devour | Devour dispatcher case | Success needs `attackerHP ≥ targetHP`, then `chance = (attackerHP − targetHP)/attackerHP`; the Devour effect comes from the Devour kernel section. **Byte is dead** |
 | Scan, Angelo Search, Moogle Dance | Scan / Angelo Search / Moogle Dance dispatcher cases | Utility actions (reveal info / find item / GF HP recovery) — no roll, accuracy never read. **Byte is dead** |
-| None, Summon Item?, Unknown 2, Unknown 3 | dispatcher `LABEL_46` / no-op default | No damage or status roll at all. **Byte is dead** |
+| None, `0x1E`, `0x1F` | dispatcher `LABEL_46` / no-op default | No damage or status roll at all. **Byte is dead** |
+| Summon item (`0x0E`) | rerouted before damage by `computeCommandAction` | The item's own bytes are never consulted — the action becomes the Non-junctionable GF attack named by its Special action ID, and that entry's accuracy applies instead. **Byte is dead** |
 
 ```
 Battle_ApplyStatusWithResistRoll roll (the two confirmed-rolled rows above):

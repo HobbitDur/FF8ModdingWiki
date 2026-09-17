@@ -69,5 +69,5 @@ permalink: /technical-reference/main/kernel/battle-items/
 | 0x0010 | 4 bytes | [Status 2]({{site.baseurl}}/technical-reference/list/status-flags#status-2) (statuses 16-47)   |
 | 0x0014 | 1 byte  | Hit rate — physical accuracy vs. the target's Evade (`Battle_applyDamage` → `HIT_ATTACK_HITPERCENT`, the Hit%-stat slot); `0xFF` = always hits |
 | 0x0015 | 1 byte  | Random-select flag — bit 0 marks the item eligible for random battle-item selection (`sub_483CA0` picks a random inventory item with this bit set) |
-| 0x0016 | 1 bytes | Hit Count                   |
+| 0x0016 | 1 bytes | [Hit count]({{site.baseurl}}/technical-reference/list/kernel#hit-count) |
 | 0x0017 | 1 bytes | Element                     |

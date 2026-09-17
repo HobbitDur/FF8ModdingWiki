@@ -35,7 +35,7 @@ permalink: /technical-reference/main/kernel/temporary-characters-limit-breaks/
 | 0x0009 | 1 byte  | [Status window flags]({{site.baseurl}}/technical-reference/list/battle/#status-window-flags) — all retail entries use `0x80` (ally status panel hidden while targeting); `BuildLimitCommandMenu` reads it (as `HIBYTE` of the old WORD) into the Seifer/Edea limit list entry's status-window slot |
 | 0x000A | 1 byte  | Target Info                 |
 | 0x000B | 1 byte  | Attack Flags                |
-| 0x000C | 1 byte  | Hit Count                   |
+| 0x000C | 1 byte  | [Hit count]({{site.baseurl}}/technical-reference/list/kernel#hit-count) |
 | 0x000D | 1 byte  | Element Attack              |
 | 0x000E | 1 byte  | Element Attack %            |
 | 0x000F | 1 byte  | Status attack accuracy       |

@@ -16,11 +16,11 @@ permalink: /technical-reference/main/kernel/enemy-attacks/
 
 | Offset | Ability                                   |
 |--------|-------------------------------------------|
-| 0x17B8 | 000 - Dummy?                              |
-| 0x17CC | 001 - ??                                  |
-| 0x17E0 | 002 - Physical attack                     |
-| 0x17F4 | 003 - ??                                  |
-| 0x1808 | 004 - ??                                  |
+| 0x17B8 | 000 - Dummy (blank)                       |
+| 0x17CC | 001 - Dummy (blank)                       |
+| 0x17E0 | 002 - Physical attack (power 16)          |
+| 0x17F4 | 003 - Physical attack (power 32)          |
+| 0x1808 | 004 - Physical attack (power 48)          |
 | 0x181C | 005 - Blade Slice                         |
 | 0x1830 | 006 - Hind Kick                           |
 | 0x1844 | 007 - Blade Shot                          |
@@ -401,6 +401,15 @@ permalink: /technical-reference/main/kernel/enemy-attacks/
 | 0x3590 | 382 - Unused (dev filler; placeholder name "A382", generic data, no monster reference) |
 | 0x35A4 | 383 - Unused (dev filler; placeholder name "A383", generic data, no monster reference) |
 
+Entries **000-004 have no name** — their name offset is the `0xFFFF` sentinel and bit 7 of
+`0x09` is clear, which is exactly the flag that suppresses the attack-name banner. They are not
+unidentified:
+
+- **000 and 001** are byte-identical blanks (Attack type 0 = None, power 0).
+- **002, 003 and 004** are byte-identical to each other apart from Attack power (`0x10`, `0x20`,
+  `0x30`): the generic monster physical attack at three power tiers — Attack type 1, 1 hit,
+  crit bonus 5, hit rate 150, no element, no status.
+
 ## Section Structure
 
 | Offset | Length  | Description               |
@@ -412,7 +421,7 @@ permalink: /technical-reference/main/kernel/enemy-attacks/
 | 0x06   | 1 byte  | Attack type               |
 | 0x07   | 1 byte  | Attack power              |
 | 0x08   | 1 byte  | Attack flags              |
-| 0x09   | 1 byte  | Hit count & name flag — bits 0–6 = hit count; bit 7 = show attack name (if clear, the attack-name text is suppressed). Read in `computeCommandAction` |
+| 0x09   | 1 byte  | [Hit count]({{site.baseurl}}/technical-reference/list/kernel#hit-count) & name flag — bits 0–6 = hit count; bit 7 = show attack name (if clear, the attack-name text is suppressed). Read in `computeCommandAction` |
 | 0x0A   | 1 byte  | Attack Element            |
 | 0x0B   | 1 byte  | Attack crit bonus         |
 | 0x0C   | 1 byte  | Status attack accuracy     |

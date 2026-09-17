@@ -39,7 +39,7 @@ permalink: /technical-reference/main/kernel/command-abilities-in-battle/
 | 0x0004 | 1 byte  | Attack type           |
 | 0x0005 | 1 byte  | Attack power          |
 | 0x0006 | 1 byte  | Attack flags          |
-| 0x0007 | 1 byte  | Hit Count             |
+| 0x0007 | 1 byte  | [Hit count]({{site.baseurl}}/technical-reference/list/kernel#hit-count) |
 | 0x0008 | 1 byte  | Element               |
 | 0x0009 | 1 byte  | Status attack accuracy |
 | 0x000A | 2 bytes | Status1               |

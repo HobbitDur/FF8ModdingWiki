@@ -8,7 +8,7 @@ permalink: /technical-reference/list/kernel/
 # Target info
 
 This byte is read by two independent paths, and a bit inert in one can still matter in the
-other. `getTargetMaskFromInfo` / `computeTargetMaskDeadUnknown1` decode it when the engine
+other. `getTargetMaskFromInfo` / `computeTargetMaskDeadAndSpread` decode it when the engine
 **auto-resolves** a target mask (AI attacks, auto-summons, item randomization); `sub_4AB190`
 and the cursor engine `sub_4AA1D0` decode it when a **player** aims a command by hand. `0x04`
 is the case that bites: no reader at all on the auto-resolve side, the cursor's side switch
@@ -29,7 +29,7 @@ on the player side.
 
 ### 0x0004 is the cursor's side switch, not an unused bit
 
-`0x0004` has no reader in `getMagicTargetMask` / `computeTargetMaskDeadUnknown1`, which is why
+`0x0004` has no reader in `getMagicTargetMask` / `computeTargetMaskDeadAndSpread`, which is why
 it was previously recorded as unused — but those only cover the **AI / auto-resolve** path. The
 **player target cursor** reads it, twice.
 
@@ -81,11 +81,11 @@ behaviour. Setting `0x08` alone changes nothing; clearing `0x04` is what locks t
 
 **Reader census — complete.** Every reader of this byte in the binary:
 `getMagicTargetMask` (`0x4838C0`), `getTargetMaskFromInfo` (`0x483880`),
-`computeTargetMaskDeadUnknown1` (`0x483860`), `sub_483D20`, `sub_483D60`,
+`computeTargetMaskDeadAndSpread` (`0x483860`), `sub_483D20`, `sub_483D60`,
 `Battle_PickRandomActionConfusedBerserk` (`0x483940`), `sub_4AB190`, `sub_4AA1D0`, plus
 `linkedStockFieldCharData` / `setMenuFlagMagicOnCharaData` / `updateBattleItemData`, which only
 copy it. `queuePlayerBattleCommand`, `BattleAction_ExecuteCommand` and `MonsterAI` (two sites)
-load the raw byte and hand it straight to `computeTargetMaskDeadUnknown1` or
+load the raw byte and hand it straight to `computeTargetMaskDeadAndSpread` or
 `getTargetMaskFromInfo` without testing anything themselves. Only `sub_4AB190` and `sub_4AA1D0`
 touch bits 2-3, and both test the pair. Nothing anywhere tests `0x08` on its own.
 
@@ -278,14 +278,14 @@ intent: stocking a drawn spell onto yourself has no target to pick, so the curso
 | 12 | 0x0B | GF                                   |
 | 13 | 0x0C | Scan                                 |
 | 14 | 0x0D | LV Down                              |
-| 15 | 0x0E | Summon Item?                         |
+| 15 | 0x0E | Summon item (non-junctionable GF) — see below |
 | 16 | 0x0F | GF (Ignore Target SPR)               |
 | 17 | 0x10 | LV Up                                |
 | 18 | 0x11 | Card                                 |
 | 19 | 0x12 | Kamikaze                             |
 | 20 | 0x13 | Devour                               |
 | 21 | 0x14 | % GF Damage                          |
-| 22 | 0x15 | Unknown 1                            |
+| 22 | 0x15 | Curative Magic (% of target's Max HP) — see below |
 | 23 | 0x16 | Magic Attack (Ignore Target SPR)     |
 | 24 | 0x17 | Angelo Search                        |
 | 25 | 0x18 | Moogle Dance                         |
@@ -294,13 +294,74 @@ intent: stocking a drawn spell onto yourself has no target to pick, so the curso
 | 28 | 0x1B | Fixed Damage                         |
 | 29 | 0x1C | Target Current HP - 1                |
 | 30 | 0x1D | Fixed Magic Damage Based on GF Level |
-| 31 | 0x1E | Unknown 2                            |
-| 32 | 0x1F | Unknown 3                            |
+| 31 | 0x1E | No handler — does nothing, see below  |
+| 32 | 0x1F | No handler — does nothing, see below  |
 | 33 | 0x20 | Give Percentage HP                   |
-| 34 | 0x21 | Unknown 4                            |
+| 34 | 0x21 | Magic damage from step count — see below |
 | 35 | 0x22 | Everyone's Grudge                    |
 | 36 | 0x23 | 1 HP Damage                          |
 | 37 | 0x24 | Physical Attack (Ignore Target VIT)  |
+
+
+### The four that used to be "Unknown"
+
+Everything below comes from `Damage_DispatchByAttackType` (`0x4922B0`), the switch every
+attack type goes through, and from its jump table at `0x4922E0` — whose own IDA annotation
+reads *"default case, cases 14, 30, 31"*, i.e. `0x0E`, `0x1E` and `0x1F` have **no case** in it.
+
+**`0x15` — Curative Magic (% of target's Max HP).** Calls
+`Damage_ComputeCurativeMagic` (`0x493280`) with mode `8`, which computes
+`heal = Spell power × target MaxHP / 16`. It is the *magic-path* twin of `0x20`
+(Give Percentage HP / Angelo Recover), which runs the identical formula through
+`Damage_ComputeCurativeItemSpecial` mode `15`. The difference is the path, not the number:
+
+| | `0x15` (magic path) | `0x20` (item/special path) |
+|---|---|---|
+| Reflect | bounces | not checked |
+| Shell | halves the heal | not checked |
+| Hit roll | none | rolls against the entry's Hit% |
+| Med Data (`charaAbilities & 2`) | no effect | doubles the heal |
+| Petrified target | heal forced to 0 | not checked |
+| Zombie target | heal flips to damage | heal flips to damage |
+
+**`0x21` — Magic damage from step count.** Calls `Damage_ComputeMagicAndGF`
+(`0x491AD0`) with `GF_MAGIC_DAMAGE_TYPE_STEP_COUNTER`, giving
+`damage = Attack power × (STEP_COUNTER / 1000)` — the party's total step counter, divided by
+1000. The result then goes through the normal magic post-processing (Shell, Defend, the
+elemental multiplier, drain, status application).
+
+**`0x1E` and `0x1F` — inert.** Neither has a case in the dispatcher, so both fall to the
+default and return 0 damage, and no other code reads the attack-type byte with these values.
+
+None of `0x15`, `0x1E`, `0x1F` or `0x21` is used by any entry in the vanilla `kernel.bin`.
+
+### `0x0E` — Summon item
+
+`0x0E` never reaches the damage dispatcher. It is tested once, in `computeCommandAction`
+(`0x48D26F`), and only for the Item command:
+
+```
+if ((command == COMMAND_ITEM || command == COMMAND_LINK_TO_ITEM)
+    && K_ITEM[id].attackType == 0x0E)
+```
+
+When it matches, the command is switched to `COMMAND_CHOCOBO` and the action is taken from the
+[Non-junctionable GF attacks](../main/kernel/non-junctionable-gf-attacks/) table, indexed by the
+**item's own Special action ID**. The item itself therefore has no damage behaviour of its own —
+its Attack type, power and so on are never consulted.
+
+Two items are special-cased inside that branch: **Gysahl Greens** reads Chocobo World state
+(Boko's attack becomes `BokoAttack + 2`, otherwise the "is not here" / "nothing happened"
+messages), and **Phoenix Pinion** also sets the Phoenix-called-once flag
+(`SG_ODIN_ANGEL_GILGA_FLAG |= SPECIAL_BYTE_FLAG_PHOENIX_CALLED_ONCE`).
+
+Vanilla users — the only three entries in the kernel with Attack type `0x0E`:
+
+| Battle item | Non-junctionable GF attack it summons |
+|-------------|----------------------------------------|
+| 30 Gysahl Greens | ChocoFire / ChocoFlare / ChocoMeteor / ChocoBocle (by Chocobo World level) |
+| 31 Phoenix Pinion | Rebirth Flame |
+| 32 Friendship | MoombaMoomba |
 
 
 ## Attack flag
@@ -484,3 +545,43 @@ the *implications of the pair value* matter just as much as the doubling:
   the flag governs *curative-item HP restore*, while revival amount is gated separately by the command
   type.
 
+# Hit count
+
+Most ability tables carry a **Hit count** byte (magic `0x0D`, junctionable GF `0x0C`, enemy attacks
+`0x09` bits 0-6, Renzokuken finishers `0x0C`, battle items `0x16`, non-junctionable GF `0x0A`,
+command abilities `0x07`, temp-char limits `0x0C`, blue magic `0x0B`, Shot `0x0C`, Duel `0x0C`,
+Rinoa part 2 `0x0A`). It is **not** animation-specific and it is not limited to Meteor.
+
+`computeCommandAction` copies the byte into `CURRENT_ATTACK_HIT_COUNT`, and
+`processMultiHitAttackExecution` (`0x48E830`) — its only reader — uses it for exactly two things.
+
+**1. One target mask per hit.** The function fills `TARGET_MASK_FOR_EACH_HIT[0 … n-1]`, one entry per
+hit. What goes in each entry depends on the **spread bit `0x2000`** of the resolved target mask,
+which comes from [Target info](#target-info) bit `0x02` ("Multi-target spread"):
+
+- **spread bit set** → each hit re-rolls its own random target
+  (`getRandomTargetCharaMask` / `getRandomTargetMonsterMask`)
+- **spread bit clear** → every hit reuses the same mask and lands on the same target
+
+This is the part that looks Meteor-specific but isn't: *the random re-targeting comes from Target
+info, not from Hit count.*
+
+**2. One full damage pass per hit.** The second loop calls `Battle_applyDamage` +
+`computeTargetData` once per hit, per slot in that hit's mask — so the hit roll, crit roll, elemental
+multiplier, Shell/Defend reduction and status roll are all re-evaluated for every hit, independently.
+`calculateHitDistributionPerSlot` then tallies how many hits each slot receives into
+`BATTLE_SLOT_DATA[].hit_count_to_receive`, which is what drives the stacked damage numbers.
+
+A Hit count of **0** skips the loop entirely: the ability resolves with no damage, no status and no
+damage number.
+
+Every vanilla entry with more than one hit:
+
+| Entry | Table | Hits | Spread bit `0x02` |
+|-------|-------|------|--------------------|
+| Lion Heart | Renzokuken finishers #3 | 17 | no — all 17 on the same target |
+| Terra Break | Enemy attacks #311 | 16 | — |
+| Meteor | Magic #16 | 10 | **yes** — 10 independently random targets |
+| Meteor Stone | Battle items #28 | 10 | **yes** |
+| Wishing Star | Rinoa limits part 2 #3 | 8 | no |
+| Blood Pain | Temp-char limits #3 (Seifer) | 6 | no |

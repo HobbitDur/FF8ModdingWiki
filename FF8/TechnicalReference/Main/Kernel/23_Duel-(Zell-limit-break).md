@@ -40,7 +40,7 @@ permalink: /technical-reference/main/kernel/duel-zell-limit-break/
 | 0x0009 | 1 byte  | Padding (unused; IDA: 0 xrefs) |
 | 0x000A | 1 byte  | Target Info                 |
 | 0x000B | 1 bytes | Attack flags — behavior bitfield (low 2 bits also stored as the last-attacker `ATTACK_FLAG`) |
-| 0x000C | 1 byte  | Hit count                   |
+| 0x000C | 1 byte  | [Hit count]({{site.baseurl}}/technical-reference/list/kernel#hit-count) |
 | 0x000D | 1 byte  | Element Attack              |
 | 0x000E | 1 byte  | Element Attack %            |
 | 0x000F | 1 byte  | Status attack accuracy       |

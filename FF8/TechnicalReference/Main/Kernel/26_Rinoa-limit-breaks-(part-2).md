@@ -36,7 +36,7 @@ permalink: /technical-reference/main/kernel/rinoa-combine-limit-break/
 | 0x0007 | 1 byte  | Padding (unused; IDA: 0 xrefs) |
 | 0x0008 | 1 byte  | Target info               |
 | 0x0009 | 1 byte  | Attack flags — behavior bitfield (low 2 bits also stored as the last-attacker `ATTACK_FLAG`) |
-| 0x000A | 1 byte  | Hit Count                 |
+| 0x000A | 1 byte  | [Hit count]({{site.baseurl}}/technical-reference/list/kernel#hit-count) |
 | 0x000B | 1 byte  | Element Attack            |
 | 0x000C | 1 byte  | Element Attack %          |
 | 0x000D | 1 byte  | Status attack accuracy     |
