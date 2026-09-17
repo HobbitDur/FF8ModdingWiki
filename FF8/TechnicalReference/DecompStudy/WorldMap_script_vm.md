@@ -17,6 +17,8 @@ Two wmset sections contain scripts:
 * **Section 37** — the global event list, evaluated every frame by `Wm_Script_RunGlobalEvents`. The section starts with an offset table (one 32-bit offset per script, terminated by 0); every script is evaluated each frame.
 * **Section 8** — per-location scripts, evaluated when the player stands on a location entry that has flag bit 8 set (`Wm_Script_GetLocationWarpEntrance`), and also in a "wildcard" mode used to query what a location could trigger (`Wm_Script_GetLocationWarpAnyState`).
 
+The interpreter's second argument decides only what happens at `FF16`, not how the list is walked: a condition failure jumps to `LABEL_51`, which advances to the next offset-table entry whichever way the flag is set. So with `a2 = 1` (section 37) the walk carries on past `FF16` and every script is evaluated; with `a2 = 0` (section 8, and section 12's vehicle scripts) it stops there — **first match wins**. In those sections the order of the offset table decides which script runs, so inserting one can shadow a later one.
+
 ## Instruction format
 
 Every instruction is 4 bytes: a signed 16-bit opcode (always `0xFFxx`, i.e. negative) followed by one 16-bit argument, or two 8-bit arguments (noted b2 = byte at +2, b3 = byte at +3). An opcode the action runner does not know is skipped, not a terminator: only `FF05` ends an action list.
