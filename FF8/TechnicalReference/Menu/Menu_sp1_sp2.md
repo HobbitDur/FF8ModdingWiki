@@ -28,8 +28,30 @@ Each quad is 8 bytes, two packed UInt32:
 Icon ids **128-139** are not read from the file: they are the confirm/cancel/etc. button icons, redirected to
 a dedicated renderer that remaps them through the controller key configuration.
 
-The text engine draws icons with control code 0x05+n (see
-[MenuModuleRuntime](../menu-module-runtime/)); n is the icon id in this file.
+The text engine draws icons with control code `0x05 NN` (see
+[MenuModuleRuntime](../menu-module-runtime/)), but `NN` is **not** the icon id directly.
+`Text_RenderGlyphs` resolves it as:
+
+| `NN` | Icon id drawn |
+|------|---------------|
+| `0x20`–`0x2F` | controller button icon, through the key configuration |
+| `0x30`–`0x3F` | `NN + 80` |
+| `0x40`–`0x7E` | `TEXT_ICON_CODE_TO_SPRITE[NN]`, a table of 16-bit ids at `0xB86D84` (EN 2013) |
+
+The table's entries include the status icons (`0x53`–`0x59`, `0x65`–`0x71` → ids `0x110`–`0x11C`)
+and the eight element icons (`0x5D`–`0x64` → ids `0x120`–`0x127`, the "names" kernel misc text
+101–108 hold). It ends at `0x7E`; see [Element System]({{site.baseurl}}/technical-reference/battle/element-system/#element-names-are-icon-tokens-not-words)
+for the full list.
+
+Two different renderers read this file, and only one is bounds-checked. `Menu_DrawSp1SpriteById`
+(`0x4B7210`, used by the menu pages) returns without drawing when the id is at or past the
+file's icon count. The text path — `Menu_DrawSp1Icon` (`0x4B75B0`) and
+`Menu_GetSp1IconSize` (`0x4B73F0`) — does not check, so a text icon code that resolves past the
+end of the file reads beyond the directory.
+
+`icon.sp1` is loaded by `Menu_LoadFile` into an allocation of the file's own size, so sprites
+can be appended: add a directory entry, move every existing offset by 4, and put the new quads
+at the end.
 
 ## .sp2 format (face.sp2, cardanm.sp2, mngrp Pos 4)
 
