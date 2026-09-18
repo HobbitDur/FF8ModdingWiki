@@ -47,13 +47,40 @@ the data format allows the bits to be combined.
 
 ## Where the element byte lives in data
 
-| Source | Offset | Size | Adjacent free space |
-|--------|--------|------|---------------------|
-| Kernel §2 Magic data | `0x0E` | 1 | **Yes** — `0x0F` is confirmed unused padding (0 xrefs) |
-| Kernel §2 J-Elem attack | `0x20` | 1 | No (value byte at `0x21`); `0x3A`–`0x3B` are free at the end of the record |
-| Kernel §2 J-Elem defense | `0x22` | 1 | No (value byte at `0x23`) |
-| Kernel §4 Enemy attacks | `0x0A` | 1 | **No** — the 20-byte record is fully packed |
-| Kernel §8 Battle items | `0x17` | 1 | Padding exists at `0x0C` (not adjacent) |
+`Battle_applyDamage` loads the attack element into `HIT_ELEMENT` from **twelve** kernel
+sections, one store per command source. Each offset below was read from its store site and
+checked against that section's page:
+
+| Kernel section | Element offset | Record size | Retail values seen |
+|----------------|----------------|-------------|--------------------|
+| §2 Magic | `0x0E` | 60 | all eight, and 0 |
+| §3 Junctionable GFs | `0x0D` | 132 | all eight, and 0 |
+| §4 Enemy attacks | `0x0A` | 20 | all eight, and 0 |
+| §6 Renzokuken finishers | `0x0D` | 24 | 0 only |
+| §8 Battle items | `0x17` | 24 | 0, Holy |
+| §10 Non-junctionable GF attacks | `0x0B` | 20 | 0, Fire |
+| §11 Command abilities in battle | `0x08` | 16 | 0 only |
+| §19 Temporary character limit breaks | `0x0D` | 24 | 0 only |
+| §20 Blue magic | `0x0C` | 16 | 0, Fire, Thunder, Water |
+| §22 Shot | `0x0D` | 24 | 0, Fire |
+| §23 Duel | `0x0D` | 32 | 0 only |
+| §26 Rinoa limit breaks (part 2) | `0x0B` | 20 | 0 only |
+
+A thirteenth field reaches it indirectly: magic `jElemAttack` (`0x20`) becomes a character's
+attack element through the junction (`get_elem_attack` → `hitElement` → `hit_element`).
+
+**Across all 566 records of these fields, and every `jElemAttack`, no retail value has more
+than one bit set.** Combined with the damage paths reading only the lowest set bit, the
+attack element is an index in everything but encoding.
+
+The junction defence mask is different: magic `jElemDefense` (`0x22`) **is** multi-bit in
+retail — 8 of 57 spells, including `0xFF` — and it is the only element field that is.
+
+Blue magic's element is at `0x0C`; the load at `0x0D` right beside it in the code is the
+status accuracy, which is easy to mistake for it.
+
+Free space in the magic record: `0x0F` (after the element byte) and `0x3A`–`0x3B` at the end
+of the record have no readers.
 
 Per-target resistance is stored per element, not as a bitfield:
 
@@ -201,11 +228,26 @@ junction a *magic*, and the element is whatever that magic's kernel `jElemAttack
 `jElemDefense` byte says.
 
 `StatusJunctionMenuHandler` (0x4DA9B0) — the 21KB state machine behind the whole junction
-screen — is consequently **element-count independent**. It never touches element data
-directly. Its only element-adjacent call is `Menu_UnjunctionGFAndCompactDefSlots`
-(0x4E02C0, from 0x4DC843 and 0x4DF49A), and that operates on the **4 Elem-Def-J slots**,
-not on the 8 elements. All element drawing is delegated through
+screen — has no element loop of its own. It reaches element data in one place:
+`Junction_GetMagicValueForTarget` (0x4C2E50), called at four sites to decide which held
+spells are offered for the current junction slot (nonzero = offered). That getter returns,
+per junction target:
+
+| Target | Returns |
+|--------|---------|
+| 0–8 | HP..LCK junction value, read as a **signed** byte |
+| 9 | `jElemAttack` |
+| 10 | `jStatusesAttack` (16-bit) |
+| 11–14 | `jElemDefense`, **as a byte** — the four Elem-Def slots |
+| 15–18 | `jStatusesDefend` (16-bit) — the four Status-Def slots |
+
+`Menu_UnjunctionGFAndCompactDefSlots` (0x4E02C0, from 0x4DC843 and 0x4DF49A) operates on
+the **4 Elem-Def-J slots**, not on the elements, and all element drawing is delegated through
 `Menu_DrawStatusJunctionWindow` (0x4E04F0) to the two pages above.
+
+The preview's "before" column comes from `JUNCTION_PREVIEW_CHAR_SNAPSHOT` (0x1D8B3B0), a
+464-byte copy of `F_CHAR_DATA[0]` that the handler takes and restores with the generic copy
+helper `Menu_CopyBytes` (0x49A7B0) at about twenty sites.
 
 The same holds for `Menu_DrawJunctionElemSummaryRows` (0x4E1E40, the Elem-Atk / Elem-Def
 summary rows with icons 298/299) and `Junction_AutoPickForStatMultiSlot` (0x4DFDE0) — both
@@ -239,24 +281,55 @@ unpatched, the Auto command would silently ignore elements 8–15 when choosing 
 Matching indices are appended to `SCAN_ELEMENT_INDEX_LIST` and each is rendered as misc text
 `index + 101`.
 
-`getSomeText0` (`0xB68390`) and `ScanText_CollectElementsByAffinity_Dup` (`0xB686D0`) are a
-near-identical second copy of this pair writing to `SCAN_ELEMENT_INDEX_LIST_DUP`.
+`manageScanText_Dup` (`0xB68390`, previously `getSomeText0`) and
+`ScanText_CollectElementsByAffinity_Dup` (`0xB686D0`) are an identical second copy with their
+own arrays, used by the other Scan effect variant.
+
+Two limits bound what a scan can show, neither checked by the code:
+
+- **Line length.** Lines are built in `BUFFER_CONCATENATE_TEXT` (48 bytes) and copied by
+  `addToQueueMessageToPrint` into a 48-byte `PrintMessage`. A verdict line is the label plus
+  eight name slots, each preceded by a separator; with the longest English label (17 bytes)
+  that is 42 bytes.
+- **Line count.** `SCAN_TEXT_LINES` holds exactly 8 pointers, with `SCAN_TEXT_LINE_COUNT`
+  directly behind it. Retail's maximum is exactly 8: level/HP, monster type, five verdicts,
+  and the monster's own scan text. `ScanText_GetLine` (0xB68370) is the reader.
 
 ### Element names are icon tokens, not words
 
 Kernel **misc-text entries 101–108** are each exactly two bytes — `05 5D` through `05 64` —
 i.e. FF8 text special codes **0x055D–0x0564**, one per element, rendered as icon glyphs.
 Verified by decoding `main/kernel.bin` directly. No `push 65h` (=101) immediate exists
-anywhere else in the executable, so `manageScanText` / `getSomeText0` are their only
-consumers.
+anywhere else in the executable, so the two scan builders are their only consumers.
+
+`Text_RenderGlyphs` settles what such a code draws. For `0x05 NN` with `NN >= 0x40` it draws
+`icon.sp1` sprite `TEXT_ICON_CODE_TO_SPRITE[NN]` (0xB86D84); `NN` 0x20–0x2F are controller
+buttons through the key config, and 0x30–0x3F draw sprite `NN + 80`. The table:
+
+| Codes | Sprites |
+|-------|---------|
+| `0x0553`–`0x0559` | status icons `0x110`–`0x116` (`0x5A`–`0x5C` repeat `0x110`) |
+| `0x055D`–`0x0564` | **element icons `0x120`–`0x127`** |
+| `0x0565`–`0x0571` | status icons `0x110`–`0x11C` |
+| `0x0572`–`0x0575` | `0x128`–`0x12B` |
+| `0x0576`–`0x057E` | `0x130`–`0x138` |
+
+Valid entries stop at `0x7E` and unrelated strings follow, so the table cannot grow in place.
+Its four readers — `Text_IconCodeToSpriteId` (0x49F930), `calculateTextDimension`,
+`sub_4A1200` and `Text_RenderGlyphs` — only check `NN >= 0x40` and index with a
+zero-extended byte; there is no upper bound.
 
 ### Icon sprite ids
 
-`sub_4B7210` gates sprite ids with `if (id >= *AICON_SP1_DATA) return;` — the ceiling is the
-sprite count stored in `icon.sp1`'s **own header** (329 in retail), not a constant in the
-executable. Adding sprites to `icon.sp1` raises the cap with no exe patch. Ids 128–139 are
-reserved (diverted to the sysfnt path). Element icons occupy 288–295 (`0x0120`–`0x0127`),
-mental-status icons 272–284.
+`Menu_DrawSp1SpriteById` (0x4B7210) gates sprite ids with `if (id >= *AICON_SP1_DATA) return;`
+— the ceiling is the sprite count stored in `icon.sp1`'s **own header** (329 in retail EN,
+checked in the file), not a constant in the executable. Adding sprites to `icon.sp1` raises
+the cap with no exe patch. Ids 128–139 are diverted to the sysfnt path. Element icons occupy
+288–295 (`0x0120`–`0x0127`), mental-status icons 272–284.
+
+The ids right after the element icons are **not** free: `0x128`–`0x12B` and `0x130`–`0x138`
+are drawn by text icon codes `0x72`–`0x7E` (above). New sprites have to go after the last
+retail one, from 329.
 
 ## Inventory of element-carrying storage
 
@@ -273,10 +346,11 @@ Every place an element bitfield is stored, and whether it has room to become 16 
 | 7 | Kernel §4 enemy attack element `0x0A` | 1 | No — 20-byte record fully packed |
 | 8 | Kernel §8 item element `0x17` | 1 | Padding at `0x0C`, not adjacent |
 
-Only one of the eight has adjacent free space. **The element type cannot be widened in
-place**; any extension past 8 has to carry the extra bits in a parallel structure keyed by
-slot / magic id / attack id, with the vanilla byte retained as a low-8-bits compatibility
-shadow.
+Only one of the eight has adjacent free space, so **the element type cannot be widened in
+place**. It does not have to be: every attack-side value in retail is a single bit and only
+the lowest bit is ever used, so a byte holding an *index* (0 = none, 1–16) says everything
+the bitfield ever did, in the same byte. Only the junction defence mask needs more bits, and
+the magic record has free bytes for it.
 
 ## Notes for extending past eight elements
 
@@ -309,9 +383,14 @@ not a recommended design.
 10. **Auto-junction scoring truncates** at the two `(unsigned __int8)` casts in
     `Junction_AutoPickBestSpellForStat` (see above).
 
-A note on what is *not* in the way: `StatusJunctionMenuHandler` itself, and the false-positive
-`elemDefInfo` xref in `BattleMenu_DrawWindow_Update` at `0x4ADEAA` — that instruction reads
-`status_1` (+0x1B2), not elemental defense.
+11. **`Junction_GetMagicValueForTarget` truncates** `jElemDefense` to a byte, so a spell
+    whose defence covered only new elements would be hidden from the Elem-Def spell list.
+12. **The scan screen's text icon table ends at code `0x7E`**, and its line and message
+    buffers (48 bytes each, 8 lines) are unchecked — see *Scan screen*.
+
+A note on what is *not* in the way: the false-positive `elemDefInfo` xref in
+`BattleMenu_DrawWindow_Update` at `0x4ADEAA` — that instruction reads `status_1` (+0x1B2),
+not elemental defense.
 
 Two things that are **not** blockers:
 
@@ -347,7 +426,7 @@ low byte is ever read, and the next symbol starts at `+4`.
 | `Menu_DrawElemDefensePage` | 0x4E1460 | Junction/status menu, elemental defense page |
 | `manageScanText` | 0xB67EF0 | Scan screen text builder |
 | `ScanText_CollectElementsByAffinity` | 0xB68230 | Buckets `elem_def` into the five affinity categories |
-| `sub_4B7210` | 0x4B7210 | `icon.sp1` sprite renderer (data-driven id cap) |
+| `Menu_DrawSp1SpriteById` | 0x4B7210 | `icon.sp1` sprite renderer (data-driven id cap) |
 | `battle_monster_dat_loader` | 0x507120 | Offset-table-driven `.dat` section placement |
 | `Menu_DrawStatusDefensePage` | 0x4E0FF0 | Status-defense preview page (13 rows) |
 | `Menu_DrawWindowFrame` | 0x4B2740 | Common tail call of every preview page; draws frame + header icon |
@@ -356,7 +435,7 @@ low byte is ever read, and the next symbol starts at `+4`.
 | `Menu_ElemDefIsAbsorb` | 0x4BFAF0 | `v > 900`; gates the absorb icon (175) on the defense page |
 | `Menu_StatusResToPercent` | 0x4BFAB0 | Status resistance → displayed percent (`v - 100`) |
 | `Menu_GetMenuContextId` | 0x4BD060 | Selects between the two window header-icon sets |
-| `StatusJunctionMenuHandler` | 0x4DA9B0 | Junction screen state machine (element-count independent) |
+| `StatusJunctionMenuHandler` | 0x4DA9B0 | Junction screen state machine; no element loop of its own |
 | `Menu_DrawStatusJunctionWindow` | 0x4E04F0 | Status/junction window drawer; dispatches the element pages |
 | `Menu_UnjunctionGFAndCompactDefSlots` | 0x4E02C0 | GF removal; compacts the 4 Elem-Def-J slots |
 | `Menu_DrawJunctionElemSummaryRows` | 0x4E1E40 | Elem-Atk / Elem-Def summary rows (icons 298/299) |
@@ -365,3 +444,8 @@ low byte is ever read, and the next symbol starts at `+4`.
 | `PopCount32` | 0x4ABC20 | 32-bit set-bit count used by auto-junction scoring |
 | `Battle_applyDamage` | 0x48FE20 | Loads `HIT_ELEMENT` / `HIT_ELEMENT_PERCENT` (byte stores) |
 | `applyDamageAndHandleDeath` | 0x494410 | Stamps `last_attacker_attack_element` |
+| `Junction_GetMagicValueForTarget` | 0x4C2E50 | What a magic gives a junction target; truncates `jElemDefense` to a byte |
+| `Menu_CopyBytes` | 0x49A7B0 | Generic forward copy; takes and restores the preview snapshot |
+| `Text_IconCodeToSpriteId` | 0x49F930 | Text icon code → `icon.sp1` sprite id |
+| `manageScanText_Dup` | 0xB68390 | Second scan text builder (other Scan effect variant) |
+| `ScanText_GetLine` | 0xB68370 | Reads a built scan line |
