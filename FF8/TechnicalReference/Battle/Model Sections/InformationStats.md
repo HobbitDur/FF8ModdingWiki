@@ -50,7 +50,7 @@ author: HobbitDur
 | 335    | 1 byte     | APs                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 | 336    | 16 bytes   | [Renzokuken data](#renzokuken-data)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |                                                                         
 | 352    | 8 bytes    | [Elemental resistance](#elemental-resistance) (Fire, Ice, Thunder, Earth, Poison, Wind, Water, Holy)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
-| 360    | 20 bytes   | [Status resistance](#Status-resistance) (Death, Poison, Petrify, Darkness, Silence, Berserk, Zombie, Sleep,<br> Haste, Slow, Stop, Regen, Reflect, Doom, Slow Petrify, Float, Drain, Confuse , Expulsion, VIT0(but unused by the game))                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| 360    | 20 bytes   | [Status resistance](#Status-resistance) (Death, Poison, Petrify, Darkness, Silence, Berserk, Zombie, Sleep,<br> Haste, Slow, Stop, Regen, Reflect, Doom, Slow Petrify, Float, Confuse, Drain, Expulsion, VIT0 (unused by the game))                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
 
 ### Abilities
 
@@ -97,11 +97,38 @@ value_hex = floor((900 - value%) / 10))
 
 ### Status resistance
 
-The % def value follow the formula:
+Each byte is copied as-is into the monster's battle status resistance (`FF8BattleMentalStatus`) when it
+loads. Byte *n* covers these statuses, in this order:
+
+| Bytes | Statuses                                                                  |
+|-------|---------------------------------------------------------------------------|
+| 0-6   | Death, Poison, Petrify, Darkness, Silence, Berserk, Zombie                |
+| 7-11  | Sleep, Haste, Slow, Stop, Regen                                           |
+| 12-18 | Reflect, Doom, Slow Petrify, Float, Confuse, Drain, Expulsion             |
+| 19    | VIT0 - never read: the resistance to VIT0 stays at 100                    |
+
+Every status the list does not name (Protect, Shell, Aura, Curse, Invincible...) gets 100.
+
+The % def value follows the formula:
 value% = value_hex - 100
 
 and to revert back:
 value_hex = value% + 100
+
+`value_hex` is the resistance itself:
+
+- 100 (0%) is neutral.
+- Each point above 100 lowers the chance of inflicting that status by 1%.
+- 200 or more (100% or more) is immune. Only a status attack accuracy of 255 still lands, because it
+  skips the resistance check.
+- Below 100 is more vulnerable than neutral. Retail monsters go down to 80 (-20%).
+
+The chance of a status attack landing is:
+chance = accuracy + attacker_stat/4 - target_stat/4 - value_hex
+
+The stats are STR and VIT for a physical attack, and MAG and SPR for magic and GFs. Vit0 on the target
+makes its stat count as 0. The chance must be above 0. An accuracy of 250-254 then lands; any other
+accuracy lands when `GetRandomInt() <= 255 * chance / 100`.
 
 ### Rate value
 
@@ -211,6 +238,8 @@ For readers following along in IDA / a disassembler. Names above are the ones se
 | `ComputeProbabilityGetItemMug`       | `0x486650`  | On-kill item drop: reads byte 333 (`DropRate`), drop succeeds when `GetRandomInt() <= DropRate`                                       |
 | `getMugObjectIdAndQuantity`          | `0x4867C0`  | Mug/steal: reads byte 332 (`MugRate`); 0 = never, else succeeds when `GetRandomInt() <= MugRate + attacker_SPD/2`                     |
 | `GetRandomInt`                       | `0x48F020`  | Battle random byte generator, returns a value in `[0, 255]`                                                                           |
+| `setMonsterInfoFromDatInfoSection`   | `0x48BBD0`  | Copies the 20 status resistance bytes into the battle slot's `FF8BattleMentalStatus` (byte 19 is skipped); other statuses get 100 |
+| `Battle_ApplyStatusWithResistRoll`   | `0x48F9F0`  | Status attack roll: immune when the resistance is `>= 200` (`cmp 0C8h`), else the chance formula above                           |
 | `computeDevour`                      | `0x48FC60`  | Picks the devour effect ID by level tier, stores it and byte 255 into the pending-devour block                                        |
 | `Battle_DamageGettingRelated`        | `0x4922B0`  | Resolves attack-type-specific damage; `ATTACK_TYPE_DEVOUR` case at `0x4926BC` rolls the devour and returns byte 255 as the hit damage |
 | `relatedToDevour`                    | `0x492220`  | Applies the devour effect's permanent Str/Vit/Mag/Spr/Spd/HP bonuses from the kernel devour table                                     |
