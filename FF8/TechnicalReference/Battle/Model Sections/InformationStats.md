@@ -89,11 +89,30 @@ Quantity is not used for draw (always 0 but no impact on game when changing it)
 
 ### Elemental resistance
 
-The % def value follow the formula:
+The % def value follows the formula:
 value% = 900 - value_hex * 10
 
 and to revert back:
 value_hex = floor((900 - value%) / 10))
+
+`value%` is the damage the monster takes from that element:
+
+- 100 is normal damage.
+- 200 is double damage (a weakness).
+- 0 is no damage (immune).
+- Below 0 the monster absorbs the element: the damage heals it and shows as a green number.
+
+When the monster loads, the game keeps `elemDef = value_hex * 10`. Magic and GF damage of an elemental attack is then
+multiplied by `(900 - elemDef) / 100`, which is `value% / 100`.
+
+- An attack with several elements uses only the first one set, in the order Fire, Ice, Thunder, Earth, Poison, Wind,
+  Water, Holy.
+- Holy against a Zombie target always counts as 200%.
+- Weakness has no cap.
+- A physical attack uses the attack's element percentage as well:
+  `damage + damage * element_percent / 100 * (value% - 100) / 100`.
+
+Examples from vanilla: Snow Lion has Fire 250 and Ice -100 (weak to fire, absorbs ice), Bomb has Fire -100 and Ice 300.
 
 ### Status resistance
 
@@ -240,6 +259,8 @@ For readers following along in IDA / a disassembler. Names above are the ones se
 | `GetRandomInt`                       | `0x48F020`  | Battle random byte generator, returns a value in `[0, 255]`                                                                           |
 | `setMonsterInfoFromDatInfoSection`   | `0x48BBD0`  | Copies the 20 status resistance bytes into the battle slot's `FF8BattleMentalStatus` (byte 19 is skipped); other statuses get 100 |
 | `Battle_ApplyStatusWithResistRoll`   | `0x48F9F0`  | Status attack roll: immune when the resistance is `>= 200` (`cmp 0C8h`), else the chance formula above                           |
+| `Damage_ComputeMagicAndGF`           | `0x491AD0`  | Magic/GF damage: multiplied by `(900 - elemDef) / 100` for the attack's first element                                          |
+| `Damage_ApplyPhysicalModifiers`      | `0x48F600`  | Physical damage: `+ damage * element_percent * (800 - elemDef) / 10000`                                                        |
 | `computeDevour`                      | `0x48FC60`  | Picks the devour effect ID by level tier, stores it and byte 255 into the pending-devour block                                        |
 | `Battle_DamageGettingRelated`        | `0x4922B0`  | Resolves attack-type-specific damage; `ATTACK_TYPE_DEVOUR` case at `0x4926BC` rolls the devour and returns byte 255 as the hit damage |
 | `relatedToDevour`                    | `0x492220`  | Applies the devour effect's permanent Str/Vit/Mag/Spr/Spd/HP bonuses from the kernel devour table                                     |
