@@ -423,8 +423,21 @@ unidentified:
 | 0x08   | 1 byte  | Attack flags              |
 | 0x09   | 1 byte  | [Hit count]({{site.baseurl}}/technical-reference/list/kernel#hit-count) & name flag — bits 0–6 = hit count; bit 7 = show attack name (if clear, the attack-name text is suppressed). Read in `computeCommandAction` |
 | 0x0A   | 1 byte  | Attack Element            |
-| 0x0B   | 1 byte  | Attack crit bonus         |
+| 0x0B   | 1 byte  | Attack crit bonus — critical-hit chance for this attack. `Battle_applyDamage` (case `COMMAND_MONSTER_ATTACK`) loads it into `RELATED_TO_CRIT_BONUS`, the same slot the weapon / Blue Magic / Shot crit bytes fill, and `Damage_RollCrit` crits when `rand(0..255) ≤ CritBonus + attacker LUCK`. **A monster has no LUCK stat** — `setMonsterInfoFromDatInfoSection` writes `charaStat[5]` (LUCK) `= 0` at load and nothing writes it again, and the [monster .dat info section]({{site.baseurl}}/technical-reference/battle/model-sections/information-stats/) carries no LUCK curve — so here the LUCK term is always 0 and `P(crit) = CritBonus/256` exactly. This byte is therefore the **only** source of critical hits for a monster; `255` = always crits. A crit **doubles** the physical damage and fires the white screen flash. Only the crit-rolling Attack Types read it: Physical (1), % physical damage (7) and Physical ignore VIT (36) — on any other type the byte is inert. In retail data 56 of the 384 attacks set it (22 of them to `255`). See the [crit formula]({{site.baseurl}}/technical-reference/list/formula/#compute-crit) |
 | 0x0C   | 1 byte  | Status attack accuracy     |
-| 0x0D   | 1 byte  | Hit rate — physical accuracy rolled against the target's Evade to decide hit vs. miss. `0xFF` = always hits. `Battle_applyDamage` loads it into `HIT_ATTACK_HITPERCENT`, the same slot a character's Hit% stat fills; distinct from Status attack accuracy (0x0C), which governs status infliction |
+| 0x0D   | 1 byte  | Hit rate — physical accuracy rolled against the target's Evade to decide hit vs. miss. `0xFF` = always hits. `Battle_applyDamage` loads it into `HIT_ATTACK_HITPERCENT`, the same slot a character's Hit% stat fills; distinct from Status attack accuracy (0x0C), which governs status infliction. The roll (`Damage_RollPhysicalHit`) is `hit% = hitRate + attackerLUCK/2 − targetEVA − targetLUCK`; the attacker's LUCK term is likewise always 0 for a monster (see 0x0B), so only the target's Evade and Luck cut into this value |
 | 0x0E   | 2 bytes | [Status 1]({{site.baseurl}}/technical-reference/list/status-flags#status-1) (statuses 0-15)  |
 | 0x10   | 4 bytes | [Status 2]({{site.baseurl}}/technical-reference/list/status-flags#status-2) (statuses 16-47) |
+
+## Function addresses
+
+| Function | Address |
+|---|---|
+| `computeCommandAction` | 0x48d200 |
+| `Battle_applyDamage` | 0x48fe20 |
+| `Damage_DispatchByAttackType` | 0x4922b0 |
+| `Damage_RollCrit` | 0x492b30 |
+| `Damage_RollPhysicalHit` | 0x492ba0 |
+| `Damage_ComputePhysicalWithHitCritRoll` | 0x492e10 |
+| `setMonsterInfoFromDatInfoSection` | 0x48bbd0 |
+| `cameraWhenDoingAction` | 0x506190 |

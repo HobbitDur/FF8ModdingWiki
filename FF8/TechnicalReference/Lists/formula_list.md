@@ -157,6 +157,12 @@ $$
 `CritBonus` is the weapon's crit bonus (or the enemy attack's / Shot's crit increase), staged in
 `RELATED_TO_CRIT_BONUS`. A crit doubles the physical damage above.
 
+`LUCK` is read from the attacker's battle slot (`charaStat[5]`). **When the attacker is a monster it
+is always 0** — `setMonsterInfoFromDatInfoSection` zeroes that byte at load and nothing writes it
+again (monster stat data has no LUCK curve), so an
+[enemy attack]({{site.baseurl}}/technical-reference/main/kernel/enemy-attacks/)'s crit chance is
+exactly `CritBonus/256`. The same applies to the `LUCK/2` term of the hit% below.
+
 ## Hit % {#hit-rate}
 
 Physical accuracy, from `computeAttackPhysical`:
@@ -426,7 +432,7 @@ Reverse-engineering addresses for the functions referenced above, for readers wh
 | `ComputeWithDamageSTRFormula` | 0x492c40 |
 | `computeAttackPhysical` | 0x492e10 |
 | `HpModifierComputationForPhysical` | 0x48f600 |
-| `Damage_RollCrit` | 0x492b60 |
+| `Damage_RollCrit` | 0x492b30 |
 | `Battle_DamageGettingRelated` | 0x4922b0 |
 | `Battle_ApplyStatusWithResistRoll` | 0x48f9f0 |
 | `Damage_ComputeCurativeItemSpecial` | 0x493450 |

@@ -55,10 +55,14 @@ The "weakened look" group tested by the engine is `0x41021` (weakened, poison, s
 | 0x002 | An animation was queued by the sequence (opcode &lt; 0x80 or A0); when it ends the driver re-queues it (loop) |
 | 0x004 | Current animation finished (set automatically at the animation's last frame, cleared while playing). Opcode A0 only re-triggers an already-playing animation when this is set; opcode A4 sets it manually |
 | 0x008 | Waiting for the animation to finish: set (together with 0x002) by opcode &lt; 0x80; the driver does not advance the sequence while it is set, and clears it when the animation completes |
+| 0x010 | Effect-code handshake, "effect ready": set by the magic-cast action driver (`BattleActionSequence_Tick_MagicCast`, case 3) once the magic/limit effect code is loaded; the casting sequence polls it via `C3 08` before its firing pose |
+| 0x020 | Effect-code handshake, "fire": raised by the casting sequence via `E5 08` to tell the driver to launch the effect. The driver waits for it in case 4, then calls the loaded effect's init (`MAGIC_EFFECT_LOGIC_CALLBACK`) — see the [magic effect anatomy]({{site.baseurl}}/technical-reference/battle/magic-effect-anatomy/) |
 | 0x040 | Sequence chain finished / entity idle-interruptible: set by A3 when no follow-up sequence is pending, cleared when a sequence is queued. Externally triggered sequences (hit reactions BF, status changes) are only accepted when 0x040 or 0x100 is set |
+| 0x080 | Raised by some vanilla sequences via `E5 08` (typically after applying the action result with AA); no engine reader has been located |
 | 0x100 | Taking damage / hit reaction in progress (same gate as 0x040 for external triggers) |
+| 0x200 | Effect-code handshake, "effect done": signals that the launched magic/limit effect has finished |
 
-Other bits (e.g. 0x080, written by some vanilla sequences through `E5 08`) have no identified engine use.
+Bits not listed have no identified engine use.
 
 # Default sequence IDs
 
@@ -73,6 +77,7 @@ When a sequence ends (`A2`) with nothing queued, **monsters** return to `basedAn
 | 16 (0x10)| Running / moving |
 | 19 (0x13)| Preparing attack |
 | 29 (0x1D)| Defending |
+| 1        | Normal standing (none of the above — the default) |
 
 ## Function addresses
 
@@ -80,4 +85,4 @@ When a sequence ends (`A2`) with nothing queued, **monsters** return to `basedAn
 |---|---|---|
 | `getAnimMaskFromStatus` | 0x509BA0 | Refreshes anim_status bits from entity statuses |
 | `analyse_animation_status` | 0x509C10 | Picks the fallback sequence for a character entity |
-| 1        | Normal standing (default) |
+| `BattleActionSequence_Tick_MagicCast` | 0x50A9A0 | Magic-cast action driver: case 3 (0x50AAF0) sets flag 0x010, case 4 (0x50AB47) waits for flag 0x020 then launches the effect logic callback |

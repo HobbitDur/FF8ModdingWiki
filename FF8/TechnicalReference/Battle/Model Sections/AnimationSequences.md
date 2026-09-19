@@ -99,9 +99,9 @@ Full list (from `AnimSeq_ReadSpecialVar_C3`):
 | 0x0A               | Total frames of the active animation                                                                                        |
 | 0x0B               | [Base sequence id](#execution-model) (`basedAnimSeq`, the idle the entity returns to)                                       |
 | 0x0C               | Random value [0..32767]                                                                                                     |
-| 0x0D               | Position Z                                                                                                                  |
-| 0x0E               | Position X                                                                                                                  |
-| 0x0F               | Position Y                                                                                                                  |
+| 0x0D               | [Position offset](#position-offsets) — lateral (sideways, entity-local)                                                     |
+| 0x0E               | [Position offset](#position-offsets) — vertical (positive = down)                                                           |
+| 0x0F               | [Position offset](#position-offsets) — forward along the facing (negative = toward the target)                              |
 | 0x10               | Speed depending of distance to target. On itself, speed_factor = 1000. On a target, speed_factor = 5000\*distance/4096      |
 | 0x11               | Speed from 0x10 adjusted: Speed_0x10 - (2000\*(attacker_speed_factor + target_speed_factor)/4096). Set to 1000 if on itself |
 | 0x12               | Stored sine (set via E5 0x12)                                                                                               |
@@ -146,9 +146,9 @@ Full list (from `AnimSeq_WriteSpecialVar_E5`):
 | 0x00-0x07          | Write local variable `e5_data_saved[param]` (readable via C3 0x00-0x07)                                                  |
 | 0x08               | Write the [battle state controller flags]({{site.baseurl}}/technical-reference/list/battle-animation-state/#battle-state-controller-flags-some_flag) |
 | 0x0B               | Set the [base sequence id](#execution-model) (`basedAnimSeq`, the idle the entity returns to)                             |
-| 0x0D               | Set position Z                                                                                                           |
-| 0x0E               | Set position X                                                                                                           |
-| 0x0F               | Set position Y                                                                                                           |
+| 0x0D               | Set [position offset](#position-offsets) — lateral (sideways, entity-local)                                              |
+| 0x0E               | Set [position offset](#position-offsets) — vertical (positive = down)                                                    |
+| 0x0F               | Set [position offset](#position-offsets) — forward along the facing (negative = toward the target)                       |
 | 0x12               | Compute and store sin(current_value) (readable via C3 0x12)                                                              |
 | 0x13               | Compute and store cos(current_value) (readable via C3 0x13)                                                              |
 | 0x14-0x16          | Write weapon anim data words at +28/+30/+32 (no-op if no weapon)                                                         |
@@ -223,6 +223,18 @@ Beware the exe's own field names for the other two: `+0x0C` is called `based_rot
 `ApplyXRotation` (pitch), and `+0x10` is called `based_rotation_x` but feeds `ApplyZRotation` (roll).
 The target-side names used in the tables above (`0x30`/`0x21` forwards-backwards, `0x31` left-right,
 `0x32` lean-to-side) are the accurate ones.
+
+#### Position offsets
+
+The variables 0x0D / 0x0E / 0x0F form a displacement vector applied to the entity's model every frame. The vector is **entity-local**: when the per-frame transform is built (`pre_pre_linkedToAnimationSequence`), it is rotated by the entity's base rotation before being transformed into camera space, so the components follow the direction the entity is facing rather than world axes:
+
+| Var  | Component                                                                              |
+|------|-----------------------------------------------------------------------------------------|
+| 0x0D | Lateral offset (sideways)                                                               |
+| 0x0E | Vertical offset (positive = down, the inherited PSX Y-down convention)                  |
+| 0x0F | Forward offset along the facing — **negative values move the entity toward its target** |
+
+This is how attack sequences make the attacker run or leap at the target: opcode 92 rotates the attacker to face the target, then the sequence reads the distance-scaled speed factor (C3 0x10 or 0x11), negates it and ramps the result into E5 0x0F frame by frame, sliding the model along the facing until it reaches the target (see the Bite Bug example below; character weapons do the same, e.g. Squall's run-in in d0w000 sequence 13, and monsters in c0m001 sequence 14).
 
 ### 0xE4: set to zero (BUGGED)
 
@@ -358,7 +370,7 @@ Normal attack sequence of the Bite Bug, fully annotated:
 - `C3 FF` `CF 09` `E5 FE`: stack[0xFE] = e5[2] * current_frame
 - `C3 FE` `D3 0A` `E5 FD`: stack[0xFD] = e5[2] * current_frame / total_frames (linear interpolation)
 - `C1 00` `C7 FD`: current_value = stack[0xFD]
-- `E5 0F`: write the position offset → the model slides toward the target
+- `E5 0F`: write the forward position offset (negative → toward the target): the model slides at the target
 - `A1`: yield (resume next frame)
 - `C3 7F` `C5 FF` `E5 7F`: decrement the loop counter
 - `E7 E1`: if counter > 0, jump back 0x100-0xE1 = 31 bytes (loop start)
@@ -384,7 +396,7 @@ Normal attack sequence of the Bite Bug, fully annotated:
 - `C3 0A` `E5 7F`: loop counter = total frames
 - `C1 00` `CB 02` `E5 FF`: stack[0xFF] = -e5[2] (reverse direction)
 - `C3 FF` `CF 09` `E5 FE` `C3 FE` `D3 0A` `E5 FD`: interpolate as before
-- `C3 02` `C7 FD` `E5 0F`: position = e5[2] + interpolated value (slides back home)
+- `C3 02` `C7 FD` `E5 0F`: forward offset = e5[2] + interpolated value (slides back home)
 - `A1`: yield
 - `C3 7F` `C5 FF` `E5 7F` `E7 E1`: decrement and loop
 - `0C`: play animation 0C and wait (landing)
@@ -402,3 +414,5 @@ FF8_EN.exe:
 | `AnimSeq_ReadSpecialVar_C3` | 0x5044B0 | C3-family special variable reader (verified IDA function) |
 | `AnimSeq_WriteSpecialVar_E5` | 0x5048E0 | E5-family special variable writer (verified IDA function) |
 | `AnimSeq_DispatchActionOpcode` | 0x504BB0 | Opcode dispatcher for entity sequences (verified IDA function) |
+| `pre_pre_linkedToAnimationSequence` | 0x502AB0 | Per-frame entity transform build; rotates the 0x0D-0x0F offset vector by the entity's base rotation before applying it |
+| `TransformCoordinateToCameraSpace` | 0x56C820 | Transforms the rotated offset vector into camera space |

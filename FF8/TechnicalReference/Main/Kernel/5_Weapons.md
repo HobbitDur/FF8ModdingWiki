@@ -73,4 +73,4 @@ permalink: /technical-reference/main/kernel/weapons/
 | `ComputeWithDamageSTRFormula` | 0x492c40 |
 | `computeAttackPhysical` | 0x492e10 |
 | `GetCharacterStat` | 0x496440 |
-| `Damage_RollCrit` | 0x492b60 |
+| `Damage_RollCrit` | 0x492b30 |
