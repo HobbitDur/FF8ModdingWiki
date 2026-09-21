@@ -38,3 +38,9 @@ permalink: /technical-reference/main/kernel/gf-abilities/
 | 0x0007 | 1 byte  | Increase value                |
 
 
+
+## Adding GF abilities
+
+The nine entries above are not a closed list, but the seven ability sections share one id space and the
+exe hardcodes where each group starts. See [Ability id space](../ability-id-space/) for what a new entry
+can do, what caps the count, and the exact patch sites.
