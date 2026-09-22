@@ -77,12 +77,23 @@ Note: Diablos has a thunk wrapper (`MAG_325_UNKNOWN` in IDA) in `MagicList_Logic
 
 ## GF families
 
-| Family | Shape | Examples |
-|--------|-------|----------|
-| FamilyA | Entry -> Init -> SequenceTick -> secondary SequenceTaskDriver | Pandemona, Doomtrain, Shiva, Odin |
-| FamilyB | Entry -> SequenceTick; the tick is the driver | Cerberus, Brothers, Leviathan, Alexander, Bahamut, Eden |
-| SharedInit | Entry -> `BdLinkTask_CreateAndInitContext` -> SequenceTick | Siren, Tonberry |
-| Atypical | Partially resolved or not clearly classified | Several low-confidence chains |
+Static study of every summon driver (FFNx 30 fps work, 2026-09). The earlier FamilyA/FamilyB/Atypical
+labels of the catalog above are superseded by this split.
+
+| Family | Members (effect id) | Driver shape | Draw-without-advance switch |
+|--------|---------------------|--------------|-----------------------------|
+| Cinematic engine | Ifrit 201, Leviathan 6, Bahamut 202, Cerberus 203, Alexander 204, Brothers 205, Eden 206 | One engine compiled seven times: script VM + integrator over generic bones, see [GF cinematic engine](GFCinematicEngine.md) | `battle_to_update_flags` bit 0 (sets `ctx->paused`) + `rt->boneSkipFlag` |
+| Timeline A | Quezacotl 116, Diablos 325, Carbuncle 278, Pandemona 291, Phoenix 140, Moomba 338, Griever 69 | Master `SequenceTask` counts ticks, spawns the creature task at counter 2, owns particle sub-queues; private ping-pong packet arena | Per-GF pause global the retail game never sets (Quezacotl `0x25216DC`, Diablos `0x2505180`, Carbuncle `0x2508114`, Phoenix `0x2517AAC`, Pandemona `0x2556258`); none for Moomba |
+| Timeline B | Shiva 185, Cactuar 199, Odin 187 / 326, Doomtrain 191, Gilgamesh 327-330 | Same master/creature/particle shape, other code range; Gilgamesh's four ids share one master and one timeline task | Every task tests `battle_to_update_flags & 0x201`: draw, return if paused, then advance |
+| Actor state machine | Siren 95, Tonberry 90, MiniMog 96, Boko 97-100 | Same engine as ordinary spells (Cure and others) | none |
+
+Creatures of the timeline families use the standard battle-entity layout (animation header at
+entity +96, `BattleAnimCmd` at +108, `pre_Battle_ReadAnimation` / `Battle_ReadAnimation`), except
+Doomtrain, whose model uses a statically linked private copy of the animation reader
+(`0x642490` / `0x642520`). Griever owns no animation of its own: it re-renders the real battle
+entities of slots 1 and 2. Frame parity (`dword_1D96A80`) is read only by Carbuncle's mirror pass
+(`0x6812E0`) and Phoenix's heat haze (`0x6A8450`). `Battle_RequestScreenFeedback` (`0x47CF50`, the
+one-frame full-screen ghost) is issued every tick by Gilgamesh and by Eden.
 
 All families use the same completion return pattern:
 
