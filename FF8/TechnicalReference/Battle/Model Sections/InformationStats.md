@@ -52,6 +52,25 @@ author: HobbitDur
 | 352    | 8 bytes    | [Elemental resistance](#elemental-resistance) (Fire, Ice, Thunder, Earth, Poison, Wind, Water, Holy)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
 | 360    | 20 bytes   | [Status resistance](#Status-resistance) (Death, Poison, Petrify, Darkness, Silence, Berserk, Zombie, Sleep,<br> Haste, Slow, Stop, Regen, Reflect, Doom, Slow Petrify, Float, Confuse, Drain, Expulsion, VIT0 (unused by the game))                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
 
+### Stat values
+
+Each stat (bytes 24–51) is four bytes, A B C D in file order, turned into the stat at the monster's level L.
+Every division truncates toward zero.
+
+| Stat               | Value at level L                                        |
+|--------------------|---------------------------------------------------------|
+| HP                 | `A×L²/20 + A×L + 10×B + 100×C×L + 1000×D`               |
+| Str, Mag           | `(C + L×A/10 + L/B − (L²/D)/2) / 4`                     |
+| Vit, Spr, Spd, Eva | `C + L×A + L/B − L/D`                                   |
+
+The L² term of Str and Mag is **subtracted**: with a small D it overtakes the rest, and the stat falls as the
+level rises. Str to Eva are then capped at 255, but only from above: the result is stored in a byte, so a
+negative value wraps around (−3 becomes 253). A steep enough Str/Mag curve at a high level therefore turns
+into a very high stat. B and D are divisors with no zero check: a 0 there crashes the game.
+
+In battle, Str, Vit, Mag, Spr, Spd and Eva are also multiplied by the monster's AI stat variable divided by 10
+(10 by default, so ×1), which its AI script can change.
+
 ### Abilities
 
 Abilities are composed of:
@@ -251,6 +270,10 @@ For readers following along in IDA / a disassembler. Names above are the ones se
 
 | Name                                 | Address     | Role                                                                                                                                  |
 |--------------------------------------|-------------|---------------------------------------------------------------------------------------------------------------------------------------|
+| `Stat_ComputeMonsterStats`          | `0x48C1C0`  | Monster battle stats: each curve's value × the AI stat variable / 10                                                          |
+| `Stat_ComputeMonsterStatCurve`      | `0x48C3F0`  | Str/Vit/Mag/Spr/Spd/Eva at a level from the four curve bytes (formulas above)                                                  |
+| `Stat_ComputeMonsterMaxHP`          | `0x48C500`  | Max HP at a level from the HP curve bytes                                                                                        |
+| `CapTo255`                          | `0x495930`  | Caps a stat at 255 from above only; the byte store then wraps a negative value                                                   |
 | `initAnimationSequenceAtStartBattle` | `0x5027D0`  | Per-entity battle-start init; converts byte 246 into the entity's `cameraDataRelated`                                                 |
 | `getMonsterCameraCategory`           | `0x48B9F0`  | Reads byte 246 (`camera_category`) from a monster's info section                                                            |
 | `CameraSeq_ReadSpecialVar_C3` (renamed from `a3ParamAnimSeqForCamera` in the community IDB) | `0x509640`  | Camera-sequence VM special-variable reader; C3 var `0x15` returns a target's `cameraDataRelated`                                      |

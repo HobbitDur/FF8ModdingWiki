@@ -24,7 +24,7 @@ Kernel growth curve bytes A, B, C, D per stat; `J_val` = junctioned magic's junc
 
 ## Monster stats (`Stat_ComputeMonsterStats` / `Stat_ComputeMonsterStatCurve` / `Stat_ComputeMonsterMaxHP`)
 
-From the .dat info_stat 4-byte curves: **STR/MAG** `= (C + lvl·A/10 + lvl/B − (lvl²/D)/2)/4`; **VIT/SPR/SPD/EVA** `= C + lvl·A + lvl/B − lvl/D`; each is then scaled by the AI-controllable stat variable (`× var/10`), capped 255. **HP** `= HP1·lvl²/20 + (HP1 + 100·HP3)·lvl + 10·HP2 + 1000·HP4`.
+From the .dat info_stat 4-byte curves: **STR/MAG** `= (C + lvl·A/10 + lvl/B − (lvl²/D)/2)/4`; **VIT/SPR/SPD/EVA** `= C + lvl·A + lvl/B − lvl/D`; each is then scaled by the AI-controllable stat variable (`× var/10`), capped 255 from above only — the stat is stored in a byte, so a negative result (the Str/Mag L² term is subtracted and can overtake the rest at a high level) wraps around (−3 becomes 253). **HP** `= HP1·lvl²/20 + (HP1 + 100·HP3)·lvl + 10·HP2 + 1000·HP4`.
 
 ## Physical damage (`Damage_ComputePhysicalCore`)
 
