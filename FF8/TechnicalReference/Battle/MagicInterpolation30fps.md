@@ -4,6 +4,7 @@ layout: default
 parent: Battle
 permalink: /technical-reference/battle/magic-interpolation-30fps/
 nav_order: 5
+author: HobbitDur
 ---
 
 # Magic effect interpolation to 30 fps
@@ -16,7 +17,9 @@ sequencing are unaffected — only visual frames are added.
 This page is the implementation plan for **magic effects**. It builds on
 [Magic effect anatomy](MagicEffectAnatomy.md), which documents the draw engines and each spell's data.
 The sibling problem for character and monster models is covered in
-[Animation frame-rate conversion](AnimationFrameRateConversion.md).
+[Animation frame-rate conversion](AnimationFrameRateConversion.md). The overview of every effect family and
+of the FFNx True30FPS implementation (native effect code, verification, in-between frames) is
+[Battle effects and true 30 fps](BattleEffects30fps.md).
 
 ## The mechanism
 

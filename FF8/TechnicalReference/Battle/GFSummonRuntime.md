@@ -3,9 +3,10 @@ layout: default
 parent: Battle
 title: GF Summon Runtime
 permalink: /technical-reference/battle/gf-summon-runtime/
+author: HobbitDur
 ---
 
-This page documents the runtime dispatch for Guardian Force summon effects, special GF-style auto-actions and the shared `MagicList_Logic` effect table.
+This page documents the runtime dispatch for Guardian Force summon effects, special GF-style auto-actions and the shared `MagicList_Logic` effect table. How the summon programs themselves animate, family by family, and how they run at 30 fps is explained in [Battle effects and true 30 fps](BattleEffects30fps.md).
 
 1. TOC
 {:toc}
