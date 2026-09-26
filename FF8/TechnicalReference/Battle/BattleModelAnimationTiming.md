@@ -3,6 +3,7 @@ layout: default
 parent: Battle
 title: Battle Model Animation Timing (SLOW/FAST)
 permalink: /technical-reference/battle/battle-model-animation-timing/
+author: HobbitDur
 ---
 
 This page documents how battle model animations (characters, weapons, monsters) are
@@ -107,7 +108,30 @@ advancement at all:
   `total_frames`) into the R1-trigger stage buckets; wall-clock timing is preserved under
   SLOW since each data frame still spans the same real time.
 
-## Application: smooth models in high-frame-rate battle mods
+## Smooth models at the vanilla rate: look-ahead midpoint poses
+
+FFNx True30FPS keeps every battle animation exactly as vanilla plays it and only adds poses between ticks:
+
+- Animations keep the flags the engine gives them (Slow and Haste included) and are read once per
+  battle tick, so frame counts, durations, completions, sequence waits and the frame variables the
+  choreography VM reads are all the vanilla ones.
+- On the in-between frame the engine's own reader runs **one frame ahead on a copy**: the
+  animation command and the skeleton section are saved, `Battle_ReadAnimation` produces the next pose,
+  that pose is kept, and command and skeleton are put back byte for byte. The reader depends only on the
+  animation command and the skeleton (its bit cursor is rebuilt from the command on every call), so the
+  next real read finds exactly the vanilla state.
+- The bone matrices are then built from the **halfway pose** between the current and the next one, each
+  joint angle turning the short way round (a joint going from 4000 to 100 goes through 0, not back
+  through 2000), and the real pose values are restored.
+- A completed animation has no next frame of its own (the choreography decides what plays next); it
+  holds its last pose for that half tick, which is what vanilla shows until the next tick.
+
+Compared with forcing SLOW (below), nothing about the animation's timing changes, so no byte
+call-counter limit applies and no animation needs splitting. Models drawn by GF summon effects follow
+the same principle inside the effect code; see
+[Battle effects and true 30 fps](BattleEffects30fps.md).
+
+## Alternative: smooth models by forcing SLOW
 
 At a 30fps battle loop (2 host frames per native 15fps tick), forcing SLOW on every
 entity animation start gives native speed, native duration and **genuinely smooth
