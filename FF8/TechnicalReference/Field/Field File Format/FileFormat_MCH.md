@@ -141,6 +141,26 @@ Notes for decoding:
 - Vertex indices are in triangle-strip order: a quad's perimeter is `(0, 1, 3, 2)`; drawn as triangles it is `(0,1,3)` + `(0,2,3)`.
 - Each `tex_coords[i]` belongs to `vertex_indexes[i]`.
 - UVs are in pixels of the 128x128 TIM selected by `texture_index` (divide by 128 to normalize). The V axis is top-down like the TIM data (only flip it for tools with bottom-left UV origins, like Blender).
+- Triangles and quads are interleaved in the section; the engine sorts them into two primitive lists by opcode, in file order. A triangle's 4th vertex index is always 0.
+
+### Fields the engine reads
+
+When it builds a model instance, the engine converts each face into a GPU primitive and reads only these fields; every other byte of the record is ignored:
+
+| Offset | Size | Field                | Use                                                                                         |
+|--------|------|----------------------|---------------------------------------------------------------------------------------------|
+| 0x00   | 4    | opcode               | Triangle or quad; any other value skips the face                                            |
+| 0x08   | 2    | flags                | Copied into the primitive. Values are 1 or 5 (bit 0x04 = semi-transparency), set per face   |
+| 0x0C   | 6/8  | vertex_indexes       | 3 (triangle) or 4 (quad) indexes                                                            |
+| 0x1D   | 1    | command byte         | Byte 1 of `vertex_colors[0]`: the primitive command/attribute byte. Bit 0x02 = ABE: texels with the STP bit blend only on ABE faces. Common values 0x7F, 0xFF, 0x99, 0x00, 0x66, 0x3F; set per face |
+| 0x2C   | 8    | tex_coords           | UVs                                                                                         |
+| 0x36   | 2    | texture_index        | TIM of the header list                                                                      |
+
+The primitive's color is a fixed neutral 0x80, 0x80, 0x80: the other `vertex_colors` bytes and `edge_data` are not read.
+
+### Layout of the model data
+
+In all 71 main_chr .mch files and 1854 chara.one NPC models, the sections follow the header (0x40 bytes) back to back with no padding, in this order: bones, vertices, texture animation, faces, section 5, skin objects, animation. The vertex padding word and the skin object padding word are always 0, and so is the header DWORD at 0x18. TIMs always come before the model data (in the .mch file and in a chara.one NPC block), so the model data can be rewritten without moving them.
 
 ## Section 5: Unknown data
 
@@ -160,6 +180,8 @@ struct unknown_group {
 ```
 
 (sizeof = 32)
+
+The triangle and quad ranges count triangles and quads separately (index among the faces of that kind). Almost every model has a single group covering all its skin objects, triangles and quads, with the unknown bytes at 0. 15 models have several groups: `d049`, `d053`, `d075` and some NPCs (`o038`–`o040` in titown, `n027` in feart/fepic, `n023`, `n028`, `n014`, `p019` in bgkote). The engine copies the groups into the model instance unchanged.
 
 ## Section 6: Skin objects
 
