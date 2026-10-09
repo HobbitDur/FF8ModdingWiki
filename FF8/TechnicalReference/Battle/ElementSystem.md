@@ -2,6 +2,7 @@
 layout: default
 parent: Battle
 title: Element System
+author: HobbitDur
 permalink: /technical-reference/battle/element-system/
 ---
 
@@ -43,7 +44,16 @@ resistance lookup is indexed, not masked.
 
 Both damage paths read `list[0]` only — the **lowest set bit**. A spell flagged
 `Fire|Ice` behaves as pure Fire. Multi-element attacks are not implemented, even though
-the data format allows the bits to be combined.
+the data format allows the bits to be combined. The order is fixed: Fire, Ice, Thunder,
+Earth, Poison, Wind, Water, Holy, so Holy only counts when it is the attack's sole element
+(and so does the Zombie + Holy double damage).
+
+Two readers do look at the whole byte:
+
+- the magic path misses a floating target when **any** bit is Earth (`HIT_ELEMENT & Earth`
+  combined with the target's Float status);
+- `applyDamageAndHandleDeath` stores the full byte in `last_attacker_attack_element`, so an
+  AI "last attack element" test sees every element of the attack.
 
 ## Where the element byte lives in data
 
@@ -107,6 +117,14 @@ Two producers fill it:
 - **Party** — `setBattleSlotData`: straight 8-word copy of `FF8FieldCharData.elemDefInfo`,
   which `Stat_RefreshCharaBattleStats` computes from junctions via `getMagicElemDefValue`
   (base 800, `+= jElemDefenseValue * stock / 100` over 4 junction slots, capped at 1000).
+
+A character is **never weak** to an element. `jElemDefenseValue` is an unsigned byte that is
+only ever added, so the party range is 800–1000. Retail values go up to 200 (Holy, Quake,
+Aero; Firaga, Blizzaga and Thundaga use 150), so the byte cannot simply be read as signed.
+Weaknesses exist only on monsters: a `.dat` byte below 80, or AI opcode `0x2D` at runtime.
+
+The two formulas are linear in `elem_def`, and the multiplier keeps growing below 800:
+700 is ×2, 600 ×3, and 0 (a monster byte of 0) ×9. Below 0 the unsigned word wraps around.
 
 Two consumers read it:
 
@@ -182,6 +200,24 @@ the mental statuses.
 
 Both pages compare the new value against a pre-junction snapshot and draw sprite 109 or 110
 (down/up arrow) when they differ.
+
+The Status screen draws the same eight values in its own window,
+`Menu_DrawStatusElemDefenseWindow`, from a copy of the character data whose `elemDefInfo`
+is `MENU_STATUS_CHAR_SNAPSHOT_ELEM_DEF`. It has no comparison arrows.
+
+Both the Junction page and the Status window format a row the same way:
+
+| Step   | Function                                                     | Result                                                               |
+|--------|--------------------------------------------------------------|----------------------------------------------------------------------|
+| Number | `Menu_ElemDefToPercent`                                      | `v - 900` from 901 up, otherwise `v - 800`, clamped to 0–100         |
+| Icon   | `Menu_ElemDefIsAbsorb`                                       | `v > 900` → sprite 175 (green star) at x + 18                        |
+| Draw   | `BattleText_IntToDigitGlyphs`, `menu_draw_number_sprites`   | 2-digit padded number, then the `%` string                           |
+
+A value below 800 therefore shows **0%**. `menu_draw_number_sprites` maps a glyph code to
+sprite `code + 224` and only draws ids below `0x110`: the menu number set is sprites 256–271
+(blank, `0`–`9`, `%`, `/`, `:`, and two empty slots). There is **no minus sprite**, so a sign
+cannot be printed through this path without adding one to `icon.sp1`.
+`Menu_ElemDefToPercent` and `Menu_ElemDefIsAbsorb` have no other callers.
 
 ### Preview panel geometry
 
@@ -407,6 +443,18 @@ Two things that are **not** blockers:
 `HIT_ELEMENT` (`0x1D2A244`) is worth noting: it is declared as a 4-byte global but only its
 low byte is ever read, and the next symbol starts at `+4`.
 
+## Modding: multi-element attacks and junction weaknesses
+
+The Cronos mod ships two patches built on the facts above:
+
+| Patch                   | Change                                                                                                                                                                                           |
+|-------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| MultiElementAverage hext | Both damage paths use the **average** `elem_def` of every element on the attack instead of `list[0]` (Holy on a Zombie counts as 700). A single-element attack is unchanged.                     |
+| NegativeElemDef DLL     | `jElemDefenseValue` bytes 201–255 mean `(byte - 256) * 5` = −275…−5, so an Elem-Def spell can create a weakness; the total is clamped to 0–1000. Menus show it as a red down-triangle + red number. |
+
+Because both damage formulas are linear in `elem_def`, averaging the resistances averages the
+damage multipliers: Fire+Ice against Fire 700 / Ice 800 deals ×1.5.
+
 ## Function address reference
 
 | Name | Address | Role |
@@ -433,6 +481,11 @@ low byte is ever read, and the next symbol starts at `+4`.
 | `Menu_ComputeWindowOpenScaleRect` | 0x4A35A0 | Window open/close scale animation over the POS/SIZE rect |
 | `Menu_ElemDefToPercent` | 0x4BFAC0 | Raw `elem_def` → displayed percent (800→0, 900→100, >900 absorb) |
 | `Menu_ElemDefIsAbsorb` | 0x4BFAF0 | `v > 900`; gates the absorb icon (175) on the defense page |
+| `Menu_DrawStatusElemDefenseWindow` | 0x4CF2B0 | Status screen elemental defense window |
+| `MENU_STATUS_CHAR_SNAPSHOT_ELEM_DEF` | 0x1D7D954 | `elemDefInfo` of the Status screen's character copy |
+| `menu_draw_number_sprites` | 0x49F850 | Menu number drawer; glyph → sprite `code + 224`, ids below `0x110` only |
+| `BattleText_IntToDigitGlyphs` | 0x4B87F0 | Integer → digit glyph codes |
+| `BattleUI_DrawIconSpriteById` | 0x4B77C0 | `icon.sp1` sprite with a palette offset (draws the 109/110 arrows) |
 | `Menu_StatusResToPercent` | 0x4BFAB0 | Status resistance → displayed percent (`v - 100`) |
 | `Menu_GetMenuContextId` | 0x4BD060 | Selects between the two window header-icon sets |
 | `StatusJunctionMenuHandler` | 0x4DA9B0 | Junction screen state machine; no element loop of its own |

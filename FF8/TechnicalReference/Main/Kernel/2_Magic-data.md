@@ -1,6 +1,7 @@
 ---
 layout: default
 title: Magic
+author: HobbitDur
 nav_order: 3
 parent: Kernel
 permalink: /technical-reference/main/kernel/magic/
@@ -111,7 +112,7 @@ dispatched it would run no hits at all. The GF compatibility bytes are the neutr
 | 0x0020 | 1 byte  | [Characters J-Elem attack]({{site.baseurl}}/technical-reference/list/magic-list#element)        |
 | 0x0021 | 1 byte  | Characters J-Elem attack value                                                                  |
 | 0x0022 | 1 byte  | [Characters J-Elem defense]({{site.baseurl}}/technical-reference/list/magic-list#element)       |
-| 0x0023 | 1 byte  | Characters J-Elem defense value                                                                 |
+| 0x0023 | 1 byte  | Characters J-Elem defense value, unsigned, added (see Element System below)                    |
 | 0x0024 | 1 byte  | Characters J-Status attack value                                                                |
 | 0x0025 | 1 byte  | Characters J-Status defense value                                                               |
 | 0x0026 | 2 bytes | [Characters J-Statuses Attack]({{site.baseurl}}/technical-reference/list/characters-j-statuses) |
@@ -133,3 +134,12 @@ dispatched it would run no hits at all. The GF compatibility bytes are the neutr
 | 0x0038 | 1 byte  | Tonberry compatibility                                                                          |
 | 0x0039 | 1 byte  | Eden compatibility                                                                              |
 | 0x003A | 2 bytes | Unused (padding) — no code references these bytes (IDA: 0 xrefs)                                |
+
+### J-Elem defense value
+
+When the spell is junctioned to an Elem-Def slot, each element ticked in J-Elem defense
+(`0x22`) gains `value × stock / 100` on top of the neutral 800, capped at 1000 (100% absorb).
+The byte is unsigned and only added, so retail characters can never be weak to an element;
+retail values go up to 200 (Holy, Quake, Aero). The full mechanics are on the
+[Element System]({{site.baseurl}}/technical-reference/battle/element-system/) page, including
+the Cronos NegativeElemDef DLL that reads bytes 201–255 as −275…−5.
