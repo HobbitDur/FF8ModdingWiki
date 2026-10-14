@@ -44,7 +44,7 @@ The first 20 bytes (`0x00`–`0x14`) are the game's own locator/buffer record; t
 
 The shipped `audio.fmt` holds **2791 entries** (`soundCount` = 2790), of which **1544 are valid sounds** (the rest are blank placeholders). Every valid sound is **MS-ADPCM, 44100 Hz, mono**. The valid entries' `dataOffset + dataLength` values tile audio.dat exactly up to its full size (~105 MB), confirming the layout.
 
-Sound entries are addressed by their **index** (0-based) in audio.fmt. That index is the "sound id" used elsewhere in the engine — e.g. the [battle actor sound table](../../battle/battle-actor-sounds/) stores, per battle actor, the indices of the sounds it plays.
+Sound entries are addressed by their **index** (0-based) in audio.fmt. The [battle actor sound table](../../battle/battle-actor-sounds/) stores **world-sound ids**, which `GetSoundID_ForWorld` converts to these archive indices. For example, world id `400000` becomes archive entry #1230; the world id is not itself the archive index.
 
 ## Exporting a sound to WAV
 
@@ -61,6 +61,10 @@ Both PCM and MS-ADPCM WAVs round-trip this way. (Note: FF8SND/ff8-sound-remixed 
 ## Editing
 
 The **Julia** sound editor in FF8UltimateEditor reads audio.fmt/audio.dat, plays and exports sounds to WAV, replaces a sound from a WAV (PCM or MS-ADPCM), and rebuilds both files (repacking audio.dat and rewriting audio.fmt offsets). It also shows which battle actor uses each sound via the [battle actor sound table](../../battle/battle-actor-sounds/).
+
+Opening `audio.fmt` in Julia automatically reads `audio.dat` from the same folder. In **Audio archive**, select the resolved archive index and click **Play**: G-Soldier's world id `400000` is sound **#1230** here. The category groups used by the conversion do not refer to separate audio files; the samples are stored in this same archive.
+
+Julia's **Actor sound IDs** tab edits FFNx's `battle_actor_sounds.bin`, a table of references rather than audio samples. The main **Import** selects `audio.fmt` and `audio.dat` on either tab; **Import complementary** opens the BIN side file. **Save** writes the archive on Audio archive and the BIN on Actor sound IDs. With the archive loaded, select a slot and use **Play slot** to preview the resolved sound directly. See [world-id conversion and the FFNx table format](/technical-reference/battle/battle-actor-sounds/) for the category bases, worked examples and file layout.
 
 ## Reference (names & addresses)
 

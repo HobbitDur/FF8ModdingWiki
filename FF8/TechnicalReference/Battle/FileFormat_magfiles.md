@@ -2,7 +2,7 @@
 layout: default
 parent: Battle
 title: Mag File Format
-author: MaKiPL
+author: MaKiPL, HobbitDur
 permalink: /technical-reference/battle/mag-file-format/
 ---
 
@@ -38,6 +38,11 @@ the exe.
 ## G.F. Sequence
 
 <http://forums.qhimm.com/index.php?topic=15056.0>
+
+The seven summons of the GF cinematic engine (Ifrit, Leviathan, Bahamut, Cerberus, Alexander,
+Brothers, Eden) use packed `MAGnnn_B.00`/`.01` files whose header, objects (meshes, embedded
+creature model, sprite lists) and script byte code are documented on
+[GF cinematic script and mag files](../gf-cinematic-script/).
 
 For runtime dispatch of GF summon effects, `MagicList_Logic`, `effect_id`, Odin/Gilgamesh/Phoenix/Angelo auto-actions and GF callback addresses, see [GF Summon Runtime](../gf-summon-runtime/).
 

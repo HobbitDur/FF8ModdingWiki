@@ -46,6 +46,47 @@ The values stored in the table are "world-sound ids". `GetSoundID_ForWorld` spli
 
 Final audio id = `base[category] + index`.
 
+#### What category, base and offset mean
+
+A world-sound id packs two numbers into one: a **category number** and a **sound number within that category**, also called the offset. Here, offset means a number of sound entries, not a byte position in `audio.dat`.
+
+```text
+world id = category × 10000 + offset
+category = world id // 10000     (integer division)
+offset   = world id % 10000      (remainder)
+```
+
+The category chooses a starting archive index using the hardcoded lookup in `GetSoundID_ForWorld`. **The base cannot be calculated from the category number alone.** Category 40 has base 1230 because the game code explicitly assigns it that value.
+
+For example, G-Soldier (`c0m071`, actor row 87) has world id `400000` in slot 0:
+
+```text
+category = 400000 // 10000 = 40
+offset   = 400000 % 10000  = 0
+base for category 40      = 1230
+archive sound index       = 1230 + 0 = 1230
+```
+
+| World id | Category | Offset within category | Base | Archive sound index |
+|----------|----------|------------------------|------|---------------------|
+| 400000   | 40       | 0                      | 1230 | 1230                |
+| 400025   | 40       | 25                     | 1230 | 1255                |
+| 220037   | 22       | 37                     | 180  | 217                 |
+
+Categories are numeric groups, not monster identifiers. Category 40 does not mean G-Soldier: other actors can reference sounds in that group too. The "Used for" column above describes observed uses; the conversion function itself supplies numbers, not category names. Category 0, and categories without a special case, use base 0. Category 69 follows the special calculation in the table rather than the general formula.
+
+#### Where the audio is stored and how to preview it
+
+The resolved index selects an entry in the same PC sound archive used by Julia's **Audio archive** tab:
+
+- `audio.fmt` describes each entry: format, sample rate, length and its byte offset in `audio.dat`.
+- `audio.dat` contains the actual sample bytes.
+- The actor table contains sound references, not audio samples. Categories do not select separate audio files.
+
+In Julia, opening `audio.fmt` automatically opens the neighbouring `audio.dat`; both files must be in the same folder. To hear G-Soldier's slot 0 in **Audio archive**, select entry **#1230**, not #400000, and click **Play**. Other resolved IDs can be previewed the same way if the loaded archive contains a nonempty entry at that index.
+
+The **Actor sound IDs** tab can also preview a slot directly. Use **Import** to select both `audio.fmt` and `audio.dat` on either tab, select a slot cell, then click **Play slot**. The tab displays its world id and resolved archive index. An actor slot containing zero is unused; Julia does not preview it.
+
 **Worked example:** world-sound id `220037` → category `22`, index `37` → `180 + 37` = audio id **217** (the first slot of `com_id 0x11`).
 
 The decoded audio id is the entry index into the [audio archive](../../miscellaneous/audio-audiodataudiofmt/) (`audio.fmt` / `audio.dat`). This is verified against the retail archive: e.g. index `217` is `com_id 0x11` (GIM52A) and indices `158`/`159` are Squall's — each an MS-ADPCM, 44100 Hz mono sound. The table below lists the **decoded audio ids** directly.
@@ -227,7 +268,15 @@ The decoded audio id is the entry index into the [audio archive](../../miscellan
 - **3D variant.** `BdPlayActorSE3D` reads the same table but positions the sound in the battle scene when the 3D-sound capability flag is set; otherwise it falls back to the same stereo path as `BdPlayActorSE`.
 - **Global sounds.** The `0xB8` opcode path (`BdPlaySy`) does not use this table; its operand is already a world-sound id and goes straight to `PlayWorldSound`.
 - **Shared rows.** Several monster rows are identical (e.g. `0x69`/`0x71`/`0x72`/`0x7F` share the same 7 sounds), so a family of related enemies reuses one sound set.
-- **Editing the sounds.** Changing an actor's battle sounds means editing the referenced entries in the [audio archive](../../miscellaneous/audio-audiodataudiofmt/) (e.g. with the Julia tool in FF8UltimateEditor). Changing *which* sound an actor points to means editing `BattleActorSoundTable` in the executable; the `.dat` sound sections have no effect on either.
+- **Editing the sounds.** Changing an actor's battle sounds means editing the referenced entries in the [audio archive](../../miscellaneous/audio-audiodataudiofmt/) (e.g. with the Julia tool in FF8UltimateEditor). Changing *which* sound an actor points to means editing the actor table, either in the executable or through an FFNx table override when supported; the `.dat` sound sections have no effect on either.
+
+### FFNx table override and added monsters
+
+The implementation merged in [FFNx PR #999](https://github.com/julianxhokaxhiu/FFNx/pull/999) extends the array from 160 to 216 actors, covering monsters through `c0m199`. It exposes the table as `direct/exe/battle_actor_sounds.bin`, with language-specific `direct/<language>/exe/` files taking precedence. This requires a build containing that implementation; it is not a file read by the original FF8 executable.
+
+The file is a raw array with no header: **216 rows × 7 slots × 4 bytes = 6,048 bytes**. Each value is an unsigned 32-bit little-endian **world-sound id**, not an archive index. Character rows are 0–15; a monster's row is its `c0m` number plus 16. The original 160 rows are preserved by default, and added rows start at zero for mods to populate.
+
+Julia's Actor sound IDs tab can create this file using the original values. The audio archive (`audio.fmt` + `audio.dat`) remains the main file pair on both Julia tabs; use **Import complementary** for the BIN side file. The shared **Save** writes the archive pair on Audio archive and the BIN on Actor sound IDs, asking for a destination when the BIN is new. The panel beside the slot table shows the selected value's category, offset, hardcoded starting archive sound and final archive index. To give `c0m145` G-Soldier's sounds, copy actor row **87** to row **161**. Its slot 0 will then contain `400000`, resolving to archive entry #1230. Copying a row changes the references; it does not copy audio samples or import a DAT sound section.
 
 ### Reference (names & addresses)
 

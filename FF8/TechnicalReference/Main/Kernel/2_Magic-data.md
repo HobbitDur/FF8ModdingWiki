@@ -142,4 +142,5 @@ When the spell is junctioned to an Elem-Def slot, each element ticked in J-Elem 
 The byte is unsigned and only added, so retail characters can never be weak to an element;
 retail values go up to 200 (Holy, Quake, Aero). The full mechanics are on the
 [Element System]({{site.baseurl}}/technical-reference/battle/element-system/) page, including
-the Cronos NegativeElemDef DLL that reads bytes 201–255 as −275…−5.
+the Cronos NegativeElemDef DLL, which replaces this mask/value per spell with a table of signed
+per-element values.

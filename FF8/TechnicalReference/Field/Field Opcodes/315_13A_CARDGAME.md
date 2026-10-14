@@ -16,9 +16,10 @@ none
 
 #### Stack
 
-The opcode pops **7 bytes** off the script stack (one byte each, last pushed is
-popped first) into engine globals, then starts the match. Some entries are pushed
-as Long in scripts, but only the low byte of each is actually consumed.
+The opcode pops **7 values** off the script stack (last pushed is popped first)
+into engine globals, then starts the match. Six of them keep only their low byte;
+the **Game rules** value keeps the whole 32-bit stack entry (see
+[Game rules](#game-rules)).
 
 | Order popped | Name                       | Description             |
 |--------------|----------------------------|-------------------------|
@@ -60,18 +61,35 @@ When the card module actually boots (in `FFBattleDirector_battleLoop`) it copies
 `CARD_TRADE_RULES_ENGINE`, decides who controls each side, and builds the decks.
 
 {: .important }
-The opcode returns the number of cards you currently own and only starts the game
-if you own **5 or more** cards.
+The opcode only starts the game if you own **5 or more** cards.
+
+#### Return values
+
+The opcode writes two temporary variables that the calling script reads right
+after it:
+
+| Variable | Value                                                                       |
+|----------|-----------------------------------------------------------------------------|
+| `I[0]`   | Number of cards the player owns. Below 5, no match is played.               |
+| `I[1]`   | Match result: `0` player won, `1` player lost, `2` draw, `-1` rules refused |
+
+The vanilla scripts test `I[0] < 5` first (the "not enough cards" line), then
+`I[1]` (for example to count the wins against an NPC). When no match is played,
+`I[1]` still receives the result of the previous match, so it is only meaningful
+once `I[0]` is 5 or more.
 
 ---
 
 #### Game rules
 
 [*Game rules*]({{ site.baseurl }}/technical-reference/list/card-list#game-rules)
-(`CARD_GAME_RULES_SCRIPT`, enum `CardGameRulesFlag`) is a bitfield. The opcode can
-only set the **low byte** — the 7 real Triple Triad rules. The three high
-control-mode bits exist in the engine but are set by other systems (the
-cardgamemaster entity / debug), not by this opcode.
+(`CARD_GAME_RULES_SCRIPT`, enum `CardGameRulesFlag`) is a bitfield. The opcode
+keeps the full 32-bit value, and the card module copies it as is when the match
+boots, so the three high control-mode bits can come from the script too. In
+practice a literal push (`PSHN_L`) is a 24-bit value sign-extended to 32 bits: a
+literal can set the 7 real rules, but it sets either **none** of the high byte or
+**all** of it (bit 23 set). Setting only one control bit needs a 32-bit savemap
+variable push (`PSHM_L`). No vanilla script uses the control bits.
 
 | Bit          | Rule                             | Notes                                                                   |
 |--------------|----------------------------------|-------------------------------------------------------------------------|
@@ -104,31 +122,66 @@ at the end of the match:
 | `4`   | **All**        | Winner takes all 5                                                    |
 
 {: .note }
-The **Game rules** and **Trade rules** arguments are normally *not* hard-coded:
-the `[region]_maeshori0` script reads the region's current ruleset from the
-save-map card-game block (variables **272–299**; see
-[Variables]({{ site.baseurl }}/technical-reference/miscellaneous/variables)) and
-passes those two bytes in — which is why the rules reflect whatever the Queen of
-Cards has spread or abolished. The old page cited vars **292 / 293** for this. A
-mod can instead push a literal rules/trade value to force a fixed ruleset.
+The **Game rules** and **Trade rules** arguments are normally *not* hard-coded.
+The `[region]_maeshori0` script copies the region's current ruleset from the
+save-map card-game block (variables **272–299**, for example Balamb's rules byte
+272 and trade byte 280; see
+[Variables]({{ site.baseurl }}/technical-reference/miscellaneous/variables)) into
+variables **292** (rules) and **293** (trade rule), and the NPC script pushes
+those two variables (`PSHM_B 292`, `PSHM_B 293`). This is why the rules reflect
+whatever the Queen of Cards has spread or abolished. Every vanilla CARDGAME call
+but one (the Queen's challenge in `eapod1`) does this. A mod can instead push a
+literal rules/trade value to force a fixed ruleset.
 
 #### Rare card chance
 
-Each rare card whose current location equals the challenge's **Deck ID** has a
-`RARE_CARD_CHANCE / 100` probability of being added to the NPC's deck (up to 5
-rares). The chance is **halved** after every successful pick, so additional rares
-in the same hand become progressively less likely.
+The rare cards (IDs 77-109) whose current location equals the challenge's
+**Deck ID** are tested one by one in card-ID order. The first one is added to the
+NPC's hand with a `RARE_CARD_CHANCE / 100` probability. After the first rare card
+is added, every following rare card is tested at **half** the original chance
+(`RARE_CARD_CHANCE / 2`, it is not halved again), up to 5 rare cards.
 
 - Rare cards are card IDs **77–109** (33 cards: the GF / boss / special cards).
 - A card is eligible only if its current owner-location matches the Deck ID.
-- `RARE_CARD_CHANCE = 0` → never; `100` → first rare guaranteed, then 50 %, 25 %…
+  Deck ID `0` never gets rare cards.
+- `RARE_CARD_CHANCE = 0` → never; `100` → the first rare card is guaranteed,
+  every further one has 50 %.
 
 #### Deck ID (owner location)
 
-The **Deck ID** is a location/owner code. It (a) is the deck the AI opponent draws
-from and (b) gates which rare cards can appear (see above). The reserved value
-`0xF0` means "the player's own cards". Rare-card locations are **savegame state**
-(cards move around as you play), not a fixed table.
+The **Deck ID** is a location/owner code: the NPC's "pocket" for rare cards. It
+has **no effect on the NPC's normal cards**, which come only from the
+[allowed card level mask](#allowed-card-level-mask). Its roles:
+
+- **Which rare cards the NPC can play.** Every rare card whose current location
+  equals the Deck ID is a candidate (see [Rare card chance](#rare-card-chance)).
+  Deck ID `0` disables rare cards completely.
+- **Where the player's cards go while in play.** Each card the player picks for
+  the match is moved to the Deck ID at pick time (a rare card's location becomes
+  the Deck ID, a normal card's count drops by one). The cards the player keeps or
+  wins come back at the end. So a rare card the player **loses** stays at the
+  Deck ID, and that NPC can play it in a later match.
+- The **Random** rule does the same with the 5 random cards drawn for the player.
+
+Rare-card locations are **savegame state** (see
+[Triple Triad save data]({{ site.baseurl }}/technical-reference/miscellaneous/game-save-format)).
+Reserved values:
+
+| Deck ID   | Meaning                                                                         |
+|-----------|---------------------------------------------------------------------------------|
+| `0`       | No rare cards                                                                   |
+| `1`       | Queen of Cards                                                                  |
+| `200-232` | Starting owner of rare card `Deck ID - 123` (card 77-109), see below            |
+| `240`     | The player (`0xF0`)                                                             |
+
+On a new game every rare card **N** (77-109) starts at location **N + 123**.
+Those 33 locations are the Deck IDs of the NPCs that hold each rare card at the
+start, for example Deck ID `213` (Joker) holds card 90 (Leviathan) and `232`
+(Laguna) holds card 109 (Squall). The full list is in the
+[Card List]({{ site.baseurl }}/technical-reference/list/card-list#rare-card-starting-owners).
+
+Several NPCs can share one Deck ID (for example the Trepies use `38`): they share
+the same pocket, so a rare card lost to one of them can come back from another.
 
 #### Allowed card level mask
 
@@ -155,7 +208,7 @@ Deck-building details:
 
 #### Deck-source logic (per participant)
 
-Which hand each participant receives (decided in `sub_537110`):
+Which hand each participant receives:
 
 ```mermaid
 flowchart TD
@@ -459,6 +512,13 @@ Functions and engine internals:
 | Symbol                                                                 | Address   |
 |------------------------------------------------------------------------|-----------|
 | `SCRIPT_CARDGAME`                                                      | 0x5225A0  |
+| `CARD_GAME_SCRIPT_RESULT` (result copied to `I[1]`)                    | 0x1DCD7B4 |
+| `BuildParticipantDecksTask` (deck-source logic)                        | 0x537110  |
+| `PlayerChooseHandTask` (moves picked cards to the Deck ID)             | 0x537380  |
+| `CardMatchTurnAndResultTask` (match result, win/lose/draw counters)    | 0x535D00  |
+| `CardRuleConfirmTask` (rules shown, player can refuse)                 | 0x536CB0  |
+| `MoveCardToLocation`                                                   | 0x5347F0  |
+| `Savemap_InitTripleTriadNewGame` (rare card N starts at N+123)         | 0x8DFF20  |
 | `BuildOpponentDeck`                                                    | 0x537640  |
 | `PrepareAIMoveDecisionTask`                                            | 0x53ADF0  |
 | `ExecuteAIMoveSelectionTask`                                           | 0x53AFA0  |

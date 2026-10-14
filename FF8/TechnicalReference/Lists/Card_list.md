@@ -127,6 +127,60 @@ permalink: /technical-reference/list/card-list/
 | 101 | Laguna         | 0x0      |
 | 102 | Selphie        | 0x0      |
 | 103 | Quistis        | 0x0      |
+| 104 | Irvine         | 0x0      |
+| 105 | Zell           | 0x0      |
+| 106 | Rinoa          | 0x0      |
+| 107 | Edea           | 0x0      |
+| 108 | Seifer         | 0x0      |
+| 109 | Squall         | 0x0      |
+
+## Rare card starting owners
+
+Rare cards (IDs 77-109) are unique: the save data stores where each one is (see
+[Triple Triad save data]({{ site.baseurl }}/technical-reference/miscellaneous/game-save-format#triple-triad)).
+On a new game rare card **N** starts at location **N + 123**. An NPC can play a
+rare card only when its CARDGAME **Deck ID** equals the card's location (see
+[CARDGAME]({{ site.baseurl }}/technical-reference/field/field-opcodes/13a-cardgame/#deck-id-owner-location)).
+
+The owner column lists the vanilla NPCs whose CARDGAME Deck ID is that starting
+location. `-` means no NPC uses it: the card reaches the player another way
+(boss drop, GF, Queen of Cards quest...).
+
+| ID  | Card           | Start location | NPC owner (field maps)                                                     |
+|-----|----------------|----------------|----------------------------------------------------------------------------|
+| 77  | Chubby Chocobo | 200            | -                                                                          |
+| 78  | Angelo         | 201            | Watts (`seback1`, `tiagit1`)                                               |
+| 79  | Gilgamesh      | 202            | Quistis (`bgsido_7`, `bgryo2_2`, `rgair2`)                                 |
+| 80  | MinMog         | 203            | Balamb Garden hall kids (`bghall1b`, `bghall_1`, `bghall3a`, `bghall_5`)   |
+| 81  | Chicobo        | 204            | -                                                                          |
+| 82  | Quezacotl      | 205            | Mayor Dobe (`fhwisef2`)                                                    |
+| 83  | Shiva          | 206            | -                                                                          |
+| 84  | Ifrit          | 207            | -                                                                          |
+| 85  | Siren          | 208            | Man in the Dollet pub (`dopub_2`, `dopub_3`)                               |
+| 86  | Sacred         | 209            | -                                                                          |
+| 87  | Minotaur       | 210            | -                                                                          |
+| 88  | Carbuncle      | 211            | Xu (`bgsido_7`, `rgexit2`)                                                 |
+| 89  | Diablos        | 212            | -                                                                          |
+| 90  | Leviathan      | 213            | Joker (`bgmon_4`, `rgroad11`)                                              |
+| 91  | Odin           | 214            | -                                                                          |
+| 92  | Pandemona      | 215            | Balamb town NPCs (`bcmin1_1`, `bcmin11a`, `bcsaka_1`)                      |
+| 93  | Cerberus       | 216            | -                                                                          |
+| 94  | Alexander      | 217            | Piet and the Lunar Base staff (`sscont1`, `ssblock1`, `ssmedi1`, `eapod1`) |
+| 95  | Phoenix        | 218            | -                                                                          |
+| 96  | Bahumut        | 219            | -                                                                          |
+| 97  | Doomtrain      | 220            | -                                                                          |
+| 98  | Eden           | 221            | -                                                                          |
+| 99  | Ward           | 222            | Dr. Odine (`emlabo1`, `epmeet1`)                                           |
+| 100 | Kiros          | 223            | -                                                                          |
+| 101 | Laguna         | 224            | Ellone (`sscont1`, `sselone1`)                                             |
+| 102 | Selphie        | 225            | Trabia Garden student (`tggate1`)                                          |
+| 103 | Quistis        | 226            | Trepies, Balamb Garden (`bgroom_1`, `bgeat_2`)                             |
+| 104 | Irvine         | 227            | -                                                                          |
+| 105 | Zell           | 228            | Ma Dincht (`bcmin2_1`, `bcmin21a`, `bcmin23a`)                             |
+| 106 | Rinoa          | 229            | General Caraway (`glfurin1`)                                               |
+| 107 | Edea           | 230            | Edea (`ehback2`)                                                           |
+| 108 | Seifer         | 231            | Cid (`bgsido_2`, `bgsido_8`, `ehback2`)                                    |
+| 109 | Squall         | 232            | Laguna (`epwork3`, `rgguest4`)                                             |
 
 ## Trade rules
 

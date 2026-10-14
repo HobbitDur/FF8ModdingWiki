@@ -368,7 +368,7 @@ Notes column: `undocumented` = no wiki page exists for this opcode yet; `wiki:X`
 | 0x133 | SETPLACE | 0x523200 |  |
 | 0x134 | SETDCAMERA | 0x521930 | undocumented |
 | 0x135 | CHOICEMUSIC | 0x51F9A0 | undocumented |
-| 0x136 | GETCARD | 0x5224D0 | undocumented |
+| 0x136 | GETCARD | 0x5224D0 |  |
 | 0x137 | DRAWPOINT | 0x522770 |  |
 | 0x138 | PHSPOWER | 0x522230 |  |
 | 0x139 | KEY | 0x51E0B0 | undocumented |
@@ -409,8 +409,8 @@ Notes column: `undocumented` = no wiki page exists for this opcode yet; `wiki:X`
 | 0x15C | CLOSEEYES | 0x526280 | undocumented |
 | 0x15D | BLINKEYES | 0x5262C0 | undocumented |
 | 0x15E | SETCARD | 0x522500 |  |
-| 0x15F | HOWMANYCARD | 0x522540 | undocumented |
-| 0x160 | WHERECARD | 0x522570 | undocumented |
+| 0x15F | HOWMANYCARD | 0x522540 |  |
+| 0x160 | WHERECARD | 0x522570 |  |
 | 0x161 | ADDMAGIC | 0x5222D0 |  |
 | 0x162 | SWAP | 0x51E8A0 | undocumented |
 | 0x163 | SETPARTY2 | 0x51E860 | undocumented |

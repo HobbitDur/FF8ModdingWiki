@@ -73,14 +73,20 @@ Only one cinematic summon runs at a time, so the engine keeps its state in a fix
 
 | Offset | Field | Meaning |
 |--------|-------|---------|
-| +0x12 | id | Bone id, key of its node matrix slot |
+| +0x00 | chanStreamPtr[3] | Script pointer of each channel (0 = unused; negative = runs in the first phase) |
+| +0x0C | chanWait[3] | Remaining wait of each channel, decremented by `chanWaitSpeed` |
+| +0x12 | id | Bone id, key of its node matrix slot and of bone references |
+| +0x14, +0x16 | parentId, grandParentId | Ids of the spawning bone and of its parent (relative bone references) |
 | +0x18 | boneHandlerId | How accumulators become outputs (BoneHandlerTable) |
 | +0x1A | flags | Bit 0: integrate rotation acceleration; bit 3: integrate position acceleration |
+| +0x1B | battleSlot | Battle entity slot the entity opcodes act on (below 3 = a party member) |
 | +0x1C | drawHandlerId | How the bone is drawn (DrawHandlerTable); 0 = not drawn |
 | +0x1E | orientation | Sprite orientation type (handler 5) |
-| +0x20.. | chanStreamPtr[3] | Script pointer of each channel (0 = unused; negative = runs in the first phase) |
-| chanWait[3] | | Remaining wait of each channel, decremented by `chanWaitSpeed` |
+| +0x20..+0x23 | loopCounter[4] | Loop counters of opcodes `0x01E`/`0x01F` |
+| +0x24..+0x3B | returnStack[3][2] | Call return addresses, two levels per channel (`0x003`/`0x004`) |
+| +0x44..+0x46 | callDepth[3] | Call depth per channel |
 | +0x48 | renderListOffset | OT bucket (depth layer) of this bone's packets |
+| +0x4A | boneFlags | Per-bone flag word (`0x10C`, `0x10D`) |
 | +0x4C | drawFlags | Bit 0: draw from the alternate packet pool; bit 1: per-vertex clip codes; bit 2: emitter variant |
 | +0x50/54/58 | accumRot XYZ | 16.16 rotation accumulators |
 | +0x5C/60/64 | accumPos XYZ | 16.16 position accumulators |
@@ -133,10 +139,13 @@ the battle scene has the same one-frame lag, so everything stays consistent.
 
 ### Instruction format and channels
 
-An instruction is 10 bytes: `{opcode, slot, param1, param2, param3}` as five 16-bit words. The
-low 9 bits of the opcode word index a 512-entry `VmOpcodeTable` (one per GF); the high bits carry
-per-opcode modifiers (component mask, write mode, rotation order). Opcodes read their operands
-through the global stream cursor `g_GfCinematic_StreamCursor` and advance it themselves.
+Instructions have a **variable length** (2 to 10 bytes, longer for inline data blocks): an opcode
+word followed by 16-bit operands. The low 9 bits of the opcode word index the `VmOpcodeTable` of
+the GF (0x147 entries, numbering shared by the seven GFs); the high 7 bits carry per-opcode
+modifiers (component mask, wait length, sub-operation). Opcodes read their operands through the
+global stream cursor `g_GfCinematic_StreamCursor` and advance it themselves. The full instruction
+set, the length rules and the file layout are on
+[GF cinematic script and mag files](GFCinematicScript.md).
 
 Each bone has three channels. A phase loops over the bone order list, then over the three channels
 of the bone: a channel whose wait counter is positive is decremented by the bone's wait speed;
@@ -151,8 +160,8 @@ Three scripts can therefore run on the same bone at once (typically move / rotat
 | Set / add values | write modes 0-5 with a per-component mask | Write an immediate or another bone's value into velocity, acceleration, accumulator or output, absolute or relative. "Move to X in N frames" = set the velocity, then wait N |
 | Wait | | Set the channel wait; ends the channel for this tick |
 | Freeze | 0x07 | `rt->boneSkipFlag` = 0xFF or 0 (bits 15/14 of the opcode word) and marks the current bone "keeps running": every other bone stops animating, including the draw-side animations |
-| Node builders | 0x65, 0x66, 0x67, 0x69, 0x6A, 0xCB | Build this bone's node matrix from `outAngle`/`outPos`, node 0 (camera) and a parent node; pure functions of those inputs |
-| Set parent | 0x68 | `bone->parentNodeId` = param1 |
+| Node builders | 0x65, 0x66, 0x67, 0x69, 0x6A, 0xCB, 0x7A, 0x84, 0xC4, 0x104, 0x105, 0x116 | Build this bone's node matrix (or, for 0x104, a billboard slot) from `outAngle`/`outPos`, node 0 (camera), a parent node or a matrix; pure functions of those inputs. 0x7A composes a parent node with a matrix stored in the bone, 0x84 copies a 32-byte matrix, 0xC4 builds a node without the camera |
+| Set parent | 0x68 | `bone->parentNodeId` = param0 |
 | Camera and sound | 0x39 | Sub-op 0: battle camera position, look-at (another bone's `outPos`), projection distance = `outAngleX`, roll = `outAngleY`. Sub-op 1: stage camera animation. Sub-ops 2/3: sound voices. Sub-op 4: save the return view. Sub-op 8: arm the camera return |
 | Light set | 0x93 | Build a light-direction matrix, a light-colour matrix and a back colour from three bones (Ifrit and Leviathan only; a stub in the other five) |
 
@@ -298,6 +307,11 @@ In test on Ifrit: the summon runs to completion without faults (324 real ticks, 
 but the first build shows mesh triangles moving on held frames; F9 selects sub-modes (camera only /
 + node replay / + bone half-step) to isolate the faulty piece. F6 falls back to the generic 2D path.
 
+The full instruction set ([GF cinematic script](GFCinematicScript.md)) shows twelve node builders,
+not six: the pilot does not log 0x7A, 0x84, 0xC4, 0x104, 0x105 and 0x116, so a bone placed by one
+of them keeps the node matrix of the real tick on a held frame. Opcode 0x89 also steps the
+creature's keyframe animation from the script, outside draw handler 3.
+
 ## Addresses
 
 Ifrit module unless noted. The other six modules have the same functions at their own addresses
@@ -317,7 +331,7 @@ Ifrit module unless noted. The other six modules have the same functions at thei
 | `0xB26FB0` / `0xB27050` / `0xB26B80` / `0xB26E20` / `0xB298D0` / `0xB29F20` / `0xB27220` / `0xB270A0` / `0xB266C0` / `0xB272D0` | Draw handlers 1 / 2 / 3 / 4 / 5 / 6 / 7 / 9 / 21 / 27 | See table |
 | `0xB27440` | `GF_201Ifrit_DrawMeshObject` | Shared mesh renderer |
 | `0xB65480` | node slot find-or-allocate | Keyed by bone id |
-| `0x1874D6C` / `0x1874B80` / `0x1874F10` | DrawHandlerTable / BoneHandlerTable / VmOpcodeTable | Ifrit tables (73 / 12 / 512 entries) |
+| `0x1874D6C` / `0x1874B80` / `0x1874F10` | DrawHandlerTable / BoneHandlerTable / VmOpcodeTable | Ifrit tables (73 / 12 / 327 entries) |
 | `0x27973EC` | `g_GfCinematic_SequenceCtxPtr` | ctx |
 | `0x27973B8` | `g_GfCinematic_RuntimeSlotPtr` | rt |
 | `0x27973E8` | `g_GfCinematic_CurBonePtr` | Bone being processed |

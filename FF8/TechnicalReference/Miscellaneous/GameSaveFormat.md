@@ -224,17 +224,23 @@ Squall, Zell, Irvine, Quistis, Rinoa, Selphie, Seifer, Edea. For each character:
 
 ### Triple Triad
 
-| Offset | Size | Data                                              |
-|--------|------|---------------------------------------------------|
-| 0x00   | 77   | `cards[77]` (Array of 77 cards)                   |
-| 0x4D   | 33   | `card_locations[33]` (Array of 33 card locations) |
-| 0x6E   | 5    | `cards_rare[5]` (Array of 5 rare cards)           |
-| 0x73   | 1    | `u1` (Padding or unknown)                         |
-| 0x74   | 2    | `tt_victory_count` (TT victory count)             |
-| 0x76   | 2    | `tt_defeat_count` (TT defeat count)               |
-| 0x78   | 2    | `tt_egality_count` (TT egality count)             |
-| 0x7A   | 2    | `u2` (Unknown)                                    |
-| 0x7C   | 4    | `u3` (Unknown)                                    |
+| Offset | Size | Data                                                                                                 |
+|--------|------|------------------------------------------------------------------------------------------------------|
+| 0x00   | 77   | Normal cards (IDs 0-76), 1 byte each: bit 7 = owned at least once, bits 0-6 = copies owned (max 100) |
+| 0x4D   | 33   | Rare cards (IDs 77-109): current location of each card (`240` = player, otherwise an NPC's Deck ID)  |
+| 0x6E   | 5    | Rare cards obtained at least once (1 bit per rare card, bit N = card 77+N)                           |
+| 0x73   | 1    | Flags: bit 0 = collection complete (every card obtained once)                                        |
+| 0x74   | 2    | Triple Triad victory count                                                                           |
+| 0x76   | 2    | Triple Triad defeat count                                                                            |
+| 0x78   | 2    | Triple Triad draw count                                                                              |
+| 0x7A   | 2    | Unknown                                                                                              |
+| 0x7C   | 4    | Unknown (set to 1 on a new game)                                                                     |
+
+On a new game everything is cleared and rare card **N** is placed at location
+**N + 123** (200-232), the Deck ID of its starting NPC owner. See the
+[Card List]({{ site.baseurl }}/technical-reference/list/card-list#rare-card-starting-owners)
+and the [CARDGAME]({{ site.baseurl }}/technical-reference/field/field-opcodes/13a-cardgame/#deck-id-owner-location)
+opcode for how locations work.
 
 ### Chocobo World
 

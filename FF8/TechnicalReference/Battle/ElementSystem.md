@@ -447,10 +447,10 @@ low byte is ever read, and the next symbol starts at `+4`.
 
 The Cronos mod ships two patches built on the facts above:
 
-| Patch                   | Change                                                                                                                                                                                           |
-|-------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| MultiElementAverage hext | Both damage paths use the **average** `elem_def` of every element on the attack instead of `list[0]` (Holy on a Zombie counts as 700). A single-element attack is unchanged.                     |
-| NegativeElemDef DLL     | `jElemDefenseValue` bytes 201–255 mean `(byte - 256) * 5` = −275…−5, so an Elem-Def spell can create a weakness; the total is clamped to 0–1000. Menus show it as a red down-triangle + red number. |
+| Patch                    | Change                                                                                                                                                                                                                                                                                                                            |
+|--------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| MultiElementAverage hext | Both damage paths use the **average** `elem_def` of every element on the attack instead of `list[0]` (Holy on a Zombie counts as 700). A single-element attack is unchanged.                                                                                                                                                      |
+| NegativeElemDef DLL      | A table file (`cronos\elemdef.csv`) gives each listed spell one **signed value per element** (Fire +50 / Ice −50 from one spell), replacing its `jElemDefense` mask/value in `getMagicElemDefValue`, the Elem-Def spell list and Auto; the total is clamped to 0–1000. Menus show a weakness as a red down-triangle + red number. |
 
 Because both damage formulas are linear in `elem_def`, averaging the resistances averages the
 damage multipliers: Fire+Ice against Fire 700 / Ice 800 deals ×1.5.

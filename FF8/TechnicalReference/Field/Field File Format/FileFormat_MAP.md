@@ -17,11 +17,17 @@ MAP files contain data about the tiles used to draw the field background. There 
 
 Two signed 16-bit integers, X and Y relative to center (0, 0)  
 Unsigned 16-bit Z: the tile's draw depth, see [Z: draw depth](#z-draw-depth) below  
-4 bits, which 128x256 texture to use, if you consider the MIM to be one big image, just multiply this value by 128 and add it to the source X coordinate  
-1 unknown bit, always 1 (except in ending.map)  
-1 bit, image depth. 0 - there is two color indexes per byte (4-bit indexed), 1 there is one color index per byte (8-bit indexed)
-2 unknown bits, seem to be always equal to (blend mode % 4), except in some test fields
-1 Unknown byte, always 0 (except in ending.map)  
+Unsigned 16-bit texture word:
+
+| Bits | Meaning                                                                                                                                                   |
+|------|-----------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 0-3  | Which 128-byte-wide texture page to use: if you consider the MIM to be one big image, multiply this value by 128 to get the page's byte column            |
+| 4    | Draw flag, always 1 (except in the test fields test10-test12 and logo.map)                                                                                |
+| 5-6  | Blend mode % 4, except in some test fields                                                                                                                |
+| 7-8  | Texel depth: `0` = 4-bit indexed (two texels per byte, source X / 2), `1` = 8-bit indexed (one texel per byte), `2` = 16-bit direct colors (source X * 2) |
+| 9-15 | Always 0 (except in logo.map)                                                                                                                             |
+
+
 6 unknown bits, always 0  
 4 bits specifying which palette to use, add 8 to this number to get the right palette from the MIM  
 6 unknown bits, always 15  
@@ -37,11 +43,9 @@ Unsigned 16-bit Z: the tile's draw depth, see [Z: draw depth](#z-draw-depth) bel
 X and Y, same as above  
 Source coordinates, both 16-bit this time  
 Z, same as above  
-4 bits, which 128x256 texture to use, same as above  
-4 unknown bits (maybe same as above)  
-1 unknown byte, always 0  
+Unsigned 16-bit texture word, same bits as above  
 6 unknown bits, always 0  
-4 bits specifying which palette to use, add 8 to this number to get the right palette from the MIM  
+4 bits specifying which palette to use, use it directly (type 2 MIMs have only 16 palettes; checked on bccent15)  
 6 unknown bits, always 15  
 1 byte, background animation id  
 1 byte, animation state  
