@@ -3,6 +3,7 @@ layout: default
 parent: Battle
 title: Encounter Codes
 permalink: /technical-reference/battle/encounter-codes/
+author: HobbitDur
 ---
 
 Encounter IDs are battle scene IDs. Field scripts, field random encounters and world-map random encounters all select one of these IDs, then hand it to the battle module as `COMBAT_SCENE_ID`. See [Encounter Trigger Runtime](../encounter-trigger-runtime/) for the field/world-map selection and module handoff.
@@ -44,7 +45,7 @@ Encounter IDs are battle scene IDs. Field scripts, field random encounters and w
 | 030          | G-Soldier                                          | Dollet Elevator                          |
 | 031          | G-Soldier + Elite Soldier                          | Dollet Elevator                          |
 | 032          | Elite Soldier                                      | Dollet Elevator                          |
-| 033          | 2 G-Soldier                                        | Dollet Elevator                          |
+| 033          | 3 G-Soldier                                        | Dollet Elevator                          |
 | 034          | Grat                                               | Balamb Garden Gate                       |
 | 035          | 2 Grat                                             | Balamb Garden Gate                       |
 | 036          | 2 Caterchipillar + 1 Bomb                          | Balamb Garden Gate                       |
@@ -73,7 +74,7 @@ Encounter IDs are battle scene IDs. Field scripts, field random encounters and w
 | 059          | 2 Grat                                             | Balamb Garden Training Center            |
 | 060          | 3 Grat                                             | Balamb Garden Training Center            |
 | 061          | 1 T-Rexaur                                         | Balamb Garden Training Center            |
-| 062          | 1 Grenaldo + 3 Raldo (boss)                        | Balamb Garden Training Center            |
+| 062          | 1 Granaldo + 3 Raldo (boss)                        | Balamb Garden Training Center            |
 | 063          | NORG (boss)                                        | Master's Room                            |
 | 064          | 1 Geezard                                          | Balamb Garden MD Level                   |
 | 065          | 2 Geezard                                          | Balamb Garden MD Level                   |
@@ -97,8 +98,6 @@ Encounter IDs are battle scene IDs. Field scripts, field random encounters and w
 | 083          | Raijin + 2 G-Soldier (boss)                        | Balamb Hotel (outside)                   |
 | 084          | Raijin + Fujin (boss)                              | Balamb Hotel                             |
 | 085          | Red Propagator                                     | Ragnarok                                 |
-| 085          | Red Propagator                                     | Ragnarok                                 |
-| 085          | Red Propagator                                     | Ragnarok Cargo Bay                       |
 | 086          | Red Propagator                                     | Ragnarok Cargo Bay (door)                |
 | 087          | 1 Buel                                             | Fire Cavern                              |
 | 088          | 1 Bomb                                             | Fire Cavern                              |
@@ -130,7 +129,7 @@ Encounter IDs are battle scene IDs. Field scripts, field random encounters and w
 | 114          | 1 Blitz                                            | Galbadia Garden Hallway                  |
 | 115          | 1 Death Claw                                       | Galbadia Garden Main Hall                |
 | 116          | 1 Tri Face                                         | Galbadia Garden Main Hall                |
-| 117          | 1 Red Dragon                                       | Galbadia Garden Main Hall                |
+| 117          | 1 Ruby Dragon                                      | Galbadia Garden Main Hall                |
 | 118          | Cerberus (boss)                                    | Galbadia Garden Main Hall                |
 | 119          | Seifer (2nd)                                       | Galbadia Garden Master Room              |
 | 120          | Seifer + Edea (2nd)                                | Galbadia Garden Auditorium               |
@@ -161,22 +160,22 @@ Encounter IDs are battle scene IDs. Field scripts, field random encounters and w
 | 145          | 2 Creeps + Grand Mantis                            | Deling Sewers Access                     |
 | 146          | Grand Mantis                                       | Deling Sewers Access                     |
 | 147          | 2 Iguion (boss)                                    | Commencement Room                        |
-| 148          | G-Soldier                                          | Missile Base?                            |
-| 149          | 2 G-Soldier                                        | Missile Base?                            |
-| 150          | GIM52A                                             | Missile Base?                            |
+| 148          | Guard                                              | D-District Prison                        |
+| 149          | 2 Guard                                            | D-District Prison                        |
+| 150          | GIM52A                                             | D-District Prison                        |
 | 151          | Biggs + Wedge (2nd)                                | D-District Prison                        |
-| 152          | G-Soldier                                          | D-District Prison                        |
-| 153          | 2 G-Soldier                                        | D-District Prison                        |
+| 152          | Guard                                              | D-District Prison                        |
+| 153          | 2 Guard                                            | D-District Prison                        |
 | 154          | GIM52A                                             | D-District Prison                        |
 | 155          | GIM47N                                             | D-District Prison                        |
-| 156          | GIM47N + 2 G-Soldier                               | D-District Prison                        |
-| 157          | 2 GIM47N + 2 G-Soldier                             | D-District Prison                        |
+| 156          | GIM47N + 2 Guard                                   | D-District Prison                        |
+| 157          | 2 GIM47N + 2 Guard                                 | D-District Prison                        |
 | 158          | GIM47N                                             | D-District Control Room                  |
-| 159          | GIM47N + G-Soldier                                 | D-District Control Room                  |
+| 159          | GIM47N + Guard                                     | D-District Control Room                  |
 | 160          | 2 GIM52A                                           | D-District Control Room                  |
 | 161          | 2 GIM52A + Elite Soldier (boss)                    | D-District Exit                          |
-| 162          | 3 Fastitocalon                                     | Drylands (world map)                     |
-| 163          | 3 Fastitocalon                                     | Drylands (world map)                     |
+| 162          | 3 Fastitocalon-F                                   | Desert outside D-District Prison         |
+| 163          | 2 Fastitocalon-F + Fastitocalon                    | Desert outside D-District Prison         |
 | 164          | BGH251F2 (boss)                                    | Missile Base Parking Lot                 |
 | 165          | G-Soldier                                          | Missile Base Catwalk                     |
 | 166          | 2 G-Soldier                                        | Missile Base Catwalk                     |
@@ -187,14 +186,14 @@ Encounter IDs are battle scene IDs. Field scripts, field random encounters and w
 | 171          | G-Soldier + SAM08G                                 | Missile Base Platform                    |
 | 172          | G-Soldier                                          | Missile Base Control Room                |
 | 173          | 2 G-Soldier                                        | Missile Base Control Room                |
-| 174          | SAMN08G                                            | Missile Base Control Room                |
-| 175          | 2 G-Soldier + Elite Soldier                        | Missile Base Control Room                |
+| 174          | SAM08G                                             | Missile Base Control Room                |
+| 175          | 2 Base Soldier + Base Leader                       | Missile Base Control Room                |
 | 176          | Esthar Soldier                                     | Winhill                                  |
 | 177          | 2 Esthar Soldier                                   | Winhill                                  |
 | 178          | 2 Esthar Soldier + Esthar Soldier (robot)          | Winhill                                  |
-| 179          | G-Soldier                                          | Missile Base Catwalk                     |
-| 180          | Funguar                                            | Forest (world map)                       |
-| 181          | 2 Funguar + Geezard                                | Forest (world map)                       |
+| 179          | Base Soldier                                       | Missile Base Catwalk                     |
+| 180          | Funguar                                            | Timber Forest (Laguna dream 1)           |
+| 181          | 2 Funguar + Geezard                                | Timber Forest (Laguna dream 1)           |
 | 182          | Blobra + Buel                                      | Tomb of the Unknown King Corridor        |
 | 183          | 2 Buel                                             | Tomb of the Unknown King Corridor        |
 | 184          | Forbidden                                          | Tomb of the Unknown King Corridor        |
@@ -207,15 +206,15 @@ Encounter IDs are battle scene IDs. Field scripts, field random encounters and w
 | 191          | SAM08G                                             | FH Streets                               |
 | 192          | 2 G-Soldier                                        | FH Streets                               |
 | 193          | 2 GIM47N + Elite Soldier                           | FH Streets                               |
-| 194          | BGH521F2 (boss)                                    | FH Square                                |
+| 194          | BGH251F2 (boss)                                    | FH Square                                |
 | 195          | Seifer (1st)                                       | Parade Float                             |
-| 196          | G-Soldier                                          | ?                                        |
+| 196          | Guard                                              | D-District Prison (cell)                 |
 | 197          | T-Rexaur                                           | Balamb Garden Walkway ()                 |
 | 198          | 2 Bomb                                             | Balamb Garden Walkway ()                 |
 | 199          | Caterchipillar                                     | Balamb Garden Walkway (Quad)             |
 | 200          | 2 Bite Bug                                         | Balamb Garden Walkway (infirmary)        |
 | 201          | Grat                                               | Balamb Garden Walkway (library)          |
-| 202          | Bite Big + Grat                                    | Balamb Garden Walkway (library)          |
+| 202          | Bite Bug + Grat                                    | Balamb Garden Walkway (library)          |
 | 203          | SAM08G                                             | Balamb Garden Main Hall                  |
 | 204          | 2 GIM52A                                           | Balamb Garden Main Hall                  |
 | 205          | Elite Soldier + Paratrooper + G-Soldier            | Balamb Garden Main Hall                  |
@@ -224,12 +223,12 @@ Encounter IDs are battle scene IDs. Field scripts, field random encounters and w
 | 208          | 2 G-Soldier + Paratrooper                          | Balamb Garden 2f Hall                    |
 | 209          | Paratrooper                                        | Balamb Garden Quad                       |
 | 210          | Paratrooper + GIM52A                               | Balamb Garden Quad                       |
-| 211          | 2 Paratrooper + SAMN08G                            | Balamb Garden Quad                       |
-| 212          | Left hand + Right hand                             | Salt Flats                               |
+| 211          | 2 Paratrooper + SAM08G                             | Balamb Garden Quad                       |
+| 212          | Lefty + Righty                                     | Salt Flats                               |
 | 213          | Vysage                                             | Salt Flats                               |
-| 214          | 2 Left Hand + 2 Right Hand                         | Salt Flats                               |
-| 215          | Vysage + Left Hand + Right Hand                    | Salt Flats                               |
-| 216          | Abaddon (boss)                                     | Salt Flats                               |
+| 214          | 2 Lefty + 2 Righty                                 | Salt Flats                               |
+| 215          | Vysage + Lefty + Righty                            | Salt Flats                               |
+| 216          | Abadon (boss)                                      | Salt Flats                               |
 | 217          | Bite Bug                                           | Trabia Canyon Cliffs                     |
 | 218          | Mesmerize                                          | Trabia Canyon Cliffs                     |
 | 219          | Mesmerize + 2 Bite Bug                             | Trabia Canyon Cliffs                     |
@@ -242,7 +241,7 @@ Encounter IDs are battle scene IDs. Field scripts, field random encounters and w
 | 226          | Gesper                                             | Lunatic Pandora                          |
 | 227          | Elastoid                                           | Lunatic Pandora                          |
 | 228          | Gesper + 2 Esthar Soldier                          | Lunatic Pandora                          |
-| 229          | Esthar Soldier                                     | Lunatic Pandora (yellow)                 |
+| 229          | Esthar Soldier (robot)                             | Lunatic Pandora (yellow)                 |
 | 230          | 2 Gesper                                           | Lunatic Pandora (yellow)                 |
 | 231          | Esthar Soldier                                     | Lunatic Pandora (red)                    |
 | 232          | Elastoid                                           | Lunatic Pandora (red)                    |
@@ -281,8 +280,8 @@ Encounter IDs are battle scene IDs. Field scripts, field random encounters and w
 | 265          | SAM08G                                             | Esthar Front of O-Lab                    |
 | 266          | G-Soldier + Elite Soldier + GIM52A                 | Esthar Front of O-Lab                    |
 | 267          | G-Soldier                                          | Esthar Front of Palace                   |
-| 268          | 2 SAM08G                                           | Esthar Front of Palace                   |
-| 269          | ? (i totally wasn't paying attention)              | Esthar Front of Palace                   |
+| 268          | 2 G-Soldier                                        | Esthar Front of Palace                   |
+| 269          | 2 SAM08G                                           | Esthar Front of Palace                   |
 | 270          | G-Soldier + GIM52A + SAM08G                        | Esthar Front of Palace                   |
 | 271          | G-Soldier + Elite Soldier                          | Esthar Streets (curve)                   |
 | 272          | G-Soldier + GIM52A                                 | Esthar Streets (curve)                   |
@@ -331,14 +330,14 @@ Encounter IDs are battle scene IDs. Field scripts, field random encounters and w
 | 315          | Torama                                             | Esthar Front of O-Lab (red sky)          |
 | 316          | Behemoth + Imp                                     | Esthar Front of O-Lab (red sky)          |
 | 317          | Odin (boss) (see notes)                            | Odin's Throne Room                       |
-| 318          | Anacondour                                         | Deep Sea Laboratory Entrance             |
-| 319          | Anacondour + 2 Blood Soul                          | Deep Sea Laboratory Entrance             |
-| 320          | Anacondour + Buel + Bomb                           | Deep Sea Laboratory Entrance             |
-| 321          | Red Dragon                                         | Deep Sea Laboratory Entrance             |
-| 322          | Anacondour + Buel                                  | Deep Sea Laboratory Entrance (destroyed) |
-| 323          | Anacondour + Blood Soul                            | Deep Sea Laboratory Entrance (destroyed) |
+| 318          | Anacondaur                                         | Deep Sea Laboratory Entrance             |
+| 319          | Anacondaur + 2 Blood Soul                          | Deep Sea Laboratory Entrance             |
+| 320          | Anacondaur + Buel + Bomb                           | Deep Sea Laboratory Entrance             |
+| 321          | Ruby Dragon                                        | Deep Sea Laboratory Entrance             |
+| 322          | Anacondaur + Buel                                  | Deep Sea Laboratory Entrance (destroyed) |
+| 323          | Anacondaur + Blood Soul                            | Deep Sea Laboratory Entrance (destroyed) |
 | 324          | Buel + Blood Soul + Bomb                           | Deep Sea Laboratory Entrance (destroyed) |
-| 325          | Red Dragon + Bomb                                  | Deep Sea Laboratory Entrance (destroyed) |
+| 325          | Ruby Dragon + Bomb                                 | Deep Sea Laboratory Entrance (destroyed) |
 | 326          | Bahamut (boss)                                     | Bahamut's Room                           |
 | 327          | 3 Turtapod + Torama                                | Tears' Point                             |
 | 328          | Turtapod + 2 Imp                                   | Tears' Point                             |
@@ -357,34 +356,34 @@ Encounter IDs are battle scene IDs. Field scripts, field random encounters and w
 | 341          | Torama + 2 Bomb                                    | Deep Sea Research Center                 |
 | 342          | 2 Imp                                              | Deep Sea Control Room                    |
 | 343          | Blue Dragon                                        | Deep Sea Control Room                    |
-| 344          | Grenaldo + 3 Raldo                                 | Deep Sea Control Room                    |
+| 344          | Granaldo + 3 Raldo                                 | Deep Sea Control Room                    |
 | 345          | Bomb + 2 Imp                                       | Deep Sea Pipe Room                       |
 | 346          | Blue Dragon + Imp                                  | Deep Sea Pipe Room                       |
 | 347          | Oilboyle + Bomb                                    | Deep Sea Pipe Room                       |
 | 348          | Triface                                            | Deep Sea Ruins                           |
 | 349          | Grendel + Imp                                      | Deep Sea Ruins                           |
 | 350          | Behemoth                                           | Deep Sea Ruins                           |
-| 351          | Red Dragon                                         | Deep Sea Ruins                           |
+| 351          | Ruby Dragon                                        | Deep Sea Ruins                           |
 | 352          | 2 Iron Giant                                       | Deep Sea Ruins                           |
 | 353          | Elnoyle                                            | Deep Sea Ruins                           |
 | 354          | Ultima Weapon (boss)                               | Deep Sea Ruins, Ultima Room              |
 | 355          | Blobra                                             | Castle Hall                              |
-| 356          | Belhemel + Mezmerize                               | Castle Hall                              |
+| 356          | Belhelmel + Mesmerize                              | Castle Hall                              |
 | 357          | 2 Blobra + Buel                                    | Castle Hall                              |
 | 358          | 2 Anacondaur                                       | Castle Hall                              |
 | 359          | Caterchipillar                                     | Castle Hall                              |
 | 360          | Caterchipillar + Cockatrice                        | Castle Hall                              |
 | 361          | Geezard + Cockatrice + Fastitocalon                | Castle Hall                              |
 | 362          | Snow Lion + Glacial Eye                            | Castle Hall                              |
-| 363          | Sphynxaur (boss)                                   | Castle Hall                              |
+| 363          | Sphinxaur / Sphinxara (boss)                       | Castle Hall                              |
 | 364          | Grat                                               | Castle Chandelier Room                   |
-| 365          | 3 Fastitocalon                                     | Castle Chandelier Room                   |
+| 365          | 2 Fastitocalon-F + Fastitocalon                    | Castle Chandelier Room                   |
 | 366          | Grat + Geezard                                     | Castle Chandelier Room                   |
 | 367          | Hexadragon + Bomb                                  | Castle Chandelier Room                   |
 | 368          | Thrustaevis                                        | Castle Balcony                           |
 | 369          | Jelleye + Blood Soul                               | Castle Balcony                           |
 | 370          | Thrustaevis + 2 Jelleye                            | Castle Balcony                           |
-| 371          | Grenaldo + 2 Bite Bug                              | Castle Balcony                           |
+| 371          | Granaldo + 2 Bite Bug                              | Castle Balcony                           |
 | 372          | Krysta (boss)                                      | Castle Balcony                           |
 | 373          | Funguar                                            | Castle Library                           |
 | 374          | 4 Red Bat                                          | Castle Library                           |
@@ -393,7 +392,7 @@ Encounter IDs are battle scene IDs. Field scripts, field random encounters and w
 | 377          | Tri-Point (boss)                                   | Castle Library                           |
 | 378          | Abyss Worm                                         | Castle Passageway                        |
 | 379          | 2 Grand Mantis                                     | Castle Passageway                        |
-| 380          | Red Dragon                                         | Castle Passageway                        |
+| 380          | Ruby Dragon                                        | Castle Passageway                        |
 | 381          | 2 Wendigo                                          | Castle Passageway                        |
 | 382          | 2 Blobra                                           | Castle Passageway                        |
 | 383          | Behemoth                                           | Castle Passageway                        |
@@ -409,7 +408,7 @@ Encounter IDs are battle scene IDs. Field scripts, field random encounters and w
 | 393          | Triface                                            | Castle Stair Hall                        |
 | 394          | Cactuar                                            | Castle Stair Hall                        |
 | 395          | Abyss Worm + Creeps                                | Castle Stair Hall                        |
-| 396          | Vysage + Left Hand + Right Hand                    | Castle Stair Hall                        |
+| 396          | Vysage + Lefty + Righty                            | Castle Stair Hall                        |
 | 397          | Chimera                                            | Castle Stair Hall                        |
 | 398          | Grendel                                            | Castle Stair Hall                        |
 | 399          | Wendigo + 2 Creeps                                 | Castle Stair Hall                        |
@@ -438,8 +437,8 @@ Encounter IDs are battle scene IDs. Field scripts, field random encounters and w
 | 422          | T-Rexaur                                           | Castle Gallery                           |
 | 423          | Cactuar                                            | Castle Gallery                           |
 | 424          | Blobra + Blitz                                     | Castle Gallery                           |
-| 425          | Elvoret                                            | Castle Gallery                           |
-| 426          | Red Dragon                                         | Castle Gallery                           |
+| 425          | Elnoyle                                            | Castle Gallery                           |
+| 426          | Ruby Dragon                                        | Castle Gallery                           |
 | 427          | Glacial Eye                                        | Castle Gallery                           |
 | 428          | 2 Cactuar + Bomb                                   | Castle Gallery                           |
 | 429          | Blue Dragon                                        | Castle Gallery                           |
@@ -449,32 +448,32 @@ Encounter IDs are battle scene IDs. Field scripts, field random encounters and w
 | 433          | Turtapod + Funguar + Raldo                         | Castle Armory                            |
 | 434          | Malboro                                            | Castle Armory                            |
 | 435          | 2 Death Claw                                       | Castle Armory                            |
-| 436          | Vysage + Left Hand + Right Hand -&gt; Gargantua    | Castle Armory                            |
+| 436          | Vysage + Lefty + Righty -&gt; Gargantua            | Castle Armory                            |
 | 437          | 2 Red Bat                                          | Castle Dungeon                           |
 | 438          | 4 Red Bat                                          | Castle Dungeon                           |
 | 439          | Cockatrice + Armadodo                              | Castle Dungeon                           |
-| 440          | Elvoret                                            | Castle Dungeon                           |
+| 440          | Elnoyle                                            | Castle Dungeon                           |
 | 441          | Red Giant (boss)                                   | Castle Dungeon                           |
 | 442          | Gayla                                              | Castle Waterway                          |
 | 443          | Bomb + Adamantoise                                 | Castle Waterway                          |
 | 444          | Blitz + Wendigo                                    | Castle Waterway                          |
 | 445          | Forbidden + Adamantoise                            | Castle Waterway                          |
-| 446          | 3 Fastitocalon                                     | Castle Waterway                          |
-| 447          | Chimera + 2 Fastitocalon                           | Castle Waterway                          |
-| 448          | Grenaldo + 2 Bite Bug                              | Castle Waterway                          |
+| 446          | 3 Fastitocalon-F                                   | Castle Waterway                          |
+| 447          | Chimera + 2 Fastitocalon-F                         | Castle Waterway                          |
+| 448          | Granaldo + 2 Bite Bug                              | Castle Waterway                          |
 | 449          | 2 Triface                                          | Castle Waterway                          |
 | 450          | Grand Mantis                                       | Castle Waterway                          |
 | 451          | Gayla + Caterchipillar                             | Castle Waterway                          |
 | 452          | Fastitocalon                                       | Castle Waterway                          |
 | 453          | Snow Lion + Anacondaur                             | Castle Waterway                          |
 | 454          | 2 Raldo                                            | Castle Courtyard                         |
-| 455          | Abyss Worm + Left Hand + Right Hand                | Castle Courtyard                         |
+| 455          | Abyss Worm + Lefty + Righty                        | Castle Courtyard                         |
 | 456          | Torama + Adamantoise                               | Castle Courtyard                         |
 | 457          | T-Rexaur                                           | Castle Courtyard                         |
 | 458          | 2 Mesmerize                                        | Castle Chapel                            |
 | 459          | Jelleye + Grendel                                  | Castle Chapel                            |
-| 460          | Elvoret                                            | Castle Chapel                            |
-| 461          | Blue Dragon + Left Hand + Right Hand               | Castle Chapel                            |
+| 460          | Elnoyle                                            | Castle Chapel                            |
+| 461          | Blue Dragon + Lefty + Righty                       | Castle Chapel                            |
 | 462          | Omega Weapon (boss)                                | Castle Chapel                            |
 | 463          | Belhelmel                                          | Castle Clocktower                        |
 | 464          | Belhelmel + 2 Blood Soul                           | Castle Clocktower                        |
@@ -491,7 +490,7 @@ Encounter IDs are battle scene IDs. Field scripts, field random encounters and w
 | 475          | Buel                                               | Castle Clocktower                        |
 | 476          | Death Claw                                         | Castle Clocktower                        |
 | 477          | Forbidden + Vysage                                 | Castle Clocktower                        |
-| 478          | Grenaldo + 2 Raldo                                 | Castle Clocktower                        |
+| 478          | Granaldo + 2 Raldo                                 | Castle Clocktower                        |
 | 479          | Anacondaur + Grat                                  | Castle Clocktower Exterior               |
 | 480          | Snow Lion                                          | Castle Clocktower Exterior               |
 | 481          | Triface                                            | Castle Clocktower Exterior               |
@@ -504,7 +503,7 @@ Encounter IDs are battle scene IDs. Field scripts, field random encounters and w
 | 488          | Death Claw + 2 Funguar                             | Castle Final Path                        |
 | 489          | Ochu                                               | Castle Final Path                        |
 | 490          | T-Rexaur                                           | Castle Final Path                        |
-| 491          | Red Dragon                                         | Castle Final Path                        |
+| 491          | Ruby Dragon + Imp                                  | Castle Final Path                        |
 | 492          | Caterchipillar + 2 Bite Bug                        | Winhill                                  |
 | 493          | G-Soldier                                          | Lunatic Pandora Catwalk                  |
 | 494          | 2 G-Soldier                                        | Lunatic Pandora Catwalk                  |
@@ -521,13 +520,13 @@ Encounter IDs are battle scene IDs. Field scripts, field random encounters and w
 | 505          | 2 SAM08G                                           | Lunatic Pandora Main Hall                |
 | 506          | G-Soldier + Elite Soldier                          | Lunatic Pandora Bridge                   |
 | 507          | GIM52A + G-Soldier                                 | Lunatic Pandora Bridge                   |
-| 511          | Ultimecia (boss)                                   | ????                                     |
+| 511          | Ultimecia (boss)                                   | Castle Master Room                       |
 | 512          | 2 Bite Bug                                         | Balamb Plains                            |
 | 513          | 3 Bite Bug                                         | Balamb Plains                            |
 | 514          | Bite Bug                                           | Balamb Plains                            |
 | 515          | Caterchipillar                                     | Forest                                   |
 | 516          | Caterchipillar + 2 Bite Bug                        | Forest                                   |
-| 517          | 2 Fastitocalon                                     | Beach                                    |
+| 517          | 2 Fastitocalon-F                                   | Beach                                    |
 | 518          | Glacial Eye                                        | Valley                                   |
 | 519          | 2 Glacial Eye                                      | Valley                                   |
 | 520          | Glacial Eye                                        | Plains                                   |
@@ -541,19 +540,19 @@ Encounter IDs are battle scene IDs. Field scripts, field random encounters and w
 | 528          | 2 Funguar + Cockatrice                             | Forest                                   |
 | 529          | Wendigo                                            | Forest                                   |
 | 530          | Ochu                                               | Forest                                   |
-| 531          | 2 Fastitocalon                                     | Beach                                    |
+| 531          | 2 Fastitocalon-F                                   | Beach                                    |
 | 532          | 2 Thrustaevis                                      | Cliff                                    |
 | 533          | Geezard                                            | Cliff Valley                             |
 | 534          | Thrustaevis + Geezard                              | Desert                                   |
 | 535          | Funguar                                            | Plains                                   |
-| 536          | 3 Fastitocalon                                     | Beach                                    |
+| 536          | 3 Fastitocalon-F                                   | Beach                                    |
 | 537          | Wendigo                                            | Cliff                                    |
 | 538          | 3 Geezard                                          | Cliff Valley                             |
 | 539          | Geezard                                            | Plains                                   |
 | 540          | 2 Geezard                                          | Plains                                   |
 | 541          | 3 Geezard                                          | Plains                                   |
 | 542          | 3 Funguar                                          | Forest                                   |
-| 543          | 3 Fastitocalon                                     | Beach                                    |
+| 543          | 3 Fastitocalon-F                                   | Beach                                    |
 | 544          | Anacondaur                                         | Cliff                                    |
 | 545          | Anacondaur + 2 Geezard                             | Cliff                                    |
 | 546          | Geezard                                            | Cliff Valley                             |
@@ -565,7 +564,7 @@ Encounter IDs are battle scene IDs. Field scripts, field random encounters and w
 | 552          | Belhelmel + Geezard                                | Desert                                   |
 | 553          | Grendel                                            | Forest                                   |
 | 554          | Thrustaevis                                        | Cliff                                    |
-| 555          | Thrustaevis + Blood Soul                           | Badlands                                 |
+| 555          | Thrustaevis + 2 Blood Soul                         | Badlands                                 |
 | 556          | Thrustaevis + 2 Geezard                            | Desert                                   |
 | 557          | Geezard                                            | Cliff Plains (night)                     |
 | 558          | Thrustaevis                                        | Cliff Plains (night)                     |
@@ -574,21 +573,21 @@ Encounter IDs are battle scene IDs. Field scripts, field random encounters and w
 | 561          | 2 Wendigo                                          | Desert (night)                           |
 | 562          | Wendigo + Geezard + Blood Soul                     | Desert (night)                           |
 | 563          | Belhelmel                                          | Desert (night)                           |
-| 564          | 2 Fastitocalon                                     | Beach (night)                            |
+| 564          | 2 Fastitocalon-F                                   | Beach (night)                            |
 | 565          | 2 Geezard                                          | Cliff (night)                            |
 | 566          | Thrustaevis + Geezard                              | Cliff (night)                            |
 | 567          | 2 Thrustaevis + Belhelmel                          | Cliff (night)                            |
-| 568          | 3 Fastitocalon                                     | Desert (night)                           |
-| 569          | 3 Fastitocalon                                     | Desert (night)                           |
+| 568          | 3 Fastitocalon-F                                   | Desert (night)                           |
+| 569          | 2 Fastitocalon-F + Fastitocalon                    | Desert (night)                           |
 | 570          | Abyss Worm                                         | Desert (night)                           |
-| 571          | 2 Fastitocalon                                     | Desert                                   |
+| 571          | 2 Fastitocalon-F                                   | Desert                                   |
 | 572          | Chimera                                            | Desert                                   |
 | 573          | 3 Geezard                                          | Cliff Valley (night)                     |
 | 574          | 2 Funguar                                          | Cliff Valley (night)                     |
 | 575          | Thrustaevis                                        | Cliff Desert (night)                     |
 | 576          | Thrustaevis + Geezard                              | Cliff Desert (night)                     |
 | 577          | 2 Thrustaevis                                      | Cliff Desert (night)                     |
-| 578          | 2 Fastitocalon                                     | Beach (night)                            |
+| 578          | Fastitocalon-F + Fastitocalon                      | Beach (night)                            |
 | 579          | Funguar + 2 Geezard                                | Cliff Valley (night)                     |
 | 580          | Geezard                                            | Cliff Desert (night)                     |
 | 581          | Fastitocalon                                       | Desert                                   |
@@ -596,8 +595,8 @@ Encounter IDs are battle scene IDs. Field scripts, field random encounters and w
 | 583          | Lefty + Righty                                     | Plains                                   |
 | 584          | Vysage                                             | Plains                                   |
 | 585          | Cockatrice + Blood Soul                            | Cliff Desert                             |
-| 586          | Fastitocalon                                       | Beach                                    |
-| 587          | Fastitocalon + Lefty + Righty                      | Beach                                    |
+| 586          | Fastitocalon-F                                     | Beach                                    |
+| 587          | Fastitocalon-F + Lefty + Righty                    | Beach                                    |
 | 588          | 2 Grendel                                          | Cliff                                    |
 | 589          | Grendel                                            | Cliff                                    |
 | 590          | Lefty                                              | Cliff Valley                             |
@@ -611,8 +610,8 @@ Encounter IDs are battle scene IDs. Field scripts, field random encounters and w
 | 598          | Mesmerize                                          | Tundra                                   |
 | 599          | Ochu                                               | Tundra                                   |
 | 600          | Snow Lion                                          | Snowy Beach                              |
-| 601          | 2 Fastitocalon                                     | Snowy Beach                              |
-| 602          | 2 Fastitocalon                                     | Snowy Beach                              |
+| 601          | 2 Fastitocalon-F                                   | Snowy Beach                              |
+| 602          | Fastitocalon-F + Fastitocalon                      | Snowy Beach                              |
 | 603          | Adamantoise                                        | Snowy Beach                              |
 | 604          | Mesmerize + Gayla                                  | Snow Valley                              |
 | 605          | 2 Gayla                                            | Snow Valley                              |
@@ -626,8 +625,8 @@ Encounter IDs are battle scene IDs. Field scripts, field random encounters and w
 | 613          | Gayla + 2 Bite Bug                                 | Snow Forest                              |
 | 614          | Snow Lion + 2 Bite Bug                             | Snow Forest                              |
 | 615          | Blue Dragon                                        | Snow Forest                              |
-| 616          | Fastitocalon                                       | Snowy Beach                              |
-| 617          | 2 Fastitocalon                                     | Snowy Beach                              |
+| 616          | Fastitocalon-F                                     | Snowy Beach                              |
+| 617          | 3 Fastitocalon-F                                   | Snowy Beach                              |
 | 618          | Fastitocalon                                       | Snowy Beach                              |
 | 619          | Gayla                                              | Snow Valley                              |
 | 620          | Mesmerize                                          | Snow Valley                              |
@@ -652,17 +651,17 @@ Encounter IDs are battle scene IDs. Field scripts, field random encounters and w
 | 639          | Death Claw                                         | Forest                                   |
 | 640          | Blitz                                              | Forest                                   |
 | 641          | Grand Mantis                                       | Forest                                   |
-| 642          | Red Dragon                                         | Forest                                   |
+| 642          | Ruby Dragon                                        | Forest                                   |
 | 643          | Grand Mantis + 2 Geezard                           | Forest                                   |
 | 644          | Blitz + Geezard                                    | Forest                                   |
-| 645          | 3 Fastitocalon                                     | Beach                                    |
-| 646          | 3 Fastitocalon                                     | Beach                                    |
-| 647          | 3 Fastitocalon                                     | Beach                                    |
+| 645          | 3 Fastitocalon-F                                   | Beach                                    |
+| 646          | 2 Fastitocalon-F + Fastitocalon                    | Beach                                    |
+| 647          | Fastitocalon-F + 2 Fastitocalon                    | Beach                                    |
 | 648          | Blitz + Jelleye                                    | Dirt                                     |
 | 649          | Jelleye                                            | Dirt                                     |
 | 650          | Adamantoise                                        | Beach                                    |
-| 651          | 2 Fastitocalon + Adamantoise                       | Beach                                    |
-| 652          | Red Dragon                                         | Cliff                                    |
+| 651          | Fastitocalon-F + Fastitocalon + Adamantoise        | Beach                                    |
+| 652          | Ruby Dragon                                        | Cliff                                    |
 | 653          | Gayla                                              | Glacier                                  |
 | 654          | Bite Bug                                           | Glacier                                  |
 | 655          | Glacial Eye                                        | Glacier                                  |
@@ -677,7 +676,7 @@ Encounter IDs are battle scene IDs. Field scripts, field random encounters and w
 | 664          | Gayla + Glacial Eye                                | Glacier                                  |
 | 665          | Bite Bug + Glacial Eye                             | Glacier                                  |
 | 666          | Cockatrice                                         | Cliff                                    |
-| 667          | Cockatrice + ? (i fell asleep)                     | Cliff                                    |
+| 667          | 2 Cockatrice                                       | Cliff                                    |
 | 668          | Hexadragon                                         | Cliff                                    |
 | 669          | Jelleye                                            | Glacier                                  |
 | 670          | Bomb                                               | Glacier                                  |
@@ -697,7 +696,7 @@ Encounter IDs are battle scene IDs. Field scripts, field random encounters and w
 | 684          | Bomb                                               | Forest                                   |
 | 685          | 2 Bomb                                             | Forest                                   |
 | 686          | Grand Mantis + 2 Bomb                              | Forest                                   |
-| 687          | Red Dragon + Blitz                                 | Forest                                   |
+| 687          | Ruby Dragon + Blitz                                | Forest                                   |
 | 688          | Grand Mantis                                       | Dirt Valley                              |
 | 689          | Blitz + Grand Mantis                               | Dirt Valley                              |
 | 690          | Malboro                                            | Glacier                                  |
@@ -715,7 +714,7 @@ Encounter IDs are battle scene IDs. Field scripts, field random encounters and w
 | 702          | Blue Dragon (level 100?)                           | Plains                                   |
 | 703          | T-Rexaur (level 100?)                              | Plains                                   |
 | 704          | Hexadragon (level 100?)                            | Plains                                   |
-| 705          | Red Dragon (level 100?)                            | Plains                                   |
+| 705          | Ruby Dragon                                        | Plains                                   |
 | 706          | Cactuar                                            | Dirt                                     |
 | 707          | 2 Cactuar                                          | Dirt                                     |
 | 708          | 3 Cactuar                                          | Dirt                                     |
@@ -725,7 +724,7 @@ Encounter IDs are battle scene IDs. Field scripts, field random encounters and w
 | 712          | Jumbo Cactuar (GF)                                 | Desert                                   |
 | 713          | Forbidden                                          | Cliff (red sky)                          |
 | 714          | Forbidden + 2 Cockatrice                           | Cliff (red sky)                          |
-| 715          | Red Dragon + Cockatrice                            | Cliff (red sky)                          |
+| 715          | Ruby Dragon + Cockatrice                           | Cliff (red sky)                          |
 | 716          | Mesmerize                                          | Glacier                                  |
 | 717          | 2 Mesmerize                                        | Glacier                                  |
 | 718          | 3 Mesmerize                                        | Glacier                                  |
@@ -754,7 +753,7 @@ Encounter IDs are battle scene IDs. Field scripts, field random encounters and w
 | 741          | Torama + 2 Turtapod                                | Dirt Valley (red sky)                    |
 | 742          | Adamantoise                                        | Snowy Beach                              |
 | 743          | Snow Lion                                          | Snow                                     |
-| 744          | 2 Fastitocalon                                     | Beach                                    |
+| 744          | Fastitocalon-F + Fastitocalon                      | Beach                                    |
 | 745          | UFO w/ Moai                                        | Beach                                    |
 | 746          | UFO w/ Cow                                         | Plains                                   |
 | 747          | UFO w/ Metal?                                      | Tundra                                   |
@@ -808,7 +807,7 @@ Encounter IDs are battle scene IDs. Field scripts, field random encounters and w
 | 809          | Behemoth                                           | Lunatic Pandora Hall (elevator)          |
 | 810          | Fujin and Raijin (2nd) (boss)                      | Lunatic Pandora Landing                  |
 | 811          | Diablos (GF)                                       | Diablos' Realm                           |
-| 812          | Red Dragon                                         | Esthar Canyon                            |
+| 812          | Ruby Dragon                                        | Esthar Canyon                            |
 | 813          | Sorceress Battles (boss)                           | Commencement Room                        |
 | 814          | Purple Propagator                                  | Ragnarok                                 |
 | 815          | Green Propagator                                   | Ragnarok                                 |
@@ -816,8 +815,8 @@ Encounter IDs are battle scene IDs. Field scripts, field random encounters and w
 | 817          | Purple Propagator                                  | Ragnarok (cargo)                         |
 | 818          | Green Propagator                                   | Ragnarok (cargo)                         |
 | 819          | Yellow Propagator                                  | Ragnarok (cargo)                         |
-| 820          | Geezard                                            | Prison Cell?                             |
-| 821          | 2 Geezard                                          | ?                                        |
+| 820          | Geezard                                            | D-District Prison (cell)                 |
+| 821          | 2 Geezard                                          | D-District Prison                        |
 | 822          | Wendigo                                            | D-District Prison                        |
 | 823          | Thrustaevis                                        | D-District Prison                        |
 | 824          | 2 Thrustaevis                                      | D-District Prison                        |
@@ -833,11 +832,11 @@ Encounter IDs are battle scene IDs. Field scripts, field random encounters and w
 | 835          | Garden Faculty + Bomb + Glacial Eye                | Balamb Garden Quad                       |
 | 836          | Garden Faculty + Bomb                              | Balamb Garden Walkway (cafeteria)        |
 | 837          | Garden Faculty + Grendel                           | Balamb Garden Walkway (parking)          |
-| 838          | Garden Faculty + Grenaldo                          | Balamb Garden Walkway (quad)             |
+| 838          | Garden Faculty + Granaldo                          | Balamb Garden Walkway (quad)             |
 | 839          | Garden Faculty + Caterchipillar                    | Balamb Garden Walkway (dorms)            |
 | 840          | Garden Faculty + T-Rexaur                          | Balamb Garden Training Center            |
 | 841          | Garden Faculty + Grat                              | Balamb Garden Walkway (library)          |
-| 842          | Grendel                                            | Missile Base Catwalk                     |
+| 842          | Wendigo                                            | Missile Base Catwalk                     |
 | 843          | SAM08G + Geezard                                   | Missile Base Overlook                    |
 | 844          | Belhelmel                                          | Missile Base Overlook                    |
 
@@ -904,7 +903,7 @@ These encounters are in the game but are never used in the story.
 | 890          | Dummy                           | Deep Sea Pipe Room                    |
 | 891          | Dummy                           | Deep Sea Ruins                        |
 | 892          | Dummy                           | Sorceress Battles' Final Area         |
-| 893          | Dummy                           | Esthar Mall                           |
+| 893          | 2 Dummy                         | Esthar Mall                           |
 | 894          | Dummy                           | Tears' Point (red sky)                |
 | 895          | Dummy                           | Odine's Lab (outside, red sky)        |
 | 896          | 2 Dummy                         | Castle Hall                           |
@@ -920,15 +919,6 @@ These encounters are in the game but are never used in the story.
 | 906          | Dummy                           | Snow Forest                           |
 | 907          | Dummy                           | Beach                                 |
 | 908          | Dummy                           | Snowy Beach                           |
-| 909          | Dummy                           | Esthar Streets (bend) (red sky)       |
-| 910          | Dummy                           | Esthar Streets (bend)                 |
-| 911          | Dummy                           | Cliff                                 |
-| 903          | Dummy                           | Cliff Valley                          |
-| 904          | Dummy                           | Snow                                  |
-| 905          | 3 Dummy                         | Forest                                |
-| 906          | Dummy                           | Snow Forest                           |
-| 907          | Dummy                           | Beach                                 |
-| 908          | Dummy                           | Snowy Beach                           |
 | 909          | 3 Dummy                         | Esthar Streets (bend) (red sky)       |
 | 910          | Dummy                           | Esthar Streets (bend)                 |
 | 911          | Dummy                           | Cliff                                 |
@@ -939,5 +929,7 @@ These encounters are in the game but are never used in the story.
 
 ## Notes
 
+-   Monster names follow the in-game names stored in each `c0m` file; text in parentheses is a descriptive annotation. The one exception is **Fastitocalon-F**: `c0m021` and `c0m020` both show the in-game name "Fastitocalon", and the tables write `c0m021` as Fastitocalon-F to tell the two monsters apart.
+-   Locations of field random encounters come from the four encounter IDs of each field's `.mrt` file; see [Encounter locations by disc](../../list/encounter-locations-by-disc/) for the field names behind each location.
 -   In the first Edea battle (136), if anyone but Squall is in the party, the game crashes.
 -   In the Odin battle (317), if no timer is set, it thinks the timer ran out and he will Zantetsuken you immediately.
