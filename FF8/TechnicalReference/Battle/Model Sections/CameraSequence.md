@@ -12,9 +12,14 @@ author: HobbitDur
 The camera sequences reuse the **same byte-code VM** as [animation sequences](../animation-sequences/) (arithmetic `C0`-`E5` and jumps `E6`-`F3` behave identically), with camera-specific
 callbacks (`CameraSeq_DispatchActionOpcode`, driver `BS_UpdateCameraSequence`).
 
+For the path from a monster ability to the opening shot and then the effect camera, see
+[Battle Cameras](../../battle-cameras/). Actor animation sequences, actor camera collections,
+and effect camera scripts have separate roles.
+
 ### Two container forms (important)
 
-Camera data ships in **two container shapes**, and they are easy to confuse because both open with a `u16 count + u16 pointer table`:
+Camera data ships in **two container shapes**, and they are easy to confuse because both open with a `u16 count + u16 pointer table`.
+A **blob** simply means a block of binary data; here, a full camera data block contains a header, a camera-setting script, and a camera-animation collection:
 
 - **Full camera blob with a byte-code setting** — battle-stage `.X` files, R0WIN section 2, and spell/effect camera globals (`MAG_*`). An 8-byte header (`pointerCount`, relative offset to the **camera setting** = the byte-code VM sequence, relative offset to the **camera animation collection**, size), then the camera-setting byte-code (e.g. `a0stg000.x`: `05 00 C3 10 E5 7F C1 00 CB 7F EA 06 …`), then the collection. This is the [`BattleStageCameraData`](../../file-format-x/#camera-data) layout, and **this is the only form that contains a byte-code camera sequence.** Started via `Battle_PlayCameraAnimation`.
 - **Bare camera animation collection** — **per-entity cameras: monster files section 6, and character files (`dXc`) section 5**. There is **no 8-byte header and no camera-setting byte-code**: the section *is* a [camera animation collection](../../file-format-x/#camera-animations-collection) and starts directly at `NumOfSets`, ending with an EOF word equal to the section's byte length. The engine plays these through `cameraWhenDoingAction`, which passes the *acting entity's own* collection pointer (`command_queue->camera_animation_collection`, at offset 0x2C of the command-queue struct, set at load time to the entity's section-6/section-5 destination — see `Battle_isLoadSquallEtc` @0x5078CA) to `BS_GetCameraAnimationPointer`. Verified:
@@ -30,11 +35,11 @@ A camera data blob starts with a small header containing two relative offsets: o
 A camera sequence is started by calling `Battle_PlayCameraAnimation` with a pointer to such a blob, which registers both pointers (`CURRENT_CAMERA_SETTING_ADDR` / `CURRENT_CAMERA_ANIMATION_COLLECTION_HEADER_ADDR`). In practice this is called:
 
 - at battle start by `BS_CameraInit` (the battle stage's idle camera),
-- by **every spell/ability effect routine** (the `MAG_xxx` functions in magic.fs and the monster-attack effect inits) when the action's visual effect begins — each effect embeds/points to its own camera data. For monster abilities the camera comes from this section.
+- by many **spell/ability effect initializers** (the `MAG_xxx` routines compiled into the PC executable) when the visual effect begins. An effect can point to a full camera block, share another effect's data, or use procedural camera tasks. Inspect the particular implementation. This effect camera is separate from the optional opening shot selected from the acting monster's section 6; see [the action-camera path](../../battle-cameras/).
 
 A camera sequence can adapt its framing to the monster it is filming through the [camera category](../information-stats/#byte-246-camera-category) ([information & stats](../information-stats/) byte 246): that per-monster value is converted at battle start into the entity's camera variable, which camera sequences read back via camera-C3 `0x15` (see the table below).
 
-From then on, the battle camera update (`updateBattleCamera`, every frame unless battle is paused) calls `BS_UpdateCameraSequence`, which interprets the sequence: it runs until opcode `01` (yield, one frame), and stops when it reaches `02` (or any unknown opcode), releasing the camera back to the default behaviour.
+From then on, `updateBattleCamera` drives the camera task queue and, unless the relevant pause flags are set, calls `BS_UpdateCameraSequence`. The script yields at opcode `01` and clears its script pointer at `02` (or the default/unknown-opcode branch). Ending a script is not itself a guarantee that the saved view is restored: [return-view cleanup](../../battle-cameras/#camera-cleanup-and-return) also depends on the camera flags.
 
 Camera opcodes < 0xC0:
 

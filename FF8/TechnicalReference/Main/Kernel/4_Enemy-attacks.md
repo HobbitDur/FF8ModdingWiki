@@ -415,8 +415,8 @@ unidentified:
 | Offset | Length  | Description               |
 |--------|---------|---------------------------|
 | 0x00   | 2 bytes | Offset to attack name     |
-| 0x02   | 2 bytes | Magic ID                  |
-| 0x04   | 1 byte  | Camera change — which battle-stage camera animation plays while the monster performs this attack. Read only for monster attacks (`computeCommandAction`, `COMMAND_MONSTER_ATTACK`), stored into the queued action and consumed by `cameraWhenDoingAction`@0x506190: **low 7 bits** = the camera-animation index picked from the battle stage's camera-animation collection (`BS_GetCameraAnimationPointer`); **bit 0x80** = force this camera even in the state (`sub_4A7120`) that would otherwise skip it (~70% of retail attacks set it). `0xFF` = default / no specific camera. Retail values are index 1–7 (e.g. `0x01`–`0x04`, or `0x81`–`0x87` with the force bit). Ignored for player commands (their camera is chosen randomly) |
+| 0x02   | 2 bytes | Visual-effect ID (`attackAnimation`), copied to the queued action's 16-bit `effectId`; distinct from a magic/ability ID |
+| 0x04   | 1 byte  | Camera change — copied into the queued action's `cameraChange`. For command 8, **low 7 bits** select an opening-camera animation from the **acting entity's own camera collection** (monster DAT section 6), not the battle stage collection. **Bit `0x80`** takes the forced branch, bypassing the probability and target-display checks but still requiring the earlier camera-control/collection gate. **`0xFF` disables this opening-camera request**. The effect can later start a separate camera. See [Battle Cameras]({{site.baseurl}}/technical-reference/battle/battle-cameras/#enemy-attack-camerachange). |
 | 0x05   | 1 byte  | Animation triggered       |
 | 0x06   | 1 byte  | Attack type               |
 | 0x07   | 1 byte  | Attack power              |

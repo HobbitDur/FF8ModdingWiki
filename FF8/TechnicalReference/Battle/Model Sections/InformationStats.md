@@ -73,6 +73,13 @@ In battle, Str, Vit, Mag, Spr, Spd and Eva are also multiplied by the monster's 
 
 ### Abilities
 
+Each ability entry is four bytes. The low, medium, and high level-tier lists each contain
+16 entries, starting at section-relative offsets `0x34`, `0x74`, and `0xB4`. The normal AI
+USE instruction selects an entry from the active tier; its type determines how to interpret
+the ability ID (for example, type 2 indexes magic data and type 8 indexes enemy attacks).
+See [Battle Cameras](../../battle-cameras/#where-the-action-values-come-from) for the full
+ability-to-action-to-camera path.
+
 Abilities are composed of:
 
 | Length | Description                                                                             |
@@ -83,7 +90,12 @@ Abilities are composed of:
 
 #### AnimationSequenceID
 
-Refer to a sequence in [Animation sequences](../animation-sequences/)
+Refers to the actor's sequence in [Animation sequences](../animation-sequences/), not a
+camera-animation index. The queued action calls this field `animationSequenceId` (formerly
+`unk3`). For monster Magic in the relevant opening-camera branch, the engine tests whether
+this ID is 11 and the actor's saved base sequence is 1, then selects camera 0 or 1 from the
+monster's section 6. Other command types can take different branches; see
+[the selection rule and command scope](../../battle-cameras/#the-hardcoded-monster-choice-camera-0-or-1).
 
 ### Renzokuken data
 

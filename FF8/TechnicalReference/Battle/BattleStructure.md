@@ -76,7 +76,7 @@ There is exactly one hardcoded exception: **encounter ID 33** (2× G-Soldier, Do
 3. Every frame, `updateBattleCamera` → `BS_UpdateCameraSequence` executes the stage's *camera settings* byte-code with the shared animation-sequence VM (`computeAnimationSequence` — the same VM used by [monster animation sequences](../monster-file/) and [camera sequences](../model-sections/camera-sequence/)). Stage camera scripts start with camera opcode `05 00` = "play the camera animation whose ID is read from camera variable 0" — i.e. the scene.out byte.
 4. `BS_GetCameraAnimationPointer` decodes the byte: `set = (id >> 4) & 0xF` (bounds-checked against `NumOfSets`), `anim = id & 7`, resolves the animation's relative pointer inside the stage file and spawns the `ProcessCameraAnimation` task that plays it.
 
-After the intro animation ends, this byte has no further effect: mid-battle cameras are chosen per action by `cameraWhenDoingAction`, which overwrites camera variable 0 with its own animation choices.  
+After the intro animation ends, this byte has no further effect. Mid-battle opening shots are selected per action by `cameraWhenDoingAction`; visual effects can then start separate camera scripts or tasks. Camera variable 0 carries script context and is not always the actual opening-camera index (the monster Magic branch stores marker 8 while selecting actor camera 0 or 1). See [Battle Cameras](../battle-cameras/) for the complete path.
 
 See [Function addresses](#function-addresses) for the raw exe addresses.
 

@@ -47,6 +47,13 @@ All `int16` parameters are **little-endian**.
 
 **Base sequence ID (`basedAnimSeq`):** the sequence the entity returns to when nothing else is queued — its "idle". Defaults to 1 at battle start. It can be changed by opcode `A3` (adopts the current sequence as the new base) or via `E5 0x0B`, and read via `C3 0x0B`. When a sequence ends (`A2`) with nothing queued, **monsters** return to `basedAnimSeq`, while **characters** (com_id &lt; 0x10) instead pick a sequence from their [animation status]({{site.baseurl}}/technical-reference/list/battle-animation-state/#default-sequence-ids) (dead → 3, sleeping/weakened → 2, running → 16, preparing attack → 19, defending → 29, else 1).
 
+The action's requested `animationSequenceId`, the executing `currentAnimSeqId`, and the
+saved `basedAnimSeq` are distinct. Starting an action changes the current sequence without
+necessarily changing the base. This distinction matters for the
+[monster opening-camera condition](../../battle-cameras/#the-hardcoded-monster-choice-camera-0-or-1):
+it compares the saved base with 1 and the action's requested sequence with 11. Camera
+keyframes are stored separately in monster section 6.
+
 ### Opcode between C0 and E3: set a "current_value"
 
 Those opcode are meant to store and modify a local values (that is then used by later opcodes).  

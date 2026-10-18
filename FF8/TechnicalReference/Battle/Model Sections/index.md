@@ -38,7 +38,7 @@ those file-type pages; the blocks below are referenced by name.
 | [Model animation](model-animation/)                   | Key-framed bone animation pool.                                     |
 | [Dynamic texture data](dynamic-texture-data/)         | Runtime VRAM sub-region copy/scroll (blink-eyes, conveyor…).        |
 | [Animation sequences](animation-sequences/)           | Byte-code VM that decides which animation plays for each action.    |
-| [Camera sequence](camera-sequence/)                   | Byte-code VM (same engine) driving key-framed camera motion.        |
+| [Camera sequence](camera-sequence/)                   | Camera collections and the effect/stage camera-script VM; see [Battle Cameras](../battle-cameras/) for action selection. |
 | [Information & stats](information-stats/)             | Combat stats, elemental/status affinities, rewards, AI flags.       |
 | [Battle scripts / AI](battle-scripts-ai/)             | The enemy AI script program.                                        |
 | [Sounds](sounds/)                                     | AKAO sound-effect sequences.                                        |
