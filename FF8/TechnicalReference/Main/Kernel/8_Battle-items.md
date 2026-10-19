@@ -56,7 +56,7 @@ permalink: /technical-reference/main/kernel/battle-items/
 |--------|---------|-----------------------------|
 | 0x0000 | 2 bytes | Offset to item  name        |
 | 0x0002 | 2 bytes | Offset to item  description |
-| 0x0004 | 2 bytes | Magic ID                    |
+| 0x0004 | 2 bytes | Attack animation — effect ID (`AttackAnimationID`), not a Magic-section entry ID                    |
 | 0x0006 | 1 byte  | Attack type                 |
 | 0x0007 | 1 byte  | Attack power                |
 | 0x0008 | 1 byte  | Category (unused) — not a bitfield; 3 mutually-exclusive category codes that never combine: `0x00` pure curatives (Potion..Megalixir), `0x40` status-cure/support items (Antidote, Remedy, Hero, Holy War, Shell/Protect/Aura Stone), `0x80` offensive/special items (the 6 elemental stones, Gysahl Greens, Phoenix Pinion, Friendship). Copied into the runtime battle-item inventory by `updateBattleItemData`, but nothing reads that copy back and nothing reads this kernel byte directly either (item-use AI keys on item id, the item-menu draw path only uses the selectability byte, `computeCommandAction` resolves item effects from `attackType`/`specialActionID`) — real, deliberate category data that is inert in the shipped PC engine |

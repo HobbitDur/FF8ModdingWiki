@@ -417,7 +417,7 @@ unidentified:
 | 0x00   | 2 bytes | Offset to attack name     |
 | 0x02   | 2 bytes | Visual-effect ID (`attackAnimation`), copied to the queued action's 16-bit `effectId`; distinct from a magic/ability ID |
 | 0x04   | 1 byte  | Camera change — copied into the queued action's `cameraChange`. For command 8, **low 7 bits** select an opening-camera animation from the **acting entity's own camera collection** (monster DAT section 6), not the battle stage collection. **Bit `0x80`** takes the forced branch, bypassing the probability and target-display checks but still requiring the earlier camera-control/collection gate. **`0xFF` disables this opening-camera request**. The effect can later start a separate camera. See [Battle Cameras]({{site.baseurl}}/technical-reference/battle/battle-cameras/#enemy-attack-camerachange). |
-| 0x05   | 1 byte  | Animation triggered       |
+| 0x05   | 1 byte  | Target hit animation       |
 | 0x06   | 1 byte  | Attack type               |
 | 0x07   | 1 byte  | Attack power              |
 | 0x08   | 1 byte  | Attack flags              |

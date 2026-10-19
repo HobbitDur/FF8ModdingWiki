@@ -98,7 +98,7 @@ At damage resolve time, `COMMAND_TYPE_ID` selects which kernel/runtime table sup
 | `2` | Magic | `K_MAGIC[action_id]` |
 | `4` | Item | `K_ITEM[action_id]` |
 | `6` | Draw | `K_MAGIC[action_id]` |
-| `7`, `23..27`, `29..34`, `38` | Command ability | `K_BATTLE_COMMAND_ABILITY[action_id]` |
+| `7`, `23..27`, `29..34`, `38` | Command ability | `K_COMMAND_ABILITY_DATA[action_id]` |
 | `8` | Enemy attack | `K_ENEMY_ATTACK[action_id]` |
 | `16` | Slot / Selphie | `K_MAGIC[action_id]` |
 | `236` | Enemy attack variant | `K_ENEMY_ATTACK[action_id]` |
@@ -135,10 +135,10 @@ GF `command_arg` values are kernel GF IDs, not zero-based indices. The resolver 
 | Global | Source |
 |--------|--------|
 | `HIT_ELEMENT` | Kernel table `.element` |
-| `HIT_ATTACK_ENABLER` | Kernel table `.statusAttackEnabler` |
-| `HIT_STATUS_1` | Kernel table `.statuses0` |
-| `HIT_STATUS_2` | Kernel table `.statuses1` |
-| `HIT_ATTACK_HITPERCENT` | Kernel table `.hitPercent` |
+| `HIT_ATTACK_ACCURACY` | Kernel table `.statusAttackAccuracy`; junctionable GFs use `.abilityData[0].summonStatusAccuracyOrUnused` |
+| `HIT_STATUS_1` | Kernel table `.status1` (`Status1Flag`, 16 bits) |
+| `HIT_STATUS_2` | Kernel table `.status2` (`Status2Flag`, 32 bits) |
+| `HIT_ATTACK_HITPERCENT` | `.hitRate` for items/enemy attacks; other command paths supply computed or context-specific values |
 | `ATTACK_FLAG` | Kernel table `.attackFlags` |
 
 `Damage_DispatchByAttackType` (renamed from `Damage_ComputeRawDeltaFromAttackType`) then dispatches by `attackType`:
@@ -157,7 +157,7 @@ Status application is split into a gating layer and an execution layer.
 
 | Step | Function | Address | Role |
 |------|----------|---------|------|
-| Payload | `BattleAction_ResolveAndApplyDamage` | `0x48FE20` | Populate `HIT_STATUS_1`, `HIT_STATUS_2`, `HIT_ATTACK_ENABLER` |
+| Payload | `Battle_applyDamage` | `0x48FE20` | Populate `HIT_STATUS_1`, `HIT_STATUS_2`, `HIT_ATTACK_ACCURACY` |
 | Gate | `BattleStatus_CanApplyHitStatus` | `0x492AC0` | Pure predicate: can this status land? |
 | Resolve | `BattleStatus_ApplyHitStatus` | `0x4914E0` | Mutual exclusion, double-apply prevention, clear/set bits |
 | Commit | `BattleStatus_ApplyAndSyncSlot` | `0x493840` | Write `status_1/2`, sync mirror, handle side effects |

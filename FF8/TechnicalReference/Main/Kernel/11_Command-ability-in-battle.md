@@ -1,12 +1,17 @@
 ---
 layout: default
-title: Command abilities in battle
+title: Command ability data
 nav_order: 12
 parent: Kernel
 permalink: /technical-reference/main/kernel/command-abilities-in-battle/
 ---
 
 ## General
+
+Section **11**, named **Command ability data** in SolomonRing. These 16-byte records
+supply the fixed effects referenced by Battle Commands. They are distinct from
+section 13, the GF-learned **Command abilities**. The canonical IDA type is
+`FF8KernelCommandAbilityData`, with global table `K_COMMAND_ABILITY_DATA`.
 
 | Offset | Sections | Section Size |
 |--------|----------|--------------|
@@ -33,9 +38,9 @@ permalink: /technical-reference/main/kernel/command-abilities-in-battle/
 
 | Offset | Length  | Description           |
 |--------|---------|-----------------------|
-| 0x0000 | 2 bytes | Magic ID              |
+| 0x0000 | 2 bytes | Attack animation — effect ID (`AttackAnimationID`), not a Magic-section entry ID              |
 | 0x0002 | 1 bytes | Padding (unused; IDA: 0 xrefs) |
-| 0x0003 | 1 bytes | Animation triggered   |
+| 0x0003 | 1 bytes | Target hit animation   |
 | 0x0004 | 1 byte  | Attack type           |
 | 0x0005 | 1 byte  | Attack power          |
 | 0x0006 | 1 byte  | Attack flags          |

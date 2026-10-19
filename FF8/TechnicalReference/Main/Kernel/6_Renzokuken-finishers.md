@@ -27,7 +27,7 @@ permalink: /technical-reference/main/kernel/renzokuken-finishers/
 |--------|---------|-----------------------------|
 | 0x0000 | 2 bytes | Offset to limit name        |
 | 0x0002 | 2 bytes | Offset to limit description |
-| 0x0004 | 2 bytes | Magic ID                    |
+| 0x0004 | 2 bytes | Attack animation — effect ID (`AttackAnimationID`), not a Magic-section entry ID                    |
 | 0x0006 | 1 byte  | Attack Type                 |
 | 0x0007 | 1 byte  | Padding (unused; IDA: 0 xrefs) |
 | 0x0008 | 1 byte  | Attack power                |

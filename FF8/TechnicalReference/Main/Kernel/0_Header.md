@@ -27,9 +27,9 @@ permalink: /technical-reference/main/kernel/header/
 | 0x0020 | 4 bytes | Offset to [**Battle items** section                                 ](../battle-items)                            |
 | 0x0024 | 4 bytes | Offset to [**Non-battle item name and description offsets** section ](../non-battle-item-name-and-description-offset) |
 | 0x0028 | 4 bytes | Offset to [**Non-junctionable GF attacks** section                  ](../non-junctionable-gf-attacks/)             |
-| 0x002C | 4 bytes | Offset to [**Command abilities in battle** section                  ](../command-abilities-in-battle)             |
+| 0x002C | 4 bytes | Offset to [**Command ability data** section                  ](../command-abilities-in-battle)             |
 | 0x0030 | 4 bytes | Offset to [**Junction abilities** section                           ](../junction-abilities)                      |
-| 0x0034 | 4 bytes | Offset to [**Command abilities GF** section                         ](../command-abilities-gf)                    |
+| 0x0034 | 4 bytes | Offset to [**Command abilities** section                         ](../command-abilities-gf)                    |
 | 0x0038 | 4 bytes | Offset to [**Stat percentage increasing abilities** section         ](../stat-percentage-increasing-abilities)     |
 | 0x003C | 4 bytes | Offset to [**Character abilities** section                          ](../characters-abilities)                     |
 | 0x0040 | 4 bytes | Offset to [**Party abilities** section                              ](../party-abilities)                         |

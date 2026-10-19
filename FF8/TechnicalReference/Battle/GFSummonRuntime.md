@@ -36,7 +36,7 @@ The player command path identifies a GF with `command_id=0x03` and `command_arg=
 
 ```
 gf_index = command_arg - 0x40
-effect_id = K_GF_JUNCTIONABLE[gf_index].magicID
+effect_id = K_GF_JUNCTIONABLE[gf_index].attackAnimationID
 ```
 
 The effect id is written to the action context at offset `+6`. `BattleActionSequence_Tick_GF_Cinematic` later reads it and calls `BattleGF_LoadCallbackByMagicID`.

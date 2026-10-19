@@ -1,6 +1,6 @@
 ---
 layout: default
-title: Command abilities GF
+title: Command abilities
 nav_order: 14
 parent: Kernel
 permalink: /technical-reference/main/kernel/command-abilities-gf/

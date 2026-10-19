@@ -31,7 +31,7 @@ permalink: /technical-reference/main/kernel/shot-irvine-limit-breaks/
 |--------|---------|-----------------------------|
 | 0x0000 | 2 bytes | Offset to limit name        |
 | 0x0002 | 2 bytes | Offset to limit description |
-| 0x0004 | 2 bytes | Magic ID                    |
+| 0x0004 | 2 bytes | Attack animation — effect ID (`AttackAnimationID`), not a Magic-section entry ID                    |
 | 0x0006 | 1 byte  | Attack Type                 |
 | 0x0007 | 1 byte  | Attack Power                |
 | 0x0008 | 1 byte  | Target hit/reaction animation index (`HIT_TYPE_TARGET_ANIMATION_TO_PLAY`) played on the target when the ability lands — all 8 Shot entries use `4`. Runtime may override: crit→6, miss→0/9, monster death→3. (This byte and 0x09 were previously documented as one WORD holding `0x8004` with an "inert" high byte — the high byte is actually the separate field below) |

@@ -50,14 +50,21 @@ Verified from `kernel.bin` (+0x04) and the IDB function names:
 Note the three thunder tiers use **different** effects (bigger spell → bigger effect), so
 tiers do **not** share a file.
 
-## The kernel "+0x06 Animation triggered" byte is NOT the selector
+## Target hit animation (+0x06) is separate from the effect ID
 
-Dumping the +0x06 byte for every spell family gives only two values — `5` for **all**
-offensive spells, `0` for **all** curatives. It is a coarse category flag, not a per-spell
-id. Its exact runtime role is unconfirmed; it routes to a shared/secondary effect
-(`effect_id 5`, handler `MagicEffect05_Init`, loads `mag004_034.tim`, previously mis-guessed
-`MAG_005_PHOENIX_DOWN`), which is **not** the per-spell animation. Renamed in the IDB to a
-neutral `MagicEffect05_*` scheme:
+The Magic record's byte at **+0x06** is `targetHitAnimation`: the reaction/impact
+animation played by the **target**, not a visual-effect selector or a category flag.
+`Battle_applyDamage` copies it to `HIT_TYPE_TARGET_ANIMATION_TO_PLAY` (`0x490AA6`).
+Offensive spells commonly store `5`, curatives `0`; those values do not directly select
+`mag004` or another spell effect. Runtime miss, critical-hit and death rules can
+override the reaction. The 16-bit **Attack animation** at **+0x04** selects the effect.
+
+### Shared MagicEffect05 effect
+
+The independently identified effect 5 uses `MagicEffect05_Init` and loads
+`mag004_034.tim`. Its neutral `MagicEffect05_*` names replace the old unsupported
+`MAG_005_PHOENIX_DOWN` guess. The kernel's target-hit byte selects a reaction sequence,
+rather than this effect-table entry.
 
 | Address | Name | Role |
 |---------|------|------|

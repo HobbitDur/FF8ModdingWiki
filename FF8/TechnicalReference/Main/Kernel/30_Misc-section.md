@@ -23,8 +23,8 @@ permalink: /technical-reference/main/kernel/misc/
 | 0x4CDA | ATB Speed Multiplier        | 1 byte   |
 | 0x4CDB | Gilgamesh/Angelo summon interval ("Dead Timer") | 1 byte   |
 | 0x4CDC | Status Limit Effects        | 32 bytes |
-| 0x4CFC | Duel Timers and Start Moves | 8 bytes  |
-| 0x4D04 | Shot Timers                 | 4 bytes  |
+| 0x4CFC | Duel durations and initial sequences | 8 bytes  |
+| 0x4D04 | Shot durations                 | 4 bytes  |
 
 
 ## Section Structure
@@ -112,33 +112,39 @@ being harmful.
 | 0x002D | 1 byte | Immune Magic attack limit effect    |
 | 0x002E | 1 byte | Charged Limit Effect               |
 | 0x002F | 1 byte | Back Attack Limit Effect           |
-| 0x0030 | 1 byte | Duel Start Sequence Crisis Level 1 |
-| 0x0031 | 1 byte | Duel Timer Crisis Level 1          |
-| 0x0032 | 1 byte | Duel Start Sequence Crisis Level 2 |
-| 0x0033 | 1 byte | Duel Timer Crisis Level 2          |
-| 0x0034 | 1 byte | Duel Start Sequence Crisis Level 3 |
-| 0x0035 | 1 byte | Duel Timer Crisis Level 3          |
-| 0x0036 | 1 byte | Duel Start Sequence Crisis Level 4 |
-| 0x0037 | 1 byte | Duel Timer Crisis Level 4          |
-| 0x0038 | 1 byte | Shot Timer Crisis Level 1          |
-| 0x0039 | 1 byte | Shot Timer Crisis Level 2          |
-| 0x003A | 1 byte | Shot Timer Crisis Level 3          |
-| 0x003B | 1 byte | Shot Timer Crisis Level 4          |
+| 0x0030 | 1 byte | Duel duration CL1 |
+| 0x0031 | 1 byte | Duel initial sequence CL1 |
+| 0x0032 | 1 byte | Duel duration CL2 |
+| 0x0033 | 1 byte | Duel initial sequence CL2 |
+| 0x0034 | 1 byte | Duel duration CL3 |
+| 0x0035 | 1 byte | Duel initial sequence CL3 |
+| 0x0036 | 1 byte | Duel duration CL4 |
+| 0x0037 | 1 byte | Duel initial sequence CL4 |
+| 0x0038 | 1 byte | Shot duration CL1 |
+| 0x0039 | 1 byte | Shot duration CL2 |
+| 0x003A | 1 byte | Shot duration CL3 |
+| 0x003B | 1 byte | Shot duration CL4 |
 
 ## Duel / Shot crisis-level fields (0x30–0x3B)
 
-These drive **Zell's "Duel"** and **Irvine's "Shot"** limit breaks, which both scale with the
-character's crisis level (0–3, higher = lower HP / stronger limit).
+These drive **Zell's "Duel"** and **Irvine's "Shot"**. The native crisis level is
+**1–4** while a Limit Break is available; **0** means no Limit Break.
 
-- **Duel Start Sequence (CL1–4)** — the starting index into the [Duel move table](../duel-parameters/)
-  (section 24, *Duel Params*). When a Duel begins, `linkedToZellDuel` reads the byte for the current
-  crisis level (`K_MISC[0x2E + 2·crisis_level]`) and uses it to seed the "current sequence" pointer.
-  The per-tick Duel driver (`sub_4852B0`) then performs `duelMoves[seq].StartMove`, and the player's
-  button input selects one of that entry's *Next Sequence* bytes to advance to the next move. In short:
-  this byte decides **which move-chain Zell opens the Duel with at each crisis level**.
-- **Duel Timer (CL1–4)** — length of the Duel input window at that crisis level (higher crisis = longer),
-  loaded alongside the start sequence.
-- **Shot Timer (CL1–4)** — the equivalent input-window duration for Irvine's Shot at each crisis level.
+- **Duel duration (CL1–4)** — `linkedToZellDuel` (`0x48E5A0`, read at `0x48E5C2`)
+  passes `K_MISC[0x2E + 2 * crisis_level]` to `BattleMenu_ZellDuel_Open` as the
+  input-window duration. This selects offsets **0x30, 0x32, 0x34, 0x36**.
+- **Duel initial sequence (CL1–4)** — `computeCommandAction` (`0x48DF0D`)
+  assigns `K_MISC[0x2F + 2 * crisis_level]` to `ZELL_DUEL_CURRENT_SEQ`, which then
+  indexes the [Duel move graph](../duel-parameters/) (section 24). This selects
+  offsets **0x31, 0x33, 0x35, 0x37**. It is a move-graph index, not an actor's Seq anim.
+- **Shot duration (CL1–4)** — offsets **0x38–0x3B** select Irvine's shooting-window duration.
+
+Duration bytes are displayed as **raw / 15 seconds** at normal game speed: the game
+loads `4 * raw` countdown ticks and displays 60 ticks per second. The countdown can
+pause while its input window is inactive. These are distinct from status-effect timers.
+
+The corresponding IDA members are `duel_duration_crisis_1` … `_4`,
+`duel_initial_sequence_crisis_1` … `_4`, and `shot_duration_crisis_1` … `_4`.
 
 ## Function addresses
 
