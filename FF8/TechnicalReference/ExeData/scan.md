@@ -119,18 +119,54 @@ During the short scan (`MAG_040_SCAN_ShortScanner_State3_CircleUntilTextClosed`)
 ## Scan text
 
 The scan text table holds one string per com_id (160 strings in the vanilla exe), read by
-`Scan_GetText` with the target's `com_file_id`. The info screen draws two text layers:
+`Scan_GetText` with the target's `com_file_id`. The info screen draws three text layers:
 
 | Layer | Content                                | Rectangle (x, y, width, height) |
 |-------|----------------------------------------|---------------------------------|
 | 2     | monster name (from the monster's .dat) | 170, 30, 136, 28                |
-| 0     | scan text                              | 170, 52, 136, 128               |
+| 0     | scan text (the description)            | 170, 52, 136, 128               |
+| 1     | info bar, one line at a time           | 16, 180, 296, 28                |
 
 `setTextPosition` draws a layer's text 6 pixels inside its rectangle, one line every 16 pixels,
-with (height - 12) / 16 lines per page: one line for the name, 7 lines per page for the scan
-text. A longer text is split into pages: `MAG_040_SCAN_TextPager_State2_PageInput` turns the page
-when the player presses the page button, or by itself when its timer runs out, and goes back to the
-first page after the last one.
+with room for (height - 12) / 16 lines: one line for the name and the info bar, 7 lines for the
+description.
+
+### The description has a single page
+
+The description is set once and never scrolled or paged. Only its first 7 lines fit in the box,
+and `Text_RenderGlyphs` stops at a page break (`0x01` or `0x07`), so the text after a page break
+is never shown. Lines are broken with `0x02` only: the game does not wrap long lines.
+
+### Info bar pages
+
+The "pages" of the Scan screen are the lines of the info bar under the model and the description.
+`MAG_040_SCAN_TextPager_State0_TextOpen` builds them with `manageScanText_Dup`, in this order:
+
+| Line                    | Content                                                                                     | When                                       |
+|-------------------------|---------------------------------------------------------------------------------------------|--------------------------------------------|
+| Level and HP            | "Lv" level, "HP" current HP / max HP                                                        | always; HP shows "?????" for a target with flag 0x2000 set |
+| Undead / Flying monster | "Undead", "Fly" and "monster" kernel texts                                                  | monsters with the undead or flying flag    |
+| Very weak against       | the elements with an element defence of 600 or less                                         | at least one such element (no HP-hiding flag) |
+| Weak against            | element defence 601 to 799                                                                   | same                                       |
+| Strong against          | element defence 801 to 899                                                                   | same                                       |
+| Has no effect           | element defence 900                                                                          | same                                       |
+| Absorbs                 | element defence above 900                                                                    | same                                       |
+| Extra scan text         | the battle text set by the monster's AI with `setScanText` ([AI opcode 0x25](../../battle/battle-scripts/#opcode-0x25-37---setscantext)) | the monster's AI set one              |
+
+Every line comes from the kernel's battle texts and the target's battle stats, except the extra
+scan text, which the AI copies from the monster's own battle texts (24 bytes at most, including
+the end byte; text id 0xFF clears it).
+
+`MAG_040_SCAN_TextPager_State1_TextShowLine` shows one line and starts a 45-tick timer (3
+seconds). Then `MAG_040_SCAN_TextPager_State2_PageInput`:
+
+- turns to the next line when the button in the Circle slot of the button config is newly
+  pressed, or when the timer runs out;
+- goes back to the first line after the last one;
+- closes the Scan screen when the button in the Cross slot (confirm) is held.
+
+To add a page to a monster's Scan screen, give its AI a `setScanText` call with one of its battle
+texts. The other lines follow the monster's stats, and the description cannot have more pages.
 
 ## FFNx files
 
@@ -168,6 +204,9 @@ FF8_EN.exe:
 | `MAG_040_SCAN_Viewer_Update`                             | 0x84FD90  |
 | `MAG_040_SCAN_ReadViewInput`                             | 0x8501F0  |
 | `MAG_040_SCAN_Viewer_Reset`                              | 0x850600  |
+| `MAG_040_SCAN_TextPager_Tick`                            | 0x84FAF0  |
+| `MAG_040_SCAN_TextPager_State0_TextOpen`                 | 0x84FB80  |
+| `MAG_040_SCAN_TextPager_State1_TextShowLine`             | 0x84FBB0  |
 | `MAG_040_SCAN_TextPager_State2_PageInput`                | 0x84FC30  |
 | `MAG_040_SCAN_ShortScanner_State3_CircleUntilTextClosed` | 0x8511A0  |
 | `MAG_068_SCAN_GetCameraRowIndex`                         | 0x7DC560  |
@@ -177,6 +216,10 @@ FF8_EN.exe:
 | `GetEffectSpawnPosition`                                 | 0x502170  |
 | `Damage_DispatchByAttackType` (`ATTACK_TYPE_SCAN`)       | 0x4925A6  |
 | `setTextPosition`                                        | 0x4A07A0  |
+| `Text_RenderGlyphs`                                      | 0x4A1570  |
+| `manageScanText_Dup` (info bar lines)                    | 0xB68390  |
+| `ScanText_CollectElementsByAffinity_Dup`                 | 0xB686D0  |
+| `ScanText_GetLine_Dup`                                   | 0xB68810  |
 | `Scan_GetText`                                           | 0xB687C0  |
 | `g_ScanTextOffsets` (160 u16)                            | 0x1887474 |
 | `g_ScanTextData`                                         | 0x18875B4 |
