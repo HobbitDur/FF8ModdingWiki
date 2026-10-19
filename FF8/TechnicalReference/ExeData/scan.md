@@ -213,7 +213,7 @@ Over them come four effect models stored in the exe's data and drawn in view spa
 | Part       | Model                              | Position (x, y, z)    | Behaviour                                                                  |
 |------------|------------------------------------|-----------------------|----------------------------------------------------------------------------|
 | Backdrop   | 84 vertices, 16 + 56 Gouraud faces | -3968, 3840, 32767    | scale 4608; the blue "spotlight" behind the model; fades in from black by 512/4096 a tick |
-| Spinner    | 24 vertices, 16 + 12 flat faces    | -128, -160, 1152      | turns 192/4096 a tick about Y and 96/4096 about Z; fades in by 256 a tick |
+| Spinner    | 24 vertices, 16 + 12 flat faces    | -128, -160, 1152      | turns 192/4096 a tick about Y and 96/4096 about X; fades in by 256 a tick |
 | Stat board | 1 textured quad (48 × 32)          | -64, -88, 576         | the labels HP, STR., DEF., INT., SPI., DEX., EVA. from the Scan texture (`mag039-067.tim`) |
 | Stat bars  | 6 vertices, 2 Gouraud quads each   | board + table / 2     | 8 bars from a table: x, y, Z turn (0 or 180°), delay, pulse phase           |
 
@@ -223,7 +223,8 @@ grows by 768/4096 a tick up to its length and pulses: its colour is faded toward
 (sin(phase) + 4096) / 6, the phase moving 256 a tick. The full length (scale 16384, 64 pixels) is
 reached at 999 HP, 127 for STR to SPD and 25 for EVA; higher values are capped.
 
-The drawing matrix is RotZ × RotX × RotY, scaled per axis, translated by the position. With the
+The drawing matrix is RotY × RotX × RotZ (each rotation call multiplies the matrix on the right,
+so the Z turn acts on the vertices first), its columns scaled per axis, translated by the position. With the
 Scan screen's projection (576), a model at z 576 is drawn one unit per pixel around the screen
 centre. All faces are two-sided and depth-cued towards black by the part's fade value (4096 =
 black). Every primitive of the models is semi-transparent; the texture page sets additive
@@ -316,6 +317,7 @@ FF8_EN.exe:
 | `MAG_040_SCAN_StatBar_Tick` / `_State0_Init`             | 0x84F520 / 0x84F5C0 |
 | `MAG_040_SCAN_Backdrop_Tick` / `_State0_Init`            | 0x84F9E0 / 0x84FA50 |
 | `Effect_RenderPrimModel`                                 | 0x572200  |
+| `Mtx_RotX` / `Mtx_RotY` / `Mtx_RotZ`                     | 0x8DD7E0 / 0x8DD8A0 / 0x8DD960 |
 | Backdrop / spinner / board models                        | 0x15CEA34 / 0x15CF37C / 0x15CF5B4 |
 | Stat bar models (bars 0-1, then 2-7)                     | 0x15CF6FC, 0x15CF784 + 0x88 × n |
 | Stat bar table (8 × 10 bytes; short scan's: 0x15D16C8)   | 0x15D1678 |
