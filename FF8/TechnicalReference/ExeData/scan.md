@@ -110,7 +110,9 @@ The scan text table holds one string per com_id (160 strings in the vanilla exe)
 
 `setTextPosition` draws a layer's text 6 pixels inside its rectangle, one line every 16 pixels,
 with (height - 12) / 16 lines per page: one line for the name, 7 lines per page for the scan
-text. Longer texts are shown page by page.
+text. A longer text is split into pages: `MAG_040_SCAN_TextPager_State2_PageInput` turns the page
+when the player presses the page button, or by itself when its timer runs out, and goes back to the
+first page after the last one.
 
 ## FFNx files
 
@@ -146,6 +148,7 @@ FF8_EN.exe:
 | `MAG_040_SCAN_Viewer_State0_SpawnTextPager`              | 0x84F8D0  |
 | `MAG_040_SCAN_Viewer_Setup`                              | 0x84FCD0  |
 | `MAG_040_SCAN_Viewer_Update`                             | 0x84FD90  |
+| `MAG_040_SCAN_TextPager_State2_PageInput`                | 0x84FC30  |
 | `MAG_040_SCAN_ShortScanner_State3_CircleUntilTextClosed` | 0x8511A0  |
 | `MAG_068_SCAN_GetCameraRowIndex`                         | 0x7DC560  |
 | `MAG_068_SCAN_CameraSetup`                               | 0x7DD9B0  |
