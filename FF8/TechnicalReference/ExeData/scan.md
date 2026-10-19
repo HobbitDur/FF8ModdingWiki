@@ -91,6 +91,24 @@ floor). R is the rotation of the target's facing.
 In the info screen, the model turns by 64/4096 of a turn per tick when can_yaw is 1, around a
 pivot raised by model_offset_y.
 
+### Player controls in the info screen
+
+`MAG_040_SCAN_ReadViewInput` reads the pad (and the analog sticks, scaled the same way) and
+`MAG_040_SCAN_Viewer_Update` applies it every tick:
+
+| Input              | Effect                                | Per tick (full input) | Condition      |
+|--------------------|---------------------------------------|-----------------------|----------------|
+| Left / Right       | turn the model                        | ±128/4096 of a turn   | can_yaw is 1   |
+| Up / Down          | tilt the model                        | ±128/4096 of a turn   | can_pitch is 1 |
+| L1 or R1 + Up/Down | zoom, scale 2048 to 8192 (0.5x to 2x) | ±128                  |                |
+| L2 or R2 + pad     | move the model in the screen plane    | ±64 units             |                |
+| L1 + L2 together   | back to the starting pose             |                       |                |
+
+The model's orientation is RotY(turn) × RotX(tilt), scaled by the zoom, turning around the point
+model_offset_y above its origin; a move is applied along the target's starting facing. Any input
+stops the automatic turn. After 75 ticks without input, `MAG_040_SCAN_Viewer_Reset` puts back the
+starting rotation, scale 4096 and no move, and the automatic turn starts again.
+
 During the short scan (`MAG_040_SCAN_ShortScanner_State3_CircleUntilTextClosed`), each tick:
 
 - when short_scan_orbit is 1, the camera yaw turns by 64/4096 of a turn, so the camera circles
@@ -148,6 +166,8 @@ FF8_EN.exe:
 | `MAG_040_SCAN_Viewer_State0_SpawnTextPager`              | 0x84F8D0  |
 | `MAG_040_SCAN_Viewer_Setup`                              | 0x84FCD0  |
 | `MAG_040_SCAN_Viewer_Update`                             | 0x84FD90  |
+| `MAG_040_SCAN_ReadViewInput`                             | 0x8501F0  |
+| `MAG_040_SCAN_Viewer_Reset`                              | 0x850600  |
 | `MAG_040_SCAN_TextPager_State2_PageInput`                | 0x84FC30  |
 | `MAG_040_SCAN_ShortScanner_State3_CircleUntilTextClosed` | 0x8511A0  |
 | `MAG_068_SCAN_GetCameraRowIndex`                         | 0x7DC560  |
