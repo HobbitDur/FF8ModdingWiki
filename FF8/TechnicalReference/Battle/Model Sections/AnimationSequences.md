@@ -293,7 +293,7 @@ Full opcode list (decoded from `AnimSeq_DispatchActionOpcode` in FF8_EN.exe). Op
 | 84 XX              | 1      | Start a sine-wave vertex animation task (model wobble), XX = wave parameter                                                                                                                                                                                                                                                                          |
 | 85                 | 0      | Hide the yellow triangle of chara selection (clears the flag)                                                                                                                                                                                                                                                                                        |
 | 86                 | 0      | Show the yellow triangle of chara selection (sets the flag)                                                                                                                                                                                                                                                                                          |
-| 90 XX              | 1      | **Multi-part monster link**: XX < 3 unlinks the whole chain; 3 <= XX < 0x10 links self to monster slot XX; XX >= 0x10 links self to the loaded monster whose com_id == XX. Linked entities form a circular chain with two effects: a sequence queued on one of them starts **simultaneously on every part**, and each part **copies the transform matrix of the chain head** every frame so the parts move as one body (used by Ultimecia final form, etc.) |
+| 90 XX              | 1      | **Multi-part monster link**: XX < 3 unlinks the whole chain; 3 <= XX < 0x10 links self to monster slot XX; XX >= 0x10 links self to the loaded monster whose com_id == XX. Linked entities form a circular chain with two effects: a sequence queued on one of them starts **with the same index on every part**, and each part **copies the transform matrix of the chain head** every frame so the parts move as one body. See [Multi-part monsters](#multi-part-monsters-opcode-90) |
 | 91 XX YY           | 2      | Print monster battle text XX with param YY (urgent text channel)                                                                                                                                                                                                                                                                                     |
 | 92 XX              | 1      | **Setup targeting context.** Recomputes everything the attack choreography relies on: the C3 0x10/0x11 speed factors (used to scale walk-in distance/duration by how far the target is), the current target slot (C3 0x18), the attacker→target angle (C3 0x1A), and physically rotates the attacker to face the target. Two modes: XX < 7 → change the target to slot XX (attacker unchanged); XX >= 7 → make *self* the attacker and keep the current target mask (typical at the start of a monster's attack sequence, since the engine already selected the targets). Multi-target actions get the centre point of all targets as the reference |
 | 93 XX YY           | 2      | Trigger sequence YY on another entity: XX < 0x10 = slot id; XX >= 0x10 = every loaded entity (except self) with com_id == XX                                                                                                                                                                                                                         |
@@ -339,6 +339,38 @@ Full opcode list (decoded from `AnimSeq_DispatchActionOpcode` in FF8_EN.exe). Op
 | BD XX YY           | 2      | Start texture animation XX with destination index YY                                                                                                                                                                                                                                                                                                |
 | BE XX              | 1      | Stop texture animation 0; XX != 0 sets the GF-hidden status flag (model hidden during GF summon), XX == 0 clears it                                                                                                                                                                                                                                  |
 | BF XX              | 1      | **Moment of impact — make the target flinch.** Triggers sequence XX on the *current target* (XX is a sequence id in the **target's** .dat, typically its "take a hit" flinch). The engine has already computed the outcome of the attack per target, so BF silently does nothing when the impact should not be shown: attack missed / no hit reaction decided, a snap-back reaction is pending (target was dragged and gets teleported back instead), target is defending or invincible, or target is not interruptible (neither idle nor already in a damage state). Note that BF only plays the reaction *animation* — the damage numbers and statuses are applied by AA/B2/B7 (or by the magic effect). Typical use: right after each hit in a multi-hit attack (see the Bite Bug example: `BF 04` after each bite) |
+
+### Multi-part monsters (opcode 90)
+
+Some monsters are drawn as several monsters of the same encounter, tied together by opcode `90`.
+Seifer is one: his files (c0m085-c0m087, c0m128) hold his body only, the same mesh as his character
+file `d6c014`. His gunblade is a separate monster named **Gunblade** (c0m082, or c0m142 with c0m087),
+placed at the same position in the encounter and not targetable. Monsters never get a weapon
+file: only characters do.
+
+| What                     | How the game does it                                                                                                                                                                                                                          |
+|--------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| The link                 | `90 XX` puts the entity in a circular chain (next link at entity +140). Seifer links himself to slot 4 (the Gunblade's encounter slot 1), the Gunblade links itself to slot 3                                                              |
+| Sequences                | `QueueChainTransformation` starts a sequence on the whole chain: each part starts **its own** sequence with the same index. A part plays the animations of its sequence N, not the head's animation numbers (c0m087's sequence 0 plays anim 0, its Gunblade c0m142's sequence 0 plays anim 13) |
+| Position and orientation | at the end of the per-entity task, each part copies the 0x20-byte transform (rotation, scale, position) of the chain head, the lowest slot                                                                                                    |
+| Pose                     | each part poses its own skeleton with its own animation, its own skeleton scale (skeleton header +2) and its own root track. The Gunblade's scale is 195 for Seifer's 188, and its root track is stored divided by the same ratio, so it lands exactly where `d6w033` lands on character Seifer |
+| Scan                     | `MAG_040_SCAN_FindScannedEntities` takes the whole chain of the scanned monster, so the Scan screen shows and turns the parts with it                                                                                                          |
+
+Linked monsters of the vanilla encounters (scene.out), found from the opcode `90` of their sequences:
+
+| Head                          | Parts                                  | Encounters |
+|-------------------------------|----------------------------------------|------------|
+| Seifer (c0m085, c0m086)       | Gunblade (c0m082)                      | 195, 119   |
+| Seifer (c0m087)               | Gunblade (c0m142)                      | 120        |
+| Seifer (c0m128)               | Gunblade (c0m082)                      | 795        |
+| Fake President (c0m075)       | Gerogero (c0m034)                      | 104        |
+| Fake President (c0m075)       | Gunblade (c0m142)                      | 832        |
+| Abadon (c0m103)               | Abadon (c0m104)                        | 216        |
+| Mobile Type 8 (c0m105)        | Left Probe (c0m106), Right Probe (c0m107) | 794     |
+| Adel (c0m112)                 | Rinoa (c0m113)                         | 796        |
+
+FF8UltimateEditor's Ifrit 3D view and Xu's Scan preview draw a monster's linked parts when
+scene.out is open.
 
 ### B0/B4 flag byte
 
@@ -421,5 +453,9 @@ FF8_EN.exe:
 | `AnimSeq_ReadSpecialVar_C3` | 0x5044B0 | C3-family special variable reader (verified IDA function) |
 | `AnimSeq_WriteSpecialVar_E5` | 0x5048E0 | E5-family special variable writer (verified IDA function) |
 | `AnimSeq_DispatchActionOpcode` | 0x504BB0 | Opcode dispatcher for entity sequences (verified IDA function) |
-| `pre_pre_linkedToAnimationSequence` | 0x502AB0 | Per-frame entity transform build; rotates the 0x0D-0x0F offset vector by the entity's base rotation before applying it |
+| `pre_pre_linkedToAnimationSequence` | 0x502AB0 | Per-frame entity transform build; rotates the 0x0D-0x0F offset vector by the entity's base rotation before applying it; a multi-part chain member then copies the chain head's transform |
+| `QueueChainTransformation` | 0x505C00 | Starts a sequence on an entity, or on every member of its multi-part chain |
+| `AnimSeq_StartSeqOnWholeChain_Task` | 0x505C70 | Task that starts the same sequence index on each chain member |
+| `Battle_EntityChainLowest` | 0x501FF0 | The chain head: the member with the lowest slot |
+| `BattleModel_BuildBoneMatricesFromPose` | 0x508C90 | Poses a model's skeleton: root bone scaled by the skeleton scale, root at scale * root position >> 8 |
 | `TransformCoordinateToCameraSpace` | 0x56C820 | Transforms the rotated offset vector into camera space |

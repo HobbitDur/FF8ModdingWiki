@@ -91,6 +91,12 @@ floor). R is the rotation of the target's facing.
 In the info screen, the model turns by 64/4096 of a turn per tick when can_yaw is 1, around a
 pivot raised by model_offset_y.
 
+A monster made of several linked monsters ([opcode 90](../../battle/model-sections/animation-sequences/#multi-part-monsters-opcode-90))
+is scanned as a whole: `MAG_040_SCAN_FindScannedEntities` collects every member of the scanned
+monster's chain, and `MAG_040_SCAN_Viewer_Update` gives them all the main entity's position,
+rotation and scale. This is how Seifer appears with his gunblade, which is the separate
+"Gunblade" monster.
+
 ### Player controls in the info screen
 
 `MAG_040_SCAN_ReadViewInput` reads the pad (and the analog sticks, scaled the same way) and
