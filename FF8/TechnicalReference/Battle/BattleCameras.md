@@ -355,6 +355,72 @@ intermediate nonzero values blend toward it. The cleanup is conditional: do not 
 that merely ending an effect always restores the view. Effects can explicitly arm the
 return with `BS_Camera_ArmReturnAfterEffect`.
 
+## Effect camera tracks in the exe
+
+`Battle_PlayCameraAnimation` has 281 call sites in the 2013 Steam exe:
+
+- **221 pass a static track** stored in `.data`, one per visual effect. Each track has
+  exactly one caller, and the effect's code passes it with a `push imm32` just before the
+  call. In the IDA database they are named `MAGnnn_<EFFECT>_cameraAnim`, where `nnn` is the
+  effect ID. The FF8UltimateEditor tool Fujin edits them in its Camera effect editor tab.
+- **58 pass a track read from a loaded file**: the GF cinematic VM's camera opcode, plus a
+  few story effects. Their camera lives in that file, not in the exe.
+- **2 are not effects**: the victory pose (r0win.dat section 2) and the battle intro (stage file).
+
+Effects that never call it, such as the Phoenix Down (5) and Mega Phoenix (7) item
+effects, start no camera at all. With the Item command the battle view simply stays. With
+Magic or a data-driven command that opened on the caster, the caster shot stays on screen
+for the whole effect and the target is never shown.
+
+### Track layout
+
+A track is the full camera data block described above:
+
+| Offset | Content |
+|---|---|
+| `+0x00` | Header: count, script offset (always 8), keyframe offset, size |
+| `+0x08` | Camera script |
+| | 0 or 1 zero byte, so the keyframes start on an even offset |
+| keyframe offset | Camera animation collection (same format as monster section 6) |
+
+The tracks are not contiguous: each one sits among its effect's other data, with no free
+bytes after it. Both offsets are relative to the track, the script's jumps are relative, and
+the engine only reads the track (the VM stores its variables in globals). A track therefore
+works wherever it is stored, and several effects could point at the same one.
+
+Six groups of tracks are byte-identical copies: Potion = Cure, Hi-Potion = Cura,
+X-Potion = Curaga, Remedy = Treatment = Esuna, Absorb = Drain, and LV5 Death = Death.
+They are separate copies, so editing one does not change the others. Pointing a duplicate's
+`push` at its twin would free about 18.7 KB of `.data`.
+
+### Camera script op codes
+
+The script runs on the same VM as the actor animation sequences: op codes `C0`-`F3`
+(arithmetic, `C3` variable reads, `E5` variable writes, jumps) are shared. The op codes
+below `C0` are the camera's own:
+
+| Op code | Bytes | Effect |
+|---|---|---|
+| `00 XX` | 2 | Play camera animation XX (set = XX >> 4, slot = XX & 7) |
+| `01` | 1 | End the script; the camera keeps its last position |
+| `02` | 1 | End the script and clear it |
+| `03` | 1 | Save the current view as the return view, clear the camera flag |
+| `04 XX` | 2 | Start the camera oscillation (wobble) task |
+| `05 XX` | 2 | Play the camera animation whose index is read from variable XX |
+| `06` | 1 | Set the camera flag (`0x8000`) |
+| `07` | 1 | Clear the camera flag |
+| `08` | 1 | Stop the script shot and blend back to the return view |
+| `09 XX` | 2 | No operation |
+
+The heal tracks, for example, read the target slot (`C3 19`) and status (`C3 16`) to choose
+a different animation for a party target and a monster target.
+
+### Other languages
+
+The FR, DE, IT and ES exes store the same bytes slightly further: FR +0xB0 and IT +0x160
+for every track, DE +0x200, +0x208 or +0x20C and ES +0x170, +0x178 or +0x17C depending on
+the region. A patch made for one language's addresses does not fit the others.
+
 ## How to trace or modify an action
 
 1. Find the AI instruction selecting the action, and its active level-tier ability entry.
@@ -398,6 +464,8 @@ return with `BS_Camera_ArmReturnAfterEffect`.
 | `battle_monster_dat_loader` | `0x507120` | Binds monster sections, including its camera collection |
 | `BS_UpdateCameraSequence` | `0x509610` | Camera-setting byte-code driver |
 | `CameraSeq_ReadSpecialVar_C3` | `0x509640` | Camera context/category reads |
+| `CameraSeq_WriteSpecialVar_E5` | `0x5097C0` | Camera variable writes (globals, never the track) |
+| `CameraSeq_DispatchActionOpcode` | `0x509810` | Camera op codes `00`-`09` |
 | `BS_GetCameraHeaderPointers` | `0x509970` | Installs a full block's script/collection pointers |
 | `Battle_PlayCameraAnimation` | `0x5099A0` | Starts an effect/stage camera block |
 | `BattleTask68_DispatchActionSequence` | `0x50A790` | Chooses the action handler |
@@ -406,3 +474,6 @@ return with `BS_Camera_ArmReturnAfterEffect`.
 | `Magic_EffectEnd_ResetCameraAndEntityFlags` | `0x50AED0` | Conditional return and cleanup |
 | `Magic_GetIDLoad` | `0x50AF20` | Resolves the visual-effect implementation |
 | `BattleTask68_LoadActionContext` | `0x50BF90` | Loads action/target context |
+| `computeAnimationSequence` | `0x50DB40` | Shared VM: op codes `C0`-`F3` |
+| `MagicList_Logic` | `0xC81774` | Effect initializers, indexed by `effectId - 1` |
+| First / last static effect track | `0xCD09F0` / `0x1642D70` | Effect camera tracks (`MAGnnn_<EFFECT>_cameraAnim`) |
