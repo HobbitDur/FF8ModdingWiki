@@ -383,8 +383,9 @@ of these. To edit a part's *appearance* you edit the data it points at (all hex-
 
 The heal/support family also shares a common **task structure**: a director task (an N-state machine,
 state at node+0x29) driving 4 pools — director / a small helper pool / the **emitter** pool / the
-**glint** pool — over 3 packet arenas, and several spells **reuse the same camera track**
-(`MAG_Cure_cameraAnimation` — editing it changes Cure *and* Esuna *and* others). The emitter's config is a
+**glint** pool — over 3 packet arenas, and their camera tracks share **one byte-code template**
+(`MAG001_CURE_cameraAnim`, `MAG024_ESUNA_cameraAnim`, `MAG035_LIFE_cameraAnim`): each spell owns a separate
+copy with its own keyframes, so editing one track changes only that spell. The emitter's config is a
 **relocatable descriptor** (16 sprite slots + per-particle keyframe arrays, pointer-fixed at first run by
 `Effect_ParticleEmitter_RelocateDescriptor`) at **node+48**; `Effect_ParticleEmitter_RunAndCheckDone` +
 a per-spell `SetupWorkspace` (e.g. `MAG_024_ESUNA_Emitter_SetupWorkspace`) reads it, builds an

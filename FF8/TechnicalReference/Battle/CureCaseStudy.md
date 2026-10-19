@@ -175,9 +175,10 @@ beyond Cure and its immediate siblings. It does, point for point:
   paired cursor globals Cure uses;
 - it reads the cast context identically (`action_data` at +4, counts at +16/+17).
 
-Two details are worth keeping. First, **Esuna reuses Cure's camera track** —
-`Battle_PlayCameraAnimation(&MAG_Cure_cameraAnimation)` — so `MAG_Cure_cameraAnimation` is shared
-data, and editing it changes both spells. Second, Esuna takes
+Two details are worth keeping. First, **Esuna has its own camera track** —
+`Battle_PlayCameraAnimation(&MAG024_ESUNA_cameraAnim)`. It starts with the same camera byte-code as
+Cure's and Life's tracks (it reads the target through the C3 variables), but each spell owns a
+separate copy with its own keyframes, so editing one track changes only that spell. Second, Esuna takes
 `min(target_count - 1, actionCountMinus1)`, reading **both** count fields; that is independent
 evidence that `+16` and `+17` are distinct quantities (see the
 [Thundara case study](../thundara-case-study/#3-the-director-iterates-actions-not-targets)).
