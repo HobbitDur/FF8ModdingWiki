@@ -191,6 +191,50 @@ seconds). Then `MAG_040_SCAN_TextPager_State2_PageInput`:
 To add a page to a monster's Scan screen, give its AI a `setScanText` call with one of its battle
 texts. The other lines follow the monster's stats, and the description cannot have more pages.
 
+## Screen graphics
+
+While the camera zooms in, the Dimmer task darkens the other entities and the battle stage, then
+hides them. The Scan screen is therefore black, except for four effect models stored in the exe's
+data and drawn in view space (no camera) by `MAG_040_SCAN_DrawHudModel`:
+
+| Part       | Model                              | Position (x, y, z)    | Behaviour                                                                  |
+|------------|------------------------------------|-----------------------|----------------------------------------------------------------------------|
+| Backdrop   | 84 vertices, 16 + 56 Gouraud faces | -3968, 3840, 32767    | scale 4608; the blue "spotlight" behind the model; fades in from black by 512/4096 a tick |
+| Spinner    | 24 vertices, 16 + 12 flat faces    | -128, -160, 1152      | turns 192/4096 a tick about Y and 96/4096 about Z; fades in by 256 a tick |
+| Stat board | 1 textured quad (48 × 32)          | -64, -88, 576         | the labels HP, STR., DEF., INT., SPI., DEX., EVA. from the Scan texture (`mag039-067.tim`) |
+| Stat bars  | 6 vertices, 2 Gouraud quads each   | board + table / 2     | 8 bars from a table: x, y, Z turn (0 or 180°), delay, pulse phase           |
+
+The bars are, in table order: 0 and 1 HP (to the left and to the right of the board), then STR,
+VIT, MAG, SPR, SPD and EVA, on alternating sides. Each bar appears after its delay (1 to 13 ticks),
+grows by 768/4096 a tick up to its length and pulses: its colour is faded towards black by
+(sin(phase) + 4096) / 6, the phase moving 256 a tick. The full length (scale 16384, 64 pixels) is
+reached at 999 HP, 127 for STR to SPD and 25 for EVA; higher values are capped.
+
+The drawing matrix is RotZ × RotX × RotY, scaled per axis, translated by the position. With the
+Scan screen's projection (576), a model at z 576 is drawn one unit per pixel around the screen
+centre. All faces are two-sided and depth-cued towards black by the part's fade value (4096 =
+black). Every primitive is semi-transparent; the board's texture page sets additive blending, so
+over the black screen the backdrop shows its own colours and the other parts add light over the
+model.
+
+The models use the format of the effect primitive models (`Effect_RenderPrimModel`): a u32 offset
+of the primitive sections, a u32 vertex count, the vertices (x, y, z, padding: 4 × s16), then eight
+sections, each a u32 count followed by its entries. Vertex numbers are stored doubled (4-byte units).
+
+| Section | Primitive                      | Entry size | Entry                                                                         |
+|---------|--------------------------------|------------|-------------------------------------------------------------------------------|
+| 0       | flat triangle                  | 12         | colour + GPU code, 3 vertex numbers, padding                                  |
+| 1       | flat quad                      | 12         | colour + GPU code, 4 vertex numbers                                           |
+| 2       | flat textured triangle         | 20         | colour + code, 3 vertex numbers, uv2, uv0 + CLUT, uv1 + texture page          |
+| 3       | flat textured quad             | 24         | colour + code, 4 vertex numbers, uv0 + CLUT, uv1 + texture page, uv2, uv3     |
+| 4       | Gouraud triangle               | 20         | colour 0 + code, 3 vertex numbers, padding, colours 1-2                        |
+| 5       | Gouraud quad                   | 24         | colour 0 + code, 4 vertex numbers, colours 1-3                                 |
+| 6       | Gouraud textured triangle      | 28         | as section 2 with colours 1-2 after the vertex numbers                         |
+| 7       | Gouraud textured quad          | 36         | as section 3 with colours 1-3 after the vertex numbers                         |
+
+Bit 1 of the GPU code makes a primitive semi-transparent. The layouts of sections 2, 6 and 7 follow
+from their sizes; the Scan models do not use them.
+
 ## FFNx files
 
 | File                      | Content                                                                             | Size                     |
@@ -205,7 +249,7 @@ The scan text of a monster is entry com_id of the msd, so a file used with monst
 must reach their com_id.
 
 FF8UltimateEditor's **Xu** tool edits both files and previews them on the monster's model the
-way the game frames it, with the name, the description and the info bar lines.
+way the game frames it, with the name, the description, the info bar lines and the screen graphics.
 
 ## Reference (names & addresses)
 
@@ -249,6 +293,17 @@ FF8_EN.exe:
 | `Text_IconCodeToSpriteId`                                | 0x49F930  |
 | `TEXT_ICON_CODE_TO_SPRITE` (u16 per icon code)           | 0xB86D84  |
 | `Menu_GetSp1IconSize`                                    | 0x4B73F0  |
+| `MAG_040_SCAN_DrawHudModel`                              | 0x84D8B0  |
+| `MAG_040_SCAN_Dimmer_State1_FadeIn`                      | 0x84EE70  |
+| `MAG_040_SCAN_Dimmer_State2_HideOthers`                  | 0x84EF40  |
+| `MAG_040_SCAN_Spinner_Tick` / `_State0_Init`             | 0x84F300 / 0x84F390 |
+| `MAG_040_SCAN_StatBoard_State0_Init`                     | 0x84F4A0  |
+| `MAG_040_SCAN_StatBar_Tick` / `_State0_Init`             | 0x84F520 / 0x84F5C0 |
+| `MAG_040_SCAN_Backdrop_Tick` / `_State0_Init`            | 0x84F9E0 / 0x84FA50 |
+| `Effect_RenderPrimModel`                                 | 0x572200  |
+| Backdrop / spinner / board models                        | 0x15CEA34 / 0x15CF37C / 0x15CF5B4 |
+| Stat bar models (bars 0-1, then 2-7)                     | 0x15CF6FC, 0x15CF784 + 0x88 × n |
+| Stat bar table (8 × 10 bytes; short scan's: 0x15D16C8)   | 0x15D1678 |
 | `ScanText_CollectElementsByAffinity_Dup`                 | 0xB686D0  |
 | `ScanText_GetLine_Dup`                                   | 0xB68810  |
 | `Scan_GetText`                                           | 0xB687C0  |
