@@ -16,8 +16,10 @@ More info on [OpenVIII](https://github.com/MaKiPL/OpenVIII/blob/4ac151daad7cd147
 | 0      | 1 byte                      | Number of bones                                   |
 | 1      | 1 byte                      | Per-bone-scale flag (historically "Extra data")   |
 | 2      | s16                         | Model scale                                       |
-| 4      | 2 bytes                     | Unknown (not read by the PC engine)               |
-| 6      | 2 bytes                     | Unknown (not read by the PC engine)               |
+| 4      | 1 byte                      | Anchor bone for selector 0xF0                     |
+| 5      | 1 byte                      | Anchor bone for selector 0xF1 (model centre)      |
+| 6      | 1 byte                      | Anchor bone for selector 0xF2                     |
+| 7      | 1 byte                      | Anchor bone for selector 0xF3                     |
 | 8      | s16                         | Root translation X (animated)                     |
 | 10     | s16                         | Root translation Y (animated)                     |
 | 12     | s16                         | Root translation Z (animated)                     |
@@ -27,6 +29,8 @@ More info on [OpenVIII](https://github.com/MaKiPL/OpenVIII/blob/4ac151daad7cd147
 **Per-bone-scale flag** (offset 1): when 1, each bone's `scaleX/scaleY/scaleZ` (below) is applied to the bone transforms. It is 0 in **all** vanilla files at rest — but it is not static: every [model animation](../model-animation/) animation frame carries a *mode bit* that overwrites this flag, so it effectively toggles per frame during playback (this is how the squash-and-stretch monsters animate their scale).
 
 **Model scale** (offset 2): the model's global size factor, applied to the root bone matrix and the root translation. It tracks the monster's on-screen size — ≈120–210 for human-sized entities (soldiers ≈ 189, Wedge 73), up to 1822 for Bahamut and 8754 for the final Ultimecia. At battle start the engine also stores this value ×4 on the entity, where it feeds the [animation sequences](../animation-sequences/) distance/speed formulas (C3 `0x10`/`0x11`) — bigger monsters are approached from farther away.
+
+**Anchor bones** (offsets 4-7): `GetEffectSpawnPosition` turns a bone selector of 0xF0 or more into the byte at offset selector - 0xEC. Its low 7 bits are a bone index and bit 0x80 selects the end of that bone instead of the point the caller asks for. Offset 5 (selector 0xF1) is the model's centre: [Scan]({{site.baseurl}}/technical-reference/exedata/scan/) aims its camera at it.
 
 **Root translation X/Y/Z** (offsets 8/10/12, previously documented as "scale x / -z / y"): the model's world-space root offset. Each animation frame *adds* its location-vector deltas to these three fields, and the transform code consumes them as the root position (multiplied by the model scale). The file values are the starting offsets.
 
