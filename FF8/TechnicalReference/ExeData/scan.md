@@ -157,6 +157,29 @@ Every line comes from the kernel's battle texts and the target's battle stats, e
 scan text, which the AI copies from the monster's own battle texts (24 bytes at most, including
 the end byte; text id 0xFF clears it).
 
+How the lines are put together:
+
+- The texts are kernel.bin misc texts (misc text section, by index): 0x21 "LEVEL", 0x22 "HP",
+  0x24 "Monster", 0x25-0x29 the five group texts, 0x63 "Fly", 0x65-0x6C the element names,
+  0x71 "?????", 0x72 "Undead". The level/HP line reads, in English, "LEVEL 20 HP 600/600".
+- The parts are joined with a separator byte taken from misc text 0x0B (the number and symbol
+  text): its character 0 (a space) between parts and its character 18 ("/") between the HP values.
+  Numbers use its characters 1 to 10 as the digits, without leading zeros. Each HP value shows
+  "?????" when it is above 99999, and both do when the HP is hidden.
+- The undead/flying line always joins four parts and an element line nine (the group text and
+  eight element slots), so empty slots leave trailing spaces, which draw nothing.
+- The element names are not letters: each one is a text icon (code 0x05 followed by 0x5D-0x64).
+  An icon code of 0x40 or more is looked up in a table of the exe that gives the icon.sp1 sprite,
+  here sprites 288-295 (Fire to Holy); codes 0x30-0x3F are sprite code + 80, and 0x20-0x2F are pad
+  buttons that follow the key config. After an icon the text goes on at the sprite's width
+  (largest quad offset + width) plus 1 pixel.
+- The battle slot values come from the monster's .dat info section when the monster is set up:
+  the level is capped at 100, the HP is the HP curve at that level, the element defence of an
+  element is 10 × its .dat byte (so 800 is normal damage and is in no group), and "HP hidden"
+  (bit 0x10 of the flag byte at 0xF7) sets the slot flag 0x2000.
+- Only monsters get the undead/flying line and the extra scan text. Characters (battle slots 0-2)
+  get the level/HP line and element lines from their own element defence.
+
 `MAG_040_SCAN_TextPager_State1_TextShowLine` shows one line and starts a 45-tick timer (3
 seconds). Then `MAG_040_SCAN_TextPager_State2_PageInput`:
 
@@ -182,7 +205,7 @@ The scan text of a monster is entry com_id of the msd, so a file used with monst
 must reach their com_id.
 
 FF8UltimateEditor's **Xu** tool edits both files and previews them on the monster's model the
-way the game frames it.
+way the game frames it, with the name, the description and the info bar lines.
 
 ## Reference (names & addresses)
 
@@ -218,6 +241,14 @@ FF8_EN.exe:
 | `setTextPosition`                                        | 0x4A07A0  |
 | `Text_RenderGlyphs`                                      | 0x4A1570  |
 | `manageScanText_Dup` (info bar lines)                    | 0xB68390  |
+| `ScanText_CollectElementsByAffinity_Dup`                 | 0xB686D0  |
+| `concatenateTwoStringWithSpaceOrNext`                    | 0x495210  |
+| `getNumberInTextFromKernel`                              | 0x495330  |
+| `getAddressTextMisc`                                     | 0x47EC70  |
+| `setMonsterInfoFromDatInfoSection`                       | 0x48BBD0  |
+| `Text_IconCodeToSpriteId`                                | 0x49F930  |
+| `TEXT_ICON_CODE_TO_SPRITE` (u16 per icon code)           | 0xB86D84  |
+| `Menu_GetSp1IconSize`                                    | 0x4B73F0  |
 | `ScanText_CollectElementsByAffinity_Dup`                 | 0xB686D0  |
 | `ScanText_GetLine_Dup`                                   | 0xB68810  |
 | `Scan_GetText`                                           | 0xB687C0  |
