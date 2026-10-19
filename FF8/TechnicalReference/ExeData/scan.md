@@ -194,8 +194,15 @@ texts. The other lines follow the monster's stats, and the description cannot ha
 ## Screen graphics
 
 While the camera zooms in, the Dimmer task darkens the other entities and the battle stage, then
-hides them. The Scan screen is therefore black, except for four effect models stored in the exe's
-data and drawn in view space (no camera) by `MAG_040_SCAN_DrawHudModel`:
+hides them. In their place, `MAG_040_SCAN_DrawScanBars` fills the whole screen from the zoom-in
+until the Scan screen is closed: 5 rows of 3 opaque textured quads of 128 × 64 pixels, showing the
+blue scan lines of the Scan texture (`mag039-067.tim`, texture page 0xBA, CLUT 0x3C94, u from 128
+down to 0, v 0 to 64). The rows start at (frame counter & 63) − 64, so the lines scroll down one
+pixel a tick, and their black texels are transparent. The tiles fade in during the zoom (colour
++8 a tick up to 128).
+
+Over them come four effect models stored in the exe's data and drawn in view space (no camera) by
+`MAG_040_SCAN_DrawHudModel`:
 
 | Part       | Model                              | Position (x, y, z)    | Behaviour                                                                  |
 |------------|------------------------------------|-----------------------|----------------------------------------------------------------------------|
@@ -213,9 +220,9 @@ reached at 999 HP, 127 for STR to SPD and 25 for EVA; higher values are capped.
 The drawing matrix is RotZ × RotX × RotY, scaled per axis, translated by the position. With the
 Scan screen's projection (576), a model at z 576 is drawn one unit per pixel around the screen
 centre. All faces are two-sided and depth-cued towards black by the part's fade value (4096 =
-black). Every primitive is semi-transparent; the board's texture page sets additive blending, so
-over the black screen the backdrop shows its own colours and the other parts add light over the
-model.
+black). Every primitive of the models is semi-transparent; the texture page sets additive
+blending, so the backdrop adds its blue light over the scan lines and the other parts add light
+over the model.
 
 The models use the format of the effect primitive models (`Effect_RenderPrimModel`): a u32 offset
 of the primitive sections, a u32 vertex count, the vertices (x, y, z, padding: 4 × s16), then eight
@@ -294,6 +301,8 @@ FF8_EN.exe:
 | `TEXT_ICON_CODE_TO_SPRITE` (u16 per icon code)           | 0xB86D84  |
 | `Menu_GetSp1IconSize`                                    | 0x4B73F0  |
 | `MAG_040_SCAN_DrawHudModel`                              | 0x84D8B0  |
+| `MAG_040_SCAN_DrawScanBars`                              | 0x84F0B0  |
+| `MAG_040_SCAN_ScanBars_Tick`                             | 0x84EFF0  |
 | `MAG_040_SCAN_Dimmer_State1_FadeIn`                      | 0x84EE70  |
 | `MAG_040_SCAN_Dimmer_State2_HideOthers`                  | 0x84EF40  |
 | `MAG_040_SCAN_Spinner_Tick` / `_State0_Init`             | 0x84F300 / 0x84F390 |
