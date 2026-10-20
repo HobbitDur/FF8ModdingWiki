@@ -8,11 +8,14 @@ nav_order: 7
 
 # GF cinematic script and mag files
 
-The seven summons of the [GF cinematic engine](GFCinematicEngine.md) (Ifrit, Leviathan, Bahamut,
+The seven documented summons of the [GF cinematic engine](GFCinematicEngine.md) (Ifrit, Leviathan, Bahamut,
 Cerberus, Alexander, the Brothers, Eden) keep their whole choreography as byte code in their mag
 files. This page is the file-format and instruction-set reference; the engine that runs it is on
 the engine page. The FF8UltimateEditor tool **Laguna** (and `cli.py laguna`) disassembles, simulates
-and patches these scripts with the tables below.
+and patches these scripts with the tables below. The same container/VM family also appears in other
+monster, Blue Magic and story effects: the broader [MAG format census](FileFormat_magfiles.md) covers
+790 files, 58 root programs and their per-effect opcode profiles. An opcode unused by these seven
+GFs can be implemented in another effect.
 
 1. TOC
 {:toc}
@@ -43,14 +46,14 @@ Every packed file starts with twelve `u32` offsets:
 | Offset | Content |
 |--------|---------|
 | `0x00` | 0 |
-| `0x04` | Script: root program (`.00` only). The script region runs to the sound-effect table |
+| `0x04` | Script: root program. Its region ends at the next mapped section (camera or sound data, for example) |
 | `0x08` | CLUT table (= end of the texture table) |
 | `0x0C` | Object table: `u32 count`, then `u32 offset[count]` relative to the table start, 0 = not in this file |
 | `0x10` | Sound-effect table (`.00` only), one FF8 sound block per entry |
 | `0x14` | Texture table, always `0x30` |
 | `0x18` | Music-stream table |
 | `0x1C` | End of the tables. In the `.01`: start of the engine RAM area |
-| `0x20` | Stage camera animation (unused: 0 in all seven GFs) |
+| `0x20` | Stage camera track (0 in these seven GFs; used in 46 other audited files, including Disease Breath) |
 | `0x24` | Voice bank (`.00` only) |
 | `0x28`, `0x2C` | 0 |
 
@@ -94,6 +97,38 @@ The opcode that uses an object id decides what it is; the data itself is recogni
   20-byte quads.
 
 Particle pools are not in the files: opcode `0x058` allocates them at run time.
+
+## Effect-specific opcode profiles
+
+The EN runtime contains 58 matching cinematic VM dispatch directories. Laguna's
+`mag_cinematic_profiles.json` records per-effect null/return-only handlers and extra encodings.
+It must be selected by effect ID; the original seven-GF table cannot establish availability for
+all effects. The audited 58 reachable root programs decode without errors with these profiles.
+
+Additional encodings verified from native EN handlers during the full MAG sweep:
+
+| Opcode | Name / role | Bytes | Native reference |
+|---|---|---:|---|
+| `0x094` | Branch if referenced bone lies in an X/Z rectangle | 10 | `0xA26E20` |
+| `0x09A` | Set scene entity list | `2 + 2*(op >> 12)` | `0x9C5700` |
+| `0x0AB` | Start battle-entity animation | 4 | `0xA86690` |
+| `0x0AD` | Place at entity joint | 4 | `0x9A1A30` |
+| `0x0AF` | Install inline descriptor, mode 0 | 80 (4 + 0x4C) | `0xAD29D0`, helper `0xAD2A00` |
+| `0x0B3` | Build bone-facing reference data | 4 | `0xAC7800` |
+| `0x0B4` | Place at random entity joint | 2 | `0x963B80` |
+| `0x0B5` | Branch if current battle slot matches | 6 | `0x8E4B30` |
+| `0x0BB` | Copy alternative texture to magic buffer | 6 | `0xA997A0` |
+| `0x0BD` | Process relative texture data (flag-dependent path) | 6 | `0xA99730` |
+| `0x0BE` | Branch on battle-entity state | 4 | `0xB3A9B0` |
+| `0x112` | Accumulator from distance between bones | 10 | `0xA32E10` |
+| `0x113` | Accumulator from X/Z angle between bones | 8 | `0xA32F50` |
+| `0x12E` | Apply next action-result record | 2 | `0xAC53A0` |
+
+The addresses are representative native implementations; each profile records that effect's own
+handler address. References are byte displacements from the opcode word. Operand names summarize
+verified behavior; flags and battle-state dependencies still matter. Opcode `0x0AF` with nonzero
+mode does not advance the native cursor, and `0x112` requires a nonzero divisor. These handlers are
+not added to the seven-GF scene simulator merely because their encoding is decoded.
 
 ## Script format
 

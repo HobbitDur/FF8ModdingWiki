@@ -6,232 +6,176 @@ author: MaKiPL, HobbitDur
 permalink: /technical-reference/battle/mag-file-format/
 ---
 
-There is no unified format for MAG files. Every file has their own naming, even extension. You can't really distinguish them.
+# MAG file family
 
-Files starting with 10 00 00 00 09 00 00 00 are obviously TIM texture. Files starting with null 4 bytes are in most cases "Packed magic file"
+MAG names identify effect resources, not one binary format. Inspect the contents before choosing a
+parser: even a `.00` file can be a TIM texture or a four-byte reference rather than a cinematic.
+For conventional `MAGnnn_B.00` cinematics the effect ID is `nnn + 1`; shared texture names do not
+necessarily identify a single effect.
 
-## Packed magic file
+The English 2013 Steam executable and the extracted PC `magic/` and `battle/` archives were audited
+in October 2026. The 790 MAG/MA8 files in that corpus classify as follows:
 
-| Offset | Description                                  |
-|--------|----------------------------------------------|
-| 0x00   | Probably always null                         |
-| 0x04   | Probably bones/animation data                |
-| 0x08   | Unknown (used to determinate texture size\*) |
-| 0x0C   | Geometry pointer                             |
-| 0x10   | SCOT pointer                                 |
-| 0x14   | Texture pointer                              |
+| Content | Files | Identification / interpretation |
+|---|---:|---|
+| PlayStation TIM | 387 | `u32 0x10`, validated TIM blocks; suffix can be `.tim`, `.dat`, `.00`, `.1t0`, etc. |
+| Packed MAG | 180 | Validated 0x30-byte section directory and initial resource tables |
+| Indexed containers | 61 | Validated count/offset/end directories; includes model/animation/resource parts |
+| SCOT sound | 24 | `SCOT` at byte 4, preceded by a four-byte value |
+| AKAO audio | 1 | `AKAO` at byte 0 |
+| Four-byte references | 32 | Exactly one `u32`; meaning depends on the loader |
+| Raw / undecoded | 105 | No validated directory/signature; includes raw streamed pages and effect-specific data |
 
-## Regular spell effects
+These are structural classifications, not a claim that every payload has been semantically decoded.
+The [machine-readable census](https://github.com/HobbitDur/FF8UltimateEditor/blob/master/docs/mag-file-census.json)
+records names, hashes, section counts, script results and camera locations without distributing assets.
+The [Laguna editor guide](https://github.com/HobbitDur/FF8UltimateEditor/blob/master/docs/laguna-mag-editor.md)
+describes editing and reproduction commands.
 
-For how a cast spell resolves to a mag file and why the effect is procedural code (not
-keyframe data) — relevant to 60 fps work — see
-[Magic Spell Effect Runtime](../magic-spell-effect-runtime/). Key point: the per-spell
-effect id comes from the kernel magic entry field **+0x04** (e.g. Thundara = 102 → `mag101`,
-`MAG_102_THUNDARA`).
+1. TOC
+{:toc}
 
-For the full internal anatomy of a spell effect (BdLink task queues, director timeline,
-prim models embedded in the exe, and the roadmap for **editing or creating new** effects)
-see [Magic Effect Anatomy & Authoring](../magic-effect-anatomy/). Note that for regular
-spells the mag file only carries the **TIM texture** — geometry, camera and timing are in
-the exe.
+## Packed MAG header
 
-## G.F. Sequence
+Little-endian; header fields are `u32` offsets from the file start. Zero means absent for optional
+sections. Empty initial tables can share their end offset with the next table or the root script.
 
-<http://forums.qhimm.com/index.php?topic=15056.0>
+| Header offset | Meaning |
+|---|---|
+| `0x00` | Reserved/unknown; zero in the audited packed files |
+| `0x04` | Root cinematic program, present in 58 audited files |
+| `0x08` | CLUT table start; also the texture table end |
+| `0x0C` | Object directory: `u32 count`, then `u32 offset[count]` relative to this directory |
+| `0x10` | Sound-effect table/data |
+| `0x14` | Texture table start (`0x30` in the audited packed files) |
+| `0x18` | Music-stream table start; also the CLUT table end |
+| `0x1C` | End of initial tables; in GF `.01` parts, the start of runtime workspace |
+| `0x20` | Embedded stage camera track, when used; nonzero in 46 audited files |
+| `0x24` | Voice-bank data, when present |
+| `0x28`, `0x2C` | Reserved/unknown; zero in the audited packed files |
 
-The seven summons of the GF cinematic engine (Ifrit, Leviathan, Bahamut, Cerberus, Alexander,
-Brothers, Eden) use packed `MAGnnn_B.00`/`.01` files whose header, objects (meshes, embedded
-creature model, sprite lists) and script byte code are documented on
-[GF cinematic script and mag files](../gf-cinematic-script/).
+A leading zero alone is not sufficient to identify a packed file: raw VRAM pages can also start
+with many zeros. Validate the header, monotonic initial table boundaries, counts and resource targets.
 
-For runtime dispatch of GF summon effects, `MagicList_Logic`, `effect_id`, Odin/Gilgamesh/Phoenix/Angelo auto-actions and GF callback addresses, see [GF Summon Runtime](../gf-summon-runtime/).
+### Resource directories and offset bases
 
-Timeline-family summon creatures (Shiva, Quezacotl, Siren, Carbuncle, …) are ordinary
-4-section battle-model containers, some shipped in the mag groups and some embedded in
-`FF8_EN.exe` — the full census of models and textures is on
-[Summon Creature Models](../summon-creature-models/).
+Texture entries occupy `[header[0x14], header[0x08])`; CLUT entries occupy
+`[header[0x08], header[0x18])`. Entries are four bytes. A nonzero entry identifies data at
+`table_start + (entry & 0x00FFFFFF)`; do not treat the upper byte as part of the byte offset.
+Object entries use their full relative offset from the **object directory start**. Header entries
+are relative to the **file start**. These bases are different.
 
-## Environment objects
+The cinematic GF resource tables use global resource IDs shared by all loaded parts. A zero entry
+can mean that resource ID is held in another file. The per-effect executable descriptor supplies
+file slots and texture/CLUT VRAM rectangles; packed texture payload bytes alone do not establish
+image dimensions or pixel depth.
 
-**I'm aware it's chaotic**, like no tables and etc. but it's **up-to-date** information First, recognize file:
+Physical spans can be mapped using validated section starts and referenced resource starts. A span
+ends at the next known boundary and may include alignment/padding. Preserve unreferenced and unknown
+bytes; the map is not a license to discard them or to infer a resource's exact semantic length.
 
-1.Jump to pointer at 0xC \[Global\]
+### Script and object resources
 
-2.This int indicates pointer count. Example: 10 00 00 00 is 16 pointers
+The root program uses the cinematic VM: little-endian 16-bit words, low nine bits for the opcode,
+remaining bits for opcode-specific modifiers. Operands and inline data determine instruction length.
+The script region ends at the next section, which may be an embedded camera **before** the sound table.
+See [Cinematic script and mag files](GFCinematicScript.md) for instructions, control flow and resources.
 
-3.If pointer is 00 00 00 00, just ignore it and move forward
+Objects are polymorphic: the using opcode decides whether an object is a mesh, model, sprite list
+or another structure. Recognized layouts include:
 
-4.After noting all pointers that are not 00 00 00 00 (therefore inspecting Count\*4 bytes) just jump to selected one \[Relative jump from count int\]
+- **Mesh:** 0x30-byte header, primitive list at `+0x08`, vertices at `+0x14`/count `+0x18`,
+  normals at `+0x1C`/count `+0x20`. Vertices are eight-byte `{s16 x,y,z,pad}` records.
+  Primitive groups are `{u16 type,u16 count}` followed by type-specific records; count `0xFFFF`
+  terminates the list. Primitive vertex references are byte offsets into the vertex array.
+- **Embedded battle model:** seven `u32` values beginning with model size and relative skeleton,
+  geometry and animation offsets. The first section starts at `0x1C`; the last directory word is
+  `size - 4`. The other variant fields must be preserved rather than assumed zero. Skeleton,
+  geometry and animation use the corresponding battle-model section formats.
+- **Sprite frame list:** eight-byte entries `{s32 relativeFrame,s16 duration,s8 control,pad}`;
+  control 0 continues, 1 ends, 2 loops. Frame references are relative to the object directory.
 
-5.See third int (8th byte) for UNKNOWN(POLYGON TYPES see below) \[Relative jump from 03 00 00 00\]
+Detailed primitive layouts are retained in [the object reference](GFCinematicScript.md#objects).
+There is no general twelve-object limit: the audited corpus contains 712 packed object entries,
+including containers with more than twelve objects.
 
-6.Read int at 20th byte for VERTICES offset \[Relative jump from 03 00 00 00\]
+## Embedded camera tracks
 
-7.Read int at 24th byte for VERTICES COUNT \[Vertex is 8 bytes! X Z Y W, where W is probably weight byte \[as in OBJ specification\] and is normally unused (as usual, even in casual OBJ files)\]
+The cinematic opcode word `0x1039` (opcode `0x39`, sub-operation 1) invokes `StageCameraAnim`:
 
-Example: 09 00 9f 01 means there's 9f 01 (415) polygons of type 0x9. Therefore: 28\*415=11620 bytes to next polygon type or vertices if FF FF FF FF.
-
-GF Environment (stages like Cerberus gate; Alexander backdrop and etc.) geometry contains many polygon types (sic!). Every single polygon type is different than other.
+```c
+Battle_PlayCameraAnimation(file_base + read_u32(file_base + 0x20));
 ```
-private int[] _knownPolygons = new int[]   
-{  
-   0x2,  
-   0x6,  
-   0x7,  
-   0x8,  
-   0x9,  
-   0xC,  
-   0x10,  
-   0x12,  
-   0x11,  
-   0x13,  
-};
-```
-0xC points to geometry section. If \*0xC (pointers to geometries) is == 0, then file has no geometry (it is possible. Some files are only texture, some only geometry, some are only animation and some are everything). There should be no single case where the number of models in file exceed 12.
-```
-0xC:  
- PointersToModel:  
-    Example object (let's call it modOffset)
-```
-```
-uint _objCount = *modOffset;  
-ushort _vertexCount = *(modOffset + 24);  
-ushort _verticesOffset = *(modOffset + 20);
-```
 
-Polygon parsing based on types (C\#):
-```
-int relativeJump = *(modOffset + 8);  
-int *localoffset = modOffset + _relativeJump + 4;
+This is the same track format used by static exe effect cameras:
 
-               if (polygonType == 0x02)  
-               {  
-                   for (int i = 0; i < polygons * 20; i += 20)  
-                   {  
-                       f += $"f {GetPolygon(localoffset + i + 0xC)} {GetPolygon(localoffset + i + 0xE)} {GetPolygon(localoffset + i + 0x10)}\n";  
-                   }  
-                   safeHandle = polygons * 20;  
-               }
+| Track-relative offset | Type | Meaning |
+|---|---|---|
+| `+0x00` | `u16` | Pointer count, 2 |
+| `+0x02` | `u16` | Camera VM script offset, normally 8 |
+| `+0x04` | `u16` | Keyframe collection offset |
+| `+0x06` | `u16` | Total track byte size |
+| `+script` | bytes | Camera VM bytecode, **not** cinematic VM words |
+| `+keyframes` | bytes | Camera sets/animation slots/blocks/keyframes |
 
-               if (polygonType == 0x06)  
-               {  
-                   for (int i = 0; i < polygons * 12; i += 12)  
-                   {  
-                       f += $"f {GetPolygon(localoffset + i + 0x4)} {GetPolygon(localoffset + i + 0x6)} {GetPolygon(localoffset + i + 0x08)}\n";  
-                   }  
-                   safeHandle = polygons * 12;  
-               }
+All 46 camera tracks in the audit parse and rebuild byte for byte, totaling 1,120 keyframe entries.
 
-               if (polygonType == 0x07)  
-               {  
-                   for (int i = 0; i < polygons * 20; i += 20)  
-                   {  
-                       f += $"f {GetPolygon(localoffset + i + 0xC)} {GetPolygon(localoffset + i + 0xE)} {GetPolygon(localoffset + i + 0x10)}\n";  
-                   }  
-                   safeHandle = polygons * 20;  
-               }
+### Disease Breath, effect 231
 
-               if (polygonType == 0x09)  
-               {  
-                   for (int i = 0; i < polygons * 28; i += 28)  
-                   {  
-                       f += $"f {GetPolygon(localoffset + i + 18)} {GetPolygon(localoffset + i + 20)} {GetPolygon(localoffset + i + 22)}\n";  
-                   }  
-                   safeHandle = polygons * 28;  
-               }
+The resource loader at EN `0xA66470` opens `MAG230_B.00` and `MAG230_B.01`. The `.00` root is
+`0x58`; at file offset `0x5A`, words `1039 0000` start the embedded camera. Header `+0x20`
+contains `0x870`. The native call at `0xA6C240` passes this file-derived address to the battle
+camera player (`0x5099A0`).
 
-               if (polygonType == 0x08)  
-               {  
-                   for (int i = 0; i < polygons * 20; i += 20)  
-                   {  
-                       f += $"f {GetPolygon(localoffset + i + 0xA)} {GetPolygon(localoffset + i + 0xC)} {GetPolygon(localoffset + i + 0xE)}\n";  
-                   }  
-                   safeHandle = polygons * 20;  
-               }
+The track spans `[0x870,0x930)`: header words `0002 0008 0018 00C0`, 192 bytes total, a
+15-byte camera script plus one alignment byte, then the keyframe collection. Set 0/slot 0 has
+three blocks and five keyframe entries. This is a file camera; absence from the static exe-track
+list does not mean absence of camera motion.
 
-               if (polygonType == 12)  
-               {  
-                   for (int i = 0; i < polygons * 28; i += 28)  
-                   {  
-                       f += $"f {GetPolygon(localoffset + i + 20)} {GetPolygon(localoffset + i + 22)} {GetPolygon(localoffset + i + 26)} {GetPolygon(localoffset + i + 24)}\n";  
-                   }  
-                   safeHandle = polygons * 28;  
-               }
+## TIM texture files
 
-               if (polygonType == 0x12)  
-               {  
-                   for (int i = 0; i < polygons * 24; i += 24)  
-                   {  
-                       f += $"f {GetPolygon(localoffset + i + 12)} {GetPolygon(localoffset + i + 14)} {GetPolygon(localoffset + i + 18)} {GetPolygon(localoffset + i + 16)}\n";  
-                   }  
-                   safeHandle = polygons * 24;  
-               }
+Standard TIM data starts with magic `0x10` and flags. Flags select 4-, 8-, 16- or 24-bit pixel
+encoding and whether a CLUT block is present. Each CLUT/image block has a `u32` block byte size,
+VRAM X/Y and width/height fields (`u16` each), followed by its data. Width is in 16-bit VRAM words,
+so it is not always the displayed pixel width. Validate block lengths and dimensions.
 
-               if (polygonType == 0x13)  
-               {  
-                   for (int i = 0; i < polygons * 36; i += 36)  
-                   {  
-                       f += $"f {GetPolygon(localoffset + i + 24)} {GetPolygon(localoffset + i + 26)} {GetPolygon(localoffset + i + 30)} {GetPolygon(localoffset + i + 28)}\n";  
-                   }  
-                   safeHandle = polygons * 36;  
-               }
+Do not identify TIM solely by the exact flags value `0x09`: the corpus includes other valid flag
+values. A filename or payload byte count does not determine dimensions. Packed raw texture pages
+are not standalone TIMs and need their executable descriptor/upload context.
 
-               if (polygonType == 0x11)  
-               {  
-                   for (int i = 0; i < polygons * 24; i += 24)  
-                   {  
-                       f += $"f {GetPolygon(localoffset + i + 16)} {GetPolygon(localoffset + i + 18)} {GetPolygon(localoffset + i + 22)} {GetPolygon(localoffset + i + 20)}\n";  
-                   }  
-                   safeHandle = polygons * 24;  
-               }
+## Indexed containers, audio and raw parts
 
-               if (polygonType == 0x10)  
-               {  
-                   for (int i = 0; i < polygons * 12; i += 12)  
-                   {  
-                       f += $"f {GetPolygon(localoffset + i + 4)} {GetPolygon(localoffset + i + 6)} {GetPolygon(localoffset + i + 10)} {GetPolygon(localoffset + i + 8)}\n";  
-                   }  
-                   safeHandle = polygons * 12;  
-               }
+Three directory layouts are structurally recognized, each beginning with `u32 count`:
 
-               uint isNext = *(localoffset + safeHandle);  
-               if (isNext == 0xFFFFFFFF) //FFFFFFFF breaks the polygons reading  
-                   break;
-```
-Vertex:
-```
-short x  
-short z  
-short y  
-short w //rarely used, for skeleton weighting
-```
-## Textures
+1. `offset[count]`, then an end offset.
+2. An end offset, then `offset[count]`.
+3. `offset[count]` with the file length as the implicit end (verified in `mag064_h.02` and `.03`).
 
-1\. See 0x08, it points almost always to null data, but also indicates where to stop watching texture pointers
+Offsets are file-relative in these validated layouts. The first payload starts after the directory;
+entries may alias or denote empty parts, and bytes may remain after the declared end. Directory
+recognition does not establish the semantics of every part. Some model/animation banks use these
+layouts; others remain undecoded.
 
-2\. Jump to pointer 0x14 (almost always 0x30)
+SCOT/AKAO data and four-byte references require their own runtime interpretation. Raw streamed parts
+can be VRAM pages, particle data, animation data or other effect-specific bytes. **Non-packed** does
+not mean **raw texture**. Preserve undecoded data and report its status.
 
-3\. Note all pointers if not zero until streamPosition==\*(0x08)
+## Editing and validation
 
-4\. If no pointers, file has no texture.
+Laguna opens all 790 audited files and provides section tabs, named fields where decoded, embedded
+camera script/keyframe editing, TIM previews, byte editing and section export/replacement. Recognized
+embedded model headers/skeletons/geometry/animations are split into separate tabs. Unknown data remains
+editable as bytes. Editing keeps the existing size; relocating larger sections is not implemented.
 
-5\. Jump to texture (pointer+\*(0x14)) e.g. 48+21675
+The audit finds 58 script-bearing packed files. Per-effect runtime opcode profiles and fourteen
+additional native-verified opcode encodings let their reachable programs decode without errors.
+This is not a full simulation of every effect: playback remains verified for the seven documented
+GF summons, while other effects' script/resource data can be edited.
 
-6\. There's no sizes, so if there's another texture after the one you're getting, then subdivide next texture position from current position to get size and determine texture resolution. If it's the last texture, then it gets a bit tricky, as in many ways the file is not ending with texture but SCOT for example..
+Validation covers complete non-overlapping byte-span coverage, all-file unchanged save round trips,
+fixed-size edits/undo and preservation of bytes outside an edited camera. Original game assets are
+required to reproduce the full corpus tests and are not included in the repository.
 
-Texture is **8BPP** (does not contain palette/monochromatic) (one byte is all three channels in 24RGB manner)
-
-**Texture resolution is based on size:**
-
-| Texture byte size | Texture final resolution |
-|-------------------|--------------------------|
-| 0x2000            | 64x64 (or 32x32)\*       |
-| 0x4000            | 128x128 (or 64x64)\*     |
-| 0x8000            | 256x256 (or 128x128)\*   |
-| 0x10000           | 256x256                  |
-
-GFs uses higher texture resolution, for example 0x2000 is 64x64 instead of 32x32, but many magic texture like fire effect animation atlas texture is using the lower resolution (the one with asterisk \*, for example 0x2000 for fire atlas animation texture it's 32x32 instead of 64x64)
-
-## SCOT
-
-Related to sound transition effect. Structure is completely unknown.
+For conventional procedural spell dispatch and resources, see [Magic Spell Effect Runtime](MagicSpellEffectRuntime.md)
+and [Magic Effect Anatomy](MagicEffectAnatomy.md). For the seven GF examples and streamed file slots,
+see [Cinematic script and mag files](GFCinematicScript.md).

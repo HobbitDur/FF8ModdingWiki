@@ -15,6 +15,11 @@ the script language are identical. This page describes the engine with Ifrit as 
 then the design of its 30 fps rework. The other summon families (timeline and actor summons) are
 listed in [GF Summon Runtime](GFSummonRuntime.md).
 
+The broader MAG sweep also identifies this VM/container family in monster attacks, Blue Magic and
+story effects. See [MAG file formats and census](FileFormat_magfiles.md) for the 58 per-effect
+opcode directories and embedded stage-camera tracks. This page's playback and handler discussion
+remains scoped to the seven documented GF summons; their opcode availability is not universal.
+
 1. TOC
 {:toc}
 
