@@ -7,7 +7,9 @@ permalink: /technical-reference/battle/summon-creature-models/
 
 Timeline-family summon and effect creatures (see [GF Summon Runtime](../gf-summon-runtime/)) are drawn from **standard 4-section battle-model containers** — the exact same layout as sections 1–3 of a `c0mXXX.dat` monster: `[nb_sections=4][offsets][file_size]` followed by skeleton, geometry, animation and a (usually empty) trailer section. They animate through `Battle_ReadAnimation`, the same keyframe machinery as monsters and characters. This page is the census of where every such creature model and its texture live.
 
-The shared-cinematic GFs (Ifrit, Bahamut, Cerberus, Alexander, Brothers, Eden, Leviathan) are **not** covered here: their `MAGxxx_B.00/.01` packs use the custom opcode-VM format with no keyframe animation data (see the runtime page).
+The shared-cinematic GFs (Ifrit, Bahamut, Cerberus, Alexander, Brothers, Eden, Leviathan) are **not** covered by this source census: their `MAGxxx_B.00/.01` packs drive choreography with the cinematic VM and can nest creature models with skeleton/geometry/keyframe-animation sections. The cinematic VM and the creature's skeletal animation are separate layers. See [GF cinematic script](GFCinematicScript.md).
+
+The [effect workspace/source guide](BattleEffectWorkspace.md) describes mixed storage, validated executable editing and Carbuncle's procedural camera operands.
 
 1. TOC
 {:toc}

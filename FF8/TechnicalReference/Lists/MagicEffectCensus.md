@@ -12,6 +12,12 @@ spells, and — importantly — **which of the community IDB's function names we
 1. TOC
 {:toc}
 
+The [effect-source audit](../Battle/BattleEffectWorkspace.md) separates native initializer
+shape from actual choreography/storage. The per-effect table below now marks 47 additional
+effects as MAG cinematic interpreters, based on their audited opcode directories and decoded
+root scripts. Older aggregate archetype counts on this page describe the native initializer
+survey, not a mutually exclusive classification of all effect components.
+
 ## Ground truth: the dispatch table, not the names
 
 An effect is selected by the kernel magic entry's **effect_id** (field +0x04), which indexes two
@@ -20,12 +26,12 @@ parallel 400-slot function-pointer tables in `.data`:
 | Global | Address | Content |
 |---|---|---|
 | `MagicList_Logic` | 0xC81774 | the effect's init/logic fn — `MagicList_Logic[id-1]` |
-| `MagicList_TextureLoad` | 0xC81DB8 | its texture loader (`_FL`) — loads `mag(id-1).tim` |
+| `MagicList_TextureLoad` | 0xC81DB8 | its resource loader (`_FL`) — can open textures, packed files, or defer work to native/streamed loaders |
 
-Three independent facts pin every slot, and they agree:
+For ordinary spells with external textures, these independent cross-checks confirm the mapping:
 
 1. the **dispatch index** (`0xC81774 + 4·(id−1)`);
-2. the **`mag(N−1).tim` rule** — effect 23's loader really does open `mag022.tim`;
+2. the **`mag(N−1).tim` naming convention** — effect 23's loader really does open `mag022.tim`; this is corroboration for those spells, not a universal resource-ownership rule;
 3. **adjacency** — the `_FL` sits exactly `0x20` before its `_Init` (holds for 164 slots; the
    exceptions are loaders that open several files, e.g. Devour's opens five).
 
@@ -408,10 +414,10 @@ That is **57 free effect ids**, each needing a logic fn + a loader fn wired into
 | 205 | Brothers Summon (Brotherly Love) | `0xaf4520` `MAG_205_BROTHERS_SUMMON_BROTHERLY_LOVE` | shared cinematic engine |
 | 206 | Eden Summon (Eternal Breath) | `0xae2dd0` `MAG_206_EDEN_SUMMON_ETERNAL_BREATH` | shared cinematic engine |
 | 207 | Maelstrom | `0x6a3ab0` `MAG_207_MAELSTROM` → `MAG_207_sub_6A3AE0` | **timeline** (via thunk +0x30) |
-| 208 | Final "Sorceress" Death | `0xad7900` `MAG_208_FINAL_SORCERESS_DEATH` | timeline (Fire/Blizzard archetype) |
+| 208 | Final "Sorceress" Death | `0xad7900` `MAG_208_FINAL_SORCERESS_DEATH` | MAG cinematic interpreter (effect-specific opcode table) |
 | 209 | "Sorceress" Spawn | `0x637500` `MAG_209_SORCERESS_SPAWN` | timeline (Fire/Blizzard archetype) |
 | 210 | Bloodfest | `0x6f6800` `MAG_210_BLOODFEST` → `MAG_210_sub_6F6810` | **timeline** (via thunk +0x10) |
-| 211 | Adel Death | `0xaca120` `MAG_211_ADEL_DEATH` | timeline (Fire/Blizzard archetype) |
+| 211 | Adel Death | `0xaca120` `MAG_211_ADEL_DEATH` | MAG cinematic interpreter (effect-specific opcode table) |
 | 212 | Burning Rave (Zell's Finisher) | `0x6a0d20` `MAG_212_UNK8` → `MAG_212_sub_6A0D50` | **timeline** (via thunk +0x30) |
 | 213 | Storm Breath | `0x69eac0` `MAG_213_STORM_BREATH` → `MAG_213_sub_69EAF0` | **timeline** (via thunk +0x30) |
 | 214 | Gravija | `0x69d5b0` `MAG_214_GRAVIJA` → `MAG_214_sub_69D5E0` | **timeline** (via thunk +0x30) |
@@ -419,58 +425,58 @@ That is **57 free effect ids**, each needing a logic fn + a loader fn wired into
 | 216 | Different Beat (Zell's Finisher) | `0x6959e0` `MAG_216_UNK10` → `MAG_216_sub_695A10` | **timeline** (via thunk +0x30) |
 | 217 | Energy Bomber | `0x694e60` `MAG_217_ENERGY_BOMBER` → `MAG_217_sub_694E90` | **timeline** (via thunk +0x30) |
 | 218 | Unknown (owns the mag217 group — `mag217_b.dat` is a second 69-bone Gilgamesh model, same mesh as `mag326_g.dat` with 6 animations) | `0x6326d0` `MAG_218_UNK11` | timeline (Fire/Blizzard archetype) |
-| 219 | Terra Break | `0xabd420` `MAG_219_TERRA_BREAK` | timeline (Fire/Blizzard archetype) |
-| 220 | Light Pillar | `0xab3320` `MAG_220_LIGHT_PILLAR` | timeline (Fire/Blizzard archetype) |
-| 221 | Apocalypse | `0xaa5560` `MAG_221_APOCALYPSE` | timeline (Fire/Blizzard archetype) |
-| 222 | Water | `0xa9b200` `MAG_222_WATER` | timeline (Fire/Blizzard archetype) |
-| 223 | Meteor | `0xa8f890` `MAG_223_METEOR` | timeline (Fire/Blizzard archetype) |
+| 219 | Terra Break | `0xabd420` `MAG_219_TERRA_BREAK` | MAG cinematic interpreter (effect-specific opcode table) |
+| 220 | Light Pillar | `0xab3320` `MAG_220_LIGHT_PILLAR` | MAG cinematic interpreter (effect-specific opcode table) |
+| 221 | Apocalypse | `0xaa5560` `MAG_221_APOCALYPSE` | MAG cinematic interpreter (effect-specific opcode table) |
+| 222 | Water | `0xa9b200` `MAG_222_WATER` | MAG cinematic interpreter (effect-specific opcode table) |
+| 223 | Meteor | `0xa8f890` `MAG_223_METEOR` | MAG cinematic interpreter (effect-specific opcode table) |
 | 224 | Unknown | — `—` | **FREE SLOT** |
 | 225 | Unknown | — `—` | **FREE SLOT** |
 | 226 | White Wind | `0x694520` `MAG_226_UNKNOWN` → `MAG_226_sub_694550` | **timeline** (via thunk +0x30) |
 | 227 | Ultimecia First Death | `0x693790` `MAG_227_UNKNOWN` → `MAG_227_sub_6937C0` | **timeline** (via thunk +0x30) |
-| 228 | Ice Strike | `0xa855c0` `MAG_228_UNKNOWN` | timeline (Fire/Blizzard archetype) |
-| 229 | Homing Laser (Quistis) | `0xa7aa20` `MAG_229_UNKNOWN` | timeline (Fire/Blizzard archetype) |
-| 230 | Fire Breath (Quistis) | `0xa70b70` `MAG_230_UNKNOWN` | timeline (Fire/Blizzard archetype) |
-| 231 | Disease Breath | `0xa664a0` `MAG_231_UNKNOWN` | timeline (Fire/Blizzard archetype) |
-| 232 | Breath of Death | `0xa5c2e0` `MAG_232_UNKNOWN` | timeline (Fire/Blizzard archetype) |
-| 233 | Earthquake | `0xa51f40` `MAG_233_UNKNOWN` | timeline (Fire/Blizzard archetype) |
-| 234 | Fart | `0xa488f0` `MAG_234_UNKNOWN` | timeline (Fire/Blizzard archetype) |
-| 235 | Breath | `0xa3e370` `MAG_235_UNKNOWN` | timeline (Fire/Blizzard archetype) |
-| 236 | Gas | `0xa34240` `MAG_236_UNKNOWN` | timeline (Fire/Blizzard archetype) |
-| 237 | Explosion | `0xa29c30` `MAG_237_UNKNOWN` | timeline (Fire/Blizzard archetype) |
-| 238 | Breath | `0xa1fdc0` `MAG_238_UNKNOWN` | timeline (Fire/Blizzard archetype) |
-| 239 | Ochu Dance | `0xa15a30` `MAG_239_UNKNOWN` | timeline (Fire/Blizzard archetype) |
-| 240 | Earthquake | `0xa0b360` `MAG_240_UNKNOWN` | timeline (Fire/Blizzard archetype) |
-| 241 | BGH251F2 Gatling Gun | `0xa01e10` `MAG_241_UNKNOWN` | timeline (Fire/Blizzard archetype) |
-| 242 | Beam Cannon | `0x9f7d10` `MAG_242_UNKNOWN` | timeline (Fire/Blizzard archetype) |
-| 243 | BGH251F2 1st Turret Exploding | `0x9eea90` `MAG_243_UNKNOWN` | timeline (Fire/Blizzard archetype) |
-| 244 | BGH251F2 2nd Turret Exploding | `0x9e5810` `MAG_244_UNKNOWN` | timeline (Fire/Blizzard archetype) |
-| 245 | BGH251F2 3rd Turret Exploding | `0x9dc590` `MAG_245_UNKNOWN` | timeline (Fire/Blizzard archetype) |
-| 246 | BGH251F2 4th Turret Exploding | `0x9d3310` `MAG_246_UNKNOWN` | timeline (Fire/Blizzard archetype) |
-| 247 | BGH251F2 Death | `0x9c9890` `MAG_247_UNKNOWN` | timeline (Fire/Blizzard archetype) |
-| 248 | Soldier Entrance After BGH251F2 Death | `0x9c08d0` `MAG_248_UNKNOWN` | timeline (Fire/Blizzard archetype) |
-| 249 | Unknown | `0x9b7380` `MAG_249_UNKNOWN` | timeline (Fire/Blizzard archetype) |
-| 250 | Beam Cannon | `0x9abff0` `MAG_250_UNKNOWN` | timeline (Fire/Blizzard archetype) |
+| 228 | Ice Strike | `0xa855c0` `MAG_228_UNKNOWN` | MAG cinematic interpreter (effect-specific opcode table) |
+| 229 | Homing Laser (Quistis) | `0xa7aa20` `MAG_229_UNKNOWN` | MAG cinematic interpreter (effect-specific opcode table) |
+| 230 | Fire Breath (Quistis) | `0xa70b70` `MAG_230_UNKNOWN` | MAG cinematic interpreter (effect-specific opcode table) |
+| 231 | Disease Breath | `0xa664a0` `MAG_231_UNKNOWN` | MAG cinematic interpreter (effect-specific opcode table) |
+| 232 | Breath of Death | `0xa5c2e0` `MAG_232_UNKNOWN` | MAG cinematic interpreter (effect-specific opcode table) |
+| 233 | Earthquake | `0xa51f40` `MAG_233_UNKNOWN` | MAG cinematic interpreter (effect-specific opcode table) |
+| 234 | Fart | `0xa488f0` `MAG_234_UNKNOWN` | MAG cinematic interpreter (effect-specific opcode table) |
+| 235 | Breath | `0xa3e370` `MAG_235_UNKNOWN` | MAG cinematic interpreter (effect-specific opcode table) |
+| 236 | Gas | `0xa34240` `MAG_236_UNKNOWN` | MAG cinematic interpreter (effect-specific opcode table) |
+| 237 | Explosion | `0xa29c30` `MAG_237_UNKNOWN` | MAG cinematic interpreter (effect-specific opcode table) |
+| 238 | Breath | `0xa1fdc0` `MAG_238_UNKNOWN` | MAG cinematic interpreter (effect-specific opcode table) |
+| 239 | Ochu Dance | `0xa15a30` `MAG_239_UNKNOWN` | MAG cinematic interpreter (effect-specific opcode table) |
+| 240 | Earthquake | `0xa0b360` `MAG_240_UNKNOWN` | MAG cinematic interpreter (effect-specific opcode table) |
+| 241 | BGH251F2 Gatling Gun | `0xa01e10` `MAG_241_UNKNOWN` | MAG cinematic interpreter (effect-specific opcode table) |
+| 242 | Beam Cannon | `0x9f7d10` `MAG_242_UNKNOWN` | MAG cinematic interpreter (effect-specific opcode table) |
+| 243 | BGH251F2 1st Turret Exploding | `0x9eea90` `MAG_243_UNKNOWN` | MAG cinematic interpreter (effect-specific opcode table) |
+| 244 | BGH251F2 2nd Turret Exploding | `0x9e5810` `MAG_244_UNKNOWN` | MAG cinematic interpreter (effect-specific opcode table) |
+| 245 | BGH251F2 3rd Turret Exploding | `0x9dc590` `MAG_245_UNKNOWN` | MAG cinematic interpreter (effect-specific opcode table) |
+| 246 | BGH251F2 4th Turret Exploding | `0x9d3310` `MAG_246_UNKNOWN` | MAG cinematic interpreter (effect-specific opcode table) |
+| 247 | BGH251F2 Death | `0x9c9890` `MAG_247_UNKNOWN` | MAG cinematic interpreter (effect-specific opcode table) |
+| 248 | Soldier Entrance After BGH251F2 Death | `0x9c08d0` `MAG_248_UNKNOWN` | MAG cinematic interpreter (effect-specific opcode table) |
+| 249 | Unknown | `0x9b7380` `MAG_249_UNKNOWN` | MAG cinematic interpreter (effect-specific opcode table) |
+| 250 | Beam Cannon | `0x9abff0` `MAG_250_UNKNOWN` | MAG cinematic interpreter (effect-specific opcode table) |
 | 251 | Demon Slice | `0x6f44d0` `MAG_251_UNKNOWN` → `MAG_251_sub_6F44E0` | **timeline** (via thunk +0x10) |
-| 252 | Corona | `0x9a2870` `MAG_252_UNKNOWN` | timeline (Fire/Blizzard archetype) |
-| 253 | Twin Homing Laser | `0x997d10` `MAG_253_UNKNOWN` | timeline (Fire/Blizzard archetype) |
-| 254 | Homing Laser | `0x98d1b0` `MAG_254_UNKNOWN` | timeline (Fire/Blizzard archetype) |
-| 255 | Homing Laser | `0x982650` `MAG_255_UNKNOWN` | timeline (Fire/Blizzard archetype) |
-| 256 | Sand Shake | `0x979400` `MAG_256_UNKNOWN` | timeline (Fire/Blizzard archetype) |
-| 257 | Mega Flare | `0x96f290` `MAG_257_UNKNOWN` | timeline (Fire/Blizzard archetype) |
-| 258 | Mad Cow Special | `0x964a00` `MAG_258_UNKNOWN` | timeline (Fire/Blizzard archetype) |
+| 252 | Corona | `0x9a2870` `MAG_252_UNKNOWN` | MAG cinematic interpreter (effect-specific opcode table) |
+| 253 | Twin Homing Laser | `0x997d10` `MAG_253_UNKNOWN` | MAG cinematic interpreter (effect-specific opcode table) |
+| 254 | Homing Laser | `0x98d1b0` `MAG_254_UNKNOWN` | MAG cinematic interpreter (effect-specific opcode table) |
+| 255 | Homing Laser | `0x982650` `MAG_255_UNKNOWN` | MAG cinematic interpreter (effect-specific opcode table) |
+| 256 | Sand Shake | `0x979400` `MAG_256_UNKNOWN` | MAG cinematic interpreter (effect-specific opcode table) |
+| 257 | Mega Flare | `0x96f290` `MAG_257_UNKNOWN` | MAG cinematic interpreter (effect-specific opcode table) |
+| 258 | Mad Cow Special | `0x964a00` `MAG_258_UNKNOWN` | MAG cinematic interpreter (effect-specific opcode table) |
 | 259 | Renzokuken - 6 Hits | `0x5a6c20` `MAG_259_UNKNOWN` | timeline (Fire/Blizzard archetype) |
 | 260 | Shockwave Pulsar (Quistis) | `0x690690` `MAG_260_UNKNOWN` → `MAG_260_sub_6906C0` | **timeline** (via thunk +0x30) |
-| 261 | Desperado | `0x9598d0` `MAG_261_UNKNOWN` | timeline (Fire/Blizzard archetype) |
-| 262 | Blood Pain | `0x94f9f0` `MAG_262_UNKNOWN` | timeline (Fire/Blizzard archetype) |
-| 263 | Massive Anchor | `0x945810` `MAG_263_UNKNOWN` | timeline (Fire/Blizzard archetype) |
-| 264 | Unknown | `0x937eb0` `MAG_264_UNKNOWN` | timeline (Fire/Blizzard archetype) |
-| 265 | Unknown | `0x92cbd0` `MAG_265_UNKNOWN` | timeline (Fire/Blizzard archetype) |
-| 266 | Unknown | `0x91f5e0` `MAG_266_UNKNOWN` | timeline (Fire/Blizzard archetype) |
-| 267 | Unknown | `0x911ff0` `MAG_267_UNKNOWN` | timeline (Fire/Blizzard archetype) |
-| 268 | Unknown | `0x904a00` `MAG_268_UNKNOWN` | timeline (Fire/Blizzard archetype) |
-| 269 | Unknown | `0x8f7220` `MAG_269_UNKNOWN` | timeline (Fire/Blizzard archetype) |
-| 270 | Ultima Weapon Death | `0x8e9c30` `MAG_270_UNKNOWN` | timeline (Fire/Blizzard archetype) |
+| 261 | Desperado | `0x9598d0` `MAG_261_UNKNOWN` | MAG cinematic interpreter (effect-specific opcode table) |
+| 262 | Blood Pain | `0x94f9f0` `MAG_262_UNKNOWN` | MAG cinematic interpreter (effect-specific opcode table) |
+| 263 | Massive Anchor | `0x945810` `MAG_263_UNKNOWN` | MAG cinematic interpreter (effect-specific opcode table) |
+| 264 | Unknown | `0x937eb0` `MAG_264_UNKNOWN` | MAG cinematic interpreter (effect-specific opcode table) |
+| 265 | Unknown | `0x92cbd0` `MAG_265_UNKNOWN` | MAG cinematic interpreter (effect-specific opcode table) |
+| 266 | Unknown | `0x91f5e0` `MAG_266_UNKNOWN` | MAG cinematic interpreter (effect-specific opcode table) |
+| 267 | Unknown | `0x911ff0` `MAG_267_UNKNOWN` | MAG cinematic interpreter (effect-specific opcode table) |
+| 268 | Unknown | `0x904a00` `MAG_268_UNKNOWN` | MAG cinematic interpreter (effect-specific opcode table) |
+| 269 | Unknown | `0x8f7220` `MAG_269_UNKNOWN` | MAG cinematic interpreter (effect-specific opcode table) |
+| 270 | Ultima Weapon Death | `0x8e9c30` `MAG_270_UNKNOWN` | MAG cinematic interpreter (effect-specific opcode table) |
 | 271 | LV Up | `0x68f550` `MAG_271_UNKNOWN` → `MAG_271_sub_68F580` | **timeline** (via thunk +0x30) |
 | 272 | LV Down | `0x68dc70` `MAG_272_UNKNOWN` → `MAG_272_sub_68DCA0` | **timeline** (via thunk +0x30) |
 | 273 | Mad Rush | `0x68d650` `MAG_273_UNKNOWN` → `MAG_273_sub_68D680` | **timeline** (via thunk +0x30) |

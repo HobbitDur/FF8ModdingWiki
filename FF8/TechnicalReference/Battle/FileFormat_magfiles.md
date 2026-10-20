@@ -29,7 +29,7 @@ in October 2026. The 790 MAG/MA8 files in that corpus classify as follows:
 These are structural classifications, not a claim that every payload has been semantically decoded.
 The [machine-readable census](https://github.com/HobbitDur/FF8UltimateEditor/blob/master/docs/mag-file-census.json)
 records names, hashes, section counts, script results and camera locations without distributing assets.
-The [Laguna editor guide](https://github.com/HobbitDur/FF8UltimateEditor/blob/master/docs/laguna-mag-editor.md)
+The [Fujin editor guide](https://github.com/HobbitDur/FF8UltimateEditor/blob/master/docs/fujin-effects.md)
 describes editing and reproduction commands.
 
 1. TOC
@@ -162,7 +162,7 @@ not mean **raw texture**. Preserve undecoded data and report its status.
 
 ## Editing and validation
 
-Laguna opens all 790 audited files and provides section tabs, named fields where decoded, embedded
+Fujin's MAG component opens all 790 audited files and provides section tabs, named fields where decoded, embedded
 camera script/keyframe editing, TIM previews, byte editing and section export/replacement. Recognized
 embedded model headers/skeletons/geometry/animations are split into separate tabs. Unknown data remains
 editable as bytes. Editing keeps the existing size; relocating larger sections is not implemented.

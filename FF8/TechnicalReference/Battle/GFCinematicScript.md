@@ -11,7 +11,7 @@ nav_order: 7
 The seven documented summons of the [GF cinematic engine](GFCinematicEngine.md) (Ifrit, Leviathan, Bahamut,
 Cerberus, Alexander, the Brothers, Eden) keep their whole choreography as byte code in their mag
 files. This page is the file-format and instruction-set reference; the engine that runs it is on
-the engine page. The FF8UltimateEditor tool **Laguna** (and `cli.py laguna`) disassembles, simulates
+the engine page. The FF8UltimateEditor tool **Fujin** (and `cli.py fujin`) disassembles, simulates
 and patches these scripts with the tables below. The same container/VM family also appears in other
 monster, Blue Magic and story effects: the broader [MAG format census](FileFormat_magfiles.md) covers
 790 files, 58 root programs and their per-effect opcode profiles. An opcode unused by these seven
