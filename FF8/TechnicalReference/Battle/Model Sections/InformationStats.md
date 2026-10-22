@@ -246,8 +246,9 @@ It is an integer, a per-monster *category* consumed by the Devour system:
 1. When a Devour command resolves, `computeDevour` picks the devour effect ID from bytes 251–253 (by level tier). If the ID is 255 (Immune) the devour fails
    immediately. Otherwise it stores the effect ID (`DEVOUR_EFFECT_ID`) **and this byte** (`DEVOUR_CATEGORY_OR_SWAP_COM_ID`) into a pending-devour block.
 2. `Battle_DamageGettingRelated`'s `ATTACK_TYPE_DEVOUR` case then rolls the devour: it succeeds only if the devourer's **current HP ≥ the target's current HP**,
-   with probability `(attacker_hp − target_hp) / attacker_hp` (so devouring gets more reliable the more the target is weakened — a previously undocumented
-   formula). On success the target gets the *Eject* status (this is how Devour removes a monster without death rewards) and the devour message is printed; on
+   with approximate probability `(attacker_hp − target_hp) / attacker_hp`. The [exact roll]({{site.baseurl}}/technical-reference/list/formula/#devour-success)
+   truncates `q = 255 × (attacker_hp − target_hp) / attacker_hp`, rejects `q = 0`, then succeeds when `rand(0..255) ≤ q`.
+   On success the target gets the *Eject* status (this is how Devour removes a monster without death rewards) and the devour message is printed; on
    failure the miss flag is set and the byte is overwritten with **8**.
 3. Either way, the function **returns this byte as the "damage" value of the devour hit**. So on PC its gameplay effect is real but essentially invisible: a
    successful devour deals 0–7 damage to a monster that is being ejected anyway, and on a failure the miss flag suppresses the 8. In practice you cannot see it

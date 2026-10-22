@@ -136,7 +136,7 @@ attacker from the drain-back half of the same ring entry.
 | Kamikaze | `5 × attacker maxHP` |
 | Everyone's Grudge | `P × character NumKills` |
 | LV Up/Down | `newLvl = clamp(P×lvl/8, 1, 100)`, gated by `acc > rand255` |
-| Devour | success when `atkHP ≥ tgtHP` and `rand255 ≤ 255×(atkHP−tgtHP)/atkHP`; heal `HPHeal × maxHP/16` |
+| Devour | `q = floor(255×(atkHP−tgtHP)/atkHP)`; success requires a nonimmune target, `atkHP ≥ tgtHP`, **`q != 0`**, and `rand255 ≤ q`; HP effect `floor(HPHeal × devourerMaxHP/16)`. [Full Devour formulas]({{site.baseurl}}/technical-reference/list/formula/#devour) |
 | Card | success when `256 − 255×curHP/maxHP ≥ rand255` (≈1/256 at full HP, never 0 below max); rare card when `rand255 < 16` |
 | Draw quantity | `((atkLvl − tgtLvl + 10)/2 − drawResist + rand(1..32) + MAG)/5 − stockAmount`, clamp 0–9 |
 | Draw-cast damage | `dmg × (rand255 + 10)/150` |

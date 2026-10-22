@@ -194,7 +194,7 @@ individually decompiled — nothing here is inferred from the byte's *name* alon
 | LV Down, LV Up | `computeLvlUpDown` | `succeeds if accuracy > rand(0..255)` — gates the WHOLE level-change action (not a status roll at all); also fails outright if the target is level-change-immune |
 | Fixed Damage, Target Current HP - 1, Fixed Magic Damage Based on GF Level, 1 HP Damage | `Damage_ComputeFixedSpecial` | No reference to `HIT_ATTACK_ACCURACY` anywhere in the function. **Byte is dead** |
 | Card | `Battle_RollCardCommand` | Capture depends on the **target's HP ratio**, not this byte: `chance = (256 − 255×curHP/maxHP)/256` (~0.4% at full HP → 100% near 0 HP); a second `rand < 16` (6.25%) gives the rare card. **Byte is dead** |
-| Devour | Devour dispatcher case | Success needs `attackerHP ≥ targetHP`, then `chance = (attackerHP − targetHP)/attackerHP`; the Devour effect comes from the Devour kernel section. **Byte is dead** |
+| Devour | Devour dispatcher case | Uses the [Devour HP-ratio roll](#devour-success), including integer rounding and a nonzero-threshold check. The effect comes from the Devour kernel section. **Byte is dead** |
 | Scan, Angelo Search, Moogle Dance | Scan / Angelo Search / Moogle Dance dispatcher cases | Utility actions (reveal info / find item / GF HP recovery) — no roll, accuracy never read. **Byte is dead** |
 | None, `0x1E`, `0x1F` | dispatcher `LABEL_46` / no-op default | No damage or status roll at all. **Byte is dead** |
 | Summon item (`0x0E`) | rerouted before damage by `computeCommandAction` | The item's own bytes are never consulted — the action becomes the Non-junctionable GF attack named by its Special action ID, and that entry's accuracy applies instead. **Byte is dead** |
@@ -214,6 +214,129 @@ otherwise           -> roll floor(chance × 255 / 100) against rand(0..255)
 >dispatcher `Battle_DamageGettingRelated`. Only two groups actually consume the
 >status-accuracy byte (the STR/VIT and MAG/SPR rows); for the rest it is genuinely dead, or the
 >Attack Type has its own success mechanic (Card HP-ratio, Devour HP-ratio, LV Up/Down action gate).
+
+# Devour {#devour}
+
+Read from the English PC `FF8_EN.exe` (2013 release; image base `0x400000`,
+MD5 `be8b278becf6757bb811acd45d717d9c`). Devour has two separate calculations:
+the chance to consume the monster, then the selected kernel effect on the devourer.
+
+## Effect selection and immunity
+
+`computeDevour` (`0x48fc60`) selects an effect ID from the monster's
+[information section]({{site.baseurl}}/technical-reference/battle/model-sections/information-stats/):
+byte **251** for its low level tier, **252** for medium, or **253** for high. The tier
+boundaries are the monster's own medium/high level-start bytes **244/245**; they are
+not a universal level requirement. Effect ID **255** means immune and rejects Devour
+before the HP roll. Other IDs select a record in the
+[Devour kernel section]({{site.baseurl}}/technical-reference/main/kernel/devour/).
+
+## Success chance {#devour-success}
+
+Let `A` be the devourer's **current HP**, `T` the monster's **current HP**, and
+`R = GetRandomInt()` a random byte in `0..255`. For a living devourer (`A > 0`),
+the Devour dispatcher case (`0x4926bc`, HP reads at `0x4926cf`) does:
+
+```text
+if A < T: fail
+q = floor(255 * (A - T) / A)
+succeed if q != 0 and R <= q
+```
+
+The helper `isRandomNumeratorDenominator` (`0x48f0c0`) computes
+`floor(255 * q / 255)`, which leaves `q` unchanged, and explicitly rejects zero.
+Thus, counting the successful byte values out of 256:
+
+$$
+q = \left\lfloor \frac{255 \times (A-T)}{A} \right\rfloor
+\qquad (A \ge T)
+$$
+
+$$
+P(\text{Devour}) =
+\begin{cases}
+0 & \text{if immune, } A<T \text{, or } q=0 \\
+\frac{q+1}{256} & \text{otherwise}
+\end{cases}
+$$
+
+The familiar `100 * (A - T) / A` percentage is an approximation. Both HP values
+are **current**, so healing the devourer also improves the chance; the monster's
+maximum HP is not used in this roll. Equal current HP always fails, and a positive
+HP difference can still fail automatically when rounding gives `q = 0`.
+
+| Devourer current HP (`A`) | Monster current HP (`T`) | `q` | Exact success chance |
+|---|---|---|---|
+| 8000 | 9000 | Not rolled | 0% |
+| 8000 | 8000 | 0 | 0% |
+| 8000 | 7999 | 0 | 0% |
+| 8000 | 4000 | 127 | 128/256 = 50% |
+| 8000 | 2000 | 191 | 192/256 = 75% |
+| 8000 | 1 | 254 | 255/256 = 99.609375% |
+
+On success the monster receives **Eject**, the result suppresses the damage
+number, and the selected Devour message is shown. The dispatcher returns the
+monster's **category byte 255** as its internal hit amount; this is separate from
+the effect ID and from the HP effect below. On a failed HP roll it instead returns
+**8**, sets the **Miss** flag, and clears `DEVOUR_SUCEED`; no Devour benefit is applied.
+See [Devour category]({{site.baseurl}}/technical-reference/battle/model-sections/information-stats/#byte-255-devour-category).
+
+## HP and status effect on the devourer {#devour-hp-effect}
+
+The follow-up effect in `Battle_applyDamage` (HP calculation at `0x490479`)
+reads the selected kernel record. Let `H` be its **HP heal/damage quantity** byte
+at offset `0x03`, and `M` the devourer's **battle maximum HP**:
+
+$$
+\text{HPAmount} = \left\lfloor \frac{H \times M}{16} \right\rfloor
+$$
+
+`H` is a linear quantity in sixteenths of maximum HP: **4 = 25%**, **8 = 50%**,
+**12 = 75%**, and **16 = 100%**. There is no damage-variance roll or MAG/SPR term
+in this HP calculation. It uses the devourer's maximum HP, not either participant's
+current HP or the monster's maximum HP.
+
+| Kernel offset `0x02` | HP effect | Status effect |
+|---|---|---|
+| `0x1E` (Cure) | Restore `HPAmount` | Cure the record's status masks via `Battle_CureStatusesAndSetFeedback`; then apply its permanent stat bonuses |
+| `0x1F` (Damage) | Deal `HPAmount` | Pass the record's status masks through the normal MAG/SPR status-infliction routine (`sub_4914E0`); this follow-up stages status accuracy **200** |
+
+These are the calculated HP amounts before the common HP application and caps.
+The record's status masks are at offsets **0x04** (Status 2) and **0x08** (Status 1).
+The command ability's status-accuracy byte does not control the consumption roll.
+
+## Permanent stat bonuses {#devour-stat-bonuses}
+
+For a Cure (`0x1E`) record, `relatedToDevour` (`0x492220`) tests each bit in the
+**Raised Stat Flag** byte at kernel offset **0x0A** independently:
+
+| Bit | Saved stat increased |
+|---|---|
+| `0x01` | STR |
+| `0x02` | VIT |
+| `0x04` | MAG |
+| `0x08` | SPR |
+| `0x10` | SPD |
+| `0x20` | LUCK |
+
+For each selected stat, `increaseCharaStatBy1` (`0x495f90`) writes:
+
+$$
+\text{SavedStat}' = \min(255,\ \text{SavedStat}+1)
+$$
+
+Multiple bits can raise multiple stats in one effect. The separate **Raised Stat HP
+Quantity** byte at offset **0x0B**, `B`, is added directly to the character's saved
+base maximum HP by `sub_495F50` (`0x495f50`):
+
+$$
+\text{SavedBaseMaxHP}' = \min(9999,\ \text{SavedBaseMaxHP}+B)
+$$
+
+Thus a Max HP +10 effect stores **10** in `B`; it is not multiplied by 10 or
+divided by 16. This permanent HP bonus is separate from `H`, the immediate HP
+heal/damage quantity. The selected effect record determines the bonus; the
+monster's category byte does not. See the [Devour effect IDs]({{site.baseurl}}/technical-reference/list/devour-list/#devour-effects).
 
 # Stat
 
@@ -441,7 +564,16 @@ Reverse-engineering addresses for the functions referenced above, for readers wh
 | `computeLvlUpDown` | 0x493650 |
 | `Damage_ComputeFixedSpecial` | 0x4931c0 |
 | `Battle_RollCardCommand` | 0x48fba0 |
-| Devour dispatcher case | 0x4926cf |
+| Devour dispatcher case (HP reads at `0x4926cf`) | 0x4926bc |
+| `computeDevour` | 0x48fc60 |
+| `isRandomNumeratorDenominator` | 0x48f0c0 |
+| `GetRandomInt` | 0x48f020 |
+| Devour HP/status follow-up in `Battle_applyDamage` | 0x490479 |
+| `Battle_CureStatusesAndSetFeedback` | 0x491820 |
+| `sub_4914E0` (status-infliction core) | 0x4914e0 |
+| `relatedToDevour` | 0x492220 |
+| `increaseCharaStatBy1` | 0x495f90 |
+| `sub_495F50` (permanent HP bonus) | 0x495f50 |
 | Scan dispatcher case | 0x4925a6 |
 | Angelo Search dispatcher case | 0x49284b |
 | Moogle Dance dispatcher case | 0x4928d3 |
