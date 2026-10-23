@@ -62,7 +62,8 @@ Each m00x file has a specific number of entries, which are listed here.
 |--------|------|--------------------------------------------------------------------------------|------------------------------------------|
 | UInt16 | 2    | Offset                                                                         | Offset to the string                     
 | Byte   | 1    | Received                                                                       | Amount received                          |
-| UInt16 | 2    | UNK                                                                            | {0x0001}                                 |
+| Byte   | 1    | UNK | Always 0 |
+| Byte   | 1    | Level | [Required GF level](#required-gf-level): 1, or 100 for two m001 refines |
 | Byte   | 1    | [Input\_Item\_ID](https://github.com/HobbitDur/FF8GameData/wiki#item-list)     | Input: Item id value **0x00**-**0xC6**   |
 | Byte   | 1    | Required                                                                       | Amount needed                            |
 | Byte   | 1    | [Output\_Spell\_ID](https://github.com/HobbitDur/FF8GameData/wiki#magic-items) | Output: Spell id value **0x01**-**0x38** |
@@ -91,7 +92,8 @@ Each m00x file has a specific number of entries, which are listed here.
 |--------|------|-----------------------------------------------------------------------------|-----------------------------------------|
 | UInt16 | 2    | Offset                                                                      | Offset to the string                    
 | Byte   | 1    | Received                                                                    | Amount received                         |
-| UInt16 | 2    | UNK                                                                         | {0x0001}                                |
+| Byte   | 1    | UNK | Always 0 |
+| Byte   | 1    | Level | [Required GF level](#required-gf-level): 1, or 100 for two m001 refines |
 | Byte   | 1    | [Input\_Item\_ID](https://github.com/HobbitDur/FF8GameData/wiki#item-list)  | Input: Item id value **0x00**-**0xC6**  |
 | Byte   | 1    | Required                                                                    | Amount needed                           |
 | Byte   | 1    | [Output\_Item\_ID](https://github.com/HobbitDur/FF8GameData/wiki#item-list) | Output: Item id value **0x00**-**0xC6** |
@@ -115,7 +117,8 @@ Each m00x file has a specific number of entries, which are listed here.
 |--------|------|--------------------------------------------------------------------------------|------------------------------------------|
 | UInt16 | 2    | Offset                                                                         | Offset to the string                     
 | Byte   | 1    | Received                                                                       | Amount received                          |
-| UInt16 | 2    | UNK                                                                            | {0x0001}                                 |
+| Byte   | 1    | UNK | Always 0 |
+| Byte   | 1    | Level | [Required GF level](#required-gf-level): 1, or 100 for two m001 refines |
 | Byte   | 1    | [Input\_Spell\_ID](https://github.com/HobbitDur/FF8GameData/wiki#magic-items)  | Input: Spell id value **0x01**-**0x38**  |
 | Byte   | 1    | Required                                                                       | Amount needed                            |
 | Byte   | 1    | [Output\_Spell\_ID](https://github.com/HobbitDur/FF8GameData/wiki#magic-items) | Output: Spell id value **0x01**-**0x38** |
@@ -138,7 +141,8 @@ Each m00x file has a specific number of entries, which are listed here.
 |--------|------|-----------------------------------------------------------------------------|-----------------------------------------|
 | UInt16 | 2    | Offset                                                                      | Offset to the string                    
 | Byte   | 1    | Received                                                                    | Amount received                         |
-| UInt16 | 2    | UNK                                                                         | {0x0001}                                |
+| Byte   | 1    | UNK | Always 0 |
+| Byte   | 1    | Level | [Required GF level](#required-gf-level): 1, or 100 for two m001 refines |
 | Byte   | 1    | [Input\_Item\_ID](https://github.com/HobbitDur/FF8GameData/wiki#item-list)  | Input: Item id value **0x00**-**0xC6**  |
 | Byte   | 1    | Required                                                                    | Amount needed                           |
 | Byte   | 1    | [Output\_Item\_ID](https://github.com/HobbitDur/FF8GameData/wiki#item-list) | Output: Item id value **0x00**-**0xC6** |
@@ -161,10 +165,24 @@ Each m00x file has a specific number of entries, which are listed here.
 |--------|------|---------------------------------------------------------------------|---------------------------------|
 | UInt16 | 2    | Offset                                                              | Offset to the string            
 | Byte   | 1    | Received                                                            | Amount received                 |
-| UInt16 | 2    | UNK                                                                 | {0x0001}                        |
+| Byte   | 1    | UNK | Always 0 |
+| Byte   | 1    | Level | [Required GF level](#required-gf-level): 1, or 100 for two m001 refines |
 | Byte   | 1    | Card\_ID                                                            | Card id value **0x00**-**0x6D** |
 | Byte   | 1    | Required                                                            | Amount needed                   |
 | Byte   | 1    | [Item\_ID](https://github.com/HobbitDur/FF8GameData/wiki#item-list) | Item id value **0x00**-**0xC6** |
+
+# Required GF level
+
+Entry byte 0x04 is the GF level a refine needs. When the refine menu opens, `Menu_Prog19_RefineMenu_Init` looks through every GF that exists and has learned the selected refine ability, and keeps the highest level among them. A refine is offered only when that level is at least the entry's level byte; otherwise it is shown as not available, like an entry without enough input items.
+
+Every vanilla entry has level 1 except two in m001.bin:
+
+| Ability       | Entry (file index) | Refine                          | Level |
+|---------------|--------------------|---------------------------------|-------|
+| Tool-RF       | 141                | 100 Curse Spike -> 1 Dark Matter | 100   |
+| Forbid Med-RF | 56                 | 10 Shaman Stone -> 1 Hero-trial  | 100   |
+
+The PC executable still computes the highest GF level but discards it: it stores a fixed 100 as the refine level, so every refine is available at any GF level and the level byte has no effect. Storing the computed level instead restores the check (an 18-byte in-place patch at the store; FF8 Gameplay Customizer's Archeology > Refine GF level option does it). The debug flag read by the battle hidden-debug code still forces level 100.
 
 # MSG
 
@@ -176,3 +194,6 @@ classic [FF8 String]({{site.baseurl}}/FF8/TechnicalReference/Miscellaneous/FF8St
 | Function | Address | Description |
 |---|---|---|
 | `Menu_Prog19_RefineMenu_Init` | 0x4D7180 | Refine menu program init; loads the m00x mngrp copies |
+| Highest GF level loop | 0x4D7210 | Highest level among GFs that learned the refine ability, kept at [esp+10h] |
+| Refine level store | 0x4D726A | Stores the refine level (task+0x47); the PC exe writes a constant 100 here |
+| Refine menu update | 0x4D7410 | Compares the refine level `>=` entry byte 0x04 for each entry |
