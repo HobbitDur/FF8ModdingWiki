@@ -61,8 +61,7 @@ Each m00x file has a specific number of entries, which are listed here.
 | Type   | Size | Value                                                                          | Description                              |
 |--------|------|--------------------------------------------------------------------------------|------------------------------------------|
 | UInt16 | 2    | Offset                                                                         | Offset to the string                     
-| Byte   | 1    | Received                                                                       | Amount received                          |
-| Byte   | 1    | UNK | Always 0 |
+| UInt16 | 2    | Received | Amount received (the refine and its menu window read 2 bytes; the result is capped at 100) |
 | Byte   | 1    | Level | [Required GF level](#required-gf-level): 1, or 100 for two m001 refines |
 | Byte   | 1    | [Input\_Item\_ID](https://github.com/HobbitDur/FF8GameData/wiki#item-list)     | Input: Item id value **0x00**-**0xC6**   |
 | Byte   | 1    | Required                                                                       | Amount needed                            |
@@ -91,8 +90,7 @@ Each m00x file has a specific number of entries, which are listed here.
 | Type   | Size | Value                                                                       | Description                             |
 |--------|------|-----------------------------------------------------------------------------|-----------------------------------------|
 | UInt16 | 2    | Offset                                                                      | Offset to the string                    
-| Byte   | 1    | Received                                                                    | Amount received                         |
-| Byte   | 1    | UNK | Always 0 |
+| UInt16 | 2    | Received | Amount received (the refine and its menu window read 2 bytes; the result is capped at 100) |
 | Byte   | 1    | Level | [Required GF level](#required-gf-level): 1, or 100 for two m001 refines |
 | Byte   | 1    | [Input\_Item\_ID](https://github.com/HobbitDur/FF8GameData/wiki#item-list)  | Input: Item id value **0x00**-**0xC6**  |
 | Byte   | 1    | Required                                                                    | Amount needed                           |
@@ -116,8 +114,7 @@ Each m00x file has a specific number of entries, which are listed here.
 | Type   | Size | Value                                                                          | Description                              |
 |--------|------|--------------------------------------------------------------------------------|------------------------------------------|
 | UInt16 | 2    | Offset                                                                         | Offset to the string                     
-| Byte   | 1    | Received                                                                       | Amount received                          |
-| Byte   | 1    | UNK | Always 0 |
+| UInt16 | 2    | Received | Amount received (the refine and its menu window read 2 bytes; the result is capped at 100) |
 | Byte   | 1    | Level | [Required GF level](#required-gf-level): 1, or 100 for two m001 refines |
 | Byte   | 1    | [Input\_Spell\_ID](https://github.com/HobbitDur/FF8GameData/wiki#magic-items)  | Input: Spell id value **0x01**-**0x38**  |
 | Byte   | 1    | Required                                                                       | Amount needed                            |
@@ -140,8 +137,7 @@ Each m00x file has a specific number of entries, which are listed here.
 | Type   | Size | Value                                                                       | Description                             |
 |--------|------|-----------------------------------------------------------------------------|-----------------------------------------|
 | UInt16 | 2    | Offset                                                                      | Offset to the string                    
-| Byte   | 1    | Received                                                                    | Amount received                         |
-| Byte   | 1    | UNK | Always 0 |
+| UInt16 | 2    | Received | Amount received (the refine and its menu window read 2 bytes; the result is capped at 100) |
 | Byte   | 1    | Level | [Required GF level](#required-gf-level): 1, or 100 for two m001 refines |
 | Byte   | 1    | [Input\_Item\_ID](https://github.com/HobbitDur/FF8GameData/wiki#item-list)  | Input: Item id value **0x00**-**0xC6**  |
 | Byte   | 1    | Required                                                                    | Amount needed                           |
@@ -164,8 +160,7 @@ Each m00x file has a specific number of entries, which are listed here.
 | Type   | Size | Value                                                               | Description                     |
 |--------|------|---------------------------------------------------------------------|---------------------------------|
 | UInt16 | 2    | Offset                                                              | Offset to the string            
-| Byte   | 1    | Received                                                            | Amount received                 |
-| Byte   | 1    | UNK | Always 0 |
+| UInt16 | 2    | Received | Amount received (the refine and its menu window read 2 bytes; the result is capped at 100) |
 | Byte   | 1    | Level | [Required GF level](#required-gf-level): 1, or 100 for two m001 refines |
 | Byte   | 1    | Card\_ID                                                            | Card id value **0x00**-**0x6D** |
 | Byte   | 1    | Required                                                            | Amount needed                   |
