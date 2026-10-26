@@ -3,6 +3,7 @@ layout: default
 parent: GF Refinement
 title: Refine abilities
 permalink: /technical-reference/menu/gf-refinement/refine-abilities/
+author: HobbitDur
 ---
 
 
@@ -35,7 +36,9 @@ There is 5 bin files:
 * m004.bin
 
 m00x.bin files contains offsets of [strings](#msg) and actual values for Refine Abilities.
-Each m00x file has a specific number of entries, which are listed here.
+A m00x.bin file is one flat list of entries: which entries each refine ability offers is not in the file
+but in [kernel.bin's menu abilities]({{site.baseurl}}/FF8/TechnicalReference/Main/Kernel/18_Menu-abilities)
+(see [Recipe slices and limits](#recipe-slices-and-limits)). The tables below are the vanilla kernel.bin's slices.
 
 ## m000.bin
 
@@ -179,6 +182,31 @@ Every vanilla entry has level 1 except two in m001.bin:
 
 The PC executable still computes the highest GF level but discards it: it stores a fixed 100 as the refine level, so every refine is available at any GF level and the level byte has no effect. Storing the computed level instead restores the check (an 18-byte in-place patch at the store; FF8 Gameplay Customizer's Archeology > Refine GF level option does it). The debug flag read by the battle hidden-debug code still forces level 100.
 
+# Recipe slices and limits
+
+A refine ability takes its recipes from a slice of one table. Its menu ability entry in kernel.bin holds the
+table (byte 0x05, 0-4 = m000-m004) and the first and last entry of the slice (bytes 0x06 and 0x07, inclusive).
+`Menu_Prog19_RefineMenu_Init` sets the entry count to `last - first + 1` and points the list at
+`Menu_RefineEntryBuffer + 8 * first`. Abilities of the same table do not need to follow the file order:
+vanilla Tool-RF (4th refine ability of m001 in kernel.bin) offers entries 111-142, the end of m001.bin.
+
+The refine screen lists the player's items (Card Mod: the owned cards), not the recipes. For the highlighted
+item, the menu takes the first entry of the slice whose input is that item, so each input has at most one recipe per
+ability: a later entry with the same input never shows.
+
+Adding a recipe means inserting an entry and its text, then moving the first/last bytes of every ability of that
+table whose slice starts or ends after it. Nothing else in the executable depends on the counts:
+
+| Limit                     | Value        | Reason                                                                      |
+|---------------------------|--------------|-----------------------------------------------------------------------------|
+| Entries per table         | 256          | `Menu_RefineEntryBuffer` is 0x800 bytes, `Menu_RefineOwnedCardList` follows |
+| Entries per ability       | 255          | The entry count of the refine task is one byte                              |
+| First / last entry        | 0-255        | One byte each in kernel.bin                                                 |
+| Text per table (m00x.msg) | 0x5000 bytes | `Menu_RefineTextBuffer` runs up to `Menu_RefineEntryBuffer`                 |
+
+In mngrp.bin each section is padded with zeros to a multiple of 2048 bytes (the size in mngrphd.bin includes the
+padding), so a m00x.bin section ends at its last entry that is not all zeros.
+
 # MSG
 
 Text offsets are in [bin](#BIN) files, and are
@@ -186,9 +214,12 @@ classic [FF8 String]({{site.baseurl}}/FF8/TechnicalReference/Miscellaneous/FF8St
 
 ## Function addresses
 
-| Function | Address | Description |
-|---|---|---|
-| `Menu_Prog19_RefineMenu_Init` | 0x4D7180 | Refine menu program init; loads the m00x mngrp copies |
-| Highest GF level loop | 0x4D7210 | Highest level among GFs that learned the refine ability, kept at [esp+10h] |
-| Refine level store | 0x4D726A | Stores the refine level (task+0x47); the PC exe writes a constant 100 here |
-| Refine menu update | 0x4D7410 | Compares the refine level `>=` entry byte 0x04 for each entry |
+| Function                      | Address   | Description                                                                 |
+|-------------------------------|-----------|-----------------------------------------------------------------------------|
+| `Menu_Prog19_RefineMenu_Init` | 0x4D7180  | Refine menu program init; loads the m00x mngrp copies                       |
+| Highest GF level loop         | 0x4D7210  | Highest level among GFs that learned the refine ability, kept at [esp+10h] |
+| Refine level store            | 0x4D726A  | Stores the refine level (task+0x47); the PC exe writes a constant 100 here |
+| Refine menu update            | 0x4D7410  | Compares the refine level `>=` entry byte 0x04 for each entry               |
+| `Menu_RefineTextBuffer`       | 0x1D85864 | m00x.msg of the open refine table (0x5000 bytes)                            |
+| `Menu_RefineEntryBuffer`      | 0x1D8A864 | m00x.bin of the open refine table (0x800 bytes)                             |
+| `Menu_RefineOwnedCardList`    | 0x1D8B064 | Card Mod's list of owned cards, right after the entry buffer                |
