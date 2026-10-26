@@ -276,129 +276,140 @@ List of possible values:
 
 ### Icons
 
-Hex value: 0x0e
+Hex value: 0x05
+
+The parameter byte selects a sprite of `icon.sp1` (menu icons, drawn from `icon.tex`). `Text_RenderGlyphs` resolves it as follows:
+
+| Parameter | Sprite drawn |
+|-----------|--------------|
+| 0x00-0x1F | 0 (the hand cursor) |
+| 0x20-0x2F | 128 + the controller button bound to key-config entry `param - 0x20` (follows the player's button setup) |
+| 0x30-0x3F | `param + 80`: fixed controller buttons 128-143 |
+| 0x40-0x7E | looked up in `TEXT_ICON_CODE_TO_SPRITE` (63 entries) |
+| 0x7F-0xFF | read past the end of that table: not valid icons |
+
+Codes 0x53-0x59 and 0x5A-0x5C draw status sprites a second time (0x5A-0x5C all draw the Death sprite); the game text uses the 0x65-0x71 set. Code 0x47 (sprite 218) is not used by the kernel, menu (mngrp) or world text. Sprite 213 (a small yellow star) has no code, so text cannot draw it.
+
 List of possible values:
 
-| Hex value | Char                     | Size |
-|-----------|--------------------------|------|
-| 0x0500    | {Selector}               | 2    |
-| 0x0501    | {Selector}               | 2    |
-| 0x0502    | {Selector}               | 2    |
-| 0x0503    | {Selector}               | 2    |
-| 0x0504    | {Selector}               | 2    |
-| 0x0505    | {Selector}               | 2    |
-| 0x0511    | {Selector}               | 2    |
-| 0x0512    | {Selector}               | 2    |
-| 0x0513    | {Selector}               | 2    |
-| 0x0514    | {Selector}               | 2    |
-| 0x0515    | {Selector}               | 2    |
-| 0x0516    | {Selector}               | 2    |
-| 0x0517    | {Selector}               | 2    |
-| 0x0518    | {Selector}               | 2    |
-| 0x0519    | {Selector}               | 2    |
-| 0x051a    | {Selector}               | 2    |
-| 0x051b    | {Selector}               | 2    |
-| 0x051c    | {Selector}               | 2    |
-| 0x051d    | {Selector}               | 2    |
-| 0x051e    | {Selector}               | 2    |
-| 0x051f    | {Selector}               | 2    |
-| 0x0520    | {L2}                     | 2    |
-| 0x0521    | {R2}                     | 2    |
-| 0x0522    | {L1}                     | 2    |
-| 0x0523    | {R1}                     | 2    |
-| 0x0524    | {Circle}                 | 2    |
-| 0x0525    | {Triangle}               | 2    |
-| 0x0526    | {X}                      | 2    |
-| 0x0527    | {Square}                 | 2    |
-| 0x0528    | {SELECT}                 | 2    |
-| 0x0529    | {0x0529:None}            | 2    |
-| 0x052a    | {0x052a:None}            | 2    |
-| 0x052b    | {START}                  | 2    |
-| 0x052c    | {CrossTop}               | 2    |
-| 0x052d    | {CrossRight}             | 2    |
-| 0x052e    | {CrossDown}              | 2    |
-| 0x052f    | {CrossLeft}              | 2    |
-| 0x0530    | {L2}                     | 2    |
-| 0x0531    | {R2}                     | 2    |
-| 0x0532    | {L1}                     | 2    |
-| 0x0533    | {R1}                     | 2    |
-| 0x0534    | {Circle}                 | 2    |
-| 0x0535    | {Triangle}               | 2    |
-| 0x0536    | {X}                      | 2    |
-| 0x0537    | {Square}                 | 2    |
-| 0x0538    | {SELECT}                 | 2    |
-| 0x0539    | {0x0539:None}            | 2    |
-| 0x053a    | {0x053a:None}            | 2    |
-| 0x053b    | {START}                  | 2    |
-| 0x053c    | {CrossTop}               | 2    |
-| 0x053d    | {CrossRight}             | 2    |
-| 0x053e    | {CrossDown}              | 2    |
-| 0x053f    | {CrossLeft}              | 2    |
-| 0x0540    | {0x0540:None}            | 2    |
-| 0x0541    | {MagicJunctioned}        | 2    |
-| 0x0542    | {LimitBreakArrow}        | 2    |
-| 0x0543    | {GreenStar}              | 2    |
-| 0x0544    | {YellowStar(InMainTeam)} | 2    |
-| 0x0545    | {JunctionAbility}        | 2    |
-| 0x0546    | {CommandAbility}         | 2    |
-| 0x0547    | {CharacterAbility}       | 2    |
-| 0x0548    | {CharacterAbility}       | 2    |
-| 0x0549    | {PartyAbility}           | 2    |
-| 0x054a    | {GFAbility}              | 2    |
-| 0x054b    | {MenuAbility}            | 2    |
-| 0x054c    | {Potion}                 | 2    |
-| 0x054d    | {GFPotion}               | 2    |
-| 0x054e    | {TentItem}               | 2    |
-| 0x054f    | {MagicStoneItem}         | 2    |
-| 0x0550    | {PistolItem}             | 2    |
-| 0x0551    | {BookItem}               | 2    |
-| 0x0552    | {RockItem}               | 2    |
-| 0x0553    | {Dead}                   | 2    |
-| 0x0554    | {PoisonStatus}           | 2    |
-| 0x0555    | {Petrify}                | 2    |
-| 0x0556    | {Darkness}               | 2    |
-| 0x0557    | {Silence}                | 2    |
-| 0x0558    | {Berserk}                | 2    |
-| 0x0559    | {Zombie}                 | 2    |
-| 0x055a    | {Death}                  | 2    |
-| 0x055b    | {Death}                  | 2    |
-| 0x055c    | {Death}                  | 2    |
-| 0x055d    | {Fire}                   | 2    |
-| 0x055e    | {Ice}                    | 2    |
-| 0x055f    | {Thunder}                | 2    |
-| 0x0560    | {Earth}                  | 2    |
-| 0x0561    | {PoisonType}             | 2    |
-| 0x0562    | {Wind}                   | 2    |
-| 0x0563    | {Water}                  | 2    |
-| 0x0564    | {Holy}                   | 2    |
-| 0x0565    | {Death}                  | 2    |
-| 0x0566    | {PoisonStatus}           | 2    |
-| 0x0567    | {Petrify}                | 2    |
-| 0x0568    | {Darkness}               | 2    |
-| 0x0569    | {Silence}                | 2    |
-| 0x056a    | {Berserk}                | 2    |
-| 0x056b    | {Zombie}                 | 2    |
-| 0x056c    | {Sleep}                  | 2    |
-| 0x056d    | {Slow}                   | 2    |
-| 0x056e    | {Stop}                   | 2    |
-| 0x056f    | {Curse}                  | 2    |
-| 0x0570    | {Confuse}                | 2    |
-| 0x0571    | {Drain}                  | 2    |
-| 0x0572    | {StatusAttackYellow}     | 2    |
-| 0x0573    | {StatusDefenseYellow}    | 2    |
-| 0x0574    | {ElementalAttackYellow}  | 2    |
-| 0x0575    | {ElementalDefenseYellow} | 2    |
-| 0x0576    | {HPYellow}               | 2    |
-| 0x0577    | {StrengthYellow}         | 2    |
-| 0x0578    | {VitalityYellow}         | 2    |
-| 0x0579    | {MagicYellow}            | 2    |
-| 0x057a    | {SpiritYellow}           | 2    |
-| 0x057b    | {SpeedYellow}            | 2    |
-| 0x057c    | {EvadeYellow}            | 2    |
-| 0x057d    | {HitYellow}              | 2    |
-| 0x057e    | {LuckYellow}             | 2    |
-| 0x057f    | {Selector}               | 2    |
-| 0x0580    | {LimitBreakArrow}        | 2    |
+| Hex value | Char                     | Sprite           | Size |
+|-----------|--------------------------|------------------|------|
+| 0x0500    | {Selector}               | 0                | 2    |
+| 0x0501    | {Selector}               | 0                | 2    |
+| 0x0502    | {Selector}               | 0                | 2    |
+| 0x0503    | {Selector}               | 0                | 2    |
+| 0x0504    | {Selector}               | 0                | 2    |
+| 0x0505    | {Selector}               | 0                | 2    |
+| 0x0511    | {Selector}               | 0                | 2    |
+| 0x0512    | {Selector}               | 0                | 2    |
+| 0x0513    | {Selector}               | 0                | 2    |
+| 0x0514    | {Selector}               | 0                | 2    |
+| 0x0515    | {Selector}               | 0                | 2    |
+| 0x0516    | {Selector}               | 0                | 2    |
+| 0x0517    | {Selector}               | 0                | 2    |
+| 0x0518    | {Selector}               | 0                | 2    |
+| 0x0519    | {Selector}               | 0                | 2    |
+| 0x051a    | {Selector}               | 0                | 2    |
+| 0x051b    | {Selector}               | 0                | 2    |
+| 0x051c    | {Selector}               | 0                | 2    |
+| 0x051d    | {Selector}               | 0                | 2    |
+| 0x051e    | {Selector}               | 0                | 2    |
+| 0x051f    | {Selector}               | 0                | 2    |
+| 0x0520    | {L2}                     | 128 + key config | 2    |
+| 0x0521    | {R2}                     | 128 + key config | 2    |
+| 0x0522    | {L1}                     | 128 + key config | 2    |
+| 0x0523    | {R1}                     | 128 + key config | 2    |
+| 0x0524    | {Circle}                 | 128 + key config | 2    |
+| 0x0525    | {Triangle}               | 128 + key config | 2    |
+| 0x0526    | {X}                      | 128 + key config | 2    |
+| 0x0527    | {Square}                 | 128 + key config | 2    |
+| 0x0528    | {SELECT}                 | 128 + key config | 2    |
+| 0x0529    | {0x0529:None}            | 128 + key config | 2    |
+| 0x052a    | {0x052a:None}            | 128 + key config | 2    |
+| 0x052b    | {START}                  | 128 + key config | 2    |
+| 0x052c    | {CrossTop}               | 128 + key config | 2    |
+| 0x052d    | {CrossRight}             | 128 + key config | 2    |
+| 0x052e    | {CrossDown}              | 128 + key config | 2    |
+| 0x052f    | {CrossLeft}              | 128 + key config | 2    |
+| 0x0530    | {L2}                     | 128              | 2    |
+| 0x0531    | {R2}                     | 129              | 2    |
+| 0x0532    | {L1}                     | 130              | 2    |
+| 0x0533    | {R1}                     | 131              | 2    |
+| 0x0534    | {Circle}                 | 132              | 2    |
+| 0x0535    | {Triangle}               | 133              | 2    |
+| 0x0536    | {X}                      | 134              | 2    |
+| 0x0537    | {Square}                 | 135              | 2    |
+| 0x0538    | {SELECT}                 | 136              | 2    |
+| 0x0539    | {0x0539:None}            | 137              | 2    |
+| 0x053a    | {0x053a:None}            | 138              | 2    |
+| 0x053b    | {START}                  | 139              | 2    |
+| 0x053c    | {CrossTop}               | 140              | 2    |
+| 0x053d    | {CrossRight}             | 141              | 2    |
+| 0x053e    | {CrossDown}              | 142              | 2    |
+| 0x053f    | {CrossLeft}              | 143              | 2    |
+| 0x0540    | {Blank}                  | 7                | 2    |
+| 0x0541    | {JunctionedMagic}        | 192              | 2    |
+| 0x0542    | {LimitArrow}             | 6                | 2    |
+| 0x0543    | {AbsorbStar}             | 175              | 2    |
+| 0x0544    | {WhiteStar}              | 214              | 2    |
+| 0x0545    | {AbilityJunction}        | 216              | 2    |
+| 0x0546    | {AbilityCommand}         | 217              | 2    |
+| 0x0547    | {0x0547:Unknown}         | 218              | 2    |
+| 0x0548    | {AbilityCharacter}       | 219              | 2    |
+| 0x0549    | {AbilityParty}           | 220              | 2    |
+| 0x054a    | {AbilityGF}              | 221              | 2    |
+| 0x054b    | {AbilityMenu}            | 222              | 2    |
+| 0x054c    | {ItemRecovery}           | 223              | 2    |
+| 0x054d    | {ItemGF}                 | 224              | 2    |
+| 0x054e    | {ItemFullRestore}        | 225              | 2    |
+| 0x054f    | {ItemBattle}             | 226              | 2    |
+| 0x0550    | {ItemAmmo}               | 227              | 2    |
+| 0x0551    | {ItemMagazine}           | 228              | 2    |
+| 0x0552    | {ItemMisc}               | 229              | 2    |
+| 0x0553    | {0x0553:StatusDeath}     | 272              | 2    |
+| 0x0554    | {0x0554:StatusPoison}    | 273              | 2    |
+| 0x0555    | {0x0555:StatusPetrify}   | 274              | 2    |
+| 0x0556    | {0x0556:StatusDarkness}  | 275              | 2    |
+| 0x0557    | {0x0557:StatusSilence}   | 276              | 2    |
+| 0x0558    | {0x0558:StatusBerserk}   | 277              | 2    |
+| 0x0559    | {0x0559:StatusZombie}    | 278              | 2    |
+| 0x055a    | {0x055a:StatusDeath}     | 272              | 2    |
+| 0x055b    | {0x055b:StatusDeath}     | 272              | 2    |
+| 0x055c    | {0x055c:StatusDeath}     | 272              | 2    |
+| 0x055d    | {ElementFire}            | 288              | 2    |
+| 0x055e    | {ElementIce}             | 289              | 2    |
+| 0x055f    | {ElementThunder}         | 290              | 2    |
+| 0x0560    | {ElementEarth}           | 291              | 2    |
+| 0x0561    | {ElementPoison}          | 292              | 2    |
+| 0x0562    | {ElementWind}            | 293              | 2    |
+| 0x0563    | {ElementWater}           | 294              | 2    |
+| 0x0564    | {ElementHoly}            | 295              | 2    |
+| 0x0565    | {StatusDeath}            | 272              | 2    |
+| 0x0566    | {StatusPoison}           | 273              | 2    |
+| 0x0567    | {StatusPetrify}          | 274              | 2    |
+| 0x0568    | {StatusDarkness}         | 275              | 2    |
+| 0x0569    | {StatusSilence}          | 276              | 2    |
+| 0x056a    | {StatusBerserk}          | 277              | 2    |
+| 0x056b    | {StatusZombie}           | 278              | 2    |
+| 0x056c    | {StatusSleep}            | 279              | 2    |
+| 0x056d    | {StatusSlow}             | 280              | 2    |
+| 0x056e    | {StatusStop}             | 281              | 2    |
+| 0x056f    | {StatusCurse}            | 282              | 2    |
+| 0x0570    | {StatusConfuse}          | 283              | 2    |
+| 0x0571    | {StatusDrain}            | 284              | 2    |
+| 0x0572    | {JunctionStatusAttack}   | 296              | 2    |
+| 0x0573    | {JunctionStatusDefense}  | 297              | 2    |
+| 0x0574    | {JunctionElementAttack}  | 298              | 2    |
+| 0x0575    | {JunctionElementDefense} | 299              | 2    |
+| 0x0576    | {StatHP}                 | 304              | 2    |
+| 0x0577    | {StatStr}                | 305              | 2    |
+| 0x0578    | {StatVit}                | 306              | 2    |
+| 0x0579    | {StatMag}                | 307              | 2    |
+| 0x057a    | {StatSpr}                | 308              | 2    |
+| 0x057b    | {StatSpd}                | 309              | 2    |
+| 0x057c    | {StatEva}                | 310              | 2    |
+| 0x057d    | {StatHit}                | 311              | 2    |
+| 0x057e    | {StatLuck}               | 312              | 2    |
 
 ### Colors
 
@@ -613,6 +624,7 @@ base `0x400000`). Addresses are given for reference only.
 | `ProcessBattleTextExpansion`     | 0x4B8B30    | Expands a raw string: resolves names/vars/items/GF/location into displayable text. |
 | `Text_FetchNextToken`            | 0x4B9170    | Tokenizer: returns the next glyph or `(opcode<<8)\|param` control token.          |
 | `Text_RenderGlyphs`              | 0x4A1570    | Main glyph layout/rendering from the tokenized line.                             |
+| `TEXT_ICON_CODE_TO_SPRITE`      | 0xB86E04    | `0x05` icon codes 0x40-0x7E to `icon.sp1` sprite ids (UInt16 each).               |
 | `someStringWork_4B8E40`          | 0x4B8E40    | Resolves the `0x04` Var opcode (numeric variable slots, decimal/hex formats).    |
 | `Menu_SeedTest_ParseCursorStops` | 0x4D4A80    | Parses `0x0B` cursor stops and expands the `0x0A` context values for the SeeD test. |
 | `Menu_SeedTest_Update`           | 0x4D4D30    | SeeD written test state machine; fills the `0x0A` value slots below.             |
