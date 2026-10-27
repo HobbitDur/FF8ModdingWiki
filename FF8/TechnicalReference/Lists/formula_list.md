@@ -2,6 +2,7 @@
 layout: default
 title: Formula
 parent: List
+author: HobbitDur
 permalink: /technical-reference/list/formula/
 ---
 
@@ -516,11 +517,140 @@ $$
 \text{NumberMagDraw} = \frac{\left( \frac{\text{CharaLvl} - \text{MonsterLvl} + 10}{2} - \text{MagicDrawResist} + [1..32] + \text{MagChara} \right)}{5} - \text{MagicQuantity}
 $$
 
-# Crisis level
+# Limit Break {#limit-break}
+
+A character can use a Limit Break when their **crisis level** is 1 to 4. The crisis level is
+rolled by `Battle_ComputeCrisisLevelAndLimitFlag`, which stores it in the character's battle
+slot (`crisis_level`) and sets or clears the Limit Break flag of their command list. Crisis
+level 0 means no Limit Break.
+
+## Crisis level {#crisis-level}
 
 $$
-\text{CrisisValue} = \frac{15300 \times \text{CrisisLevel}}{255}
+N = 10 \times \left(\text{StatusSum} + 4 \times (5 \times \text{DeadAllies} + 40)\right)
+- \left\lfloor \frac{10 \times \text{HPMult} \times \text{CurrentHP}}{\text{MaxHP}} \right\rfloor
 $$
+
+$$
+\text{CrisisLevel} = \text{clamp}\left( \left\lfloor \frac{N}{[0..255] + 160} \right\rfloor - 4,\ 0,\ 4 \right)
+$$
+
+Expanded, `N = 10 × StatusSum + 1600 + 200 × DeadAllies − ⌊10 × HPMult × CurrentHP / MaxHP⌋`.
+All divisions truncate. Any result below 1 gives 0, any result above 4 gives 4.
+
+| Term         | Source                                                                                                                                                                                                                                              |
+|--------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `StatusSum`  | Sum of the [Misc section]({{site.baseurl}}/technical-reference/main/kernel/misc/) limit-effect bytes (offsets 0x10–0x2F) of every status the character currently has: the 8 Status 1 bits use 0x10–0x17, the 24 Status 2 bits use 0x18–0x2F |
+| `DeadAllies` | Number of active party slots (0–2) with the Death status                                                                                                                                                                                            |
+| `HPMult`     | The character's **Crisis level HP multiplier** (offset 0x02 in the [Characters section]({{site.baseurl}}/technical-reference/main/kernel/characters/))                                                                                              |
+| `CurrentHP`  | The character's current HP                                                                                                                                                                                                                          |
+| `MaxHP`      | The character's battle maximum HP                                                                                                                                                                                                                   |
+| `[0..255]`   | One `GetRandomInt` byte                                                                                                                                                                                                                             |
+
+Before the formula runs, three cases replace it:
+
+| Case                                                 | Crisis level          |
+|------------------------------------------------------|-----------------------|
+| `LINKED_CRISIS_LEVEL` is not 0                       | That value, unclamped |
+| The battle has the Limit Break seal (`MAP_SEAL` bit) | 0                     |
+| The character has **Curse**                          | 0                     |
+
+In the vanilla kernel, `HPMult` is **250** for every character except **Seifer (100)**. The
+non-zero vanilla limit effects are:
+
+| Status     | Misc offset | Value |
+|------------|-------------|-------|
+| Poison     | 0x11        | 30    |
+| Darkness   | 0x13        | 30    |
+| Silence    | 0x14        | 30    |
+| Slow       | 0x1A        | 15    |
+| Aura       | 0x20        | 200   |
+| Doom       | 0x22        | 45    |
+| Petrifying | 0x24        | 30    |
+| Confusion  | 0x26        | 30    |
+
+Each limit-effect point adds 10 to `N`, so Aura adds 2000 and each dead ally adds 200. The
+HP term removes up to `10 × HPMult` (2500 for a vanilla character other than Seifer) at full HP.
+
+## Chance to get a Limit Break {#limit-chance}
+
+The random byte is the only random part, so the chance comes from counting the bytes that
+reach each level. Crisis level is at least `k` when `N ≥ (k + 4) × (r + 160)`:
+
+$$
+P(\text{CrisisLevel} \ge k) = \frac{\text{clamp}\left( \left\lfloor \frac{N}{k+4} \right\rfloor - 159,\ 0,\ 256 \right)}{256}
+\qquad (k = 1..4)
+$$
+
+The chance to get a Limit Break is the `k = 1` case:
+
+$$
+P(\text{Limit}) = \frac{\text{clamp}\left( \left\lfloor \frac{N}{5} \right\rfloor - 159,\ 0,\ 256 \right)}{256}
+$$
+
+The chance of an exact level is `P(≥k) − P(≥k+1)`, with `P(≥5) = 0`.
+
+| Crisis level reached | Possible from `N ≥` | Guaranteed from `N ≥` |
+|----------------------|---------------------|-----------------------|
+| 1 (Limit Break)      | 800                 | 2075                  |
+| 2                    | 960                 | 2490                  |
+| 3                    | 1120                | 2905                  |
+| 4                    | 1280                | 3320                  |
+
+With no status and no dead ally, `N` never goes above 1600, so the chance is at most
+`161/256` (62.9%) even at 1 HP. A Limit Break is possible only when `CurrentHP / MaxHP ≤ 80 / HPMult`:
+**32%** of max HP for most characters, **80%** for Seifer.
+
+Examples (vanilla kernel, `MaxHP = 1000`, no dead ally). The level columns give the number of
+random bytes out of 256 that produce each crisis level:
+
+| Character    | Status | HP   | `N`  | Limit chance | CL1 | CL2 | CL3 | CL4 |
+|--------------|--------|------|------|--------------|-----|-----|-----|-----|
+| HPMult 250   | None   | 100% | -900 | 0%           | 0   | 0   | 0   | 0   |
+| HPMult 250   | None   | 50%  | 350  | 0%           | 0   | 0   | 0   | 0   |
+| HPMult 250   | None   | 25%  | 975  | 14.1%        | 33  | 3   | 0   | 0   |
+| HPMult 250   | None   | 10%  | 1350 | 43.4%        | 45  | 33  | 24  | 9   |
+| HPMult 250   | None   | 1%   | 1575 | 60.9%        | 53  | 37  | 29  | 37  |
+| HPMult 250   | Aura   | 100% | 1100 | 23.8%        | 37  | 24  | 0   | 0   |
+| HPMult 250   | Aura   | 75%  | 1725 | 72.7%        | 58  | 41  | 31  | 56  |
+| HPMult 250   | Aura   | 50%  | 2350 | 100%         | 24  | 56  | 42  | 134 |
+| Seifer (100) | None   | 100% | 600  | 0%           | 0   | 0   | 0   | 0   |
+| Seifer (100) | None   | 75%  | 850  | 4.3%         | 11  | 0   | 0   | 0   |
+| Seifer (100) | None   | 50%  | 1100 | 23.8%        | 37  | 24  | 0   | 0   |
+
+### When the roll happens
+
+The crisis level is rolled each time a character's command window opens
+(`BattleMenu_CommandWindow_Update` state 0, through `BattleCommandMenu_InitCommandSetAndLimitState`).
+This happens when the character's turn comes up and every time the player switches back to that
+character, so switching characters re-rolls the random byte and reads current HP and statuses
+again. The stored level stays until the next roll; the Limit Break action uses that stored
+value (Duel and Shot durations, Duel starting sequence, Renzokuken finisher roll).
+
+## Renzokuken finisher {#renzokuken-finisher}
+
+`Battle_RollRenzokukenFinisherFromCrisisLevel` decides whether a Renzokuken ends with a
+finisher, from the stored crisis level `CL`:
+
+$$
+T = \left\lfloor \frac{15300 \times \text{CL}}{255} \right\rfloor = 60 \times \text{CL}
+$$
+
+The finisher is used when `T ≠ 0` and `T ≥ [0..255]`, so:
+
+$$
+P(\text{Finisher}) = \frac{60 \times \text{CL} + 1}{256}
+$$
+
+| Crisis level | `T` | Finisher chance |
+|--------------|-----|-----------------|
+| 1            | 60  | 61/256 = 23.8%  |
+| 2            | 120 | 121/256 = 47.3% |
+| 3            | 180 | 181/256 = 70.7% |
+| 4            | 240 | 241/256 = 94.1% |
+
+The finisher itself is then picked by a second random roll among the ones enabled in the weapon's
+Renzokuken finisher bits.
 
 # Stat formula per level
 ## GF HP
@@ -549,43 +679,49 @@ $$
 
 Reverse-engineering addresses for the functions referenced above, for readers who want to look them up in the exe.
 
-| Function | Address |
-|---|---|
-| `ComputeMagicAndGFDamage` | 0x491ad0 |
-| `ComputeWithDamageSTRFormula` | 0x492c40 |
-| `computeAttackPhysical` | 0x492e10 |
-| `HpModifierComputationForPhysical` | 0x48f600 |
-| `Damage_RollCrit` | 0x492b30 |
-| `Battle_DamageGettingRelated` | 0x4922b0 |
-| `Battle_ApplyStatusWithResistRoll` | 0x48f9f0 |
-| `Damage_ComputeCurativeItemSpecial` | 0x493450 |
-| `Damage_ComputeCurativeMagic` | 0x493280 |
-| `GetReviveHP` | 0x491940 |
-| `computeLvlUpDown` | 0x493650 |
-| `Damage_ComputeFixedSpecial` | 0x4931c0 |
-| `Battle_RollCardCommand` | 0x48fba0 |
-| Devour dispatcher case (HP reads at `0x4926cf`) | 0x4926bc |
-| `computeDevour` | 0x48fc60 |
-| `isRandomNumeratorDenominator` | 0x48f0c0 |
-| `GetRandomInt` | 0x48f020 |
-| Devour HP/status follow-up in `Battle_applyDamage` | 0x490479 |
-| `Battle_CureStatusesAndSetFeedback` | 0x491820 |
-| `sub_4914E0` (status-infliction core) | 0x4914e0 |
-| `relatedToDevour` | 0x492220 |
-| `increaseCharaStatBy1` | 0x495f90 |
-| `sub_495F50` (permanent HP bonus) | 0x495f50 |
-| Scan dispatcher case | 0x4925a6 |
-| Angelo Search dispatcher case | 0x49284b |
-| Moogle Dance dispatcher case | 0x4928d3 |
-| `Stat_ComputeCharaMaxHP` | 0x496310 |
-| `Stat_ComputeCharaStat` | 0x496440 |
-| `CapTo255` | 0x495930 |
-| `computeMonsterHP` | 0x48c500 |
-| `Stat_ComputeMonsterStatCurve` | 0x48c3f0 |
-| `updateStatChange` | 0x48c1c0 |
-| `Stat_ComputeLevelFromExp` | 0x4961d0 |
-| `getGFhpForLvl` | 0x496120 |
-| `computeGFBattleStats` | 0x495e6b |
-| `getGFExpNeededForNextLevel` | 0x496080 |
+| Function                                           | Address   |
+|----------------------------------------------------|-----------|
+| `ComputeMagicAndGFDamage`                          | 0x491ad0  |
+| `ComputeWithDamageSTRFormula`                      | 0x492c40  |
+| `computeAttackPhysical`                            | 0x492e10  |
+| `HpModifierComputationForPhysical`                 | 0x48f600  |
+| `Damage_RollCrit`                                  | 0x492b30  |
+| `Battle_DamageGettingRelated`                      | 0x4922b0  |
+| `Battle_ApplyStatusWithResistRoll`                 | 0x48f9f0  |
+| `Damage_ComputeCurativeItemSpecial`                | 0x493450  |
+| `Damage_ComputeCurativeMagic`                      | 0x493280  |
+| `GetReviveHP`                                      | 0x491940  |
+| `computeLvlUpDown`                                 | 0x493650  |
+| `Damage_ComputeFixedSpecial`                       | 0x4931c0  |
+| `Battle_RollCardCommand`                           | 0x48fba0  |
+| Devour dispatcher case (HP reads at `0x4926cf`)    | 0x4926bc  |
+| `computeDevour`                                    | 0x48fc60  |
+| `isRandomNumeratorDenominator`                     | 0x48f0c0  |
+| `GetRandomInt`                                     | 0x48f020  |
+| Devour HP/status follow-up in `Battle_applyDamage` | 0x490479  |
+| `Battle_CureStatusesAndSetFeedback`                | 0x491820  |
+| `sub_4914E0` (status-infliction core)              | 0x4914e0  |
+| `relatedToDevour`                                  | 0x492220  |
+| `increaseCharaStatBy1`                             | 0x495f90  |
+| `sub_495F50` (permanent HP bonus)                  | 0x495f50  |
+| Scan dispatcher case                               | 0x4925a6  |
+| Angelo Search dispatcher case                      | 0x49284b  |
+| Moogle Dance dispatcher case                       | 0x4928d3  |
+| `Stat_ComputeCharaMaxHP`                           | 0x496310  |
+| `Stat_ComputeCharaStat`                            | 0x496440  |
+| `CapTo255`                                         | 0x495930  |
+| `computeMonsterHP`                                 | 0x48c500  |
+| `Stat_ComputeMonsterStatCurve`                     | 0x48c3f0  |
+| `updateStatChange`                                 | 0x48c1c0  |
+| `Battle_ComputeCrisisLevelAndLimitFlag`            | 0x4941f0  |
+| `BattleCommandMenu_InitCommandSetAndLimitState`    | 0x4bb910  |
+| `BattleMenu_CommandWindow_Update`                  | 0x4bb9e0  |
+| `Battle_RollRenzokukenFinisherFromCrisisLevel`     | 0x494190  |
+| Renzokuken finisher roll in `computeCommandAction` | 0x48de1f  |
+| `LINKED_CRISIS_LEVEL` (global)                     | 0x1cff838 |
+| `Stat_ComputeLevelFromExp`                         | 0x4961d0  |
+| `getGFhpForLvl`                                    | 0x496120  |
+| `computeGFBattleStats`                             | 0x495e6b  |
+| `getGFExpNeededForNextLevel`                       | 0x496080  |
 
 

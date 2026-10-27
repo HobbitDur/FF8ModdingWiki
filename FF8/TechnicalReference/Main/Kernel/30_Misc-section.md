@@ -3,6 +3,7 @@ layout: default
 title: Misc
 nav_order: 31
 parent: Kernel
+author: HobbitDur
 permalink: /technical-reference/main/kernel/misc/
 ---
 
@@ -68,7 +69,7 @@ faster and Slow ~2× slower.
 The 32 status limit effects at 0x10–0x2F are how much each active status contributes to a
 character's crisis/Limit-Break gauge, read by `Battle_ComputeCrisisLevelAndLimitFlag`. Every
 active status (across both Status 1 and Status 2) adds its byte here into one running total
-each frame:
+each time the character's command window opens:
 
 ```
 crisis = (10*(statusSum + 4*(5*deadAllies + 40)) - 10*crisisLevelHPMultiplier*curHP/maxHP)
@@ -79,6 +80,8 @@ Higher values push the crisis level (and so Limit Break availability) up faster;
 that status doesn't affect it at all. There's no term that lowers crisis level — every listed
 status only ever pushes it up, which is why Death/Poison/etc. all have a value here despite
 being harmful.
+
+The full formula and the resulting Limit Break chance are on the [formula page]({{site.baseurl}}/technical-reference/list/formula/#limit-break).
 
 | 0x0010 | 1 byte | Death Limit Effect                 |
 | 0x0011 | 1 byte | Poison Limit Effect                |

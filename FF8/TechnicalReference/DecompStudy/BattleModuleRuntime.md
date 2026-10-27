@@ -2,6 +2,7 @@
 layout: default
 title: Battle module runtime
 parent: Battle
+author: HobbitDur
 permalink: /technical-reference/battle/module-runtime/
 ---
 
@@ -50,7 +51,7 @@ crisis = (10×(statusSum + 4×(5×deadAllies + 40)) − 10×HPmod×curHP/maxHP)
          / (rand(0..255) + 160) − 4        → clamped to 0..4
 ```
 
-`statusSum` sums kernel Misc limit-effect bytes over the character's set status bits — **Aura** is by far the largest contributor; `HPmod` is the character's crisis-HP multiplier from kernel data; Curse (or a map seal) forces 0. The Limit command is then shown this turn when `60 × crisis ≥ rand(0..255)` — about 23% / 47% / 70% / 94% for levels 1–4.
+`statusSum` sums kernel Misc limit-effect bytes over the character's set status bits — **Aura** is by far the largest contributor; `HPmod` is the character's crisis-HP multiplier from kernel data; Curse (or a map seal) forces 0. A crisis level of 1–4 makes the Limit command available; it is rolled each time the character's command window opens. The `60 × crisis ≥ rand(0..255)` roll (about 24% / 47% / 71% / 94% for levels 1–4) is the Renzokuken finisher chance, not the Limit availability. See [Limit Break formulas]({{site.baseurl}}/technical-reference/list/formula/#limit-break).
 
 ## Command pipeline and targeting
 
@@ -74,7 +75,7 @@ Command menu → 12-byte selection buffer → `Battle_FlushMenuSelectionsToComma
 | `Battle_CalculateInitialATB` | 0x4844D0 | Starting ATB fill formula |
 | `Battle_SetMaxAtbFromBattleSpeed` | 0x484490 | Sets `max_atb` from the Battle Speed setting |
 | `Battle_ComputeCrisisLevelAndLimitFlag` | 0x4941F0 | Crisis level and Limit-availability formula |
-| `Battle_RollLimitCommandFromCrisisLevel` | 0x494190 | Rolls whether Limit is shown this turn |
+| `Battle_RollRenzokukenFinisherFromCrisisLevel` | 0x494190 | Rolls whether a Renzokuken ends with a finisher |
 | `Battle_FlushMenuSelectionsToCommandQueue` | 0x4BB610 | Flushes the menu selection buffer to the player command queue |
 | `BATTLE_SLOT_DATA` | 0x1D27B10 | Global variable/data, not a function — 8×208 B combatant slot array |
 | `mode_Battle_AnimationState` | 0x1CDBFE0 | Global variable/data, not a function — battle phase word |
