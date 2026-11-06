@@ -208,7 +208,7 @@ Squall, Zell, Irvine, Quistis, Rinoa, Selphie, Seifer, Edea. For each character:
 | 0x7C   | 2    | `script_vars` 2 bytes the wmset scripts test and set (FF2D, FF2E, FF30, FF31) |
 | 0x7E   | 2    | `u6[2]` (Unknown)                                                         |
 
-A position is `{ s32 x, s32 y, s16 height, u16 angle }`, with y stored negated and a full turn of the angle being 4096 (`World_SaveWorldmapStateToSavemap`).
+A position is `{ s32 x, s32 y, s16 height, u16 angle }`, a full turn of the angle being 4096 (`World_SaveWorldmapStateToSavemap`). On the map, x runs from -131072 to 131071 west to east and y from -98304 to 98303 north to south. Height is negative upward: the party stands at minus the ground height of `wmx.obj`, the game keeps cars and the Garden relative to the ground, and only the Ragnarok flies freely, up to -3584 (`World_ComputeVehicleAltitude`).
 
 Bits 0-7 of `script_bits` hold messages shown once: 0 car controls, 1 unused, 2 Garden controls, 3 chocobo controls, 4 Ragnarok controls, 5 Selphie's reminder of the Missile Base, 6 "This place looks...familiar" at Edea's house, 7 the Garden gauge going berserk. Bits 8-15 hold the PuPu quest: 8 and 9 unused, 10 Mandy Beach, 11 Winhill, 12 Trabia, 13 Kashkabald Desert, 14 UFO defeated, 15 PuPu defeated. In the rest, bits 17-19, 25, 27-29, 35-39, 49, 51-54 and 56-59 are unused.
 
