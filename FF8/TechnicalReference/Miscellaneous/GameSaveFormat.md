@@ -186,27 +186,31 @@ Squall, Zell, Irvine, Quistis, Rinoa, Selphie, Seifer, Edea. For each character:
 
 | Offset | Size | Data                                                                                                                         |
 |--------|------|------------------------------------------------------------------------------------------------------------------------------|
-| 0x00   | 12   | `char_pos[6]` (Character position: x, z, y, ?, ?, rotation (0->4095))                                                        |
-| 0x0C   | 12   | `uknown_pos1[6]` (Unknown position 1)                                                                                        |
-| 0x18   | 12   | `ragnarok_pos[6]` (Ragnarok position)                                                                                        |
-| 0x24   | 12   | `bgu_pos[6]` (Balamb Garden University position)                                                                             |
-| 0x30   | 12   | `car_pos[6]` (Car position)                                                                                                  |
-| 0x3C   | 12   | `uknown_pos2[6]` (Unknown position 2)                                                                                        |
-| 0x48   | 12   | `uknown_pos3[6]` (Unknown position 3)                                                                                        |
-| 0x54   | 12   | `uknown_pos4[6]` (Unknown position 4)                                                                                        |
-| 0x60   | 2    | `steps_related` (Steps related)                                                                                              |
-| 0x62   | 1    | `car_rent` (Car rent status)  0x00:forbidden ,0xFF:none,0x51:balamb1,0x52:balamb2,0x57:esthar                                |
-| 0x63   | 7    | `u1[7]` (Unknown, `u1[6]` = deep sea?)                                                                                       |
-| 0x6A   | 2    | `u2` (Always 0xFFFF?)                                                                                                        |
-| 0x6C   | 2    | `u3` (`u3[1]` = deep sea?)                                                                                                   |
-| 0x6E   | 1    | `disp_map_config` (0: none, 1: minisphere, 2: minimap)                                                                       |
-| 0x6F   | 1    | `u4` (Unknown)                                                                                                               |
-| 0x70   | 2    | `car_steps_related` (Car steps related)                                                                                      |
-| 0x72   | 2    | `car_steps_related2` (Car steps related)                                                                                     |
-| 0x74   | 1    | `vehicles_instructions_worldmap` Car,Unused,BGU,Chocobo,Hydre,???,???,Unused                                                 |
-| 0x75   | 1    | `koyok_quest` (Koyok quest flags)04 : Mandy Beach,Winhill,Trabia,Kashkabald Desert,UFO? Battu,80 : Koyo K Battu/Soigné/Mangé |
-| 0x76   | 8    | `obel_quest` (Obel quest flags)                                                                                              |
-| 0x7E   | 2    | `u6[2]` (Unknown)                                                                                                            |
+| 0x00   | 12   | `party_pos` Party position (see below)                                    |
+| 0x0C   | 12   | `party_pos2` Party position, second set. Selected by a flag that `FFWorldInit` clears and nothing sets, so never used |
+| 0x18   | 12   | `ragnarok_pos` Ragnarok position                                          |
+| 0x24   | 12   | `bgu_pos` Balamb Garden position                                          |
+| 0x30   | 12   | `car_pos` Rental car position                                             |
+| 0x3C   | 12   | `car_pos2` Rental car position, second set: never used, as above          |
+| 0x48   | 24   | Unused: no code reads it                                                  |
+| 0x60   | 2    | `camera_angle` Where the world map camera faces                           |
+| 0x62   | 1    | `car_rent` (Car rent status)  0x00:forbidden ,0xFF:none,0x51:balamb1,0x52:balamb2,0x57:esthar |
+| 0x63   | 1    | `car_rent2` Rent status of the second set: never used                     |
+| 0x64   | 5    | `u1` Unknown                                                              |
+| 0x69   | 1    | `vehicle` Vehicle in use when the world map was left                      |
+| 0x6A   | 2    | Set to 0xFFFF when the world map is left                                  |
+| 0x6C   | 1    | `camera_view` Camera view mode                                            |
+| 0x6D   | 1    | `world_flag` Bit 0 is what script condition FF21 tests                    |
+| 0x6E   | 1    | `disp_map_config` (0: none, 1: minisphere, 2: minimap)                    |
+| 0x6F   | 1    | `u4` (Unknown)                                                            |
+| 0x70   | 4    | Unused: no code reads it                                                  |
+| 0x74   | 8    | `script_bits` 64 bits the wmset scripts test and set (FF27, FF28), see below |
+| 0x7C   | 2    | `script_vars` 2 bytes the wmset scripts test and set (FF2D, FF2E, FF30, FF31) |
+| 0x7E   | 2    | `u6[2]` (Unknown)                                                         |
+
+A position is `{ s32 x, s32 y, s16 height, u16 angle }`, with y stored negated and a full turn of the angle being 4096 (`World_SaveWorldmapStateToSavemap`).
+
+Bits 0-7 of `script_bits` hold messages shown once: 0 car controls, 1 unused, 2 Garden controls, 3 chocobo controls, 4 Ragnarok controls, 5 Selphie's reminder of the Missile Base, 6 "This place looks...familiar" at Edea's house, 7 the Garden gauge going berserk. Bits 8-15 hold the PuPu quest: 8 and 9 unused, 10 Mandy Beach, 11 Winhill, 12 Trabia, 13 Kashkabald Desert, 14 UFO defeated, 15 PuPu defeated. In the rest, bits 17-19, 25, 27-29, 35-39, 49, 51-54 and 56-59 are unused.
 
 #### Obel quest flag
 
