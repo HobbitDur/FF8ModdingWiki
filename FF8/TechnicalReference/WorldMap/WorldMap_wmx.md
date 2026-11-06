@@ -21,15 +21,28 @@ One segment is 0x9000 or 36864 bytes long. There are 16 blocks in a segment. In 
 
 The game picks them from the world state flags: each flag covers a rectangle of map cells, listed as a pair of first and last cell (cell = row × 32 + column) in a table at 0xC763D0 in FF8_EN.exe, and a second table at 0xC763F0 gives each cell's replacement segment.
 
-| Flag | Cells     | Replacement segments | Place                                                       |
-|------|-----------|----------------------|-------------------------------------------------------------|
-| 0x01 | 373-572   | 768-823              | Esthar                                                      |
-| 0x02 | 149-150   | 824-825              | Not identified yet |
-| 0x04 | 267       | 826                  | Not identified yet |
-| 0x08 | 274-275   | 827-828              | Not identified yet |
-| 0x10 | 327       | 829                  | Not identified yet |
-| 0x20 | 214-247   | 830-833              | Not identified yet |
-| 0x40 | 361       | 834                  | D-District Prison: cell 361 has it sunk to its tower tops, segment 834 at full height. Field variable 264 bit 8 sets the flag. |
+| Flag | Cells   | Replacement segments | With the flag on                                                                 |
+|------|---------|----------------------|----------------------------------------------------------------------------------|
+| 0x01 | 373-572 | 768-823              | Esthar hidden: 48 of the 56 segments differ and the city's detail is gone        |
+| 0x02 | 149-150 | 824-825              | Nothing: Trabia Garden's cells, the segments are byte-identical                  |
+| 0x04 | 267     | 826                  | Galbadia Garden stands. Without it, its grounds are empty                        |
+| 0x08 | 274-275 | 827-828              | Balamb Garden stands. Without it, a crater                                       |
+| 0x10 | 327     | 829                  | Missile Base stands. Without it, rubble                                          |
+| 0x20 | 214-247 | 830-833              | Nothing: the segments are byte-identical                                         |
+| 0x40 | 361     | 834                  | D-District Prison at full height. Without it, only its tower tops show           |
+
+Field variable 266, the story phase, gives the flags, and field variable 264 bit 8 adds 0x40. The masks also set 0x80 and 0x100, which select no cell.
+
+| Phase | Mask  | Set by                                | What changes                           |
+|-------|-------|---------------------------------------|----------------------------------------|
+| 0     | 0x11D | Start of the game                     | Everything stands, Esthar hidden       |
+| 1     | 0x10D | `gmpark2`, story 482                  | Missile Base destroyed                 |
+| 2     | 0x101 | `bgsido_8`, story 570                 | Both Gardens leave their sites         |
+| 3     | 0x100 | `ewbrdg1`, story 1750                 | Esthar appears                         |
+| 4     | 0x180 | `ssspace2`, `eaplane1`                | No cell changes                        |
+
+Places were matched through the field entrances in wmset section 7: cell 267 leads to `ggview1`, 274-275 to `bggate_1`, 327 to `gmout1`, 361 to `gppark1`, and 149-150 to `tgview1`.
+
 
 ## Segment
 
