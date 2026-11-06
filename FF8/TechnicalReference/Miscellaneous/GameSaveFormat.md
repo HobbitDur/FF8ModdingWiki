@@ -99,7 +99,7 @@ PC steam version: Offsets start from at 384 (0x0180). File is compressed with LZ
 | 0x0D34 | 4 bytes             | Unknown                                                                             |
 | 0x0D38 | 4 bytes             | Party (last byte always = 255)                                                      |
 | 0x0D3C | 4 bytes             | Unknown                                                                             |
-| 0x0D40 | 2 bytes             | Module (1= field, 2= worldmap, 3= battle)                                           |
+| 0x0D40 | 2 bytes             | Module: 1 field, 2 world map. Saving writes no other value; loading reads 0 as 1 |
 | 0x0D42 | 2 bytes             | Current field                                                                       |
 | 0x0D44 | 2 bytes             | Previous field                                                                      |
 | 0x0D46 | 3\*2 bytes (signed) | Coord X (party1, party2, party3)                                                    |
@@ -194,7 +194,7 @@ Squall, Zell, Irvine, Quistis, Rinoa, Selphie, Seifer, Edea. For each character:
 | 0x3C   | 12   | `car_pos2` Rental car position, second set: never used, as above          |
 | 0x48   | 24   | Unused: no code reads it                                                  |
 | 0x60   | 2    | `camera_angle` Where the world map camera faces                           |
-| 0x62   | 1    | `car_rent` (Car rent status)  0x00:forbidden ,0xFF:none,0x51:balamb1,0x52:balamb2,0x57:esthar |
+| 0x62   | 1    | `car_rent` World model of the car left on the map, at `car_pos`: 73-75 or 81-87 (vehicles 32-40). 0xFF: none |
 | 0x63   | 1    | `car_rent2` Rent status of the second set: never used                     |
 | 0x64   | 5    | `u1` Unknown                                                              |
 | 0x69   | 1    | `vehicle` Vehicle in use when the world map was left                      |
