@@ -506,21 +506,31 @@ Record index `N` (0..127) is world draw point `N`; its magic/refill/high-yield l
 
 ---
 
-## Section 35: Special locations (save / GF / warp points)
+## Section 35: Vehicle placements
 
-Point-of-interest markers used by world-map UI: save points, GF battles, warp targets, etc. No header; records pack back-to-back at 12 bytes each (`record_count = section_size / 12`).
+Fixed spots where a story event puts Balamb Garden or the Ragnarok. Field variables 269 and 270 hold a one-time request: the row to apply the next time the world map starts, 0 for none. `World_RestoreParkedVehiclePositions` moves the vehicle there and clears the variable. No header; records pack back-to-back at 12 bytes each, and row 0 is empty.
 
-**SpecialLocation** (12 bytes):
+**VehiclePlacement** (12 bytes):
 
-| Offset | Length  | Type   | Field        |
-|--------|---------|--------|--------------|
-| 0      | 4 bytes | int32  | `x`          |
-| 4      | 4 bytes | int32  | `z`          |
-| 8      | 2 bytes | int16  | `y`          |
-| 10     | 1 byte  | uint8  | `type_code`  |
-| 11     | 1 byte  | int8   | `extra`      |
+| Offset | Length  | Type   | Field     |
+|--------|---------|--------|-----------|
+| 0      | 4 bytes | int32  | `x`       |
+| 4      | 4 bytes | int32  | `y`       |
+| 8      | 2 bytes | int16  | `height`  |
+| 10     | 1 byte  | uint8  | `vehicle` |
+| 11     | 1 byte  | int8   | `angle`   |
 
-Note the field order: `x`, `z`, `y` — not `x`, `y`, `z`.
+Here `y` is the object's value, which is the opposite sign of the `y` stored in the save.
+
+| Row | Vehicle       | Place                            | Requested by        |
+|-----|---------------|----------------------------------|---------------------|
+| 1   | Balamb Garden | Balamb island                    | `bgsido_7`          |
+| 2   | Balamb Garden | North Galbadia coast             | nothing             |
+| 3   | Balamb Garden | South Galbadia coast             | nothing             |
+| 4   | Ragnarok      | Centra                           | `eaplane1`, `ebadele5` |
+| 5   | Ragnarok      | Over the Horizon Bridge          | `fhparar1`          |
+| 6   | Ragnarok      | Esthar City                      | `ecpview2`          |
+| 7   | Balamb Garden | Sea at Fisherman's Horizon       | `bghoke_2`          |
 
 ---
 

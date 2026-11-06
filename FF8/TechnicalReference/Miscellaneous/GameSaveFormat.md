@@ -79,7 +79,7 @@ PC steam version: Offsets start from at 384 (0x0180). File is compressed with LZ
 | 0x0CD4 | 4 bytes             | Countdown                                                                           |
 | 0x0CD8 | 4 bytes             | Unknown                                                                             |
 | 0x0CDC | 4 bytes             | **Battle:** victory count                                                           |
-| 0x0CE0 | 2 bytes             | Unknown                                                                             |
+| 0x0CE0 | 2 bytes             | **Battle:** battles lost (defeat or time out)                                       |
 | 0x0CE2 | 2 bytes             | **Battle:** battle escaped                                                          |
 | 0x0CE4 | 4 bytes             | Unknown                                                                             |
 | 0x0CE8 | 4 bytes             | **Battle:** Tonberry killed count                                                   |
