@@ -212,6 +212,8 @@ A position is `{ s32 x, s32 y, s16 height, u16 angle }`, with y stored negated a
 
 Bits 0-7 of `script_bits` hold messages shown once: 0 car controls, 1 unused, 2 Garden controls, 3 chocobo controls, 4 Ragnarok controls, 5 Selphie's reminder of the Missile Base, 6 "This place looks...familiar" at Edea's house, 7 the Garden gauge going berserk. Bits 8-15 hold the PuPu quest: 8 and 9 unused, 10 Mandy Beach, 11 Winhill, 12 Trabia, 13 Kashkabald Desert, 14 UFO defeated, 15 PuPu defeated. In the rest, bits 17-19, 25, 27-29, 35-39, 49, 51-54 and 56-59 are unused.
 
+Script variable 0 is the Obel Lake quest's progress, compared and set as a whole value: 0 lake not found, 1 lake found, 2 asked to find Mr. Monkey, 4 Mr. Monkey found, then 121 to 124 for the kind of Liar Rock met (black, white, red or blue-faced), drawn at random. Script variable 1 is the step of the conversation under way, and is cleared when a field is entered.
+
 #### Obel quest flag
 
 [0] => avoir fredonné twice|???|Unused|Unused|n ricochets|infini ricochets|Vu ryo|Vu ryo² ("100x + de ricochets que toi !")
