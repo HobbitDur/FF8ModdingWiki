@@ -115,6 +115,15 @@ PC steam version: Offsets start from at 384 (0x0180). File is compressed with LZ
 
   
 
+### After the savemap
+
+The decompressed image is 8192 bytes. The game copies 5028 bytes of savemap to offset 384, so bytes 5412 to 8191 are zero, outside the checksum and never read back. FFNx keeps its own blocks there, each with its own checksum, and ignores a block that doesn't validate:
+
+| Image offset | Size      | Data                                                              |
+|--------------|-----------|-------------------------------------------------------------------|
+| 0x1600       | 522 bytes | Items: `FXIM` block with all 255 slots, when kernel.bin adds items |
+| 0x1810       | 524 bytes | Abilities: `FXAB` block with what each GF learned past id 127     |
+
 ### Guardian Forces
 
 The checksum calculation starts here.
