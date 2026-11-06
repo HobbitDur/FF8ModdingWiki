@@ -40,7 +40,7 @@ The world is a 32×24 grid of **segments** (8192 units each); a segment holds 4�
 | 12 | texture info: default = high nibble+224 → tpage, low bits → CLUT (UVs halved); with flag bit 5 = index into the animated-texture table; with bit 6 = texl detail page |
 | 13 | terrain type (walkmesh material; also drives footstep/particle effects and script conditions) |
 | 14 | flags: bits 0–1 shade level, bit 4 semi-transparent, bit 5 animated texture, bit 6 texl detail |
-| 15 | vehicle walkability mask: bit 7 foot/chocobo, bit 6 buggy, bit 5 Ragnarok, bit 4 vehicle 49 |
+| 15 | vehicle walkability mask (`World_IsTriangleWalkable`): bit 7 on foot, bit 6 car, bit 5 Balamb Garden (vehicle 48), bit 4 chocobo (vehicle 49). The Ragnarok (vehicle 50) ignores it |
 
 ## Per-frame rendering
 
