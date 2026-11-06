@@ -123,7 +123,7 @@ Maps a polygon's CLUT slot to a real `(tex_page, clut_id)` pair. Used while draw
 
 ## Section 7: Player-location scripts
 
-Generic script section (see "Script format" below). One script per offset entry. These scripts run when the player crosses into a new region or tile and decide things like text triggers and event activations.
+Generic script section (see "Script format" below). One script per offset entry. These scripts run when the player crosses into a new region or tile and decide things like text triggers and event activations. They also hold most field entrances, through `FF08`: Shumi Village, for one, is region 49 from story 750, on foot or by chocobo.
 
 ---
 

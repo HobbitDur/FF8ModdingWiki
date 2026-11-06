@@ -36,7 +36,7 @@ flowchart TD
     A[Frame start] -->|exit pending TOWN_BATTLE_SCENE| B[Fade out +16/frame<br>return 1 at 256<br>battle: immediate]
     A --> C[Input<br>locked for 24 frames on entry,<br>8 when returning from menu]
     C --> D[Movement + vehicle update,<br>camera, sky color]
-    D --> E{Field entrance under player?<br>World_FindFieldEntrance}
+    D --> E{Field entrance under player?<br>wmset FF08 warp}
     E -->|yes| F[World_RequestFieldJump<br>wanted_mode 1 + entrance id]
     D --> G{Scripted event check}
     G -->|field jump| F
@@ -58,7 +58,7 @@ Details worth knowing:
 
 * **Exit transition** — despite its community name, `TOWN_BATTLE_SCENE` is the generic "exit transition started" flag for every destination. While set, the screen fades (`world_exit_fade_counter` += 16 per frame, done at 256) and the director then returns 1; a battle exit skips the fade.
 * **Input** — pad state is double-buffered in `world_input_states[2]` with `world_input_frame_parity` selecting the current frame; "pressed this frame" is computed by XOR with the previous frame. Menu = bit 0x20, info menu = bit 0x800, board vehicle uses the same edge detection.
-* **Field entrances** — walking onto an entrance region triggers `World_FindFieldEntrance`; the returned index is the entry in `wm2field.tbl` that the module handler uses to place the party in the destination field. Boarding the mobile Balamb Garden (vehicle 48) or the Ragnarok (vehicle 50) jumps to fixed entrances 65 and 44 (their interior fields); entrances 17/44/65 also update savemap `WorldmapVariantFlags` bit 0x20 depending on whether the vehicle can stay parked at the current position (`World_FindDismountPosition` probes).
+* **Field entrances** — walking onto an entrance region runs the wmset scripts' `FF08` warp (sections 7 and 36); the returned index is the entry in `wm2field.tbl` that the module handler uses to place the party in the destination field. Boarding the mobile Balamb Garden (vehicle 48) or the Ragnarok (vehicle 50) jumps to fixed entrances 65 and 44 (their interior fields); entrances 17/44/65 also update savemap `WorldmapVariantFlags` bit 0x20 depending on whether the vehicle can stay parked at the current position (`World_FindDismountPosition` probes).
 * **Encounters** — random encounters only roll while on foot with no active event: a scripted-event check first (the [world-map script VM]({{ site.baseurl }}/technical-reference/worldmap/script-vm/) evaluating wmset section 37), then the standard roll (`WM_Encounter_wm123456`) and the Jumbo Cactuar special encounter. The chosen encounter ID goes to `wanted_game_mode` exactly like a field-triggered battle.
 * **Menu** — only available on foot or on a chocobo (`world_currentVehicle` < 10 or 128); vehicles keep the button inactive.
 * **Minimap** — `world_minimapMode`: 1 = corner planet minimap, 2 = corner zoomed map, 3 = fullscreen map.
@@ -92,7 +92,7 @@ The mapping was verified via `World_GetVehicleClearanceRadius` (Garden 700 / Rag
 | `FFWorldDirector` | 0x53FAC0 | Per-frame world logic (diagram above) |
 | `World_HandleInputs` | 0x5573C0 | Pad/keyboard → movement intents |
 | `World_CameraControl` | 0x552AD0 | Camera update |
-| `World_FindFieldEntrance` | 0x54CD40 | Entrance region test at player position |
+| `World_GetTrainStationExitEntrance` | 0x54CD40 | `wm2field.tbl` entrance (52, 53, 55) for leaving a train at a station |
 | `World_RequestFieldJump` | 0x544630 | Sets wanted_game_mode = 1 + entrance id, starts exit |
 | `WM_Encounter_wm123456` | 0x541C80 | Random encounter roll |
 | `World_JumboCactuarEncounter` | 0x54E730 | Jumbo Cactuar special encounter |

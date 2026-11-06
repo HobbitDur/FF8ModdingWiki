@@ -47,7 +47,7 @@ Field scripts pop their arguments off the entity script stack and set the global
 
 ### World map → field
 
-Boarding an entrance on the world map calls `World_FindFieldEntrance`, whose returned index selects a record in **`wm2field.tbl`**. The module handler (`FFModuleHandler_main_loop`) reads that record to fill `CURRENT_FIELD_ID` + spawn globals, then enters the field.
+Boarding an entrance on the world map runs a wmset `FF08` warp, whose argument selects a record in **`wm2field.tbl`**. The module handler (`FFModuleHandler_main_loop`) reads that record to fill `CURRENT_FIELD_ID` + spawn globals, then enters the field.
 
 ## wm2field.tbl record format
 

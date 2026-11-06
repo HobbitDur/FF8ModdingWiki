@@ -17,16 +17,18 @@ none
 #### Stack
 
   
-*Location*
+*Location or rail*
 
-*Vehicle flags?*
+*Vehicle*
 
-*?*
+*Arrival*
 
 **WORLDMAPJUMP**
 
 #### Description
 
+
+On a ride, *Location or rail* picks the track in [rail.obj](../../../worldmap/worldmap-rail-train-movement/): the value modulo 14 is the rail, and 14 or more runs it backward. *Vehicle* is the world map's vehicle code. *Arrival* is the `wm2field.tbl` entrance the party enters when the ride ends, or -1 for none.
 Jumps the player to the world map. The game has a preset list of locations to jump to - there is no way AFAIK to jump to a specific XY point. The handler requests the world-map module by setting `globalFieldNextModuleID = 7`, pops three values (the destination *Location* into `MenuState_opcode_menu_id`, plus two transition parameters written to `wm2field_FieldZ` and `wm2field_FieldTarget`), and adjusts the savemap "can save here" bit. It yields (return 1) until the module switch happens.
 
 PC handler: `SCRIPT_WORLDMAPJUMP`.

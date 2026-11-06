@@ -19,6 +19,18 @@ One segment is 0x9000 or 36864 bytes long. There are 16 blocks in a segment. In 
 
 1-768 segments are final world map. 769-835 are story based segments like Balamb garden stationary, no Esthar, No cities in DISC4.
 
+The game picks them from the world state flags: each flag covers a rectangle of map cells, listed as a pair of first and last cell (cell = row × 32 + column) in a table at 0xC763D0 in FF8_EN.exe, and a second table at 0xC763F0 gives each cell's replacement segment.
+
+| Flag | Cells     | Replacement segments | Place                                                       |
+|------|-----------|----------------------|-------------------------------------------------------------|
+| 0x01 | 373-572   | 768-823              | Esthar                                                      |
+| 0x02 | 149-150   | 824-825              | Not identified yet |
+| 0x04 | 267       | 826                  | Not identified yet |
+| 0x08 | 274-275   | 827-828              | Not identified yet |
+| 0x10 | 327       | 829                  | Not identified yet |
+| 0x20 | 214-247   | 830-833              | Not identified yet |
+| 0x40 | 361       | 834                  | D-District Prison: cell 361 has it sunk to its tower tops, segment 834 at full height. Field variable 264 bit 8 sets the flag. |
+
 ## Segment
 
 Segment starts with a header (consist offsets for every block). After segment's header blocks data appears.

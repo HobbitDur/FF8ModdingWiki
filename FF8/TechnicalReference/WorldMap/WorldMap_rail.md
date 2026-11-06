@@ -11,6 +11,10 @@ By MaKiPL
 
 Rail.obj is a file containing key locations of train movement. It stores location on world map, and the train automatically rotates, gives power and calculates needed info (like cargo rotation and etc.) This file **cannot be LZS compressed**. Doing so makes the game not recognize the file.
 
+### Which rail a ride uses
+
+File `rail.obj` holds 14 rails of 2048 bytes each. The first argument of the field opcode [WORLDMAPJUMP](../../field/field-opcodes/10d-worldmapjump/) picks one: the value modulo 14 is the rail, and 14 or more runs it backward. Rail 9, for example, leaves Balamb and stops at sea, where the first Timber train ride cuts to the SeeD cabin; rail 10 carries on to Timber; rail 6 backward is the whole line.
+
 ### File scheme
 
 The file is built the similiar way as [World map WMX.obj](WorldMap_wmx).

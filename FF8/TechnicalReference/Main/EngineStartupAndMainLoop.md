@@ -93,11 +93,11 @@ flowchart TD
 Two globals drive it:
 
 * `mode_StateGlobal` — the requested game mode (the switch value below).
-* `ENGINE_STATE` — which module the engine is currently in / coming from. Observed values: 0 = field, 1 = world map (transition request), 2 = in world map, 3 = battle, 6 = menu, 10 = menu closing back to field.
+* `ENGINE_STATE` — where the engine is coming from: 0 = a new game or a save just loaded, 1 = a field, 2 = the world map, 3 = a battle or card game, 6 = a menu, 10 = a menu asking for a reload. Every field start copies its low byte to field variable 87.
 
 Before dispatching, the handler performs two special checks:
 
-* When `ENGINE_STATE` is 0 (field) and the disc number recorded in the savemap does not match the detected disc, it loads `wm2field.tbl` and switches to the **CD-check module** (`cdcheck_main_loop`).
+* When `ENGINE_STATE` is 0 and the disc number recorded in the savemap does not match the detected disc, it loads `wm2field.tbl` and switches to the **CD-check module** (`cdcheck_main_loop`).
 * When `globalFieldNextModuleID` equals 4, it switches back to the **intro module** (used for the "reset to title" path, e.g. after a game over or the credits).
 
 ### mode_StateGlobal dispatch
@@ -202,7 +202,7 @@ The menu module communicates its result through `menu_result_flags`. Bit 0 disti
 | `cdcheck_init` | 0x52DC00 | CD-check module enter_main |
 | `cdcheck_main_loop` | 0x52DCF0 | CD-check module main loop |
 | `mode_StateGlobal` | 0x1CD8FC6 | Requested game mode (dispatch table above) |
-| `ENGINE_STATE` | 0x1CE0758 | Current/previous engine module |
+| `ENGINE_STATE` | 0x1CE0758 | Module the engine is coming from |
 | `globalFieldNextModuleID` | 0x1CE4760 | 4 = reset to title screen |
 | `CURRENT_FIELD_ID` | 0x1CD2FC0 | Field to load next |
 | `COMBAT_SCENE_ID` | 0x1CFF6E0 | Encounter ID for the next battle |
