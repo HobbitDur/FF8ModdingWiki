@@ -45,7 +45,7 @@ Two globals select what the menu module shows:
 | 1 | Load sub-machine (`dword_1D2A27C` 0→1→2): init menu state with (menu_id, menu_sub_id), run the loading steps, teardown |
 | 2 | Fetch the menu result, return `result | 0x400`, reset to phase 0 |
 
-The return value is 0 while the menu runs. **Bit 0x400 = menu closed**; the low bits are the menu system's result flags, which the module loop stores in `menu_result_flags` (`0x1D2BB9C`) before switching back to `FFModuleHandler_main_loop`. The module handler then interprets them (bit 0 = special action, bit 2 = start a battle immediately with the encounter ID in the high 16 bits — used by debug/battle-from-menu paths; on the title screen, bit 1 = New Game).
+The return value is 0 while the menu runs. **Bit 0x400 = menu closed**; the low bits are the menu system's result flags, which the module loop stores in `menu_result_flags` (`0x1D2BB9C`) before switching back to `FFModuleHandler_main_loop`. The module handler then interprets them (bit 0 = the party may have changed, set for the party and save menus; bit 2 = start a battle immediately with the encounter ID in the high 16 bits — used by debug/battle-from-menu paths; on the title screen, bit 1 = New Game).
 
 ## Menu programs and the dispatch table
 

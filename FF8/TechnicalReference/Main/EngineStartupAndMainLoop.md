@@ -93,7 +93,7 @@ flowchart TD
 Two globals drive it:
 
 * `mode_StateGlobal` — the requested game mode (the switch value below).
-* `ENGINE_STATE` — where the engine is coming from: 0 = a new game or a save just loaded, 1 = a field, 2 = the world map, 3 = a battle or card game, 6 = a menu, 10 = a menu asking for a reload. Every field start copies its low byte to field variable 87.
+* `ENGINE_STATE` — where the engine is coming from: 0 = a new game or a save just loaded, 1 = a field, 2 = the world map, 3 = a battle or card game, 6 = a menu. The code can also set 10 (see below), but no PC path reaches it. Every field start copies its low byte to field variable 87.
 
 Before dispatching, the handler performs two special checks:
 
@@ -159,7 +159,7 @@ On the normal path the handler saves whether the battle started from the field o
 
 ### Menu return (modes 6/10)
 
-The menu module communicates its result through `menu_result_flags`. Bit 0 distinguishes a plain close from a special action; bit 2 requests an immediate battle (the encounter ID is stored in the high 16 bits) — this is how the menu can chain straight into a battle. Otherwise the handler restores field or world map depending on where the menu was opened from.
+The menu module communicates its result through `menu_result_flags`. Bit 0 means the party may have changed: `Menu_StartHostedProgram` sets it for the party menu (id 1) and the save menu (id 22), and the handler then relinks the party to the field entities (`Field_RelinkPartyAfterMenu`). Bit 2 requests an immediate battle (the encounter ID is stored in the high 16 bits) — this is how the menu can chain straight into a battle. `ENGINE_STATE` becomes 10 only with bit 0 and `mode_StateGlobal` 6, which is the pause menu; since the pause menu always opens with id 0, it never returns bit 0, so field variable 87 never holds 10 on PC, although four maps test for it. Menus opened by scripts use mode 10 and give `ENGINE_STATE` 6. Otherwise the handler restores field or world map depending on where the menu was opened from.
 
 ## Address table
 
