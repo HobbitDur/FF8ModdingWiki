@@ -4,6 +4,7 @@ parent: Field Opcodes
 title: 038_DISCJUMP
 nav_order: 57
 permalink: /technical-reference/field/field-opcodes/038-discjump/
+author: HobbitDur
 ---
 
 -   Opcode: **0x038**
@@ -31,7 +32,9 @@ Destination walkmesh triangle ID (stored to `wm2field_FieldZ`)
 
 #### Description
 
-Same as [MAPJUMP3](../02a-mapjump3/), but requests a disc-change flow instead of a plain field load: it sets the low byte of `globalFieldNextModuleID` to 6 (rather than 1) and raises the `menu_disabled` flag. It pops the same five stack values, from the top: facing direction (`wm2field_FieldTarget`), an extra parameter (`wm2field_UnusedJumpParam`, never read on PC), Y then X spawn coordinates, and last the destination field ID (`MenuState_opcode_menu_id`). The inline argument is the walkmesh triangle to spawn on (`wm2field_FieldZ`). See [DISC](../11f-disc/) for the disc switch itself. Returns 1.
+Same as [MAPJUMP3](../02a-mapjump3/), but requests a disc-change flow instead of a plain field load: it sets the low byte of `globalFieldNextModuleID` to 6 (rather than 1) and raises the `menu_disabled` flag. It pops the same five stack values, from the top: facing direction (`wm2field_FieldTarget`), an extra parameter (`wm2field_UnusedJumpParam`, never read on PC), Y then X spawn coordinates, and last the destination field ID (`MenuState_opcode_menu_id`). The inline argument is the walkmesh triangle to spawn on (`wm2field_FieldZ`). See [DISC](../11f-disc/) for the disc switch itself. The handler only acts on the first frame it runs: the ready-mask test (`ready_bit_index` / `opcode_ready_mask`) lets it pop its values once, and returning 1 never advances the script, so the script stays on this opcode until the field unloads. Nothing placed after it runs.
+
+The retail scripts use it four times: three in `testbl6` and one in the debug map `test`.
 
 PC handler: `SCRIPT_DISCJUMP`.
 

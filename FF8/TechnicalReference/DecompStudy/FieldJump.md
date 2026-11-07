@@ -3,6 +3,7 @@ layout: default
 title: Field jump (map transitions)
 parent: Field
 permalink: /technical-reference/field/field-jump/
+author: HobbitDur
 ---
 
 1. TOC
@@ -41,9 +42,22 @@ Field scripts pop their arguments off the entity script stack and set the global
 | `WORLDMAPJUMP` | 0x521820 | Sets `globalFieldNextModuleID`=7 → world map (toggles the savemap save-enable flag) |
 | `DISCJUMP` | 0x521B70 | Sets `globalFieldNextModuleID`=6 → disc-change screen, disables the menu |
 
+Each of these pops its values once and stays on the opcode until the field unloads, so nothing placed after it runs. [`PREMAPJUMP`]({{ site.baseurl }}/technical-reference/field/field-opcodes/0e4-premapjump/) looks like one of them but doesn't jump: it adds a disabled gateway record that has no effect on PC.
+
+Retail script counts (882 `.jsm` files, destination always a literal):
+
+| Opcode         | Uses |
+|----------------|------|
+| `MAPJUMP3`     | 1451 |
+| `MAPJUMP0`     | 1037 |
+| `PREMAPJUMP`   | 790  |
+| `MAPJUMP`      | 390  |
+| `WORLDMAPJUMP` | 144  |
+| `DISCJUMP`     | 4    |
+
 ### Gateways (walked field exits)
 
-`Field_Collision_CheckGatewayCrossing` tests the 12 gateway records in the `.inf` file (`.inf`+100, 32 bytes each). A gateway fires when the player is within touch radius of its line **and** the cross-product sign against the line flips between the previous and current position. On firing it sets the same globals from the record: destination field ID (`< 0x48` routes to the world map = module 7, otherwise a field = module 1), spawn X/Y, triangle and facing. See the gateway record layout on the [Field Gateways]({{ site.baseurl }}/technical-reference/field/field-file-format/field-gateways/) page.
+`Field_Collision_CheckGatewayCrossing` tests the 12 gateway records in the `.inf` file (`.inf`+100, 32 bytes each), skipping those with field ID 0x7FFF or triangle -1. A gateway fires when the player is within touch radius of its line **and** the cross-product sign against the line flips between the previous and current position. On firing it sets the same globals from the record: destination field ID (`< 0x48` routes to the world map = module 7, otherwise a field = module 1), spawn X/Y, triangle and facing. See the gateway record layout on the [Field Gateways]({{ site.baseurl }}/technical-reference/field/field-file-format/field-gateways/) page.
 
 ### World map → field
 
@@ -73,6 +87,32 @@ The loader (part of `Field_LoadResources`) reads maplist into a buffer and walks
 
 `.inf` (gateways/triggers) · `.ca` (camera) · `.id` (walkmesh) · `.map` + `.mim` (background) · `.msk` (movie mask) · `.rat` / `.mrt` (encounter) · `.msd` (dialog) · `.gsm` / `.sfx` (sound) · `.pmd` (particles) · `.jsm` (scripts) · `.pcb` (extra).
 
+## Field IDs below 102
+
+The first real location, `bccent_1`, is line 102 of `maplist`, but every line is a valid field ID. Lower IDs are not errors:
+
+| IDs    | `maplist` names                                                              | Files        | Meaning                                                                                                                                  |
+|--------|------------------------------------------------------------------------------|--------------|------------------------------------------------------------------------------------------------------------------------------------------|
+| 0-71   | `wm00` to `wm71`                                                             | None         | World map exits. A gateway with one of these IDs starts the world map, with the ID as parameter (57 gateways in the retail `.inf` files) |
+| 72-101 | `testno`, `start`, `start0`, `gover`, `ending`, `test*`, `testbl*`, `testmv` | Most of them | Fields with no location of their own: new game, game over, ending, story steps shared between maps                                            |
+| 102+   | `bccent_1` onward                                                            | Yes          | Locations                                                                                                                                |
+
+`MAPJUMP`, `MAPJUMP0` and `MAPJUMP3` always ask for the field module, so they don't have the world map route of a gateway. Only the debug maps `testno` and `bgmast_6` give them an ID below 72.
+
+Destinations below 102 reached from normal maps:
+
+| ID | Name      | Jumps from                                                                                                                                                                           | Content                                                          |
+|----|-----------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------------|
+| 75 | `gover`   | `gmpark2`, `gpexit2`, `tvglen3`                                                                                                                                                      | `GAMEOVER`                                                       |
+| 76 | `ending`  | `feblack1`                                                                                                                                                                           | Three movies                                                     |
+| 90 | `testbl1` | `bgpaty_2`, `gpbig1a`                                                                                                                                                                | One message, then a jump                                         |
+| 91 | `testbl2` | `tiagit2`                                                                                                                                                                            | The Forest Owls contract letter, then a jump                     |
+| 92 | `testbl3` | `bgmd3_2`, `escouse1`, `gmcont1`, `gmcont2`, `gmden1`, `gmhouse1`, `gmmoni1`, `gmpark1`, `gmpark2`, `gmtika1` to `gmtika4`                                                           | Five movies, then a jump                                         |
+| 95 | `testbl6` | `bg2f_31`, `bgbtl_1`, `bvtr_2`, `crenter1`, `crodin1`, `cropen1`, `crpower1`, `crroof1`, `crsanc1`, `crsphi1`, `crtower1` to `crtower3`, `crview1`, `ebadele3`, `ggkodo4`, `glyagu1` | Odin's outcome, "try again" after a lost fight, the disc changes |
+| 98 | `testbl9` | `feart1f1`, `febarac1`, `feclock3`, `fehall2`, `fejail1`, `feteras1`, `fetre1`, `fewine1`                                                                                            | "Release which seal?" menu                                       |
+
+Scripts jump to the other IDs from 72 to 101 only from debug maps. `start0` (74) is the new game map, and `start` (73) has no files in the PC data.
+
 ## Where the field ID comes from
 
 `CURRENT_FIELD_ID` is set from different sources depending on the trigger:
@@ -101,6 +141,7 @@ flowchart TD
 | Function | Address | Description |
 |---|---|---|
 | `Field_Collision_CheckGatewayCrossing` | 0x477980 | Gateway line-crossing test |
+| `SCRIPT_PREMAPJUMP` | 0x521960 | PREMAPJUMP field-script opcode |
 | `SCRIPT_MAPJUMP` | 0x521A20 | MAPJUMP field-script opcode |
 | `SCRIPT_MAPJUMP0` | 0x521C30 | MAPJUMP0 field-script opcode |
 | `SCRIPT_MAPJUMP3` | 0x521AC0 | MAPJUMP3 field-script opcode |

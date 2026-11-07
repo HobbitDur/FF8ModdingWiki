@@ -4,6 +4,7 @@ title: Opcode handler table (PC)
 parent: Field Opcodes
 grand_parent: Field
 permalink: /technical-reference/field/field-opcodes/handler-table/
+author: HobbitDur
 ---
 
 1. TOC
@@ -50,7 +51,7 @@ The executable's own symbol names revealed several discrepancies with the histor
 | 0x174 | UNKNOWN15 | Sets the jump-duration divisor (LINKED_TO_LADDER global, default 28) used by JUMP/JUMP3 |
 | 0x176 | UNKNOWN17 | **PC stub** — pops one arg, calls a null function |
 
-Other undocumented-but-named opcode families now visible in the table: the full scroll set (`DSCROLL/LSCROLL/CSCROLL` + `A`/`P` targeting and `2`/`3` layer variants), background shading (`BGSHADE`, `RBGSHADELOOP`, `BGSHADESTOP`, `BGSHADEOFF`), footstep sound control, eye textures (`OPENEYES`/`CLOSEEYES`/`BLINKEYES`), animation state save/restore (`PUSHANIME`/`POPANIME`), party management (`CHANGEPARTY`, `REFRESHPARTY`, `SETPARTY2`, `SWAP`, `ISMEMBER`), and misc (`RESETGF`, `ADDGIL`, `ADDPASTGIL` for Laguna's gil, `GETCARD/HOWMANYCARD/WHERECARD`, `PREMAPJUMP` which appends a synthetic gateway to the loaded .inf, `SETCAMERA/SETDCAMERA`, `POLYCOLOR/POLYCOLORALL`, `SHAKE`, `MENUTIPS`, `BROKEN` timers, `ENDING`).
+Other undocumented-but-named opcode families now visible in the table: the full scroll set (`DSCROLL/LSCROLL/CSCROLL` + `A`/`P` targeting and `2`/`3` layer variants), background shading (`BGSHADE`, `RBGSHADELOOP`, `BGSHADESTOP`, `BGSHADEOFF`), footstep sound control, eye textures (`OPENEYES`/`CLOSEEYES`/`BLINKEYES`), animation state save/restore (`PUSHANIME`/`POPANIME`), party management (`CHANGEPARTY`, `REFRESHPARTY`, `SETPARTY2`, `SWAP`, `ISMEMBER`), and misc (`RESETGF`, `ADDGIL`, `ADDPASTGIL` for Laguna's gil, `GETCARD/HOWMANYCARD/WHERECARD`, [`PREMAPJUMP`](../0e4-premapjump/) which appends a disabled gateway to the loaded .inf, `SETCAMERA/SETDCAMERA`, `POLYCOLOR/POLYCOLORALL`, `SHAKE`, `MENUTIPS`, `BROKEN` timers, `ENDING`).
 
 ## Full table
 
@@ -286,7 +287,7 @@ Notes column: `undocumented` = no wiki page exists for this opcode yet; `wiki:X`
 | 0x0E1 | FOOTSTEPOFF | 0x520500 | undocumented |
 | 0x0E2 | FOOSTEPOFFALL | 0x520520 | undocumented |
 | 0x0E3 | FOOTSTEPCUT | 0x520550 | undocumented |
-| 0x0E4 | PREMAPJUMP | 0x521960 | undocumented |
+| 0x0E4 | PREMAPJUMP | 0x521960 |  |
 | 0x0E5 | USE | 0x51DD60 |  |
 | 0x0E6 | SPLIT | 0x525090 |  |
 | 0x0E7 | ANIMESPEED | 0x5264A0 |  |

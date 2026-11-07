@@ -3,6 +3,7 @@ layout: default
 parent: Field File Format
 title: Field Gateways
 permalink: /technical-reference/field/field-file-format/field-gateways/
+author: myst6re, HobbitDur
 ---
 
 By myst6re.
@@ -61,7 +62,7 @@ For each gateway (32 bytes, all values little-endian):
 
 ### How a gateway fires
 
-`Field_Collision_CheckGatewayCrossing` (FF8_EN.exe 0x477980) runs for the player entity after each move. For every gateway whose field ID is not 0x7FFF, it checks two things, using only X and Y (the Z values of the exit line are ignored):
+`Field_Collision_CheckGatewayCrossing` (FF8_EN.exe 0x477980) runs for the player entity after each move. For every gateway whose field ID is not 0x7FFF and whose triangle is not -1, it checks two things, using only X and Y (the Z values of the exit line are ignored):
 
 1. The player is within touch range of the exit line **segment** (`Field_Collision_PointToLineDistSq`, squared distance compared with the squared touch radius of the entity).
 2. The player's position has changed side of the line between the previous and the current frame (the sign of the cross product flips).
@@ -78,6 +79,8 @@ When both are true, the game copies the record into the jump globals, exactly li
 A field ID below 0x48 selects the world map module (`globalFieldNextModuleID` = 7) instead of the field module (1).
 
 Because the destination triangle is an index into another field's walkmesh, removing or reordering triangles in a `.id` file can break the gateways of every field that leads to it (and the `MAPJUMP` opcodes that target it).
+
+[PREMAPJUMP](../../field-opcodes/0e4-premapjump/) adds records with triangle -1 to the table in memory, which never fire.
 
 Across the 893 retail `.inf` files, 1632 gateways are used and 9084 are disabled by field ID 0x7FFF.
 
