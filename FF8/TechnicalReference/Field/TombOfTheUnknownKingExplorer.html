@@ -183,7 +183,8 @@ a { color: var(--accent) }
 
 <section>
   <div class="sec-head"><div class="eyebrow">3 · Walk the maze</div><h2>Every var486 state, on the in-game map</h2>
-  <p class="note">Positions come from the scripts' own <code>mark::onN</code> entries (the location displayer's offsets). Pick a dot, then click an exit on the field picture to move. The exit labels are drawn where each <code>mapjump_*</code> SETLINE projects through the field camera.</p></div>
+  <p class="note">Positions come from the scripts' own <code>mark::onN</code> entries (the location displayer's offsets). Pick a dot, then click an exit on the field picture to move. The exit labels are drawn where each <code>mapjump_*</code> SETLINE projects through the field camera.</p>
+  <p class="note">Seeing the same picture again and again is how the tomb is built. Every jump into a corridor field lands on one fixed spot at the near end of the screen (all 117 jumps into gnroad2 land at X 5, Y −600, triangle 46), so the party always walks into the picture and the camera turns to face the way it walked. All 12 crossroads are gnroad2. A corner is gnroad3 (turns right) when you reach it from one side and gnroad4 (turns left) from the other.</p></div>
   <div class="bench">
     <div class="panel">
       <div class="mapbox"><img id="mapimg" alt="Dungeon map from gnroad2's background"><svg id="mapsvg" viewBox="0 0 160 160" aria-label="Maze locations"></svg></div>
