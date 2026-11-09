@@ -13,6 +13,8 @@ author: HobbitDur
 
 The tomb is ten fields, `gnroad1` to `gnview1`. Its maze is not built from one field per corridor: five corridor backgrounds are reused for every place in the maze, and one variable, **var486**, says where the party is and which way the camera looks. Each exit script reads var486, writes the next value and jumps to the field that draws it. Progress through the tomb is kept in **var491**, the two one-time scenes in **var485**.
 
+**[Open the interactive Tomb explorer]({{site.baseurl}}/assets/tomb-of-the-unknown-king.html)**: the field flow chart, the story gates, every var486 value on the in-game map (click an exit on a field picture to walk the maze, tick the progress flags to sink the slabs or lower the bridge) and the ten backgrounds with their triggers.
+
 ## Fields
 | Field ID | Field   | Role                                                           | var486                           |
 | -------- | ------- | -------------------------------------------------------------- | -------------------------------- |
