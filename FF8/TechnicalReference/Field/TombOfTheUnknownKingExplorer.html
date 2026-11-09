@@ -1,11 +1,20 @@
-<!doctype html>
+---
+layout: null
+title: Interactive explorer
+parent: Tomb of the Unknown King
+permalink: /technical-reference/field/tomb-of-the-unknown-king/explorer/
+search_exclude: true
+author: HobbitDur
+---
+{% raw %}<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <style>html { color-scheme: light } @media (prefers-color-scheme: dark) { html { color-scheme: dark } }
 :root { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px) }
-body { margin: 0 } img { max-width: 100% } [hidden] { display: none !important }</style>
+body { margin: 0 } img { max-width: 100% } [hidden] { display: none !important }
+.crumbs { font-size: 13px; color: var(--muted) } .crumbs a { color: var(--accent) }</style>
 <title>Tomb of the Unknown King</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -136,6 +145,7 @@ a { color: var(--accent) }
 </head>
 <body>
 <div class="wrap">
+<nav class="crumbs" aria-label="Wiki"><a href="../../../../">FF8 Modding wiki</a> › <a href="../../">Field</a> › <a href="../">Tomb of the Unknown King</a> › <span>Interactive explorer</span></nav>
 <header>
   <div class="eyebrow">FF8 field scripts · gn* · maplist 783–792</div>
   <h1>Tomb of the Unknown King</h1>
@@ -231,7 +241,7 @@ a { color: var(--accent) }
   </ul>
 </section>
 
-<footer>Full write-up: <a href="../technical-reference/field/tomb-of-the-unknown-king/">Tomb of the Unknown King</a> on the FF8 Modding wiki. Decoded from the PC (EN) field files: .jsm disassembled with the high-byte opcode decoder, names from the .sym files, texts from the .msd files, backgrounds rebuilt from .mim/.map, triggers projected with the .ca camera. Draw point magic from the FF8_EN.exe draw table. Not checked in game.</footer>
+<footer>Full write-up: <a href="../">Tomb of the Unknown King</a> on the FF8 Modding wiki. Decoded from the PC (EN) field files: .jsm disassembled with the high-byte opcode decoder, names from the .sym files, texts from the .msd files, backgrounds rebuilt from .mim/.map, triggers projected with the .ca camera. Draw point magic from the FF8_EN.exe draw table. Not checked in game.</footer>
 </div>
 
 <script>
@@ -593,3 +603,4 @@ gotoState(1);
 
 </body>
 </html>
+{% endraw %}
