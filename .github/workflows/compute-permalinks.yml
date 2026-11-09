@@ -2,39 +2,44 @@ name: Compute Permalinks
 
 on:
   push:
-    branches: ["main"]  # Change this to your default branch
+    branches: ["main"]
+
+# The job pushes its commit back to main.
+permissions:
+  contents: write
+
+# One run at a time, so two quick pushes never race to push their permalink commits.
+concurrency:
+  group: compute-permalinks
+  cancel-in-progress: false
 
 jobs:
   compute-permalinks:
     runs-on: ubuntu-latest
 
     steps:
-      # Check out the repository
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Set up Python
+      # Any current Python 3; the script only uses the standard library.
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.9'  # Use the Python version you prefer
+          python-version: '3.x'
 
-      # Install dependencies (if any)
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r .github/scripts/requirements.txt  # Add a requirements.txt file if needed
-
-      # Run the permalink generation script
       - name: Generate permalinks
-        run: |
-          python .github/scripts/generate_permalinks.py
+        run: python .github/scripts/generate_permalinks.py
 
-      # Commit the changes (if any)
+      # Commit only the pages, and rebase on anything pushed while this ran.
       - name: Commit changes
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git add .
-          git diff --quiet && git diff --staged --quiet || git commit -m "Automatically generate permalinks"
-          git push
+          git add FF8
+          if git diff --staged --quiet; then
+            echo "No permalink to add."
+            exit 0
+          fi
+          git commit -m "Automatically generate permalinks"
+          git pull --rebase origin main
+          git push origin HEAD:main
