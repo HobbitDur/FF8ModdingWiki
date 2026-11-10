@@ -46,11 +46,11 @@ Every corridor field has up to four line entities, `mapjump_FW`, `mapjump_LW`, `
 
 The camera always turns to face the way the party walked. Walking back out of a crossroad loads the next corridor looking the other way, so each place needs one var486 value per facing it can be seen from: four at a crossroad, one per field at a bend (`gnroad3` from one side, `gnroad4` from the other), two in a dead-end corridor.
 
-The rooms and the outside set var486 themselves when they load (`Director` script): `gnview1` 0, `gnroom1` to `gnroom4` 73 to 76. Their exits are .inf gateways, not scripts: rooms 1 to 3 and `gnview1` lead to `gnroad1`, room 4 to `gnroad5`. From 73, 74 and 75, forward leads back into the maze and back re-enters the room. From 76, back leads to 72, the crossroad north of the centre, facing north, whichever side the party came from.
+The rooms and the outside set var486 themselves when they load (`Director` script): `gnview1` 0, `gnroom1` to `gnroom4` 73 to 76. Their exits are .inf gateways, not scripts: rooms 1 to 3 and `gnview1` lead to `gnroad1`, room 4 to `gnroad5`. From 73, 74 and 75, forward leads back into the maze and back re-enters the room. From 76, back leads to 72, the crossroad south of the centre, facing south, whichever side the party came from.
 
 ## Map positions
 
-The dungeon map is a background layer of every corridor field (shown by the `map` entity). The "you are here" mark is a single animated tile of the `mark` entity; each `mark::onN` script moves it by `(dx, dy)` pixels with a background-move opcode, and `mapdisplay::default` picks the script from var486. Those offsets give the real place of every value. North is the top of the map; the entrance is at the top.
+The dungeon map is a background layer of every corridor field (shown by the `map` entity). The "you are here" mark is a single animated tile of the `mark` entity; each `mark::onN` script scrolls the mark layer by `(dx, dy)` pixels with `DSCROLL2`, and `mapdisplay::default` picks the script from var486. A scroll moves the layer's content the other way, so the tile lands at `(-dx, -dy)` from its place: a positive dy puts the mark higher on the map. The offsets in the tables are the script values. North is the top of the map; the entrance is at the bottom.
 
 ![Tomb map with the mark numbers]({{site.baseurl}}/assets/tomb_maze_map.png)
 
@@ -58,34 +58,34 @@ Green: crossroads (`gnroad2`). Blue: bends (`gnroad3`/`gnroad4`). Orange: dead-e
 
 | Mark | Offset   | Kind                   | Field   | Facing N | Facing E | Facing S | Facing W |
 | ---- | -------- | ---------------------- | ------- | -------- | -------- | -------- | -------- |
-| 1    | -3, -41  | Dead-end corridor      | gnroad1 | 6        |          | 0        |          |
-| 4    | -19, -31 | Bend (turns left)      | gnroad4 |          | 22       | 5        |          |
-| 3    | -3, -31  | Junction               | gnroad2 | 18       | 9        | 1        | 3        |
-| 2    | 16, -31  | Bend (turns right)     | gnroad3 |          |          | 7        | 14       |
-| 9    | -34, -15 | Bend (turns left)      | gnroad4 |          | 41       | 21       |          |
-| 8    | -19, -15 | Junction               | gnroad2 | 37       | 25       | 8        | 17       |
-| 7    | -4, -15  | Junction               | gnroad2 | 72       | 23       | 4        | 13       |
-| 6    | 16, -15  | Junction               | gnroad2 | 33       | 19       | 2        | 11       |
-| 5    | 31, -15  | Bend (turns right)     | gnroad3 |          |          | 15       | 29       |
-| 28   | -2, -8   | Approach to the centre | gnroad5 |          |          | 16, 76   |          |
-| 15   | -41, 1   | Dead-end corridor      | gnroad1 |          | 73       |          | 40       |
-| 14   | -34, 1   | Junction               | gnroad2 | 58       | 43       | 24       | 36       |
-| 13   | -19, 1   | Junction               | gnroad2 | 56       | 42       | 20       | 71       |
-| 27   | -14, 1   | Approach to the centre | gnroad5 |          | 38       |          |          |
-| 25   | 9, 1     | Approach to the centre | gnroad5 |          |          |          | 32       |
-| 12   | 16, 1    | Junction               | gnroad2 | 48       | 69       | 12       | 28       |
-| 11   | 31, 1    | Junction               | gnroad2 | 45       | 34       | 10       | 26       |
-| 10   | 38, 1    | Dead-end corridor      | gnroad1 |          | 30       |          | 75       |
-| 26   | -2, 11   | Approach to the centre | gnroad5 | 52       |          |          |          |
-| 20   | -34, 20  | Bend (turns left)      | gnroad4 | 55       | 39       |          |          |
-| 19   | -19, 20  | Junction               | gnroad2 | 66       | 59       | 35       | 51       |
-| 18   | -4, 20   | Junction               | gnroad2 | 64       | 57       | 70       | 47       |
-| 17   | 16, 20   | Junction               | gnroad2 | 61       | 53       | 31       | 44       |
-| 16   | 31, 20   | Bend (turns right)     | gnroad3 | 49       |          |          | 27       |
-| 23   | -19, 36  | Bend (turns left)      | gnroad4 | 63       | 54       |          |          |
-| 22   | -3, 37   | Junction               | gnroad2 | 68       | 67       | 50       | 60       |
-| 21   | 16, 37   | Bend (turns right)     | gnroad3 | 65       |          |          | 46       |
-| 24   | -4, 46   | Dead-end corridor      | gnroad1 | 74       |          | 62       |          |
+| 24   | -4, 46   | Dead-end corridor      | gnroad1 | 62       |          | 74       |          |
+| 21   | 16, 37   | Bend (turns right)     | gnroad3 |          | 46       | 65       |          |
+| 22   | -3, 37   | Junction               | gnroad2 | 50       | 60       | 68       | 67       |
+| 23   | -19, 36  | Bend (turns left)      | gnroad4 |          |          | 63       | 54       |
+| 16   | 31, 20   | Bend (turns right)     | gnroad3 |          | 27       | 49       |          |
+| 17   | 16, 20   | Junction               | gnroad2 | 31       | 44       | 61       | 53       |
+| 18   | -4, 20   | Junction               | gnroad2 | 70       | 47       | 64       | 57       |
+| 19   | -19, 20  | Junction               | gnroad2 | 35       | 51       | 66       | 59       |
+| 20   | -34, 20  | Bend (turns left)      | gnroad4 |          |          | 55       | 39       |
+| 26   | -2, 11   | Approach to the centre | gnroad5 |          |          | 52       |          |
+| 10   | 38, 1    | Dead-end corridor      | gnroad1 |          | 75       |          | 30       |
+| 11   | 31, 1    | Junction               | gnroad2 | 10       | 26       | 45       | 34       |
+| 12   | 16, 1    | Junction               | gnroad2 | 12       | 28       | 48       | 69       |
+| 25   | 9, 1     | Approach to the centre | gnroad5 |          | 32       |          |          |
+| 27   | -14, 1   | Approach to the centre | gnroad5 |          |          |          | 38       |
+| 13   | -19, 1   | Junction               | gnroad2 | 20       | 71       | 56       | 42       |
+| 14   | -34, 1   | Junction               | gnroad2 | 24       | 36       | 58       | 43       |
+| 15   | -41, 1   | Dead-end corridor      | gnroad1 |          | 40       |          | 73       |
+| 28   | -2, -8   | Approach to the centre | gnroad5 | 16, 76   |          |          |          |
+| 5    | 31, -15  | Bend (turns right)     | gnroad3 | 15       | 29       |          |          |
+| 6    | 16, -15  | Junction               | gnroad2 | 2        | 11       | 33       | 19       |
+| 7    | -4, -15  | Junction               | gnroad2 | 4        | 13       | 72       | 23       |
+| 8    | -19, -15 | Junction               | gnroad2 | 8        | 17       | 37       | 25       |
+| 9    | -34, -15 | Bend (turns left)      | gnroad4 | 21       |          |          | 41       |
+| 2    | 16, -31  | Bend (turns right)     | gnroad3 | 7        | 14       |          |          |
+| 3    | -3, -31  | Junction               | gnroad2 | 1        | 3        | 18       | 9        |
+| 4    | -19, -31 | Bend (turns left)      | gnroad4 | 5        |          |          | 22       |
+| 1    | -3, -41  | Dead-end corridor      | gnroad1 | 0        |          | 6        |          |
 
 The rooms have their own marks, used by their `mapdisplay` scripts:
 
@@ -102,83 +102,83 @@ Facing is the camera direction. Each exit gives the value written and the field 
 
 | var486 | Field   | Mark | Facing | Forward                    | Left         | Right        | Back         |
 | ------ | ------- | ---- | ------ | -------------------------- | ------------ | ------------ | ------------ |
-| 0      | gnroad1 | 1    | south  | 1 (gnroad2)                |              |              | gnview1      |
-| 1      | gnroad2 | 3    | south  | 4 (gnroad2)                | 7 (gnroad3)  | 5 (gnroad4)  | 6 (gnroad1)  |
-| 2      | gnroad2 | 6    | south  | 12 (gnroad2)               | 15 (gnroad3) | 13 (gnroad2) | 14 (gnroad4) |
-| 3      | gnroad2 | 3    | west   | 5 (gnroad4)                | 4 (gnroad2)  | 6 (gnroad1)  | 7 (gnroad3)  |
-| 4      | gnroad2 | 7    | south  | 16 (gnroad5)               | 19 (gnroad2) | 17 (gnroad2) | 18 (gnroad2) |
-| 5      | gnroad4 | 4    | south  | 8 (gnroad2)                |              |              | 9 (gnroad2)  |
-| 6      | gnroad1 | 1    | north  | gnview1                    |              |              | 1 (gnroad2)  |
-| 7      | gnroad3 | 2    | south  | 2 (gnroad2)                |              |              | 3 (gnroad2)  |
-| 8      | gnroad2 | 8    | south  | 20 (gnroad2)               | 23 (gnroad2) | 21 (gnroad4) | 22 (gnroad3) |
-| 9      | gnroad2 | 3    | east   | 7 (gnroad3)                | 6 (gnroad1)  | 4 (gnroad2)  | 5 (gnroad4)  |
-| 10     | gnroad2 | 11   | south  | 27 (gnroad3)               | 30 (gnroad1) | 28 (gnroad2) | 29 (gnroad4) |
-| 11     | gnroad2 | 6    | west   | 13 (gnroad2)               | 12 (gnroad2) | 14 (gnroad4) | 15 (gnroad3) |
-| 12     | gnroad2 | 12   | south  | 31 (gnroad2)               | 34 (gnroad2) | 32 (gnroad5) | 33 (gnroad2) |
-| 13     | gnroad2 | 7    | west   | 17 (gnroad2)               | 16 (gnroad5) | 18 (gnroad2) | 19 (gnroad2) |
-| 14     | gnroad4 | 2    | west   | 3 (gnroad2)                |              |              | 2 (gnroad2)  |
-| 15     | gnroad3 | 5    | south  | 10 (gnroad2)               |              |              | 11 (gnroad2) |
-| 16     | gnroad5 | 28   | south  | gnroom4 if bridge down     |              |              | 72 (gnroad2) |
-| 17     | gnroad2 | 8    | west   | 21 (gnroad4)               | 20 (gnroad2) | 22 (gnroad3) | 23 (gnroad2) |
-| 18     | gnroad2 | 3    | north  | 6 (gnroad1)                | 5 (gnroad4)  | 7 (gnroad3)  | 4 (gnroad2)  |
-| 19     | gnroad2 | 6    | east   | 15 (gnroad3)               | 14 (gnroad4) | 12 (gnroad2) | 13 (gnroad2) |
-| 20     | gnroad2 | 13   | south  | 35 (gnroad2)               | 38 (gnroad5) | 36 (gnroad2) | 37 (gnroad2) |
-| 21     | gnroad4 | 9    | south  | 24 (gnroad2)               |              |              | 25 (gnroad2) |
-| 22     | gnroad3 | 4    | east   | 9 (gnroad2)                |              |              | 8 (gnroad2)  |
-| 23     | gnroad2 | 7    | east   | 19 (gnroad2)               | 18 (gnroad2) | 16 (gnroad5) | 17 (gnroad2) |
-| 24     | gnroad2 | 14   | south  | 39 (gnroad4)               | 42 (gnroad2) | 40 (gnroad1) | 41 (gnroad3) |
-| 25     | gnroad2 | 8    | east   | 23 (gnroad2)               | 22 (gnroad3) | 20 (gnroad2) | 21 (gnroad4) |
-| 26     | gnroad2 | 11   | west   | 28 (gnroad2)               | 27 (gnroad3) | 29 (gnroad4) | 30 (gnroad1) |
-| 27     | gnroad3 | 16   | west   | 44 (gnroad2)               |              |              | 45 (gnroad2) |
-| 28     | gnroad2 | 12   | west   | 32 (gnroad5)               | 31 (gnroad2) | 33 (gnroad2) | 34 (gnroad2) |
-| 29     | gnroad4 | 5    | west   | 11 (gnroad2)               |              |              | 10 (gnroad2) |
-| 30     | gnroad1 | 10   | east   | gnroom3 once slab sunk     |              |              | 26 (gnroad2) |
-| 31     | gnroad2 | 17   | south  | 46 (gnroad3)               | 49 (gnroad4) | 47 (gnroad2) | 48 (gnroad2) |
-| 32     | gnroad5 | 25   | west   | gnroom4 (never: no bridge) |              |              | 69 (gnroad2) |
-| 33     | gnroad2 | 6    | north  | 14 (gnroad4)               | 13 (gnroad2) | 15 (gnroad3) | 12 (gnroad2) |
-| 34     | gnroad2 | 11   | east   | 30 (gnroad1)               | 29 (gnroad4) | 27 (gnroad3) | 28 (gnroad2) |
-| 35     | gnroad2 | 19   | south  | 54 (gnroad4)               | 57 (gnroad2) | 55 (gnroad3) | 56 (gnroad2) |
-| 36     | gnroad2 | 14   | west   | 40 (gnroad1)               | 39 (gnroad4) | 41 (gnroad3) | 42 (gnroad2) |
-| 37     | gnroad2 | 8    | north  | 22 (gnroad3)               | 21 (gnroad4) | 23 (gnroad2) | 20 (gnroad2) |
-| 38     | gnroad5 | 27   | east   | gnroom4 (never: no bridge) |              |              | 71 (gnroad2) |
-| 39     | gnroad4 | 20   | east   | 59 (gnroad2)               |              |              | 58 (gnroad2) |
-| 40     | gnroad1 | 15   | west   | gnroom1                    |              |              | 43 (gnroad2) |
-| 41     | gnroad3 | 9    | east   | 25 (gnroad2)               |              |              | 24 (gnroad2) |
-| 42     | gnroad2 | 13   | east   | 38 (gnroad5)               | 37 (gnroad2) | 35 (gnroad2) | 36 (gnroad2) |
-| 43     | gnroad2 | 14   | east   | 42 (gnroad2)               | 41 (gnroad3) | 39 (gnroad4) | 40 (gnroad1) |
-| 44     | gnroad2 | 17   | west   | 47 (gnroad2)               | 46 (gnroad3) | 48 (gnroad2) | 49 (gnroad4) |
-| 45     | gnroad2 | 11   | north  | 29 (gnroad4)               | 28 (gnroad2) | 30 (gnroad1) | 27 (gnroad3) |
-| 46     | gnroad3 | 21   | west   | 60 (gnroad2)               |              |              | 61 (gnroad2) |
-| 47     | gnroad2 | 18   | west   | 51 (gnroad2)               | 50 (gnroad2) | 52 (gnroad5) | 53 (gnroad2) |
-| 48     | gnroad2 | 12   | north  | 33 (gnroad2)               | 32 (gnroad5) | 34 (gnroad2) | 31 (gnroad2) |
-| 49     | gnroad4 | 16   | north  | 45 (gnroad2)               |              |              | 44 (gnroad2) |
-| 50     | gnroad2 | 22   | south  | 62 (gnroad1)               | 65 (gnroad4) | 63 (gnroad3) | 64 (gnroad2) |
-| 51     | gnroad2 | 19   | west   | 55 (gnroad3)               | 54 (gnroad4) | 56 (gnroad2) | 57 (gnroad2) |
-| 52     | gnroad5 | 26   | north  | gnroom4 (never: no bridge) |              |              | 70 (gnroad2) |
-| 53     | gnroad2 | 17   | east   | 49 (gnroad4)               | 48 (gnroad2) | 46 (gnroad3) | 47 (gnroad2) |
-| 54     | gnroad4 | 23   | east   | 67 (gnroad2)               |              |              | 66 (gnroad2) |
-| 55     | gnroad3 | 20   | north  | 58 (gnroad2)               |              |              | 59 (gnroad2) |
-| 56     | gnroad2 | 13   | north  | 37 (gnroad2)               | 36 (gnroad2) | 38 (gnroad5) | 35 (gnroad2) |
-| 57     | gnroad2 | 18   | east   | 53 (gnroad2)               | 52 (gnroad5) | 50 (gnroad2) | 51 (gnroad2) |
-| 58     | gnroad2 | 14   | north  | 41 (gnroad3)               | 40 (gnroad1) | 42 (gnroad2) | 39 (gnroad4) |
-| 59     | gnroad2 | 19   | east   | 57 (gnroad2)               | 56 (gnroad2) | 54 (gnroad4) | 55 (gnroad3) |
-| 60     | gnroad2 | 22   | west   | 63 (gnroad3)               | 62 (gnroad1) | 64 (gnroad2) | 65 (gnroad4) |
-| 61     | gnroad2 | 17   | north  | 48 (gnroad2)               | 47 (gnroad2) | 49 (gnroad4) | 46 (gnroad3) |
-| 62     | gnroad1 | 24   | south  | gnroom2 once slab sunk     |              |              | 68 (gnroad2) |
-| 63     | gnroad3 | 23   | north  | 66 (gnroad2)               |              |              | 67 (gnroad2) |
-| 64     | gnroad2 | 18   | north  | 52 (gnroad5)               | 51 (gnroad2) | 53 (gnroad2) | 50 (gnroad2) |
-| 65     | gnroad4 | 21   | north  | 61 (gnroad2)               |              |              | 60 (gnroad2) |
-| 66     | gnroad2 | 19   | north  | 56 (gnroad2)               | 55 (gnroad3) | 57 (gnroad2) | 54 (gnroad4) |
-| 67     | gnroad2 | 22   | east   | 65 (gnroad4)               | 64 (gnroad2) | 62 (gnroad1) | 63 (gnroad3) |
-| 68     | gnroad2 | 22   | north  | 64 (gnroad2)               | 63 (gnroad3) | 65 (gnroad4) | 62 (gnroad1) |
-| 69     | gnroad2 | 12   | east   | 34 (gnroad2)               | 33 (gnroad2) | 31 (gnroad2) | 32 (gnroad5) |
-| 70     | gnroad2 | 18   | south  | 50 (gnroad2)               | 53 (gnroad2) | 51 (gnroad2) | 52 (gnroad5) |
-| 71     | gnroad2 | 13   | west   | 36 (gnroad2)               | 35 (gnroad2) | 37 (gnroad2) | 38 (gnroad5) |
-| 72     | gnroad2 | 7    | north  | 18 (gnroad2)               | 17 (gnroad2) | 19 (gnroad2) | 16 (gnroad5) |
-| 73     | gnroad1 | 15   | east   | 43 (gnroad2)               |              |              | gnroom1      |
-| 74     | gnroad1 | 24   | north  | 68 (gnroad2)               |              |              | gnroom2      |
-| 75     | gnroad1 | 10   | west   | 26 (gnroad2)               |              |              | gnroom3      |
-| 76     | gnroad5 | 28   | south  | gnroom4                    |              |              | 72 (gnroad2) |
+| 0      | gnroad1 | 1    | north  | 1 (gnroad2)                |              |              | gnview1      |
+| 1      | gnroad2 | 3    | north  | 4 (gnroad2)                | 7 (gnroad3)  | 5 (gnroad4)  | 6 (gnroad1)  |
+| 2      | gnroad2 | 6    | north  | 12 (gnroad2)               | 15 (gnroad3) | 13 (gnroad2) | 14 (gnroad4) |
+| 3      | gnroad2 | 3    | east   | 5 (gnroad4)                | 4 (gnroad2)  | 6 (gnroad1)  | 7 (gnroad3)  |
+| 4      | gnroad2 | 7    | north  | 16 (gnroad5)               | 19 (gnroad2) | 17 (gnroad2) | 18 (gnroad2) |
+| 5      | gnroad4 | 4    | north  | 8 (gnroad2)                |              |              | 9 (gnroad2)  |
+| 6      | gnroad1 | 1    | south  | gnview1                    |              |              | 1 (gnroad2)  |
+| 7      | gnroad3 | 2    | north  | 2 (gnroad2)                |              |              | 3 (gnroad2)  |
+| 8      | gnroad2 | 8    | north  | 20 (gnroad2)               | 23 (gnroad2) | 21 (gnroad4) | 22 (gnroad3) |
+| 9      | gnroad2 | 3    | west   | 7 (gnroad3)                | 6 (gnroad1)  | 4 (gnroad2)  | 5 (gnroad4)  |
+| 10     | gnroad2 | 11   | north  | 27 (gnroad3)               | 30 (gnroad1) | 28 (gnroad2) | 29 (gnroad4) |
+| 11     | gnroad2 | 6    | east   | 13 (gnroad2)               | 12 (gnroad2) | 14 (gnroad4) | 15 (gnroad3) |
+| 12     | gnroad2 | 12   | north  | 31 (gnroad2)               | 34 (gnroad2) | 32 (gnroad5) | 33 (gnroad2) |
+| 13     | gnroad2 | 7    | east   | 17 (gnroad2)               | 16 (gnroad5) | 18 (gnroad2) | 19 (gnroad2) |
+| 14     | gnroad4 | 2    | east   | 3 (gnroad2)                |              |              | 2 (gnroad2)  |
+| 15     | gnroad3 | 5    | north  | 10 (gnroad2)               |              |              | 11 (gnroad2) |
+| 16     | gnroad5 | 28   | north  | gnroom4 if bridge down     |              |              | 72 (gnroad2) |
+| 17     | gnroad2 | 8    | east   | 21 (gnroad4)               | 20 (gnroad2) | 22 (gnroad3) | 23 (gnroad2) |
+| 18     | gnroad2 | 3    | south  | 6 (gnroad1)                | 5 (gnroad4)  | 7 (gnroad3)  | 4 (gnroad2)  |
+| 19     | gnroad2 | 6    | west   | 15 (gnroad3)               | 14 (gnroad4) | 12 (gnroad2) | 13 (gnroad2) |
+| 20     | gnroad2 | 13   | north  | 35 (gnroad2)               | 38 (gnroad5) | 36 (gnroad2) | 37 (gnroad2) |
+| 21     | gnroad4 | 9    | north  | 24 (gnroad2)               |              |              | 25 (gnroad2) |
+| 22     | gnroad3 | 4    | west   | 9 (gnroad2)                |              |              | 8 (gnroad2)  |
+| 23     | gnroad2 | 7    | west   | 19 (gnroad2)               | 18 (gnroad2) | 16 (gnroad5) | 17 (gnroad2) |
+| 24     | gnroad2 | 14   | north  | 39 (gnroad4)               | 42 (gnroad2) | 40 (gnroad1) | 41 (gnroad3) |
+| 25     | gnroad2 | 8    | west   | 23 (gnroad2)               | 22 (gnroad3) | 20 (gnroad2) | 21 (gnroad4) |
+| 26     | gnroad2 | 11   | east   | 28 (gnroad2)               | 27 (gnroad3) | 29 (gnroad4) | 30 (gnroad1) |
+| 27     | gnroad3 | 16   | east   | 44 (gnroad2)               |              |              | 45 (gnroad2) |
+| 28     | gnroad2 | 12   | east   | 32 (gnroad5)               | 31 (gnroad2) | 33 (gnroad2) | 34 (gnroad2) |
+| 29     | gnroad4 | 5    | east   | 11 (gnroad2)               |              |              | 10 (gnroad2) |
+| 30     | gnroad1 | 10   | west   | gnroom3 once slab sunk     |              |              | 26 (gnroad2) |
+| 31     | gnroad2 | 17   | north  | 46 (gnroad3)               | 49 (gnroad4) | 47 (gnroad2) | 48 (gnroad2) |
+| 32     | gnroad5 | 25   | east   | gnroom4 (never: no bridge) |              |              | 69 (gnroad2) |
+| 33     | gnroad2 | 6    | south  | 14 (gnroad4)               | 13 (gnroad2) | 15 (gnroad3) | 12 (gnroad2) |
+| 34     | gnroad2 | 11   | west   | 30 (gnroad1)               | 29 (gnroad4) | 27 (gnroad3) | 28 (gnroad2) |
+| 35     | gnroad2 | 19   | north  | 54 (gnroad4)               | 57 (gnroad2) | 55 (gnroad3) | 56 (gnroad2) |
+| 36     | gnroad2 | 14   | east   | 40 (gnroad1)               | 39 (gnroad4) | 41 (gnroad3) | 42 (gnroad2) |
+| 37     | gnroad2 | 8    | south  | 22 (gnroad3)               | 21 (gnroad4) | 23 (gnroad2) | 20 (gnroad2) |
+| 38     | gnroad5 | 27   | west   | gnroom4 (never: no bridge) |              |              | 71 (gnroad2) |
+| 39     | gnroad4 | 20   | west   | 59 (gnroad2)               |              |              | 58 (gnroad2) |
+| 40     | gnroad1 | 15   | east   | gnroom1                    |              |              | 43 (gnroad2) |
+| 41     | gnroad3 | 9    | west   | 25 (gnroad2)               |              |              | 24 (gnroad2) |
+| 42     | gnroad2 | 13   | west   | 38 (gnroad5)               | 37 (gnroad2) | 35 (gnroad2) | 36 (gnroad2) |
+| 43     | gnroad2 | 14   | west   | 42 (gnroad2)               | 41 (gnroad3) | 39 (gnroad4) | 40 (gnroad1) |
+| 44     | gnroad2 | 17   | east   | 47 (gnroad2)               | 46 (gnroad3) | 48 (gnroad2) | 49 (gnroad4) |
+| 45     | gnroad2 | 11   | south  | 29 (gnroad4)               | 28 (gnroad2) | 30 (gnroad1) | 27 (gnroad3) |
+| 46     | gnroad3 | 21   | east   | 60 (gnroad2)               |              |              | 61 (gnroad2) |
+| 47     | gnroad2 | 18   | east   | 51 (gnroad2)               | 50 (gnroad2) | 52 (gnroad5) | 53 (gnroad2) |
+| 48     | gnroad2 | 12   | south  | 33 (gnroad2)               | 32 (gnroad5) | 34 (gnroad2) | 31 (gnroad2) |
+| 49     | gnroad4 | 16   | south  | 45 (gnroad2)               |              |              | 44 (gnroad2) |
+| 50     | gnroad2 | 22   | north  | 62 (gnroad1)               | 65 (gnroad4) | 63 (gnroad3) | 64 (gnroad2) |
+| 51     | gnroad2 | 19   | east   | 55 (gnroad3)               | 54 (gnroad4) | 56 (gnroad2) | 57 (gnroad2) |
+| 52     | gnroad5 | 26   | south  | gnroom4 (never: no bridge) |              |              | 70 (gnroad2) |
+| 53     | gnroad2 | 17   | west   | 49 (gnroad4)               | 48 (gnroad2) | 46 (gnroad3) | 47 (gnroad2) |
+| 54     | gnroad4 | 23   | west   | 67 (gnroad2)               |              |              | 66 (gnroad2) |
+| 55     | gnroad3 | 20   | south  | 58 (gnroad2)               |              |              | 59 (gnroad2) |
+| 56     | gnroad2 | 13   | south  | 37 (gnroad2)               | 36 (gnroad2) | 38 (gnroad5) | 35 (gnroad2) |
+| 57     | gnroad2 | 18   | west   | 53 (gnroad2)               | 52 (gnroad5) | 50 (gnroad2) | 51 (gnroad2) |
+| 58     | gnroad2 | 14   | south  | 41 (gnroad3)               | 40 (gnroad1) | 42 (gnroad2) | 39 (gnroad4) |
+| 59     | gnroad2 | 19   | west   | 57 (gnroad2)               | 56 (gnroad2) | 54 (gnroad4) | 55 (gnroad3) |
+| 60     | gnroad2 | 22   | east   | 63 (gnroad3)               | 62 (gnroad1) | 64 (gnroad2) | 65 (gnroad4) |
+| 61     | gnroad2 | 17   | south  | 48 (gnroad2)               | 47 (gnroad2) | 49 (gnroad4) | 46 (gnroad3) |
+| 62     | gnroad1 | 24   | north  | gnroom2 once slab sunk     |              |              | 68 (gnroad2) |
+| 63     | gnroad3 | 23   | south  | 66 (gnroad2)               |              |              | 67 (gnroad2) |
+| 64     | gnroad2 | 18   | south  | 52 (gnroad5)               | 51 (gnroad2) | 53 (gnroad2) | 50 (gnroad2) |
+| 65     | gnroad4 | 21   | south  | 61 (gnroad2)               |              |              | 60 (gnroad2) |
+| 66     | gnroad2 | 19   | south  | 56 (gnroad2)               | 55 (gnroad3) | 57 (gnroad2) | 54 (gnroad4) |
+| 67     | gnroad2 | 22   | west   | 65 (gnroad4)               | 64 (gnroad2) | 62 (gnroad1) | 63 (gnroad3) |
+| 68     | gnroad2 | 22   | south  | 64 (gnroad2)               | 63 (gnroad3) | 65 (gnroad4) | 62 (gnroad1) |
+| 69     | gnroad2 | 12   | west   | 34 (gnroad2)               | 33 (gnroad2) | 31 (gnroad2) | 32 (gnroad5) |
+| 70     | gnroad2 | 18   | north  | 50 (gnroad2)               | 53 (gnroad2) | 51 (gnroad2) | 52 (gnroad5) |
+| 71     | gnroad2 | 13   | east   | 36 (gnroad2)               | 35 (gnroad2) | 37 (gnroad2) | 38 (gnroad5) |
+| 72     | gnroad2 | 7    | south  | 18 (gnroad2)               | 17 (gnroad2) | 19 (gnroad2) | 16 (gnroad5) |
+| 73     | gnroad1 | 15   | west   | 43 (gnroad2)               |              |              | gnroom1      |
+| 74     | gnroad1 | 24   | south  | 68 (gnroad2)               |              |              | gnroom2      |
+| 75     | gnroad1 | 10   | east   | 26 (gnroad2)               |              |              | gnroom3      |
+| 76     | gnroad5 | 28   | north  | gnroom4                    |              |              | 72 (gnroad2) |
 
 `gnroad1`'s `mapjump_BW` also holds a copy of `gnroad5`'s table (16, 32, 38, 52). `gnroad1` never runs with those values.
 
@@ -191,11 +191,11 @@ Facing is the camera direction. Each exit gives the value written and the field 
 | 3    | `gnroad1` `Director`, `seigyo`  | With var491 & 2 clear, states 30 and 62 show an inscribed stone slab and lock walkmesh triangles 79, 82 and 85: rooms 2 and 3 are closed. Once set, the slab is sunk.                                                                             |
 | 4    | `gnroom2` `WaterRun::talk`      | A party member pulls the lever: var491 \|= 4. Water flows, and ripples show in `gnroad5`.                                                                                                                                                         |
 | 5    | `gnroom3` `gearwheel::talk`     | var491 \|= 8.                                                                                                                                                                                                                                     |
-| 6    | `gnroad5` `Director`, `hasi`    | Triangles 37 and 39 (the bridge) are locked on load. They unlock only with var491 & 4 and & 8, and only if var486 is 16 (north approach) or var84 is 791 (back from room 4). The bridge picture: raised, half down with only & 8, down with both. |
+| 6    | `gnroad5` `Director`, `hasi`    | Triangles 37 and 39 (the bridge) are locked on load. They unlock only with var491 & 4 and & 8, and only if var486 is 16 (south approach) or var84 is 791 (back from room 4). The bridge picture: raised, half down with only & 8, down with both. |
 | 7    | `gnroom4` `battleline::touchOn` | `BATTLE` 190 (Sacred and Minotaur), var491 \|= 16, var485 \|= 2 (brothers gone, triangles 99, 112, 115, 131 unlocked), `MENUNAME` 7 (Brothers), `GETCARD` 87 (Minotaur).                                                                          |
 | 8    | `gnroom4` `ArcTop::open`        | The sealed one speaks: var491 \|= 32. No script reads bits 16 and 32.                                                                                                                                                                             |
 
-From the east, south and west approaches (32, 52, 38) the building shows its side or back and the bridge never comes down.
+From the west, north and east approaches (32, 52, 38) the building shows its side or back and the bridge never comes down.
 
 ## Variables
 
